@@ -1509,6 +1509,11 @@ td,.row{font-size:13px}
   .topnav .nav-lbl{padding-top:clamp(10px,2vh,20px)!important;padding-bottom:clamp(3px,.6vh,7px)!important}
   .topnav #btn-novo{margin-bottom:clamp(6px,1.4vh,16px)!important}
 }
+
+/* ---------- modo escuro: a logo dourada fica em um cartão claro, para ter destaque ---------- */
+:root[data-theme="dark"] .brand .logo{background:#f8f1e4!important;border:1px solid #d4b483!important;box-shadow:0 0 0 3px rgba(212,180,131,.16)}
+:root[data-theme="dark"] .brand .logo img{padding:3px;box-sizing:border-box}
+:root[data-theme="dark"] .auth img,:root[data-theme="dark"] .auth .logo{background:#f8f1e4;border-radius:18px;padding:8px}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
