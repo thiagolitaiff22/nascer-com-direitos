@@ -1806,6 +1806,43 @@ td,.row{font-size:13px}
   .app:not(.collapsed) .topnav .brand > div:not(.logo) span{font-size:12px!important}
   .app:not(.collapsed) .topnav .brand{gap:10px}
 }
+
+/* ---------- Configurações: abas, equipe por cargo e integrações em grupos ---------- */
+.cfg-tabs{display:inline-flex;gap:4px;padding:4px;border-radius:14px;background:var(--gsoft,#f8f1e4);align-self:flex-start}
+.cfg-tab{border:0;background:none;padding:9px 18px;border-radius:11px;font:inherit;font-size:13.5px;font-weight:600;color:var(--ink-3);cursor:pointer}
+.cfg-tab.on{background:var(--panel,#fff);color:var(--g2,#8a6a3d);box-shadow:0 1px 4px rgba(60,45,20,.12)}
+#view-equipe[data-cfg-ativa="equipe"] [data-cfg="integ"],#view-equipe[data-cfg-ativa="integ"] [data-cfg="equipe"]{display:none!important}
+.eq-resumo{display:flex;gap:12px;flex-wrap:wrap}
+.eq-chip{display:flex;align-items:baseline;gap:8px;padding:10px 16px;border-radius:14px;background:var(--panel,#fff);border:1px solid var(--gline,var(--line))}
+.eq-chip b{font-size:20px}
+.eq-chip span{font-size:12.5px;color:var(--ink-3)}
+.eq-chip.alerta b{color:var(--red,#b91c1c)}
+.eq-grupos{display:flex;flex-direction:column;gap:22px}
+.eq-grupo-h{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.eq-grupo-h b{font-size:15px}
+.eq-grupo-d{font-size:12.5px;color:var(--ink-3)}
+.eq-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.eq-card{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:16px;background:var(--panel,#fff);border:1px solid var(--gline,var(--line))}
+.eq-card.off{opacity:.65}
+.eq-av{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:var(--gsoft,#f8f1e4);color:var(--g2,#8a6a3d);font-weight:700;font-size:16px;flex:none}
+.eq-info{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.eq-info b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.eq-info .mini{overflow:hidden;text-overflow:ellipsis}
+.eq-info .pill{align-self:flex-start}
+.eq-vazio{padding:14px 16px;border-radius:14px;border:1px dashed var(--gline,var(--line));color:var(--ink-3);font-size:13px}
+.ig-blocos{display:flex;flex-direction:column;gap:24px}
+.ig-bloco-h{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.ig-bloco-h b{font-size:15px}
+.ig-bloco-h span{font-size:12.5px;color:var(--ink-3)}
+:root[data-theme="dark"] .cfg-tabs{background:rgba(212,180,131,.1)}
+:root[data-theme="dark"] .cfg-tab.on{background:#2c251c;color:#d4b483}
+:root[data-theme="dark"] .eq-chip,:root[data-theme="dark"] .eq-card{background:#1b1712;border-color:#2e2820}
+:root[data-theme="dark"] .eq-av{background:rgba(212,180,131,.14);color:#d4b483}
+
+/* guia paga / aguardando pagamento em Contratos fechados */
+#ctr-list .guia-sel{margin-top:6px}
+#ctr-list .guia-sel.ok{color:var(--green,#15803d)}
+#ctr-list .guia-sel.warn{color:var(--amber,#b45309)}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2146,16 +2183,21 @@ td,.row{font-size:13px}
         <div class="prosp-grid" id="prosp-list"></div>
       </section>
 
-      <section id="view-equipe" hidden style="display:flex;flex-direction:column;gap:18px">
-        <div class="sec-title">Equipe</div>
-        <div class="prosp-head">
+      <section id="view-equipe" hidden data-cfg-ativa="equipe" style="display:flex;flex-direction:column;gap:18px">
+        <div class="cfg-tabs" role="tablist" aria-label="Configurações">
+          <button type="button" class="cfg-tab on" role="tab" data-cfg-tab="equipe" aria-selected="true">Equipe</button>
+          <button type="button" class="cfg-tab" role="tab" data-cfg-tab="integ" aria-selected="false">Integrações</button>
+        </div>
+        <div class="sec-title" data-cfg="equipe">Equipe</div>
+        <div class="prosp-head" data-cfg="equipe">
           <p class="view-desc">Funcionários com acesso ao sistema. Só quem está nesta lista, e ativo, consegue ver os clientes.</p>
           <button class="btn" id="btn-eq-novo" type="button"><svg class="i"><use href="#i-plus"/></svg>Novo funcionário</button>
         </div>
-        <div class="card eq-list" id="eq-list"></div>
-        <div class="integ-head"><div class="sec-title" style="margin:0">Integrações</div><p class="view-desc">Todas as integrações do escritório num só lugar. Clique no cartão para colar a chave, testar ou ajustar.</p></div>
-        <div class="ig-grid" id="ig-grid"></div>
-        <div class="integ-grid" id="ig-paineis" hidden>
+        <div class="eq-resumo" id="eq-resumo" data-cfg="equipe"></div>
+        <div class="eq-grupos" id="eq-list" data-cfg="equipe"></div>
+        <div class="integ-head" data-cfg="integ"><div class="sec-title" style="margin:0">Integrações</div><p class="view-desc">Todas as integrações do escritório num só lugar. Clique no cartão para colar a chave, testar ou ajustar.</p></div>
+        <div class="ig-blocos" id="ig-grid" data-cfg="integ"></div>
+        <div class="integ-grid" id="ig-paineis" hidden data-cfg="integ">
         <div class="card integ" data-painel="liderhub">
           <div><b class="integ-t">LiderHub</b><p class="integ-d">Chave do workspace Pós-venda, encontrada no LiderHub em Configurações → Credenciais API.</p></div>
           <form id="form-lh" class="integ-form" novalidate autocomplete="off">
@@ -2231,7 +2273,7 @@ td,.row{font-size:13px}
           <small class="integ-s" id="av-status">Nada sendo enviado.</small>
         </div>
         </div>
-        <p class="foot-note">Depois de cadastrar, envie o endereço do sistema ao funcionário. No primeiro uso ele clica em <b>Primeiro acesso</b>, informa o mesmo e-mail cadastrado aqui e cria a senha dele. <b>Administrador</b> faz tudo, inclusive excluir clientes e cuidar da equipe. <b>Assistente</b> cadastra e atualiza clientes, avisos e resultados, e gera convites, mas não exclui registros.</p>
+        <p class="foot-note" data-cfg="equipe">Depois de cadastrar, envie o endereço do sistema ao funcionário. No primeiro uso ele clica em <b>Primeiro acesso</b>, informa o mesmo e-mail cadastrado aqui e cria a senha dele. <b>Administrador</b> faz tudo, inclusive excluir clientes e cuidar da equipe. <b>Assistente</b> cadastra e atualiza clientes, avisos e resultados, e gera convites, mas não exclui registros.</p>
         
       </section>
 
@@ -2498,7 +2540,7 @@ td,.row{font-size:13px}
     <div class="f-body">
       <div class="field full"><label for="fe-nome">Nome</label><input id="fe-nome" autocomplete="off"></div>
       <div class="field full"><label for="fe-email">E-mail de acesso</label><input id="fe-email" type="email" inputmode="email" autocomplete="off"><span class="hint">É com este e-mail que o funcionário cria a senha e entra no sistema.</span></div>
-      <div class="field"><label for="fe-funcao">Função</label><select id="fe-funcao"><option value="assistente">Assistente</option><option value="admin">Administrador</option></select></div>
+      <div class="field"><label for="fe-funcao">Cargo</label><select id="fe-funcao"><option value="closer">Closer · liga e fecha contratos</option><option value="operacional">Operacional · documentos e requerimentos</option><option value="admin">Administrador · acesso total</option></select></div>
       <div class="field"><label for="fe-ativo">Acesso</label><select id="fe-ativo"><option value="sim">Ativo</option><option value="nao">Bloqueado</option></select></div>
     </div>
     <div class="f-foot">
@@ -3532,6 +3574,8 @@ td,.row{font-size:13px}
   function aguardaNasc(r){ return fechado(r) && r.fatoGerador === 'gestante' && !r.criancaNasc; }
   function noContratos(r){ return fechado(r) && !aguardaNasc(r); }
   function etapaCtr(r){ if (r.ctrEtapa && CTR_ETAPAS[r.ctrEtapa]) return r.ctrEtapa; return (docsPendentes(r) || dadosFaltando(r).length) ? 'regularizar' : 'pronto'; }
+  // guia da contribuição: aguardando pagamento ou paga (controle em Contratos fechados)
+  function guiaDe(r){ return r.guiaStatus === 'paga' ? 'paga' : 'aguardando'; }
   var ctrSit = '', ctrQ = '', ctrAberto = {}, nascSit = '', nascQ = '', nascAberto = {};
   function buscaOk(r, q){ if (!q) return true; var s = semAcento(q), d = digits(q); return semAcento(r.nome || '').indexOf(s) >= 0 || (!!d && digits(r.cpf || '').indexOf(d) >= 0); }
   function cardLista(attr, ico, rot, n, cap, filtro, atual){
@@ -3543,20 +3587,22 @@ td,.row{font-size:13px}
   function editBtn(r){ return '<button type="button" class="ico-btn" data-act="edit" data-id="' + esc(r.id) + '" title="Editar cadastro" aria-label="Editar ' + esc(r.nome) + '"><svg class="i"><use href="#i-pencil"/></svg></button>'; }
   function renderContratos(){
     var box = $('ctr-list'); if (!box) return;
-    var todos = state.rows.filter(noContratos), c = { regularizar: 0, conferencia: 0, pronto: 0 };
-    todos.forEach(function(r){ c[etapaCtr(r)]++; });
+    var todos = state.rows.filter(noContratos), c = { regularizar: 0, conferencia: 0, pronto: 0 }, gc = { aguardando: 0, paga: 0 };
+    todos.forEach(function(r){ c[etapaCtr(r)]++; gc[guiaDe(r)]++; });
     $('ctr-stats').innerHTML =
       cardLista('data-ctr-filtro', 'i-users', 'Contratos fechados', todos.length, 'esperando o requerimento no INSS', '', ctrSit) +
       cardLista('data-ctr-filtro', 'i-bellx', 'Regularizar documentos', c.regularizar, 'falta documento ou dado da cliente', 'regularizar', ctrSit) +
       cardLista('data-ctr-filtro', 'i-clock', 'Em conferência', c.conferencia, 'a equipe está conferindo', 'conferencia', ctrSit) +
-      cardLista('data-ctr-filtro', 'i-check', 'Prontos para requerer', c.pronto, 'documentação completa', 'pronto', ctrSit);
-    $('ctr-sit').innerHTML = [['', 'Todas as etapas · ' + todos.length]].concat(Object.keys(CTR_ETAPAS).map(function(k){ return [k, CTR_ETAPAS[k][0] + ' · ' + c[k]]; }))
+      cardLista('data-ctr-filtro', 'i-check', 'Prontos para requerer', c.pronto, 'documentação completa', 'pronto', ctrSit) +
+      cardLista('data-ctr-filtro', 'i-cash', 'Aguardando pagamento da guia', gc.aguardando, 'guia ainda não paga', 'g_aguardando', ctrSit) +
+      cardLista('data-ctr-filtro', 'i-check', 'Guias pagas', gc.paga, 'pagamento confirmado', 'g_paga', ctrSit);
+    $('ctr-sit').innerHTML = [['', 'Todas as etapas · ' + todos.length]].concat(Object.keys(CTR_ETAPAS).map(function(k){ return [k, CTR_ETAPAS[k][0] + ' · ' + c[k]]; })).concat([['g_aguardando', 'Aguardando pagamento da guia · ' + gc.aguardando], ['g_paga', 'Guias pagas · ' + gc.paga]])
       .map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === ctrSit ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
     var ordem = { regularizar: 0, conferencia: 1, pronto: 2 };
-    var lista = todos.filter(function(r){ return (!ctrSit || etapaCtr(r) === ctrSit) && buscaOk(r, ctrQ); })
+    var lista = todos.filter(function(r){ return (!ctrSit || (ctrSit === 'g_aguardando' ? guiaDe(r) === 'aguardando' : ctrSit === 'g_paga' ? guiaDe(r) === 'paga' : etapaCtr(r) === ctrSit)) && buscaOk(r, ctrQ); })
       .sort(function(a, b){ return ordem[etapaCtr(a)] - ordem[etapaCtr(b)] || String(a.contratoEm).localeCompare(String(b.contratoEm)) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); });
     $('ctr-count').textContent = lista.length + (lista.length === 1 ? ' cliente' : ' clientes');
-    var html = '<div class="row head"><div>Cliente</div><div>Contato</div><div>Contrato</div><div>Documentos</div><div>Etapa</div><div></div></div>';
+    var html = '<div class="row head"><div>Cliente</div><div>Contato</div><div>Contrato</div><div>Documentos</div><div>Etapa e guia</div><div></div></div>';
     if (!lista.length) html += '<div class="empty">' + (todos.length ? 'Nenhuma cliente neste filtro.' : 'Nenhum contrato fechado ainda. No <b>Cadastro</b>, use <b>Fechar contrato</b> quando a cliente assinar.') + '</div>';
     var ultimo = '';
     lista.slice(0, 300).forEach(function(r){
@@ -3568,6 +3614,8 @@ td,.row{font-size:13px}
         '<div><span class="lbl">Documentos</span>' + docsCell(r) + '</div>' +
         '<div><span class="lbl">Etapa</span><select class="inss-sel ' + CTR_ETAPAS[k][1] + '" data-ctr="' + esc(r.id) + '" aria-label="Etapa de ' + esc(r.nome) + '">' +
           Object.keys(CTR_ETAPAS).map(function(x){ return '<option value="' + x + '"' + (x === k ? ' selected' : '') + '>' + CTR_ETAPAS[x][0] + '</option>'; }).join('') + '</select>' +
+          '<select class="inss-sel guia-sel ' + (guiaDe(r) === 'paga' ? 'ok' : 'warn') + '" data-guia="' + esc(r.id) + '" aria-label="Guia de ' + esc(r.nome) + '" title="' + (r.guiaPagaEm ? 'Paga em ' + fmtDate(String(r.guiaPagaEm).slice(0, 10)) : 'Guia ainda não paga') + '">' +
+            '<option value="aguardando"' + (guiaDe(r) === 'aguardando' ? ' selected' : '') + '>Guia: aguardando pagamento</option><option value="paga"' + (guiaDe(r) === 'paga' ? ' selected' : '') + '>Guia paga</option></select>' +
           (k === 'pronto' ? '<button type="button" class="btn inss-acao" data-act="requerer" data-id="' + esc(r.id) + '" title="Lançar o requerimento feito no Meu INSS">Registrar requerimento</button>' : '') + '</div>' +
         '<div class="c-act">' + editBtn(r) + '</div></div>' + (ctrAberto[r.id] ? fichaCliente(r) : '');
     });
@@ -3636,11 +3684,18 @@ td,.row{font-size:13px}
   $('nasc-sit').addEventListener('change', function(){ nascSit = this.value; renderNasc(); });
   $('ctr-q').addEventListener('input', function(){ ctrQ = this.value.trim(); renderContratos(); });
   $('nasc-q').addEventListener('input', function(){ nascQ = this.value.trim(); renderNasc(); });
-  document.addEventListener('click', function(e){ if (e.target.closest && e.target.closest('select[data-lead],select[data-ctr]')) e.stopPropagation(); }, true);
+  document.addEventListener('click', function(e){ if (e.target.closest && e.target.closest('select[data-lead],select[data-ctr],select[data-guia]')) e.stopPropagation(); }, true);
   document.addEventListener('change', async function(e){
-    var sl = e.target.closest && e.target.closest('select[data-lead],select[data-ctr]'); if (!sl) return;
-    var r = acharRow(sl.dataset.lead || sl.dataset.ctr); if (!r) return;
+    var sl = e.target.closest && e.target.closest('select[data-lead],select[data-ctr],select[data-guia]'); if (!sl) return;
+    var r = acharRow(sl.dataset.lead || sl.dataset.ctr || sl.dataset.guia); if (!r) return;
     try {
+      if (sl.dataset.guia){
+        var antesG = { guiaStatus: r.guiaStatus || '', guiaPagaEm: r.guiaPagaEm || '' };
+        var paga = sl.value === 'paga';
+        await patchRow(r.id, { guiaStatus: sl.value, guiaPagaEm: paga ? iso(new Date()) : '', atualizadoEm: new Date().toISOString() });
+        toast((paga ? 'Guia paga: ' : 'Guia aguardando pagamento: ') + r.nome, 'Desfazer', function(){ patchRow(r.id, antesG).catch(function(e2){ toast(errMsg(e2)); }); });
+        return;
+      }
       if (sl.dataset.ctr){
         var antesC = { ctrEtapa: r.ctrEtapa || '' };
         await patchRow(r.id, { ctrEtapa: sl.value, atualizadoEm: new Date().toISOString() });
@@ -3780,6 +3835,17 @@ td,.row{font-size:13px}
     document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !pop.hidden) abrir(false); });
     $('pop-side').addEventListener('click', function(){ $('btn-side').click(); abrir(false); });
     $('pop-theme').addEventListener('click', function(){ $('btn-theme').click(); abrir(false); });
+  })();
+  /* ---------- Configurações: abas Equipe e Integrações ---------- */
+  (function(){
+    var sec = $('view-equipe'); if (!sec) return;
+    function ir(t){
+      sec.setAttribute('data-cfg-ativa', t);
+      Array.prototype.forEach.call(sec.querySelectorAll('[data-cfg-tab]'), function(b){ var on = b.dataset.cfgTab === t; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); });
+      try { sessionStorage.setItem('nascer-cfg', t); } catch(e){}
+    }
+    sec.addEventListener('click', function(e){ var b = e.target.closest('[data-cfg-tab]'); if (b) ir(b.dataset.cfgTab); });
+    try { ir(sessionStorage.getItem('nascer-cfg') || 'equipe'); } catch(e){ ir('equipe'); }
   })();
   function render(){ renderRegioes(); renderContratos(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
   var clQ = '';
@@ -4391,13 +4457,22 @@ td,.row{font-size:13px}
     if (k === 'claude' && !on && igScript && igScript.ia === 'Claude') return 'Falta a chave do ChatGPT';
     return on ? 'Ativado' : 'Desativado';
   }
+  var IG_GRUPOS = [
+    ['Documentos e arquivos', 'Pastas das clientes, fotos enviadas pelos parceiros e conferência dos documentos', ['drive', 'celular', 'claude']],
+    ['Processos', 'Acompanhamento das ações no tribunal', ['datajud']]
+  ];
   function pintarInteg(){
     var g = $('ig-grid'); if (!g) return;
-    g.innerHTML = IG.map(function(x){
+    function cartao(x){
       var on = igAtivo(x.k);
       return '<button type="button" class="ig-card" data-ig="' + x.k + '"><div class="ig-top"><div class="ig-logo">' + IG_LOGO[x.k] + '</div>' +
         '<span class="ig-st' + (on ? ' on' : '') + '">' + (on ? '<svg class="i"><use href="#i-check"/></svg>' : '') + igRotulo(x.k, on) + '<span class="ig-sw" aria-hidden="true"><span></span></span></span></div>' +
         '<div class="ig-t">' + x.t + ' <span class="help" title="' + esc(x.ajuda) + '">?</span></div><div class="ig-d">' + x.d + '</div></button>';
+    }
+    g.innerHTML = IG_GRUPOS.map(function(gr){
+      var itens = gr[2].map(function(k){ return IG.filter(function(x){ return x.k === k; })[0]; }).filter(Boolean);
+      if (!itens.length) return '';
+      return '<div class="ig-bloco"><div class="ig-bloco-h"><b>' + gr[0] + '</b><span>' + gr[1] + '</span></div><div class="ig-grid">' + itens.map(cartao).join('') + '</div></div>';
     }).join('');
   }
   async function igTestarScript(){
@@ -4872,17 +4947,28 @@ td,.row{font-size:13px}
     renderContest();
   });
 
+  var CARGOS = { closer: ['Closers', 'Comercial: ligam para as mães e fecham os contratos'], operacional: ['Operacional', 'Documentos, requerimentos e acompanhamento dos processos'], admin: ['Administração', 'Acesso total ao sistema'] };
+  function cargoDe(u){ return u && CARGOS[u.cargo] ? u.cargo : (u && u.funcao === 'admin' ? 'admin' : 'operacional'); }
   function renderEquipe(){
     var box = $('eq-list'); if (!box) return;
     var eq = (state.equipe || []).slice().sort(function(a, b){ return (a.nome || '').localeCompare(b.nome || '', 'pt-BR'); });
-    if (!eq.length){ box.innerHTML = '<div class="empty">Ninguém cadastrado ainda.</div>'; return; }
     var meu = state.me ? state.me.email : '';
-    box.innerHTML = eq.map(function(u){
-      return '<div class="eq-row"><div class="nm">' + esc(u.nome) + (u.email === meu ? ' <span class="pill muted">você</span>' : '') + '</div>' +
-        '<div class="em">' + esc(u.email) + '</div>' +
-        '<span class="pill ' + (u.funcao === 'admin' ? 'blue' : 'muted') + '">' + esc(FUNCAO[u.funcao] || u.funcao) + '</span>' +
-        '<span class="pill ' + (u.ativo ? 'ok' : 'crit') + '">' + (u.ativo ? 'Ativo' : 'Bloqueado') + '</span>' +
-        '<button type="button" class="btn" data-eq="' + esc(u.email) + '">Editar</button></div>';
+    var cont = { closer: 0, operacional: 0, admin: 0 }, bloq = 0;
+    eq.forEach(function(u){ cont[cargoDe(u)]++; if (!u.ativo) bloq++; });
+    var res = $('eq-resumo');
+    if (res) res.innerHTML = ['closer', 'operacional', 'admin'].map(function(k){ return '<div class="eq-chip"><b>' + cont[k] + '</b><span>' + CARGOS[k][0] + '</span></div>'; }).join('') +
+      '<div class="eq-chip' + (bloq ? ' alerta' : '') + '"><b>' + bloq + '</b><span>Bloqueados</span></div>';
+    if (!eq.length){ box.innerHTML = '<div class="card empty">Ninguém cadastrado ainda. Clique em <b>Novo funcionário</b>.</div>'; return; }
+    box.innerHTML = ['closer', 'operacional', 'admin'].map(function(k){
+      var lista = eq.filter(function(u){ return cargoDe(u) === k; });
+      return '<div class="eq-grupo"><div class="eq-grupo-h"><b>' + CARGOS[k][0] + '</b><span class="mini">' + lista.length + '</span><span class="eq-grupo-d">' + CARGOS[k][1] + '</span></div>' +
+        (lista.length ? '<div class="eq-cards">' + lista.map(function(u){
+          var ini = String(u.nome || u.email || '?').trim().charAt(0).toUpperCase();
+          return '<div class="eq-card' + (u.ativo ? '' : ' off') + '"><div class="eq-av">' + esc(ini) + '</div><div class="eq-info"><b>' + esc(u.nome) + (u.email === meu ? ' <span class="pill muted">você</span>' : '') + '</b>' +
+            '<span class="mini">' + esc(u.email) + '</span>' +
+            '<span class="pill ' + (u.ativo ? 'ok' : 'crit') + '">' + (u.ativo ? 'Ativo' : 'Bloqueado') + '</span></div>' +
+            '<button type="button" class="btn" data-eq="' + esc(u.email) + '">Editar</button></div>';
+        }).join('') + '</div>' : '<div class="eq-vazio">Ninguém neste cargo ainda.</div>') + '</div>';
     }).join('');
   }
 
@@ -6390,7 +6476,7 @@ td,.row{font-size:13px}
     eEditing = u ? u.email : null;
     $('fe-title').textContent = u ? 'Editar funcionário' : 'Novo funcionário';
     $('fe-nome').value = u ? u.nome : ''; $('fe-email').value = u ? u.email : ''; $('fe-email').disabled = !!u;
-    $('fe-funcao').value = u ? u.funcao : 'assistente'; $('fe-ativo').value = !u || u.ativo ? 'sim' : 'nao';
+    $('fe-funcao').value = u ? cargoDe(u) : 'operacional'; $('fe-ativo').value = !u || u.ativo ? 'sim' : 'nao';
     var eu = u && state.me && u.email === state.me.email;
     $('fe-funcao').disabled = !!eu; $('fe-ativo').disabled = !!eu;
     $('fe-del').hidden = !u || !!eu; eDelArmed = false; $('fe-del').classList.remove('armed'); $('fe-del').textContent = 'Excluir';
@@ -6414,7 +6500,8 @@ td,.row{font-size:13px}
     var nome = $('fe-nome').value.trim(), email = $('fe-email').value.trim().toLowerCase();
     if (!nome){ $('fe-nome').focus(); toast('Informe o nome do funcionário'); return; }
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ $('fe-email').focus(); toast('Informe um e-mail válido'); return; }
-    var row = { nome: nome, funcao: $('fe-funcao').value, ativo: $('fe-ativo').value === 'sim' };
+    var cargoSel = $('fe-funcao').value;
+    var row = { nome: nome, funcao: cargoSel === 'admin' ? 'admin' : 'assistente', cargo: cargoSel, ativo: $('fe-ativo').value === 'sim' };
     $('fe-save').disabled = true;
     try {
       var r = eEditing ? await SB.from('equipe').update(row).eq('email', eEditing).select('email') : await SB.from('equipe').insert(Object.assign({ email: email }, row));
