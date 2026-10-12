@@ -1426,6 +1426,14 @@ body{font-size:13.5px}
 th{font-size:11.5px!important}
 td,.row{font-size:13px}
 .btn,.tb-sel,.search input,select,input:not([type=checkbox]):not([type=radio]){font-size:13px}
+
+/* ---------- escala geral: o sistema inteiro um pouco menor em telas de computador ---------- */
+@media (min-width:1000px){
+  html{zoom:.84}
+  .topnav{height:calc(100vh / .84)!important}
+  .main,.app{min-height:calc(100vh / .84)}
+}
+.app th,.app .thead > *{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
