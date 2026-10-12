@@ -1561,6 +1561,43 @@ td,.row{font-size:13px}
   .app:not(.collapsed) .topnav .brand > div:not(.logo) span{display:block}
   .app:not(.collapsed) .topnav .side-foot b{display:block}
 }
+
+/* ---------- rodapé do menu: só dois botões, lado a lado ---------- */
+.side-acts{display:contents}
+@media (min-width:1000px){
+  .topnav .side-acts{order:4;display:flex;align-items:center;gap:8px;padding:6px 8px 2px}
+  .topnav .side-acts button{width:36px;height:36px;padding:0;margin:0;display:grid;place-items:center;border:1px solid var(--gline,var(--line));background:none;border-radius:12px;color:var(--ink-3);cursor:pointer}
+  .topnav .side-acts button:hover{background:var(--hover);color:var(--ink)}
+  .topnav .side-acts .i{width:18px;height:18px}
+  .topnav .side-acts #btn-theme{align-self:auto;margin-left:0}
+  .app.collapsed .topnav .side-acts{flex-direction:column;padding-inline:0;justify-content:center}
+}
+
+/* ---------- menu em janelas baixas: tudo cabe, nada fica cortado ---------- */
+@media (min-width:1000px){
+  .topnav .nav{scrollbar-width:thin;scrollbar-color:rgba(160,122,69,.45) transparent}
+  .topnav .nav::-webkit-scrollbar{display:block;width:4px;height:auto}
+  .topnav .nav::-webkit-scrollbar-thumb{background:rgba(160,122,69,.45);border-radius:4px}
+  .topnav .nav::-webkit-scrollbar-track{background:transparent}
+}
+@media (min-width:1000px) and (max-height:820px){
+  .topnav #sync{display:none!important}
+  .topnav .nav button{padding-top:7px!important;padding-bottom:7px!important}
+  .topnav .nav-lbl{padding-top:9px!important;padding-bottom:3px!important}
+  .topnav .brand{padding-bottom:6px!important}
+  .topnav .brand .logo img{height:48px!important;max-width:46px!important}
+  .topnav .side-foot{padding-top:8px!important}
+}
+@media (min-width:1000px) and (max-height:660px){
+  .topnav{padding-top:10px!important;padding-bottom:8px!important}
+  .topnav .brand .logo img{height:40px!important;max-width:38px!important}
+  .topnav .brand span{display:none!important}
+  .topnav #btn-novo{height:34px!important;margin-bottom:2px!important}
+  .topnav .nav button{padding-top:5px!important;padding-bottom:5px!important;font-size:12.5px}
+  .topnav .nav-lbl{padding-top:6px!important;padding-bottom:2px!important;font-size:11px}
+  .topnav .side-acts button{width:32px;height:32px}
+  .topnav .side-foot .av{width:28px;height:28px}
+}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -1640,10 +1677,10 @@ td,.row{font-size:13px}
       <button class="tab" role="tab" id="tab-ret" aria-selected="false" type="button" title="Arquivados"><svg class="i"><use href="#i-file"/></svg><span>Arquivados</span></button>
       <button class="tab admin-only" role="tab" id="tab-equipe" aria-selected="false" type="button" title="Configurações"><svg class="i"><use href="#i-gear"/></svg><span>Configurações</span></button>
     </nav>
-    <button type="button" class="side-toggle" id="btn-side" title="Esconder o menu" aria-label="Esconder o menu" aria-expanded="true"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg><span>Esconder menu</span></button>
+    <div class="side-acts"><button type="button" class="side-toggle" id="btn-side" title="Esconder o menu" aria-label="Esconder o menu" aria-expanded="true"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button><button class="icon-btn theme-btn" id="btn-theme" type="button" aria-label="Modo escuro" title="Modo escuro"><svg class="i"><use id="theme-ico" href="#i-moon"/></svg></button></div>
     <div class="top-right">
       <small id="sync">Conectando à base…</small>
-      <button class="icon-btn theme-btn" id="btn-theme" type="button" aria-label="Modo escuro" title="Modo escuro"><svg class="i"><use id="theme-ico" href="#i-moon"/></svg></button>
+      
       <button class="btn primary" id="btn-novo" type="button"><svg class="i"><use href="#i-plus"/></svg>Novo lead</button>
       <div class="side-foot"><div class="av" id="me-av">E</div><div><b id="me"></b><button type="button" class="linkbtn" id="btn-sair">Sair</button></div></div>
     </div>
