@@ -1514,6 +1514,38 @@ td,.row{font-size:13px}
 :root[data-theme="dark"] .brand .logo{background:#f8f1e4!important;border:1px solid #d4b483!important;box-shadow:0 0 0 3px rgba(212,180,131,.16)}
 :root[data-theme="dark"] .brand .logo img{padding:3px;box-sizing:border-box}
 :root[data-theme="dark"] .auth img,:root[data-theme="dark"] .auth .logo{background:#f8f1e4;border-radius:18px;padding:8px}
+
+/* ---------- botão de esconder o menu lateral ---------- */
+.side-toggle{display:none}
+@media (min-width:1000px){
+  .topnav .side-toggle{order:4;display:flex;align-items:center;gap:10px;width:100%;margin-top:4px;padding:8px 12px;border:0;background:none;border-radius:12px;color:var(--ink-3);font:inherit;font-size:12.5px;font-weight:500;cursor:pointer}
+  .topnav .side-toggle:hover{background:var(--hover);color:var(--ink)}
+  .topnav .side-toggle .i{width:17px;height:17px;transition:transform .2s}
+  .app{transition:grid-template-columns .2s ease}
+  .app.collapsed{grid-template-columns:76px minmax(0,1fr)}
+  .app.collapsed .topnav{padding-inline:10px!important}
+  .app.collapsed .topnav .brand{justify-content:center;padding:0 0 12px!important}
+  .app.collapsed .topnav .brand > div:not(.logo){display:none}
+  .app.collapsed .topnav .nav-lbl{display:none}
+  .app.collapsed .topnav .nav button span,.app.collapsed .topnav .side-toggle span{display:none}
+  .app.collapsed .topnav .nav button,.app.collapsed .topnav .side-toggle{justify-content:center;padding-inline:0!important}
+  .app.collapsed .topnav .side-toggle .i{transform:rotate(180deg)}
+  .app.collapsed .topnav .nav .tab[aria-selected="true"]::before{left:-10px}
+  .app.collapsed .topnav #btn-novo{font-size:0;gap:0;padding:0!important}
+  .app.collapsed .topnav #sync{display:none!important}
+  .app.collapsed .topnav #btn-theme{align-self:center;margin-left:0}
+  .app.collapsed .topnav .side-foot{justify-content:center;padding-inline:0!important}
+  .app.collapsed .topnav .side-foot > div:not(.av){display:none}
+}
+
+/* ---------- logo maior no menu ---------- */
+@media (min-width:1000px){
+  .topnav .brand{gap:12px}
+  .topnav .brand .logo{width:58px!important;height:58px!important;border-radius:18px!important;flex:none}
+  .topnav .brand .logo img{padding:4px;box-sizing:border-box}
+  .topnav .brand b{font-size:14.5px;line-height:1.25}
+  .app.collapsed .topnav .brand .logo{width:50px!important;height:50px!important;border-radius:16px!important}
+}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -1593,6 +1625,7 @@ td,.row{font-size:13px}
       <button class="tab" role="tab" id="tab-ret" aria-selected="false" type="button" title="Arquivados"><svg class="i"><use href="#i-file"/></svg><span>Arquivados</span></button>
       <button class="tab admin-only" role="tab" id="tab-equipe" aria-selected="false" type="button" title="Configurações"><svg class="i"><use href="#i-gear"/></svg><span>Configurações</span></button>
     </nav>
+    <button type="button" class="side-toggle" id="btn-side" title="Esconder o menu" aria-label="Esconder o menu" aria-expanded="true"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg><span>Esconder menu</span></button>
     <div class="top-right">
       <small id="sync">Conectando à base…</small>
       <button class="icon-btn theme-btn" id="btn-theme" type="button" aria-label="Modo escuro" title="Modo escuro"><svg class="i"><use id="theme-ico" href="#i-moon"/></svg></button>
@@ -3353,6 +3386,13 @@ td,.row{font-size:13px}
       toast('Contrato fechado: ' + r.nome + ' foi para Contratos fechados', 'Desfazer', function(){ patchRow(r.id, { contratoEm: '', leadStatus: r.leadStatus || '' }).catch(function(e2){ toast(errMsg(e2)); }); });
     } catch(err){ toast(errMsg(err)); }
   });
+  /* ---------- esconder / mostrar o menu lateral ---------- */
+  (function(){
+    var app = $('app'), b = $('btn-side'); if (!app || !b) return;
+    function aplicar(rec){ app.classList.toggle('collapsed', rec); b.setAttribute('aria-expanded', String(!rec)); b.title = rec ? 'Mostrar o menu' : 'Esconder o menu'; b.setAttribute('aria-label', b.title); }
+    try { aplicar(localStorage.getItem('nascer-menu') === '0'); } catch(e){}
+    b.addEventListener('click', function(){ var rec = !app.classList.contains('collapsed'); aplicar(rec); try { localStorage.setItem('nascer-menu', rec ? '0' : '1'); } catch(e){} });
+  })();
   function render(){ renderContratos(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
   var clQ = '';
   // stage of each process, derived from what is already recorded (no extra typing)
