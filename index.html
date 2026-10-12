@@ -3924,7 +3924,8 @@ td,.row{font-size:13px}
   });
   function box_est(id){ return $('cfg-estados').querySelector('input[data-est="' + id + '"]'); }
   // bandeira da cidade (Wikidata); enquanto não houver, mostra a do estado
-  var cidFlagCarga = {};
+  var cidFlagCarga = {}, cidLocal = null;
+  fetch('img/cidades/index.json').then(function(r){ return r.json(); }).then(function(j){ cidLocal = j || {}; renderEstadoLista(); }).catch(function(){ cidLocal = {}; });
   function semAcentoC(s){ return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim(); }
   function lerLS(k){ try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch(e){ return null; } }
   function carregarBandeiras(uf){
@@ -3949,7 +3950,8 @@ td,.row{font-size:13px}
       var l = lerLS('nascer-cid2-' + uf), m = lerLS('nascer-flag-' + uf);
       if (l && m){
         var alvo = semAcentoC(nome), it = l.filter(function(x){ return semAcentoC(x.n) === alvo; })[0];
-        if (it && m[it.i.slice(0, 6)]) return '<img class="cid-flag" alt="" loading="lazy" src="' + esc(m[it.i.slice(0, 6)]) + '">';
+        var id6 = it ? it.i.slice(0, 6) : '', u = it ? (m[id6] || (cidLocal && cidLocal[id6] ? 'img/cidades/' + cidLocal[id6] : '')) : '';
+        if (u) return '<img class="cid-flag" alt="" loading="lazy" src="' + esc(u) + '">';
       } else carregarBandeiras(uf);
     }
     return ufFlagReg(g);
