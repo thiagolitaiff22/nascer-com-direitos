@@ -1849,6 +1849,9 @@ td,.row{font-size:13px}
 #view-clientes #cl-aud-sel,#view-clientes #fb-sit,#view-clientes #btn-pj,#view-clientes #fb-mais,#view-clientes #fb-painel,#view-clientes #list-sum,#view-clientes #list-title,#view-clientes .sec-rot{display:none!important}
 #list .row{grid-template-columns:minmax(0,2.6fr) minmax(0,1.6fr) minmax(0,1.4fr) 36px!important}
 #list .row > :nth-child(4),#list .row > :nth-child(5){display:none!important}
+
+/* Contratos fechados: sem etapas internas (documentação ok vai direto para o INSS) */
+#ctr-list select[data-ctr],#ctr-list .inss-acao,#ctr-list .grp-head{display:none!important}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2372,7 +2375,9 @@ td,.row{font-size:13px}
   <form class="f" id="form-prosp" novalidate>
     <div class="f-head"><div class="ph-tile" style="margin:0"><svg class="i"><use href="#i-users"/></svg></div><h2 id="fp-title">Novo parceiro</h2></div>
     <div class="f-body">
-      <div class="field full"><label for="fp-nome">Nome</label><input id="fp-nome" autocomplete="off"></div>
+      <div class="field full"><label for="fp-nome">Nome do parceiro</label><input id="fp-nome" autocomplete="off"></div>
+      <div class="field"><label for="fp-tipo">Tipo</label><select id="fp-tipo"><option value="pessoa">Pessoa</option><option value="clinica">Clínica</option></select></div>
+      <div class="field" id="fp-clinica-box"><label for="fp-clinica">Nome da clínica</label><input id="fp-clinica" autocomplete="off" placeholder="Aparece no topo do aplicativo"></div>
       <div class="field"><label for="fp-tel">Telefone / WhatsApp</label><input id="fp-tel" inputmode="tel" placeholder="(97) 00000-0000" class="tnum"></div>
       <div class="field"><label for="fp-regiao">Região de atuação</label><select id="fp-regiao"></select></div>
       <div class="field"><label for="fp-reg">Comunidade / localidade</label><input id="fp-reg" placeholder="Ex.: Comunidade do Curumitá"></div>
@@ -2572,7 +2577,7 @@ td,.row{font-size:13px}
   var REC = { sem: ['Sem recurso', 'muted'], opostos: ['Recurso do INSS', 'warn'] };
   var PAG = { aguardando: ['Aguardando pagamento', 'muted'], implantado: ['Benefício implantado', 'blue'], rpv: ['RPV expedida', 'blue'], pago: ['Pago', 'ok'] };
   // situação do requerimento no INSS
-  var INSS = { analise: ['Em análise', 'blue'], exigencia: ['Exigência', 'warn'], concedido: ['Concedido', 'ok'], indeferido: ['Indeferido', 'crit'] };
+  var INSS = { redigir: ['Redigir requerimento', 'warn'], analise: ['Em análise', 'blue'], exigencia: ['Exigência', 'warn'], concedido: ['Concedido', 'ok'], indeferido: ['Indeferido', 'crit'] };
   var TIPOS = { especial: 'Segurada especial (rural)', urbana: 'Empregada / urbana', individual: 'Contribuinte individual / MEI', desempregada: 'Desempregada (período de graça)' };
   var FATOS = { parto: 'Parto', gestante: 'Ainda gestante', adocao: 'Adoção', guarda: 'Guarda para adoção', natimorto: 'Natimorto', aborto: 'Aborto não criminoso' };
   var PRAZO_ANOS = 5;          // o direito de pedir prescreve em 5 anos contados do nascimento (ou adoção/guarda)
@@ -2721,7 +2726,9 @@ td,.row{font-size:13px}
   // Cadastro: ainda sem requerimento no INSS e sem número de processo
   function noCadastro(r){ return !String(r.processo || '').trim() && !requerido(r) && !r.arquivado && !r.contratoEm; }
   // INSS: requerimento feito, ainda sem ação judicial
-  function noInss(r){ return !String(r.processo || '').trim() && requerido(r) && !r.arquivado; }
+  // contrato fechado com a documentação toda ok: sai de Contratos fechados e vai para o INSS redigir o requerimento
+  function prontoRequerer(r){ return fechado(r) && !aguardaNasc(r) && !docsPendentes(r) && !dadosFaltando(r).length; }
+  function noInss(r){ return !String(r.processo || '').trim() && !r.arquivado && (requerido(r) || prontoRequerer(r)); }
   function passEtapaCl(r, f){
     if (!noControle(r)) return false;
     if (!f) return true;
@@ -3024,7 +3031,7 @@ td,.row{font-size:13px}
       $('s-aud-c').textContent = (first === last ? fmtShort(first) : fmtShort(first) + ' a ' + fmtShort(last)) + ' · próxima ' + relLabel(daysUntil(first));
       // who is in charge of notifying (the per-day split already shows in Pauta por dia)
       var comP = fut.filter(function(r){ return prospName(respAviso(r)); }).length;
-      $('v-aud').innerHTML = stackBar([{ l: 'Com prospectador', n: comP, c: cssVar('--amber') }, { l: 'Sem prospectador', n: fut.length - comP, c: cssVar('--line-2') }]);
+      $('v-aud').innerHTML = stackBar([{ l: 'Com parceiro', n: comP, c: cssVar('--amber') }, { l: 'Sem parceiro', n: fut.length - comP, c: cssVar('--line-2') }]);
     } else { $('s-aud-c').textContent = 'Nenhuma audiência futura'; $('v-aud').innerHTML = ''; }
 
     $('s-avis').textContent = avis.length;
@@ -3038,7 +3045,7 @@ td,.row{font-size:13px}
 
     $('s-pend').textContent = pend;
     $('s-pend-c').textContent = pend ? 'precisam de contato antes da audiência' : 'Todos os clientes foram avisados';
-    var parts = [{ l: 'Sem contato', n: sc, c: cssVar('--red') }, { l: 'Com prospectador', n: comResp, c: cssVar('--amber') }];
+    var parts = [{ l: 'Sem contato', n: sc, c: cssVar('--red') }, { l: 'Com parceiro', n: comResp, c: cssVar('--amber') }];
     if (semResp) parts.push({ l: 'Sem responsável', n: semResp, c: cssVar('--ink-3') });
     $('v-pend').innerHTML = stackBar(parts);
 
@@ -3088,7 +3095,7 @@ td,.row{font-size:13px}
     'fb-aviso': ['filter', 'aviso', [['todos', 'Todos'], ['avisar', 'A avisar'], ['semcontato', 'Sem contato'], ['pendente', 'Não avisados (os dois)'], ['avisado', 'Avisados']]],
     'fb-meio': ['meio', 'meio', [['todos', 'Todos'], ['whatsapp', 'WhatsApp'], ['convite', 'Convite'], ['prospectador', 'Parceiro'], ['outro', 'Ligação ou pessoalmente']]],
     'fb-aud': ['aud', 'aud', [['todas', 'Todas'], ['semana', 'Próximos 7 dias'], ['online', 'Online'], ['sem', 'Sem data']]],
-    'fb-tel': ['tel', 'tel', [['todos', 'Todos'], ['com', 'Com telefone'], ['sem', 'Sem telefone'], ['via', 'Via outro cliente'], ['prosp', 'Pelo prospectador'], ['novo', 'Preenchidos agora']]]
+    'fb-tel': ['tel', 'tel', [['todos', 'Todos'], ['com', 'Com telefone'], ['sem', 'Sem telefone'], ['via', 'Via outro cliente'], ['prosp', 'Pelo parceiro'], ['novo', 'Preenchidos agora']]]
   };
   function renderFilters(shown){
     var rows = state.rows.filter(noControle), conta = function(o){ return rows.filter(function(r){ return matches(r, o); }).length; };
@@ -3326,7 +3333,7 @@ td,.row{font-size:13px}
       var soltos = p.palavrasEndereco && p.palavrasEndereco.length ? state.rows.filter(function(r){ return !prospName(r.responsavelId) && prospForAddress(r.endereco) === p; }).length : 0;
       var ini = (p.nome || '?').replace(/^(dona|dom|seu|sr\.?|sra\.?)\s+/i, '').charAt(0).toUpperCase();
       return '<div class="card prosp">' +
-        '<div class="prosp-top"><div class="prosp-av">' + esc(ini) + '</div><div><b>' + esc(p.nome) + '</b>' +
+        '<div class="prosp-top"><div class="prosp-av">' + esc(ini) + '</div><div><b>' + esc(p.tipo === 'clinica' && p.clinica ? p.clinica : p.nome) + '</b>' + (p.tipo === 'clinica' ? '<span class="small">Clínica · ' + esc(p.nome) + '</span>' : '') +
           (p.telefone ? '<span class="small tnum">' + esc(p.telefone) + '</span>' : '<span class="pill warn" style="margin-top:3px">Telefone não informado</span>') +
           (regiaoDe(p) ? '<span class="small reg-linha">' + ufFlagReg(regiaoDe(p)) + esc(regiaoDe(p).nome) + (p.regiao ? ' · ' + esc(p.regiao) : '') + '</span>' : (p.regiao ? '<span class="small">' + esc(p.regiao) + '</span>' : '<span class="pill warn" style="margin-top:3px">Sem região</span>')) + '</div></div>' +
                 '<div class="prosp-nums"><div><b>' + mine.length + '</b><span>clientes</span></div><div><b>' + mine.filter(function(r){ return !!r.contratoEm; }).length + '</b><span>contratos</span></div><div><b>' + mine.filter(function(r){ return r.inssStatus === 'concedido'; }).length + '</b><span>concedidos</span></div></div>' +
@@ -3410,7 +3417,7 @@ td,.row{font-size:13px}
   /* INSS: requerimentos feitos e ainda sem ação judicial */
   var inssQ = '', inssSit = '', inssAberto = {};
   var INSS_PRAZO_ANALISE = 30;   // dias que o INSS tem para analisar o salário-maternidade (acordo no STF, RE 1.171.152)
-  function statusInss(r){ return r.inssStatus && INSS[r.inssStatus] ? r.inssStatus : 'analise'; }
+  function statusInss(r){ if (!requerido(r) && !r.inssStatus) return 'redigir'; return r.inssStatus && INSS[r.inssStatus] ? r.inssStatus : 'analise'; }
   function diasDesde(s){ var n = daysUntil(s); return n == null ? null : -n; }
   function analiseAtrasada(r){ var d = diasDesde(r.der); return statusInss(r) === 'analise' && d != null && d > INSS_PRAZO_ANALISE; }
   function exigenciaVence(r){ var n = daysUntil(r.exigenciaPrazo); return statusInss(r) === 'exigencia' && n != null && n <= 5; }
@@ -3436,12 +3443,13 @@ td,.row{font-size:13px}
       return (r.exigenciaPrazo ? '<span class="prazo-tag ' + (n <= 5 ? 'crit' : 'warn') + '">' + (n < 0 ? 'Prazo vencido' : 'Prazo ' + relLabel(n)) + '</span>' : '<span class="mini warn">Prazo não informado</span>') +
         '<button type="button" class="btn inss-acao" data-iact="cumprida" data-id="' + esc(r.id) + '" title="O documento foi enviado ao INSS: volta para análise">Exigência cumprida</button>';
     }
+    if (k === 'redigir') return '<button type="button" class="btn inss-acao" data-iact="requerer" data-id="' + esc(r.id) + '" title="Lançar o requerimento feito no Meu INSS">Registrar requerimento</button>';
     if (k === 'concedido') return '<span class="mini">' + (r.pagamento === 'pago' ? 'Pago' : 'Acompanhe o pagamento no Financeiro') + '</span>';
     return '<button type="button" class="btn inss-acao" data-iact="ajuizar" data-id="' + esc(r.id) + '" title="Preencher o número do processo">Entrar no Judicial</button>';
   }
   function renderInss(){
     var box = $('inss-list'); if (!box) return;
-    var todos = state.rows.filter(noInss), conta = { analise: 0, exigencia: 0, concedido: 0, indeferido: 0 };
+    var todos = state.rows.filter(noInss), conta = { redigir: 0, analise: 0, exigencia: 0, concedido: 0, indeferido: 0 };
     todos.forEach(function(r){ conta[statusInss(r)]++; });
     var atras = todos.filter(analiseAtrasada).length, vence = todos.filter(exigenciaVence).length;
     var emAnalise = todos.filter(function(r){ return statusInss(r) === 'analise' && r.der; });
@@ -3450,6 +3458,7 @@ td,.row{font-size:13px}
     var cardI = function(ico, rot, n, cap, cor, filtro){ return '<div class="card stat cad-filtro' + (inssSit === filtro ? ' ativo' : '') + '" role="button" tabindex="0" aria-pressed="' + (inssSit === filtro) + '" data-inss-filtro="' + filtro + '" title="Mostrar na lista" data-cor-fixa="1" style="--cor-linha:var(' + cor + ')"><div class="stat-h"><svg class="i"><use href="#' + ico + '"/></svg>' + rot + '</div><div class="stat-v tnum">' + n + '</div><div class="stat-c">' + cap + '</div><div class="stat-viz"></div></div>'; };
     $('inss-stats').innerHTML =
       cardI('i-inss', 'Requerimentos', todos.length, 'no INSS, ainda sem ação judicial', '--line-2', '') +
+      cardI('i-pencil', 'Redigir requerimento', conta.redigir, 'documentação ok: falta o requerimento', '--amber', 'redigir') +
       cardI('i-clock', 'Em análise', conta.analise, (emAnalise.length ? 'média de ' + media + ' dias' : 'nenhum em análise') + (atras ? ' · ' + atras + ' passaram de ' + INSS_PRAZO_ANALISE + ' dias' : ''), '--blue', 'analise') +
       cardI('i-bellx', 'Exigências', conta.exigencia, vence ? vence + ' com prazo em até 5 dias' : 'o INSS pediu documento', '--amber', 'exigencia') +
       cardI('i-check', 'Concedidos', conta.concedido, (decididos ? Math.round(conta.concedido / decididos * 100) + '% dos decididos' : 'nenhum decidido ainda') + ' · vão para o Financeiro', '--green', 'concedido') +
@@ -3457,7 +3466,7 @@ td,.row{font-size:13px}
     var SITS = [['', 'Todas as situações · ' + todos.length]].concat(Object.keys(INSS).map(function(k){ return [k, INSS[k][0] + ' · ' + conta[k]]; })).concat([['atrasada', 'Análise atrasada · ' + atras], ['vence', 'Exigência vencendo · ' + vence]]);
     $('inss-sit').innerHTML = SITS.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === inssSit ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
     $('inss-sit').classList.toggle('ativo', !!inssSit);
-    var ordem = { exigencia: 0, indeferido: 1, analise: 2, concedido: 3 };
+    var ordem = { redigir: -1, exigencia: 0, indeferido: 1, analise: 2, concedido: 3 };
     var lista = todos.filter(function(r){ return passaInss(r, inssSit) && buscaCliente(r, inssQ); }).sort(function(a, b){
       var ka = statusInss(a), kb = statusInss(b);
       if (ka !== kb) return ordem[ka] - ordem[kb];
@@ -3504,6 +3513,7 @@ td,.row{font-size:13px}
     var ia = e.target.closest('[data-iact]');
     if (ia){
       var r = state.rows.filter(function(x){ return x.id === ia.dataset.id; })[0]; if (!r) return;
+      if (ia.dataset.iact === 'requerer'){ abrirRequerimento(r); return; }
       if (ia.dataset.iact === 'ajuizar'){ openForm(r); setTimeout(function(){ $('f-proc').scrollIntoView({ block: 'center' }); $('f-proc').focus(); }, 60); toast('Preencha o número do processo e a data do ajuizamento'); return; }
       if (ia.dataset.iact === 'cumprida'){
         var antes = { inssStatus: r.inssStatus || '', exigenciaPrazo: r.exigenciaPrazo || '' };
@@ -3573,11 +3583,11 @@ td,.row{font-size:13px}
     return '<select class="inss-sel" data-lead="' + esc(r.id) + '" aria-label="Situação do contato com ' + esc(r.nome) + '">' +
       Object.keys(LEAD).map(function(x){ return '<option value="' + x + '"' + (x === k ? ' selected' : '') + '>' + LEAD[x] + '</option>'; }).join('') + '</select>';
   }
-  var CTR_ETAPAS = { regularizar: ['Regularizar documentos', 'crit'], conferencia: ['Em conferência', 'warn'], pronto: ['Pronto para requerer', 'ok'] };
+  var CTR_ETAPAS = { regularizar: ['Regularizar documentos', 'crit'] };
   function fechado(r){ return !!r.contratoEm && !r.arquivado && !String(r.processo || '').trim() && !requerido(r); }
   function aguardaNasc(r){ return fechado(r) && r.fatoGerador === 'gestante' && !r.criancaNasc; }
-  function noContratos(r){ return fechado(r) && !aguardaNasc(r); }
-  function etapaCtr(r){ if (r.ctrEtapa && CTR_ETAPAS[r.ctrEtapa]) return r.ctrEtapa; return (docsPendentes(r) || dadosFaltando(r).length) ? 'regularizar' : 'pronto'; }
+  function noContratos(r){ return fechado(r) && !aguardaNasc(r) && !prontoRequerer(r); }
+  function etapaCtr(r){ return 'regularizar'; }
   // guia da contribuição: aguardando pagamento ou paga (controle em Contratos fechados)
   function guiaDe(r){ return r.guiaStatus === 'paga' ? 'paga' : 'aguardando'; }
   var ctrSit = '', ctrQ = '', ctrAberto = {}, nascSit = '', nascQ = '', nascAberto = {};
@@ -3591,23 +3601,21 @@ td,.row{font-size:13px}
   function editBtn(r){ return '<button type="button" class="ico-btn" data-act="edit" data-id="' + esc(r.id) + '" title="Editar cadastro" aria-label="Editar ' + esc(r.nome) + '"><svg class="i"><use href="#i-pencil"/></svg></button>'; }
   function renderContratos(){
     var box = $('ctr-list'); if (!box) return;
-    var todos = state.rows.filter(noContratos), c = { regularizar: 0, conferencia: 0, pronto: 0 }, gc = { aguardando: 0, paga: 0 };
+    var todos = state.rows.filter(noContratos), c = { regularizar: 0 }, gc = { aguardando: 0, paga: 0 };
     todos.forEach(function(r){ c[etapaCtr(r)]++; gc[guiaDe(r)]++; });
     $('ctr-stats').innerHTML =
       cardLista('data-ctr-filtro', 'i-users', 'Contratos fechados', todos.length, 'esperando o requerimento no INSS', '', ctrSit) +
-      cardLista('data-ctr-filtro', 'i-bellx', 'Regularizar documentos', c.regularizar, 'falta documento ou dado da cliente', 'regularizar', ctrSit) +
-      cardLista('data-ctr-filtro', 'i-clock', 'Em conferência', c.conferencia, 'a equipe está conferindo', 'conferencia', ctrSit) +
-      cardLista('data-ctr-filtro', 'i-check', 'Prontos para requerer', c.pronto, 'documentação completa', 'pronto', ctrSit) +
+      cardLista('data-ctr-filtro', 'i-bellx', 'Regularizar documentos', c.regularizar, 'quando completar, vai para o INSS', 'regularizar', ctrSit) +
       cardLista('data-ctr-filtro', 'i-cash', 'Aguardando pagamento da guia', gc.aguardando, 'guia ainda não paga', 'g_aguardando', ctrSit) +
       cardLista('data-ctr-filtro', 'i-check', 'Guias pagas', gc.paga, 'pagamento confirmado', 'g_paga', ctrSit);
     $('ctr-sit').innerHTML = [['', 'Todas as etapas · ' + todos.length]].concat(Object.keys(CTR_ETAPAS).map(function(k){ return [k, CTR_ETAPAS[k][0] + ' · ' + c[k]]; })).concat([['g_aguardando', 'Aguardando pagamento da guia · ' + gc.aguardando], ['g_paga', 'Guias pagas · ' + gc.paga]])
       .map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === ctrSit ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
-    var ordem = { regularizar: 0, conferencia: 1, pronto: 2 };
+    var ordem = { regularizar: 0 };
     var lista = todos.filter(function(r){ return (!ctrSit || (ctrSit === 'g_aguardando' ? guiaDe(r) === 'aguardando' : ctrSit === 'g_paga' ? guiaDe(r) === 'paga' : etapaCtr(r) === ctrSit)) && buscaOk(r, ctrQ); })
       .sort(function(a, b){ return ordem[etapaCtr(a)] - ordem[etapaCtr(b)] || String(a.contratoEm).localeCompare(String(b.contratoEm)) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); });
     $('ctr-count').textContent = lista.length + (lista.length === 1 ? ' cliente' : ' clientes');
-    var html = '<div class="row head"><div>Cliente</div><div>Contato</div><div>Contrato</div><div>Documentos</div><div>Etapa e guia</div><div></div></div>';
-    if (!lista.length) html += '<div class="empty">' + (todos.length ? 'Nenhuma cliente neste filtro.' : 'Nenhum contrato fechado ainda. No <b>Cadastro</b>, use <b>Fechar contrato</b> quando a cliente assinar.') + '</div>';
+    var html = '<div class="row head"><div>Cliente</div><div>Contato</div><div>Contrato</div><div>Documentos</div><div>Guia</div><div></div></div>';
+    if (!lista.length) html += '<div class="empty">' + (todos.length ? 'Nenhuma cliente neste filtro.' : 'Nenhum contrato com pendência. Quando a documentação estiver completa, a cliente vai para o <b>INSS</b>.') + '</div>';
     var ultimo = '';
     lista.slice(0, 300).forEach(function(r){
       var k = etapaCtr(r);
@@ -3859,6 +3867,7 @@ td,.row{font-size:13px}
   var ETAPAS = [
     ['cadastrado', 'Cadastrada (lead)', '--ink-3'],
     ['contrato', 'Contrato fechado', '--amber'],
+    ['redigir', 'Redigir requerimento', '--amber'],
     ['requerido', 'No INSS', '--blue'],
     ['exigencia', 'Exigência do INSS', '--amber'],
     ['concedido', 'Concedido no INSS', '--green'],
@@ -3884,7 +3893,7 @@ td,.row{font-size:13px}
     if (r.inssStatus === 'indeferido') return 'indeferido';
     if (r.inssStatus === 'exigencia') return 'exigencia';
     if (requerido(r)) return 'requerido';
-    if (r.contratoEm) return 'contrato';
+    if (r.contratoEm) return prontoRequerer(r) ? 'redigir' : 'contrato';
     return 'cadastrado';
   }
   function nomeEtapa(k){ if (k === '__novidade') return 'novidades do tribunal'; var e = ETAPAS.filter(function(x){ return x[0] === k; })[0]; return e ? e[1] : k; }
@@ -4409,7 +4418,7 @@ td,.row{font-size:13px}
       card('i-users', 'Ficou com as clientes', brl(rep), '', (L.length - aReceber.length - aPagar.length) + ' acertos feitos', soma('valor') ? rep / soma('valor') * 100 : 0, '--blue') +
       card('i-clock', 'Acertos pendentes', String(aReceber.length + aPagar.length), aReceber.length + aPagar.length ? 'crit' : '', aReceber.length + ' honorários a receber · ' + aPagar.length + ' clientes a pagar', aReceber.length + aPagar.length ? 100 : 0, '--red') +
       card('i-scale', 'Parceiros', brl(pr), '', 'indicações das clientes acertadas', hon ? pr / hon * 100 : 0, '--amber') +
-      card('i-check', 'Líquido ' + finAno, brl(hon - pr), 'ok', 'faturamento menos prospectadores', hon ? (hon - pr) / hon * 100 : 0, '--green');
+      card('i-check', 'Líquido ' + finAno, brl(hon - pr), 'ok', 'faturamento menos parceiros', hon ? (hon - pr) / hon * 100 : 0, '--green');
     $('fin-regra').innerHTML = 'Conta pela <b>data em que o benefício foi pago</b> (botão <b>Benefício pago</b> na Receita). Faturamento = ' + Math.round(FIN_HONORARIOS * 100) + '% de honorários + guias. Use <b>Baixar planilha do ano</b> para o fechamento anual (contador / imposto de renda).';
     $('fin-count').textContent = L.length + (L.length === 1 ? ' benefício' : ' benefícios');
     var M = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -4425,7 +4434,7 @@ td,.row{font-size:13px}
     var br = function(d){ return d ? d.split('-').reverse().join('/') : ''; };
     var q = function(t){ return '"' + String(t == null ? '' : t).replace(/"/g, '""') + '"'; };
     var L = linhasAno(finAno);
-    var csv = [['Data do pagamento', 'Cliente', 'CPF', 'Origem', 'NB / processo', 'Valor do benefício', 'Onde caiu', 'Honorários + guia', 'Valor da cliente', 'Acerto em', 'Forma', 'Parceiro', 'Valor do prospectador'].map(q).join(';')]
+    var csv = [['Data do pagamento', 'Cliente', 'CPF', 'Origem', 'NB / processo', 'Valor do benefício', 'Onde caiu', 'Honorários + guia', 'Valor da cliente', 'Acerto em', 'Forma', 'Parceiro', 'Valor do parceiro'].map(q).join(';')]
       .concat(L.map(function(x){ var r = x.r; return [br(x.data), r.nome, r.cpf, origem(r) === 'inss' ? 'INSS' : 'Judicial', origem(r) === 'inss' ? r.nb : r.processo, n2(x.valor), x.onde === 'escritorio' ? 'Escritório' : 'Cliente', n2(x.hon), n2(x.valor - x.hon), br(x.pagoEm), x.forma, prospName(r.responsavelId) || '', n2(x.prosp)].map(q).join(';'); }));
     baixarArquivo('Faturamento ' + finAno + '.csv', new Blob(['\ufeff' + csv.join('\r\n')], { type: 'text/csv;charset=utf-8' }));
   });
@@ -4711,8 +4720,8 @@ td,.row{font-size:13px}
     $('fin-stats').innerHTML =
       card('i-cash', 'Faturamento atual', brl(cen[1][3]), 'ok', 'honorários dos ganhos · recebido ' + brl(cen[0][3]), cen[1][3] ? cen[0][3] / cen[1][3] * 100 : 0, '--green') +
       card('i-clock', 'Previsão de faturamento', brl(prev[3]), 'warn', 'com os casos em andamento', prev[3] ? cen[1][3] / prev[3] * 100 : 0, '--amber') +
-      card('i-users', 'Gasto com prospectadores', brl(prev[4]), 'crit', 'na previsão · hoje ' + brl(cen[1][4]), prev[3] ? prev[4] / prev[3] * 100 : 0, '--red') +
-      card('i-check', 'Resultado líquido', brl(prev[3] - prev[4]), 'ok', 'previsão menos prospectadores', prev[3] ? (prev[3] - prev[4]) / prev[3] * 100 : 0, '--green') +
+      card('i-users', 'Gasto com parceiros', brl(prev[4]), 'crit', 'na previsão · hoje ' + brl(cen[1][4]), prev[3] ? prev[4] / prev[3] * 100 : 0, '--red') +
+      card('i-check', 'Resultado líquido', brl(prev[3] - prev[4]), 'ok', 'previsão menos parceiros', prev[3] ? (prev[3] - prev[4]) / prev[3] * 100 : 0, '--green') +
       card('i-scale', 'Se todos derem certo', brl(cen[3][3] - cen[3][4]), 'proj', 'líquido com todos os casos em aberto', 100, '--purple');
     $('fin-regra').innerHTML = 'Faturamento = <b>' + Math.round(FIN_HONORARIOS * 100) + '%</b> do benefício + a guia de cada ganho. Gasto com parceiros = valor por indicação de cada um. Resultado líquido = faturamento menos parceiros.';
     $('fin-count').textContent = base.length + (base.length === 1 ? ' cliente' : ' clientes');
@@ -4732,15 +4741,15 @@ td,.row{font-size:13px}
     var soma = function(k){ return linhas.reduce(function(a, x){ return a + x[k]; }, 0); };
     var ind = soma('ind'), apagar = soma('apagar'), prev = soma('prev'), pot = soma('pot');
     $('fin-stats').innerHTML =
-      card('i-users', 'Indicações', ind, '', linhas.length + (linhas.length === 1 ? ' prospectador' : ' prospectadores') + ' · valor próprio de cada um', 100, '--blue') +
+      card('i-users', 'Indicações', ind, '', linhas.length + (linhas.length === 1 ? ' parceiro' : ' parceiros') + ' · valor próprio de cada um', 100, '--blue') +
       card('i-cash', 'A pagar', brl(apagar), 'ok', soma('pagos') + ' clientes já acertadas', pot ? apagar / pot * 100 : 0, '--green') +
       card('i-clock', 'Previsão', brl(prev), 'warn', 'ganhos ainda sem acerto', pot ? prev / pot * 100 : 0, '--amber') +
       card('i-scale', 'Se todos derem certo', brl(pot), 'proj', 'todas as indicações pagas', 100, '--purple');
     $('fin-regra').innerHTML = 'Cada parceiro tem o <b>seu valor por indicação</b> (padrão ' + brl(FIN_INDICACAO) + '; mude na coluna da tabela). Entra em <b>A pagar</b> quando o acerto com a cliente foi feito; os ganhos ainda sem acerto ficam em <b>Previsão</b>; <b>Se todos derem certo</b> é o total caso todas as clientes indicadas por ele ganhem.';
-    $('fin-count').textContent = linhas.length + (linhas.length === 1 ? ' prospectador' : ' prospectadores');
+    $('fin-count').textContent = linhas.length + (linhas.length === 1 ? ' parceiro' : ' parceiros');
     $('fin-prosp-body').innerHTML = linhas.map(function(x){
       return '<tr><td class="nome">' + esc(x.nome) + '</td><td class="dir">' + (prospById(x.id) ? '<input class="fin-valor" type="text" inputmode="numeric" data-pind="' + esc(x.id) + '" value="' + moedaTxt(x.valor) + '" title="Quanto ' + esc(x.nome) + ' ganha por cliente indicada">' : brl(x.valor)) + '</td><td class="dir n">' + x.ind + '</td><td class="dir n">' + x.proc + '</td><td class="dir n">' + x.pagos + '</td><td class="dir n fin-apagar">' + brl(x.apagar) + '</td><td class="dir n">' + brl(x.prev) + '</td><td class="dir n fin-proj">' + brl(x.pot) + '</td></tr>';
-    }).join('') + (linhas.length ? '<tr class="fin-total"><td>Total</td><td></td><td class="dir n">' + ind + '</td><td class="dir n">' + soma('proc') + '</td><td class="dir n">' + soma('pagos') + '</td><td class="dir n fin-apagar">' + brl(apagar) + '</td><td class="dir n">' + brl(prev) + '</td><td class="dir n fin-proj">' + brl(pot) + '</td></tr>' : '<tr><td colspan="8" class="ct-mais small">Nenhuma cliente com prospectador' + (finSessao ? ' nesta origem' : '') + '.</td></tr>');
+    }).join('') + (linhas.length ? '<tr class="fin-total"><td>Total</td><td></td><td class="dir n">' + ind + '</td><td class="dir n">' + soma('proc') + '</td><td class="dir n">' + soma('pagos') + '</td><td class="dir n fin-apagar">' + brl(apagar) + '</td><td class="dir n">' + brl(prev) + '</td><td class="dir n fin-proj">' + brl(pot) + '</td></tr>' : '<tr><td colspan="8" class="ct-mais small">Nenhuma cliente com parceiro' + (finSessao ? ' nesta origem' : '') + '.</td></tr>');
   }
   $('fin-prosp-body').addEventListener('change', async function(e){
     var inp = e.target.closest('[data-pind]'); if (!inp) return;
@@ -5072,7 +5081,7 @@ td,.row{font-size:13px}
     if (state.db){ await col().doc(id).update(data); }
     else { state.rows = state.rows.map(function(r){ return r.id === id ? Object.assign({}, r, data) : r; }); render(); }
   }
-  // nome todo em maiúsculas (do aplicativo ou digitado assim): passa para o padrão do sistema ("Eliel dos Santos")
+  // qualquer nome (do aplicativo, em CAIXA ALTA ou digitado de qualquer jeito) fica no padrão: "Eliel dos Santos"
   function nomeProprio(n){
     return String(n || '').toLowerCase()
       .replace(/(^|[\s'-])([a-zà-ÿ])/g, function(m, a, b){ return a + b.toUpperCase(); })
@@ -5082,7 +5091,7 @@ td,.row{font-size:13px}
   function acertarNomesDoApp(){
     (state.rows || []).forEach(function(r){
       var n = String(r.nome || '');
-      if (nomesAcertados[r.id] || !/[A-ZÀ-Ý]{2}/.test(n) || n !== n.toUpperCase()) return;
+      if (nomesAcertados[r.id] || !n || n === nomeProprio(n)) return;
       nomesAcertados[r.id] = true;
       filaNomes = filaNomes.then(function(){ return patchRow(r.id, { nome: nomeProprio(n) }); }).catch(function(){});   // um de cada vez
     });
@@ -5103,7 +5112,7 @@ td,.row{font-size:13px}
   function valorHist(k, v){
     if (v === null || v === undefined || v === '') return '(vazio)';
     if (typeof v === 'boolean') return v ? 'sim' : 'não';
-    if (k === 'responsavelId' || k === 'avisoRespId') return prospName(v) || v || 'o próprio prospectador';
+    if (k === 'responsavelId' || k === 'avisoRespId') return prospName(v) || v || 'o próprio parceiro';
     if (k === 'contatoVia'){ var c = state.rows.filter(function(x){ return x.id === v; })[0]; return c ? c.nome : v; }
     if (k === 'resultado' && RES[v]) return RES[v][0];
     if (k === 'pagamento' && PAG[v]) return PAG[v][0];
@@ -5251,7 +5260,7 @@ td,.row{font-size:13px}
   $('form').addEventListener('submit', async function(e){
     e.preventDefault();
     var nome = $('f-nome').value.trim();
-    if (/[A-ZÀ-Ý]{2}/.test(nome) && nome === nome.toUpperCase()) nome = nomeProprio(nome);
+    nome = nomeProprio(nome);   // padrão do escritório: primeira letra maiúscula, o resto minúsculo
     if (!nome){ $('f-nome').focus(); toast('Informe o nome da cliente'); return; }
     var prev = state.rows.find(function(r){ return r.id === state.editing; }) || {};
     var situacao = $('f-situacao').value, avisado = situacao === 'avisado';
@@ -5267,7 +5276,7 @@ td,.row{font-size:13px}
       avisado: avisado, situacao: situacao, responsavelId: $('f-resp').value || (!state.editing && prospForAddress($('f-end').value) ? prospForAddress($('f-end').value).id : ''), avisadoEm: avisoEm || null, avisoRespId: $('f-aviso-resp').value, avisadoA: $('f-avisadoa').value.trim(), meioAviso: avisado ? $('f-meio').value : (prev.meioAviso || ''),
       processo: $('f-proc').value.trim(), tese: $('f-tese').value.trim(),
       nascimento: $('f-nasc').value || '', nit: $('f-nit').value.trim(), tipoSegurada: $('f-tipo').value, atividade: $('f-ativ').value.trim(),
-      fatoGerador: $('f-fato').value, crianca: $('f-crianca').value.trim(), criancaNasc: $('f-cnasc').value || '', dpp: $('f-fato').value === 'gestante' ? ($('f-dpp').value || '') : '', testemunhas: $('f-test').value.trim(),
+      fatoGerador: $('f-fato').value, crianca: nomeProprio($('f-crianca').value.trim()), criancaNasc: $('f-cnasc').value || '', dpp: $('f-fato').value === 'gestante' ? ($('f-dpp').value || '') : '', testemunhas: $('f-test').value.trim(),
       der: $('f-der').value || '', protocoloInss: $('f-pinss').value.trim(), nb: $('f-nb').value.trim(),
       inssStatus: $('f-inss').value || ($('f-der').value || $('f-pinss').value.trim() ? 'analise' : ''),
       exigenciaPrazo: $('f-inss').value === 'exigencia' ? ($('f-exigp').value || '') : '', exigenciaObs: $('f-inss').value === 'exigencia' ? $('f-exigo').value.trim() : '',
@@ -5544,7 +5553,7 @@ td,.row{font-size:13px}
     r: ['Arquivados', 'Benefícios pagos e casos encerrados · mães que podem ter um novo benefício'],
     t: ['Contestações', 'Audiência, resultado e teses da contestação do INSS'],
     g: ['Parceiros', 'Estados de atuação, responsável de cada um e os parceiros que cadastram as clientes'],
-    e: ['Configurações', 'Equipe, integrações e prospectadores']
+    e: ['Configurações', 'Equipe, integrações e parceiros']
   };
   function showTab(which){
     state.view = which;
@@ -5577,10 +5586,13 @@ td,.row{font-size:13px}
   var dlgP = $('dlg-prosp'), pEditing = null, pDelArmed = false;
   function openProsp(p){
     pEditing = p ? p.id : null;
-    $('fp-title').textContent = p ? 'Editar prospectador' : 'Novo prospectador';
+    $('fp-title').textContent = p ? 'Editar parceiro' : 'Novo parceiro';
     $('fp-nome').value = p ? p.nome || '' : '';
     $('fp-tel').value = p ? p.telefone || '' : '';
     $('fp-reg').value = p ? p.regiao || '' : '';
+    $('fp-tipo').value = p && p.tipo === 'clinica' ? 'clinica' : 'pessoa';
+    $('fp-clinica').value = p ? p.clinica || '' : '';
+    $('fp-clinica-box').hidden = $('fp-tipo').value !== 'clinica';
     regSelectPreencher(p ? p.regiaoId || '' : '');
     $('fp-pal').value = p ? (p.palavrasEndereco || []).join(', ') : '';
     $('fp-del').hidden = !p; pDelArmed = false; $('fp-del').classList.remove('armed'); $('fp-del').textContent = 'Excluir';
@@ -5588,13 +5600,16 @@ td,.row{font-size:13px}
   }
   $('btn-prosp-novo').addEventListener('click', function(){ openProsp(null); });
   $('fp-cancel').addEventListener('click', function(){ dlgP.close(); });
+  $('fp-tipo').addEventListener('change', function(){ $('fp-clinica-box').hidden = this.value !== 'clinica'; if (this.value === 'clinica') $('fp-clinica').focus(); });
   $('fp-tel').addEventListener('input', function(e){ e.target.value = maskTel(e.target.value); });
   function pcol(){ return state.db.collection('prospectadores'); }
   $('form-prosp').addEventListener('submit', async function(e){
     e.preventDefault();
-    var nome = $('fp-nome').value.trim(); if (!nome){ $('fp-nome').focus(); toast('Informe o nome do prospectador'); return; }
+    var nome = nomeProprio($('fp-nome').value.trim()); if (!nome){ $('fp-nome').focus(); toast('Informe o nome do parceiro'); return; }
+    var tipoP = $('fp-tipo').value, clinicaP = tipoP === 'clinica' ? nomeProprio($('fp-clinica').value.trim()) : '';
+    if (tipoP === 'clinica' && !clinicaP){ $('fp-clinica').focus(); toast('Informe o nome da clínica'); return; }
     var prev = pEditing ? prospById(pEditing) || {} : {};
-    var data = { nome: nome, telefone: $('fp-tel').value.trim(), regiao: $('fp-reg').value.trim(), regiaoId: $('fp-regiao').value,
+    var data = { nome: nome, tipo: tipoP, clinica: clinicaP, telefone: $('fp-tel').value.trim(), regiao: nomeProprio($('fp-reg').value.trim()), regiaoId: $('fp-regiao').value,
       palavrasEndereco: $('fp-pal').value.split(',').map(function(s){ return s.trim(); }).filter(Boolean),
       ativo: true, criadoEm: prev.criadoEm || new Date().toISOString(), atualizadoEm: new Date().toISOString() };
     if (prev.valorIndicacao) data.valorIndicacao = prev.valorIndicacao;
@@ -6503,7 +6518,7 @@ td,.row{font-size:13px}
   $('fe-cancel').addEventListener('click', function(){ dlgE.close(); });
   $('form-eq').addEventListener('submit', async function(e){
     e.preventDefault();
-    var nome = $('fe-nome').value.trim(), email = $('fe-email').value.trim().toLowerCase();
+    var nome = nomeProprio($('fe-nome').value.trim()), email = $('fe-email').value.trim().toLowerCase();
     if (!nome){ $('fe-nome').focus(); toast('Informe o nome do funcionário'); return; }
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ $('fe-email').focus(); toast('Informe um e-mail válido'); return; }
     var cargoSel = $('fe-funcao').value;

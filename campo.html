@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#faf7f2">
 <meta name="robots" content="noindex">
 <title>Nascer com Direitos</title>
 <link rel="manifest" href="campo.webmanifest">
 <!-- iPhone: abre em tela cheia pelo ícone da Tela de Início -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Nascer c/ Direitos">
+<meta name="apple-mobile-web-app-title" content="Nascer com Direitos">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="apple-touch-icon" href="img/icone-180.png">
 <link rel="icon" type="image/png" href="img/icone-192.png">
@@ -566,6 +566,17 @@ html[data-tema="dark"] .lista > div:has(i.ok) small::before{background:#4ade80}
 .lista small::before{width:7px;height:7px}
 .chips button{font-size:13.5px!important;padding:7px 12px!important}
 .busca{padding-top:2px;padding-bottom:2px}
+
+/* ---------- só gestantes ---------- */
+.fone .rc{white-space:nowrap}
+
+/* ---------- logo bem à vista ---------- */
+.topo .logo img{height:62px!important;filter:drop-shadow(0 2px 8px rgba(138,106,61,.28))}
+.topo{padding:10px 12px 10px!important}
+.login-logo{width:210px!important;max-width:70%!important;height:auto!important;margin:0 auto 22px!important;padding:0!important;background:none!important;box-shadow:none!important;border-radius:0!important;filter:drop-shadow(0 4px 14px rgba(138,106,61,.28))}
+html[data-tema="dark"] .login-logo{filter:brightness(1.55) saturate(1.05) drop-shadow(0 4px 14px rgba(0,0,0,.5))}
+.login-t{font-size:22px!important;font-weight:700;letter-spacing:-.01em}
+.topo{padding:10px 16px 10px!important}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
 </head>
@@ -629,7 +640,10 @@ html[data-tema="dark"] .lista > div:has(i.ok) small::before{background:#4ade80}
   // dados do cadastro em andamento (ficam no celular até o envio)
   // cadastro antigo, sem o tipo guardado: conta como segurada especial
   function tipoAtual(){ return 'urbana'; }   // foco: segurada urbana (paga a guia); não existe mais a escolha do tipo
-  function gestante(){ return lsGet('campo_gestante') === '1'; }
+  function gestante(){ return true; }   // o sistema atende só gestantes: o que importa é a data prevista do parto
+  // telefone no padrão (DDD) 00000-0000
+  function maskFone(v){ var d = String(v || '').replace(/\D/g, '').slice(0, 11); if (!d) return ''; if (d.length <= 2) return '(' + d; if (d.length <= 6) return '(' + d.slice(0, 2) + ') ' + d.slice(2); if (d.length <= 10) return '(' + d.slice(0, 2) + ') ' + d.slice(2, 6) + '-' + d.slice(6); return '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7); }
+  function foneOk(v){ var n = String(v || '').replace(/\D/g, '').length; return n === 10 || n === 11; }
   // o documento é obrigatório neste cadastro? (certidão: a gestante pode mandar depois do parto)
   function obrig(d){
     if (d.tipos) return d.tipos.indexOf(tipoAtual()) >= 0;
@@ -639,7 +653,7 @@ html[data-tema="dark"] .lista > div:has(i.ok) small::before{background:#4ade80}
   function serve(d){ return !d.tipos || d.tipos.indexOf(tipoAtual()) >= 0 || !!fotos[d.k]; }
   var $ = function(id){ return document.getElementById(id); };
   // nome com a primeira letra maiúscula (as cadastradas vêm em MAIÚSCULAS): "Maria das Graças Souza"
-  var bonito = function(n){ return String(n || '').toLowerCase().replace(/(^|\s)([a-zà-ú])/g, function(m, a, b){ return a + b.toUpperCase(); }).replace(/\s(Da|De|Do|Das|Dos|E)(?=\s)/g, function(m){ return m.toLowerCase(); }); };
+  var bonito = function(n){ return String(n || '').replace(/\s+/g, ' ').trim().toLowerCase().replace(/(^|[\s'-])([a-zà-ÿ])/g, function(m, a, b){ return a + b.toUpperCase(); }).replace(/\s(De|Da|Do|Dos|Das|E)(?=\s)/g, function(m){ return m.toLowerCase(); }); };
   var esc = function(t){ return String(t == null ? '' : t).replace(/[&<>"']/g, function(c){ return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
   var token = (location.hash.match(/t=([A-Za-z0-9_-]+)/) || [])[1] || lsGet('campo_token');
   var quem = null, fotos = {}, atual = null, local = null, falandoOk = false; // sem voz: as instruções ficam só escritas na tela
@@ -804,13 +818,13 @@ html[data-tema="dark"] .lista > div:has(i.ok) small::before{background:#4ade80}
     fotos = {}; completando = null; lsSet('campo_completando', ''); telaInicial();
   }
   // no aplicativo o nome do cliente aparece sempre em maiúsculas (no sistema fica 'Maria dos Santos')
-  function maiusculas(d){ if (d && d.clientes) d.clientes.forEach(function(c){ if (c.nome) c.nome = String(c.nome).toUpperCase(); }); return d; }
+  function maiusculas(d){ if (d && d.clientes) d.clientes.forEach(function(c){ if (c.nome) c.nome = bonito(c.nome); if (c.crianca) c.crianca = bonito(c.crianca); }); return d; }   // (nome da função antigo) padrão: Primeira letra maiúscula
   try { painel = maiusculas(JSON.parse(lsGet('campo_painel') || 'null')); } catch(e){}
   function montarCasca(){
     if ($('vista')) return;
     $('app').innerHTML =
       '<div class="topo"><div class="logo"><img src="img/logo-nascer-t.png" alt="Nascer com Direitos"></div>' +
-        '<div class="quem"><b id="topo-nome"></b><span>Salário-maternidade</span></div><div class="sinc" id="sinc"><i></i><span></span></div>' +
+        '<div class="quem"><b id="topo-nome"></b><span id="topo-sub">Parceira</span></div><div class="sinc" id="sinc"><i></i><span></span></div>' +
         '<button type="button" class="tema" id="tema" aria-label="Trocar entre modo claro e escuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle class="sol" cx="12" cy="12" r="4"/><path class="sol" d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/><path class="lua" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button></div>' +
       '<main class="vista" id="vista"></main>' +
       '<nav class="abas" id="abas">' +
@@ -838,7 +852,9 @@ html[data-tema="dark"] .lista > div:has(i.ok) small::before{background:#4ade80}
   window.addEventListener('online', sincronia); window.addEventListener('offline', sincronia);
   function telaInicial(){
     montarCasca();
-    $('topo-nome').textContent = (quem && quem.nome) || 'Parceiro';
+    var clin = quem && quem.tipo === 'clinica' && quem.clinica;
+    $('topo-nome').textContent = clin ? bonito(quem.clinica) : bonito((quem && quem.nome) || '') || 'Parceiro';
+    $('topo-sub').textContent = clin ? 'Clínica parceira' : 'Parceira';
     Array.prototype.forEach.call(document.querySelectorAll('#abas [data-aba]'), function(b){ b.setAttribute('aria-current', b.dataset.aba === aba ? 'true' : 'false'); });
     $('vista').className = 'vista' + (aba === 'novo' ? ' novo' : '');
     $('vista').onclick = null;   // cada aba põe o seu próprio clique
@@ -857,14 +873,11 @@ html[data-tema="dark"] .lista > div:has(i.ok) small::before{background:#4ade80}
     $('vista').innerHTML = (completando ?
       '<div class="completar"><small>Completar documentos de</small><b>' + esc(completando.nome) + '</b><span>Tire só as fotos que estavam faltando e envie.</span><button type="button" id="cancelar-comp">Cancelar</button></div>' :
       '<div class="rot" style="margin-top:0">Dados da cliente</div><div class="dados">' +
-        '<label class="fone' + (lsGet('campo_nome').trim() ? '' : ' falta') + '" id="l-nome"><svg viewBox="0 0 24 24"><use href="#i-pessoa"/></svg><input id="nome" autocomplete="off" autocapitalize="characters" placeholder="Nome completo da cliente" value="' + esc(lsGet('campo_nome')) + '"></label>' +
-        '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-fone"/></svg><input id="fone" inputmode="tel" placeholder="Número de telefone" value="' + esc(lsGet('campo_fone')) + '"></label>' +
+        '<label class="fone' + (lsGet('campo_nome').trim() ? '' : ' falta') + '" id="l-nome"><svg viewBox="0 0 24 24"><use href="#i-pessoa"/></svg><input id="nome" autocomplete="off" autocapitalize="words" placeholder="Nome completo da cliente" value="' + esc(lsGet('campo_nome')) + '"></label>' +
+        '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-fone"/></svg><input id="fone" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="(92) 99999-9999" value="' + esc(maskFone(lsGet('campo_fone'))) + '"></label>' +
       '</div>' +
-      '<div class="rot">Criança <span style="text-transform:none;letter-spacing:0;font-weight:500">(se souber)</span></div><div class="dados">' +
-        '<label class="fone gest"><input type="checkbox" id="gestante"' + (gest ? ' checked' : '') + '>Ainda está grávida</label>' +
-        '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-bebe"/></svg><input id="crianca" autocomplete="off" placeholder="Nome da criança" value="' + esc(lsGet('campo_crianca')) + '"></label>' +
-        (gest ? '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-cal"/></svg><span class="rc">Data prevista do parto</span><input id="dpp" type="date" value="' + esc(lsGet('campo_dpp')) + '"></label>'
-              : '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-cal"/></svg><span class="rc">Nascimento da criança</span><input id="crianca-nasc" type="date" max="' + hojeISO() + '" value="' + esc(lsGet('campo_crianca_nasc')) + '"></label>') +
+      '<div class="rot">Gestação</div><div class="dados">' +
+        '<label class="fone' + (lsGet('campo_dpp') ? '' : ' falta') + '" id="l-dpp"><svg viewBox="0 0 24 24"><use href="#i-cal"/></svg><span class="rc">Data prevista do parto</span><input id="dpp" type="date" value="' + esc(lsGet('campo_dpp')) + '"></label>' +
       '</div>') +
       '<div class="rot">' + (completando ? 'Documentos que faltam' : 'Documentos') + '</div><div class="grid">' + visiveis.map(function(d){
         var f = d.k === 'rg_frente' ? rgFotos() : fotos[d.k];
@@ -887,14 +900,10 @@ html[data-tema="dark"] .lista > div:has(i.ok) small::before{background:#4ade80}
     })();
     if (completando){ $('cancelar-comp').onclick = cancelarComplemento; if ($('enviar')) $('enviar').lastChild.textContent = 'Enviar documentos'; }
     else {
-    $('fone').addEventListener('input', function(){ lsSet('campo_fone', this.value); });
+    $('fone').addEventListener('input', function(){ this.value = maskFone(this.value); lsSet('campo_fone', this.value); });
     $('nome').addEventListener('input', function(){ lsSet('campo_nome', this.value); $('l-nome').classList.toggle('falta', !this.value.trim()); });
-    $('nome').addEventListener('blur', function(){ this.value = this.value.replace(/\s+/g, ' ').trim().toUpperCase(); lsSet('campo_nome', this.value); });
-    $('crianca').addEventListener('input', function(){ lsSet('campo_crianca', this.value); });
-    $('crianca').addEventListener('blur', function(){ this.value = this.value.replace(/\s+/g, ' ').trim(); lsSet('campo_crianca', this.value); });
-    if ($('crianca-nasc')) $('crianca-nasc').addEventListener('change', function(){ lsSet('campo_crianca_nasc', this.value); });
-    if ($('dpp')) $('dpp').addEventListener('change', function(){ lsSet('campo_dpp', this.value); });
-    $('gestante').addEventListener('change', function(){ lsSet('campo_gestante', this.checked ? '1' : ''); telaInicial(); });
+    $('nome').addEventListener('blur', function(){ this.value = bonito(this.value); lsSet('campo_nome', this.value); });
+    if ($('dpp')) $('dpp').addEventListener('change', function(){ lsSet('campo_dpp', this.value); var l = $('l-dpp'); if (l) l.classList.toggle('falta', !this.value); });
     }
     if ($('som')) $('som').addEventListener('click', function(){ falar(falta.length ? 'Digite o nome e o número da cliente. Depois toque em cada quadro e tire a foto, encaixando o documento no quadro. Faltam: ' + falta.map(function(d){ return d.t; }).join(', ') + '. Quando terminar, aperte o botão verde, enviar.' : 'Tudo pronto. Aperte o botão verde, enviar.'); });
     Array.prototype.forEach.call(document.querySelectorAll('.doc'), function(b){
@@ -1027,7 +1036,7 @@ html[data-tema="dark"] .lista > div:has(i.ok) small::before{background:#4ade80}
       $('lista-cli').innerHTML = '<div class="rot">' + l.length + (l.length === 1 ? ' cliente' : ' clientes') + '</div>' + (l.length ? '<div class="lista">' + l.slice(0, 300).map(function(c){
         var k = etapaCli(c), e = ETP[k], sub = k === 'marcada' ? dataBR(c.audData) + (c.audHora ? ' · ' + c.audHora : '') + ' · ' + quando(c.audData) : c.cadastro ? 'indicada em ' + dataBR(c.cadastro) : '';
         var fl = faltas(c);
-        return '<div data-cli="' + esc(c.id) + '"><i class="' + (fl.length ? 'red' : e[1]) + '"></i><span class="nm"><b>' + esc(bonito(c.nome || 'Sem nome')) + '</b><span>' + esc(sub) + '</span>' + (fl.length ? '<span class="falta-l">Falta: ' + esc(nomesFaltas(fl)) + '</span>' : '') + '</span><small>' + e[0] + '</small></div>';
+        return '<div data-cli="' + esc(c.id) + '"><i class="' + (fl.length ? 'red' : e[1]) + '"></i><span class="nm"><b>' + esc(bonito(c.nome) || 'Sem nome') + '</b><span>' + esc(sub) + '</span>' + (fl.length ? '<span class="falta-l">Falta: ' + esc(nomesFaltas(fl)) + '</span>' : '') + '</span><small>' + e[0] + '</small></div>';
       }).join('') + '</div>' : '<div class="vazio">' + (cl.length ? 'Nenhum cliente neste filtro.' : navigator.onLine === false && !painel ? 'Sem internet: a lista aparece quando o celular tiver sinal.' : 'Você ainda não tem clientes no sistema. Os cadastros enviados aparecem aqui.') + '</div>');
     }
     desenhar();
@@ -1599,6 +1608,8 @@ html[data-tema="dark"] .lista > div:has(i.ok) small::before{background:#4ade80}
     }
     var nm = ($('nome') || {}).value || '';
     if (!nm.trim()){ falar('Digite o nome completo da cliente.'); alert('Digite o nome completo da cliente.'); $('nome').focus(); return; }
+    if (!foneOk(($('fone') || {}).value)){ alert('Informe o telefone com DDD, por exemplo (92) 99999-9999.'); if ($('fone')) $('fone').focus(); return; }
+    if (!lsGet('campo_dpp')){ alert('Informe a data prevista do parto.'); if ($('dpp')) $('dpp').focus(); return; }
     var falta = DOCS.filter(function(d){ return obrig(d) && !fotos[d.k]; });
     if (falta.length){
       falar('Está faltando: ' + falta.map(function(d){ return d.t; }).join(', ') + '. Quer enviar assim mesmo?');
@@ -1642,9 +1653,9 @@ html[data-tema="dark"] .lista > div:has(i.ok) small::before{background:#4ade80}
       cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height); fotoMini = cv.toDataURL('image/jpeg', 0.72);
     }).catch(function(){}); });
     p     .then(function(){
-       var envio = { id: id, token: token, criado: new Date().toISOString(), completar: comp ? comp.id : '', foto: fotoMini, contato: ($('fone') || {}).value || '', cliente: comp ? comp.nome : (($('nome') || {}).value || '').replace(/\s+/g, ' ').trim().toUpperCase(), local: local, faltam: falta.map(function(d){ return d.k; }),
-         tipoSegurada: tipoAtual(), crianca: comp ? '' : lsGet('campo_crianca').replace(/\s+/g, ' ').trim(), criancaNasc: comp || gestante() ? '' : lsGet('campo_crianca_nasc'),
-         fatoGerador: gestante() ? 'gestante' : 'parto', dpp: !comp && gestante() ? lsGet('campo_dpp') : '',
+       var envio = { id: id, token: token, criado: new Date().toISOString(), completar: comp ? comp.id : '', foto: fotoMini, contato: maskFone(($('fone') || {}).value || ''), cliente: comp ? comp.nome : bonito(($('nome') || {}).value || ''), local: local, faltam: falta.map(function(d){ return d.k; }),
+         tipoSegurada: tipoAtual(), crianca: '', criancaNasc: comp || gestante() ? '' : lsGet('campo_crianca_nasc'),
+         fatoGerador: 'gestante', dpp: !comp && gestante() ? lsGet('campo_dpp') : '',
          docs: DOCS.filter(function(d){ return fotos[d.k]; }).map(function(d){ return d.k; }), arquivos: [] };
        return Promise.all(arquivos.map(function(a){ return paraBytes(a.blob).then(function(b){ return { nome: a.nome, mime: a.mime, buf: b, tam: b.byteLength, ok: false }; }, function(){ return { nome: a.nome, mime: a.mime, blob: a.blob, tam: a.blob.size, ok: false }; }); }))
          .then(function(l){ envio.arquivos = l; return filaPor(envio); }).then(function(){ return histPor({ id: envio.id, token: token, cliente: envio.cliente + (comp ? ' · documentos' : ''), clienteId: comp ? comp.id : '', criado: envio.criado, enviado: null }); }).then(function(){ return envio; });
