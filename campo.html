@@ -630,12 +630,12 @@ html[data-tema="dark"] .mini-btn{background:#1b1712;border-color:#4b4132;color:#
 /* ---------- margens laterais maiores, respeitando a área segura de cada celular ---------- */
 :root{--gx:max(22px,env(safe-area-inset-left));--gxr:max(22px,env(safe-area-inset-right))}
 .vista{padding-left:var(--gx)!important;padding-right:var(--gxr)!important}
-.topo{padding-left:var(--gx)!important;padding-right:var(--gxr)!important}
-.wrap{padding-left:var(--gx)!important;padding-right:var(--gxr)!important}
+.topo{margin:0 0 6px!important;padding-left:var(--gx)!important;padding-right:var(--gxr)!important}
+html,body{overflow-x:hidden}
 .folha > div{padding-left:var(--gx)!important;padding-right:var(--gxr)!important}
 .barra{padding-left:var(--gx)!important;padding-right:var(--gxr)!important}
-.abas{left:max(18px,env(safe-area-inset-left))!important;right:max(18px,env(safe-area-inset-right))!important}
-#barra-envio{left:max(18px,env(safe-area-inset-left))!important;right:max(18px,env(safe-area-inset-right))!important}
+.abas{left:var(--gx)!important;right:var(--gxr)!important}
+#barra-envio{left:var(--gx)!important;right:var(--gxr)!important}
 .tela{padding-left:max(22px,env(safe-area-inset-left));padding-right:max(22px,env(safe-area-inset-right))}
 .ver .topo,.rec .topo,.ver .ctl,.rec .ctl{padding-left:var(--gx)!important;padding-right:var(--gxr)!important}
 .lista div{padding:13px 16px!important}
