@@ -1549,7 +1549,7 @@ td,.row{font-size:13px}
       <button class="tab" role="tab" id="tab-ctr" aria-selected="false" type="button" title="Contratos fechados"><svg class="i"><use href="#i-check"/></svg><span>Contratos fechados</span></button>
       <button class="tab" role="tab" id="tab-nasc" aria-selected="false" type="button" title="Aguardando nascimento"><svg class="i"><use href="#i-clock"/></svg><span>Aguardando nascimento</span></button>
       <button class="tab" role="tab" id="tab-inss" aria-selected="false" type="button" title="INSS"><svg class="i"><use href="#i-inss"/></svg><span>INSS</span></button>
-      <button class="tab" role="tab" id="tab-clientes" aria-selected="true" type="button" title="Judicial"><svg class="i"><use href="#i-users"/></svg><span>Judicial</span></button>
+      <button class="tab" role="tab" id="tab-clientes" aria-selected="true" type="button" title="Judicial"><svg class="i"><use href="#i-users"/></svg><span>Judicial</span></button>
       <button class="tab admin-only" role="tab" id="tab-fin" aria-selected="false" type="button" title="Financeiro"><svg class="i"><use href="#i-cash"/></svg><span>Financeiro</span></button>
       <button class="tab" role="tab" id="tab-ret" aria-selected="false" type="button" title="Arquivados"><svg class="i"><use href="#i-file"/></svg><span>Arquivados</span></button>
       <button class="tab admin-only" role="tab" id="tab-equipe" aria-selected="false" type="button" title="Configurações"><svg class="i"><use href="#i-gear"/></svg><span>Configurações</span></button>
@@ -3059,7 +3059,7 @@ td,.row{font-size:13px}
       cardI('i-clock', 'Em análise', conta.analise, (emAnalise.length ? 'média de ' + media + ' dias' : 'nenhum em análise') + (atras ? ' · ' + atras + ' passaram de ' + INSS_PRAZO_ANALISE + ' dias' : ''), '--blue', 'analise') +
       cardI('i-bellx', 'Exigências', conta.exigencia, vence ? vence + ' com prazo em até 5 dias' : 'o INSS pediu documento', '--amber', 'exigencia') +
       cardI('i-check', 'Concedidos', conta.concedido, (decididos ? Math.round(conta.concedido / decididos * 100) + '% dos decididos' : 'nenhum decidido ainda') + ' · vão para o Financeiro', '--green', 'concedido') +
-      cardI('i-gavel', 'Indeferidos', conta.indeferido, 'prontos para entrar na Justiça', '--red', 'indeferido');
+      cardI('i-gavel', 'Indeferidos', conta.indeferido, 'prontos para entrar no Judicial', '--red', 'indeferido');
     var SITS = [['', 'Todas as situações · ' + todos.length]].concat(Object.keys(INSS).map(function(k){ return [k, INSS[k][0] + ' · ' + conta[k]]; })).concat([['atrasada', 'Análise atrasada · ' + atras], ['vence', 'Exigência vencendo · ' + vence]]);
     $('inss-sit').innerHTML = SITS.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === inssSit ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
     $('inss-sit').classList.toggle('ativo', !!inssSit);
@@ -3598,7 +3598,7 @@ td,.row{font-size:13px}
   function origem(r){ return String(r.processo || '').trim() ? 'justica' : 'inss'; }
   // perdeu de vez: improcedente/extinto, ou indeferido no INSS sem ação judicial e já arquivado
   function perdeu(r){ return r.resultado === 'improcedente' || r.resultado === 'extinto' || (r.inssStatus === 'indeferido' && !String(r.processo || '').trim() && r.arquivado); }
-  // em andamento: requerido ou na Justiça, ainda sem ganho nem perda
+  // em andamento: requerido ou no Judicial, ainda sem ganho nem perda
   function emAndamento(r){ return !ganhou(r) && !perdeu(r) && !r.arquivado && (requerido(r) || !!String(r.processo || '').trim()); }
   function renderFin(){
     var body = $('fin-body'); if (!body) return;
