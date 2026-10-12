@@ -673,6 +673,11 @@ html,body{overflow-x:hidden}
 .cid-limpar{width:34px;height:34px;border-radius:50%;border:0;background:var(--soft,#f1ece2);color:var(--ink2,#6b5d47);display:inline-flex;align-items:center;justify-content:center;flex:none;padding:0;margin-left:4px}
 .cid-limpar svg{width:16px;height:16px;fill:none}
 .cid-limpar[hidden]{display:none}
+/* data prevista do parto: dentro da caixa, alinhada à direita */
+#l-dpp{box-sizing:border-box;width:100%;max-width:100%;overflow:hidden}
+#l-dpp .rc{font-size:14px}
+#dpp{flex:1 1 0!important;width:0!important;min-width:0!important;text-align:right;font-size:18px!important;letter-spacing:0!important;color:var(--ink)}
+#dpp::placeholder{color:var(--ink2);opacity:.7}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
 </head>
@@ -715,7 +720,7 @@ html,body{overflow-x:hidden}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 7;
+  var APP_VERSAO = 8;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
