@@ -1546,6 +1546,21 @@ td,.row{font-size:13px}
   .topnav .brand b{font-size:14.5px;line-height:1.25}
   .app.collapsed .topnav .brand .logo{width:50px!important;height:50px!important;border-radius:16px!important}
 }
+
+/* ---------- logo sem moldura: fundo transparente, direto no menu ---------- */
+.brand .logo,.topnav .brand .logo,:root[data-theme="dark"] .brand .logo,:root[data-theme="dark"] .topnav .brand .logo{background:none!important;border:0!important;box-shadow:none!important;border-radius:0!important;width:auto!important;height:auto!important;overflow:visible!important}
+.topnav .brand .logo img,.app.collapsed .topnav .brand .logo img{height:60px;width:auto;max-width:56px;object-fit:contain;padding:0!important;filter:drop-shadow(0 3px 8px rgba(138,106,61,.22))}
+.app.collapsed .topnav .brand .logo img{height:50px;max-width:48px}
+:root[data-theme="dark"] .topnav .brand .logo img{filter:brightness(1.55) saturate(1.05) drop-shadow(0 3px 10px rgba(0,0,0,.45))}
+.auth-logo{background:none!important;padding:0!important;border-radius:0!important;width:auto!important;height:112px!important;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(138,106,61,.25))}
+:root[data-theme="dark"] .auth-logo{filter:brightness(1.55) saturate(1.05) drop-shadow(0 4px 12px rgba(0,0,0,.45))}
+
+/* o nome ao lado da logo aparece sempre que o menu lateral está aberto (também em telas de 1000 a 1180 px) */
+@media (min-width:1000px){
+  .app:not(.collapsed) .topnav .brand > div:not(.logo){display:block}
+  .app:not(.collapsed) .topnav .brand > div:not(.logo) span{display:block}
+  .app:not(.collapsed) .topnav .side-foot b{display:block}
+}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -1591,7 +1606,7 @@ td,.row{font-size:13px}
 <div class="auth" id="auth" hidden>
   <div class="card auth-card">
     <div>
-      <img class="auth-logo" src="img/logo-nascer.png" alt="">
+      <img class="auth-logo" src="img/logo-nascer-t.png" alt="Nascer com Direitos">
       <div class="eyebrow">Salário-maternidade</div>
       <h1>Nascer com Direitos</h1>
     </div>
@@ -1614,7 +1629,7 @@ td,.row{font-size:13px}
 
 <div class="app" id="app" hidden>
   <header class="topnav">
-    <div class="brand"><div class="logo"><img src="img/logo-nascer.png" alt=""></div><div><b>Nascer com Direitos</b><span>Salário-maternidade</span></div></div>
+    <div class="brand"><div class="logo"><img src="img/logo-nascer-t.png" alt="Nascer com Direitos"></div><div><b>Nascer com Direitos</b><span>Salário-maternidade</span></div></div>
     <nav class="nav" role="tablist" aria-orientation="horizontal">
       <div class="nav-lbl" aria-hidden="true">Comercial</div><button class="tab" role="tab" id="tab-cad" aria-selected="false" type="button" title="Cadastro"><svg class="i"><use href="#i-plus"/></svg><span>Cadastro</span></button>
       <button class="tab" role="tab" id="tab-ctr" aria-selected="false" type="button" title="Contratos fechados"><svg class="i"><use href="#i-check"/></svg><span>Contratos fechados</span></button>
