@@ -1337,9 +1337,68 @@ dialog{box-shadow:0 24px 60px rgba(60,45,20,.22)!important;border:0!important}
 #list .row,.rows .row{border-radius:14px}
 #list .row:hover{background:#f7f0e4}
 input:focus,select:focus,textarea:focus{outline:0;border-color:var(--gold)!important;box-shadow:0 0 0 4px rgba(160,122,69,.16)}
+
+/* ---------- layout de painel (SaaS): menu lateral dourado e branco, cartões de indicadores com ícone ---------- */
+:root{--g1:#a07a45;--g2:#8a6a3d;--gsoft:#f8f1e4;--gline:#efe6d6}
+.stat-h{letter-spacing:.04em;font-size:11.5px;gap:10px}
+.stat-h svg.i{width:38px!important;height:38px!important;padding:9px;border-radius:12px;background:var(--gsoft);color:var(--g2);flex:none;box-sizing:border-box}
+:root[data-theme="dark"] .stat-h svg.i{background:rgba(212,180,131,.14);color:#d4b483}
+.stat{min-height:122px;padding:16px 18px 0}
+.ph h1{font-size:26px;letter-spacing:-.02em}
+.ph p{font-size:14px;color:var(--ink-3)}
+@media (min-width:1000px){
+  .app{display:grid;grid-template-columns:272px minmax(0,1fr);min-height:100vh;align-items:start}
+  .topnav{position:sticky;top:0;height:100vh;flex-direction:column;align-items:stretch;gap:6px;padding:22px 16px 18px;border-bottom:0!important;border-right:1px solid var(--gline);background:#fff!important;backdrop-filter:none;box-shadow:none;overflow-y:auto}
+  :root[data-theme="dark"] .topnav{background:var(--panel)!important;border-right-color:var(--line)}
+  .topnav .brand{padding:2px 8px 18px;gap:12px}
+  .topnav .brand .logo{width:46px;height:46px;border-radius:16px;background:#fff;border:1px solid var(--gline)}
+  .topnav .brand b{font-size:15.5px}
+  .topnav .brand span{display:block!important;font-size:12px}
+  .topnav .top-right{display:contents}
+  .topnav #btn-novo{order:1;justify-content:center;width:100%;height:46px;margin:0 0 14px;border-radius:14px!important}
+  .topnav .nav{order:2;flex-direction:column;flex:1 1 auto;gap:4px;overflow:visible;padding:0}
+  .topnav .nav button{width:100%;justify-content:flex-start;padding:12px 14px!important;border-radius:14px!important;font-size:14.5px;position:relative}
+  .topnav .nav button svg.i{width:20px;height:20px}
+  .topnav .nav .tab[aria-selected="true"]{background:var(--gsoft)!important;color:var(--g2)!important;font-weight:600;box-shadow:none!important}
+  .topnav .nav .tab[aria-selected="true"]::before{content:"";position:absolute;left:-16px;top:10px;bottom:10px;width:4px;border-radius:0 4px 4px 0;background:linear-gradient(180deg,var(--g1),var(--g2))}
+  .topnav .nav .tab[aria-selected="true"] .i{stroke:var(--g2)}
+  :root[data-theme="dark"] .topnav .nav .tab[aria-selected="true"]{background:rgba(212,180,131,.14)!important;color:#d4b483!important}
+  .topnav #sync{order:3;display:block!important;font-size:11.5px;color:var(--ink-3);padding:6px 8px}
+  .topnav #btn-theme{order:4;align-self:flex-start;margin-left:6px}
+  .topnav .side-foot{order:5;margin:6px 0 0;padding:14px 8px 0;border-left:0!important;border-top:1px solid var(--gline)}
+  .topnav .side-foot b{display:block!important;font-size:13px}
+  .topnav .side-foot > div:not(.av){max-width:none}
+  .main{min-height:100vh}
+  .content{padding:30px 36px 56px;gap:22px}
+}
+
+/* ---------- acabamento: tipografia limpa, cartões arejados, sem cara de "painel de programador" ---------- */
+:root{--font:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--sombra-leve:0 1px 3px rgba(60,45,20,.04),0 6px 20px rgba(60,45,20,.05)}
+body{font-feature-settings:"cv11","ss01";-webkit-font-smoothing:antialiased}
+/* cartões de indicadores: ficha de ícone + número grande + texto em fonte normal */
+.vw-dash .stats{gap:18px!important}
+.vw-dash .stat{padding:20px 22px!important;min-height:0!important;border-radius:20px!important;background:#fff;border:1px solid var(--gline)!important;box-shadow:var(--sombra-leve)!important}
+.vw-dash .stat-h{font-size:14px!important;font-weight:600!important;letter-spacing:0!important;text-transform:none!important;color:var(--ink-2)!important;gap:12px!important}
+.vw-dash .stat-h svg.i{width:44px!important;height:44px!important;padding:11px!important;border-radius:14px!important;background:var(--gsoft)!important;color:var(--g2)!important;stroke:var(--g2)}
+.vw-dash .stat-h .help{margin-left:auto;opacity:.7}
+.vw-dash .stat-v{font-size:34px!important;font-weight:700!important;letter-spacing:-.025em!important;margin-top:14px!important;color:var(--ink)}
+.vw-dash .stat-c{font-family:var(--font)!important;font-size:13px!important;letter-spacing:0!important;color:var(--ink-3)!important;white-space:normal!important;overflow:visible!important;margin-top:4px!important;line-height:1.4}
+.vw-dash .card.stat[aria-pressed="true"],.vw-dash .card.stat.on{border-color:var(--g1)!important;box-shadow:0 0 0 3px rgba(160,122,69,.16)!important}
+/* títulos e blocos */
+.ph h1{font-size:28px!important;font-weight:700!important}
+.sec-rot,.rot{font-size:15px!important;font-weight:700!important;letter-spacing:0!important;text-transform:none!important;color:var(--ink)!important}
+/* botões e destaque dourado liso (sem degradê) */
+#btn-novo,.btn.primary{background:var(--g1)!important;box-shadow:0 4px 14px rgba(138,106,61,.22)!important;font-weight:600}
+#btn-novo:hover,.btn.primary:hover{background:var(--g2)!important}
+.topnav .nav .tab[aria-selected="true"]::before{background:var(--g1)!important}
+/* tabelas */
+th{font-size:12.5px!important;font-weight:600!important;letter-spacing:0!important;text-transform:none!important;color:var(--ink-3)!important}
+td,.row{font-size:14px}
+@media (min-width:1000px){.topnav{overflow-x:hidden!important}.topnav .side-foot{min-width:0}.topnav .side-foot > div:not(.av){min-width:0;overflow:hidden}.topnav .side-foot b{white-space:normal;overflow-wrap:anywhere;line-height:1.3}}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
