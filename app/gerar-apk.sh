@@ -13,6 +13,6 @@ rm -f android/app/build/outputs/apk/release/app-release.apk
 V=$(grep -o 'var APP_VERSAO = [0-9]*' ../campo.html | grep -o '[0-9]*$')
 mkdir -p download
 cp android/app/build/outputs/apk/release/app-release.apk download/nascer-com-direitos.apk
-printf '{"versao": %s, "url": "https://SEU-USUARIO.github.io/nascer-com-direitos/app/download/nascer-com-direitos.apk"}\n' "$V" > versao.json
+printf '{"versao": %s, "url": "https://thiagolitaiff22.github.io/nascer-com-direitos/app/download/nascer-com-direitos.apk"}\n' "$V" > versao.json
 "$T/sdk/build-tools/35.0.0/apksigner.bat" verify --print-certs download/nascer-com-direitos.apk | grep -i "signer #1 certificate DN"
 echo "APK pronto: app/download/nascer-com-direitos.apk (versão $V)"
