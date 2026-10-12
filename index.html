@@ -1475,6 +1475,17 @@ td,.row{font-size:13px}
 #nasc-list .c-act{flex-wrap:wrap}
 #ctr-list .docs-pend,#nasc-list .docs-pend{position:relative;cursor:help}
 #ctr-list .docs-tip,#nasc-list .docs-tip{display:none}
+
+/* ---------- menu lateral organizado em grupos ---------- */
+.topnav .nav-lbl{display:none}
+@media (min-width:1000px){
+  .app{grid-template-columns:236px minmax(0,1fr)}
+  .topnav .nav-lbl{display:block;padding:16px 14px 6px;font-size:11.5px;font-weight:600;letter-spacing:.02em;color:var(--ink-3);opacity:.9}
+  .topnav .nav-lbl:first-child{padding-top:4px}
+  .topnav .nav button{padding-right:10px!important}
+  .topnav .nav .tab:hover{background:#fbf7ef!important}
+  :root[data-theme="dark"] .topnav .nav .tab:hover{background:#262019!important}
+}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -1545,12 +1556,12 @@ td,.row{font-size:13px}
   <header class="topnav">
     <div class="brand"><div class="logo"><img src="img/logo-nascer.png" alt=""></div><div><b>Nascer com Direitos</b><span>Salário-maternidade</span></div></div>
     <nav class="nav" role="tablist" aria-orientation="horizontal">
-      <button class="tab" role="tab" id="tab-cad" aria-selected="false" type="button" title="Cadastro"><svg class="i"><use href="#i-plus"/></svg><span>Cadastro</span></button>
+      <div class="nav-lbl" aria-hidden="true">Comercial</div><button class="tab" role="tab" id="tab-cad" aria-selected="false" type="button" title="Cadastro"><svg class="i"><use href="#i-plus"/></svg><span>Cadastro</span></button>
       <button class="tab" role="tab" id="tab-ctr" aria-selected="false" type="button" title="Contratos fechados"><svg class="i"><use href="#i-check"/></svg><span>Contratos fechados</span></button>
       <button class="tab" role="tab" id="tab-nasc" aria-selected="false" type="button" title="Aguardando nascimento"><svg class="i"><use href="#i-clock"/></svg><span>Aguardando nascimento</span></button>
-      <button class="tab" role="tab" id="tab-inss" aria-selected="false" type="button" title="INSS"><svg class="i"><use href="#i-inss"/></svg><span>INSS</span></button>
+      <div class="nav-lbl" aria-hidden="true">Processos</div><button class="tab" role="tab" id="tab-inss" aria-selected="false" type="button" title="INSS"><svg class="i"><use href="#i-inss"/></svg><span>INSS</span></button>
       <button class="tab" role="tab" id="tab-clientes" aria-selected="true" type="button" title="Judicial"><svg class="i"><use href="#i-users"/></svg><span>Judicial</span></button>
-      <button class="tab admin-only" role="tab" id="tab-fin" aria-selected="false" type="button" title="Financeiro"><svg class="i"><use href="#i-cash"/></svg><span>Financeiro</span></button>
+      <div class="nav-lbl" aria-hidden="true">Gestão</div><button class="tab admin-only" role="tab" id="tab-fin" aria-selected="false" type="button" title="Financeiro"><svg class="i"><use href="#i-cash"/></svg><span>Financeiro</span></button>
       <button class="tab" role="tab" id="tab-ret" aria-selected="false" type="button" title="Arquivados"><svg class="i"><use href="#i-file"/></svg><span>Arquivados</span></button>
       <button class="tab admin-only" role="tab" id="tab-equipe" aria-selected="false" type="button" title="Configurações"><svg class="i"><use href="#i-gear"/></svg><span>Configurações</span></button>
     </nav>
