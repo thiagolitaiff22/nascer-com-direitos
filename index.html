@@ -1502,6 +1502,13 @@ td,.row{font-size:13px}
 
 /* WhatsApp: o sistema não faz disparo; os painéis ficam fora da tela */
 [data-painel="liderhub"],[data-painel="regua"],[data-painel="lembrete"],#av-card{display:none!important}
+
+/* ---------- menu: espaçamento que acompanha a altura da janela (mais ar em telas altas, compacto em baixas) ---------- */
+@media (min-width:1000px){
+  .topnav .nav button{padding-top:clamp(7px,1.35vh,13px)!important;padding-bottom:clamp(7px,1.35vh,13px)!important}
+  .topnav .nav-lbl{padding-top:clamp(10px,2vh,20px)!important;padding-bottom:clamp(3px,.6vh,7px)!important}
+  .topnav #btn-novo{margin-bottom:clamp(6px,1.4vh,16px)!important}
+}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -1584,7 +1591,7 @@ td,.row{font-size:13px}
     <div class="top-right">
       <small id="sync">Conectando à base…</small>
       <button class="icon-btn theme-btn" id="btn-theme" type="button" aria-label="Modo escuro" title="Modo escuro"><svg class="i"><use id="theme-ico" href="#i-moon"/></svg></button>
-      <button class="btn primary" id="btn-novo" type="button"><svg class="i"><use href="#i-plus"/></svg>Novo cliente</button>
+      <button class="btn primary" id="btn-novo" type="button"><svg class="i"><use href="#i-plus"/></svg>Novo lead</button>
       <div class="side-foot"><div class="av" id="me-av">E</div><div><b id="me"></b><button type="button" class="linkbtn" id="btn-sair">Sair</button></div></div>
     </div>
   </header>
@@ -1921,7 +1928,7 @@ td,.row{font-size:13px}
 
 <dialog id="dlg">
   <form class="f" id="form" novalidate>
-    <div class="f-head"><div class="ph-tile" style="margin:0"><svg class="i"><use href="#i-users"/></svg></div><h2 id="f-title">Novo cliente</h2></div>
+    <div class="f-head"><div class="ph-tile" style="margin:0"><svg class="i"><use href="#i-users"/></svg></div><h2 id="f-title">Novo lead (orgânico)</h2></div>
     <div class="f-body">
       <div class="section-lbl">Dados da cliente (mãe)</div>
       <div class="field full"><label for="f-nome">Nome completo da mãe</label><input id="f-nome" required autocomplete="off"></div>
@@ -2813,7 +2820,7 @@ td,.row{font-size:13px}
     renderSum(list);
     var html = '<div class="row head"><div>Cliente</div><div>Processo</div><div>Contato</div><div>Audiência</div><div>Aviso</div><div></div></div>';
     if (!list.length){
-      html += '<div class="empty">' + (state.rows.length ? 'Nenhum cliente neste filtro.' : 'Nenhum cliente cadastrado ainda. Clique em <b>Novo cliente</b> para começar.') + '</div>';
+      html += '<div class="empty">' + (state.rows.length ? 'Nenhum cliente neste filtro.' : 'Nenhum cliente cadastrado ainda. Clique em <b>Novo lead</b> para começar.') + '</div>';
     }
     list.slice(0, state.limit).forEach(function(r){
       html += '<div class="row' + (clAberto[r.id] ? ' aberto' : '') + '" data-linha="' + esc(r.id) + '">' +
@@ -3023,14 +3030,14 @@ td,.row{font-size:13px}
       .sort(function(a, b){ var da = String(a.dataCadastro || a.criadoEm || '').slice(0, 10), db = String(b.dataCadastro || b.criadoEm || '').slice(0, 10); return db.localeCompare(da) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); });
     $('cad-count').textContent = lista.length + (lista.length === 1 ? ' cliente' : ' clientes');
     var html = '<div class="row head"><div>Cliente</div><div>Prospectador</div><div>Contato</div><div>Cadastrado</div><div>Documentos</div><div>Situação</div><div></div></div>';
-    if (!lista.length) html += '<div class="empty">' + (todos.length ? 'Nenhum cliente neste filtro.' : 'Nenhum cliente em cadastro. Clique em <b>Novo cliente</b> para começar.') + '</div>';
+    if (!lista.length) html += '<div class="empty">' + (todos.length ? 'Nenhum cliente neste filtro.' : 'Nenhum cliente em cadastro. Clique em <b>Novo lead</b> para começar.') + '</div>';
     lista.slice(0, 300).forEach(function(r){
       var st = situacaoCad(r);
       html += '<div class="row' + (cadAberto[r.id] ? ' aberto' : '') + '" data-linha="' + esc(r.id) + '">' +
         '<div class="c-name"><div class="name">' + (/^data:image\/(jpeg|png);base64,/.test(r.fotoCliente || '') ? '<img class="av-foto" src="' + r.fotoCliente + '" alt="">' : '') + '<button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome) + '</button>' +
           '<button type="button" class="nome-copia" data-copiar-nome="' + esc(r.nome) + '" title="Copiar o nome" aria-label="Copiar o nome de ' + esc(r.nome) + '"><svg class="i"><use href="#i-copy"/></svg></button>' +
           (r.pastaUrl ? pastaIco(r) : '<button type="button" class="pasta-falta" data-pasta-cad="' + esc(r.id) + '" title="Pasta não ligada ao cadastro: clique para procurar a pasta dela no Drive" aria-label="Ligar pasta de ' + esc(r.nome) + '"><svg class="i"><use href="#i-folder"/></svg>+</button>') + prazoTag(r) + '</div><div class="addr">' + (r.cpf ? 'CPF ' + esc(r.cpf) : 'CPF não informado') + (r.tipoSegurada ? ' · ' + esc(r.tipoSegurada === 'especial' ? 'rural' : (TIPOS[r.tipoSegurada] || '').split(' ')[0].toLowerCase()) : '') + '</div></div>' +
-        '<div><span class="lbl">Prospectador</span><div class="val">' + esc(prospName(r.responsavelId) || '—') + '</div></div>' +
+        '<div><span class="lbl">Prospectador</span><div class="val">' + esc(prospName(r.responsavelId) || (r.origem === 'organico' ? 'Orgânico' : '—')) + '</div></div>' +
         '<div><span class="lbl">Contato</span>' + telCell(r, true) + '</div>' +
         '<div><span class="lbl">Cadastrado</span><div class="val">' + (r.dataCadastro || r.criadoEm ? String(r.dataCadastro || r.criadoEm).slice(0, 10).replace(/^\d\d(\d\d)-(\d\d)-(\d\d)$/, '$3/$2/$1') : '—') + '</div></div>' +
         '<div><span class="lbl">Documentos</span>' + docsCell(r) + '</div>' +
@@ -4607,7 +4614,7 @@ td,.row{font-size:13px}
     state.editing = r ? r.id : null;
     $('form').classList.toggle('novo', !r || !!compacto); // cadastro inicial: só os dados do cliente
     $('form').classList.toggle('com-pasta', !!(r && (comPasta || !r.pastaUrl)));   // sem pasta ligada: mostra o campo para colar o link
-    $('f-title').textContent = r ? 'Editar cliente' : 'Novo cliente';
+    $('f-title').textContent = r ? 'Editar cliente' : 'Novo lead (orgânico)';
     $('f-nome').value = r ? r.nome || '' : '';
     $('f-cpf').value = r ? r.cpf || '' : '';
     $('f-rg').value = r ? r.rg || '' : '';
@@ -4746,7 +4753,8 @@ td,.row{font-size:13px}
       comparecimento: $('f-comp').value, motivoFalta: $('f-comp').value === 'faltou' ? $('f-falta').value.trim() : '',
       resultado: $('f-comp').value === 'faltou' && !$('f-res').value ? 'ausente' : ($('f-comp').value === 'compareceu' && $('f-res').value === 'ausente' ? '' : $('f-res').value), concluso: $('f-conc').value === 'sim', motivoConcluso: $('f-conc').value === 'sim' ? $('f-mot').value.trim() : '', embargos: $('f-rec').value, pagamento: $('f-pag').value, previsao: $('f-prev').value || '',
       obs: $('f-obs').value.trim(), dataCadastro: $('f-dtcad').value || prev.dataCadastro || iso(new Date()), criadoEm: prev.criadoEm || new Date().toISOString(), atualizadoEm: new Date().toISOString(),
-      conferirDados: false
+      conferirDados: false,
+      origem: prev.origem || 'organico'
     });
     var pastaCol = $('f-pasta-url') ? $('f-pasta-url').value.trim() : '';
     if (pastaCol){ var pm = pastaCol.match(/folders\/([A-Za-z0-9_-]+)/); data.pastaUrl = pastaCol; data.pastaId = pm ? pm[1] : ''; }
