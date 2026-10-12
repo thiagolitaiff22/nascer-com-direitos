@@ -577,6 +577,27 @@ html[data-tema="dark"] .lista > div:has(i.ok) small::before{background:#4ade80}
 html[data-tema="dark"] .login-logo{filter:brightness(1.55) saturate(1.05) drop-shadow(0 4px 14px rgba(0,0,0,.5))}
 .login-t{font-size:22px!important;font-weight:700;letter-spacing:-.01em}
 .topo{padding:10px 16px 10px!important}
+
+/* ================= tela de entrada: limpa, centralizada e legível nos dois modos ================= */
+.login{background:none!important;overflow:visible!important;align-items:center}
+.login::before{display:none!important}
+.login .entrar,html[data-tema="dark"] .login .entrar{background:none!important;border:0!important;box-shadow:none!important;border-radius:0!important;max-width:360px!important;padding:0!important}
+.login-logo{width:170px!important;max-width:60%!important;margin:0 auto 18px!important}
+html[data-tema="dark"] .login-logo{filter:brightness(1.35) saturate(.95) drop-shadow(0 4px 14px rgba(0,0,0,.45))!important}
+.login-t{font-size:24px!important;margin-top:2px}
+.login-s{font-size:15px!important;color:var(--ink2)!important;margin:8px 0 26px!important;line-height:1.5}
+.login-rot{font-size:14px!important;font-weight:600!important;color:var(--ink2)!important;margin:0 0 7px 2px!important}
+.login .fone{height:52px!important;background:var(--card)!important;border:1px solid var(--line2)!important;border-radius:14px!important}
+html[data-tema="dark"] .login .fone{background:#1d1812!important;border-color:#4b4132!important}
+.login .fone input{color:var(--ink)!important;font-size:16.5px!important}
+.login .fone svg{color:var(--g2,#8a6a3d)!important;opacity:1!important}
+html[data-tema="dark"] .login .fone svg{color:#d4b483!important}
+html[data-tema="dark"] .login #ver-senha{color:#d4b483!important}
+.login .enviar{height:54px!important;margin-top:24px!important;font-size:17px!important;border-radius:14px!important}
+.login-nota{font-size:13.5px!important;color:var(--ink2)!important;margin:18px 0 0!important;line-height:1.45}
+.login details{font-size:14px!important;color:var(--ink2)!important;margin-top:14px!important}
+.login details summary{padding:8px 0}
+.login details input{color:var(--ink)!important}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
 </head>
