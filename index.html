@@ -1095,7 +1095,7 @@ section.vw-dash{gap:10px!important}
 #list .row .tel-edit,#list .row .tel-add{font-size:12.5px}
 
 /* ---------- cantos retos em todo o sistema (sem mexer no que é redondo: avatar, bolinhas, chaves) ---------- */
-.card,.btn,button.tb-btn,.tb-sel,.search,.search input,input:not([type=checkbox]):not([type=radio]),select,textarea,dialog,.f,.pill,.st,.res-rap,.res-rap button,.ct-pills span,.modo-sel,.ig-card,.ct-cart-g,.ct-cart-tag,.rep-btn,.day-chip,.fb-painel,.toast,#toast,.tel-add,.campo-tag,.cpf-ruim,.pj-l,.pj-det,.pj-fav,.copia,.ico-btn,.stat-link,.ph-tile,.tab,.integ,.fin-valor,.ct-bar,.ct-bars-box,.bc-res,.list-sum,.termo,.pp-row,.eq-list,.linkbtn,.fb-clear,.res-imp,.vw-dash .card.stat,.cl-etapa-cards > button.card{border-radius:4px!important}
+.card,.btn,button.tb-btn,.tb-sel,.search,.search input,input:not([type=checkbox]):not([type=radio]),select,textarea,dialog,.f,.pill,.st,.res-rap,.res-rap button,.ct-pills span,.modo-sel,.ig-card,.ct-cart-g,.ct-cart-tag,.rep-btn,.day-chip,.fb-painel,.toast,#toast,.tel-add,.campo-tag,.cpf-ruim,.pj-l,.pj-det,.pj-fav,.copia,.ico-btn,.stat-link,.ph-tile,.tab,.integ,.fin-valor,.ct-bar,.ct-bars-box,.bc-res,.list-sum,.termo,.pp-row,.eq-list,.linkbtn,.fb-clear,.res-imp,.vw-dash .card.stat,.cl-etapa-cards > button.card{border-radius:var(--r-sm)!important}
 
 /* ---------- lista de clientes: uma linha limpa por cliente ---------- */
 #list .row{grid-template-columns:minmax(0,2.5fr) minmax(0,1.35fr) minmax(0,1fr) minmax(0,1.75fr) minmax(0,1.6fr) 36px!important;gap:16px!important;min-height:46px}
@@ -1314,6 +1314,29 @@ section.vw-dash{gap:10px!important}
 .falta-docs span{display:block;font-size:12.5px;color:var(--ink-2);margin:2px 0 8px}
 .falta-docs div{display:flex;gap:6px;flex-wrap:wrap}
 .falta-docs .btn{padding:5px 10px;font-size:12.5px}
+
+/* ---------- visual suave: cantos arredondados, sombras leves, fundo quente (mesmo estilo do aplicativo) ---------- */
+:root{--r:20px;--r-sm:12px;--sombra:0 1px 2px rgba(60,45,20,.05),0 10px 28px rgba(60,45,20,.07);--gold:#a07a45;--gold2:#8a6a3d}
+:root:not([data-theme="dark"]) body{background:#faf7f2}
+:root:not([data-theme="dark"]) .card,:root:not([data-theme="dark"]) .ig-card,:root:not([data-theme="dark"]) .integ,:root:not([data-theme="dark"]) .list-sum{background:#fff;border:1px solid #efe6d6!important;box-shadow:var(--sombra)}
+.card,.ig-card,.integ,.ct-bars-box,.list-sum,.vw-dash .card.stat,.cl-etapa-cards > button.card,.cad-box,dialog{border-radius:var(--r)!important}
+.cad-box .f-foot{border-radius:0 0 var(--r) var(--r)}
+dialog{box-shadow:0 24px 60px rgba(60,45,20,.22)!important;border:0!important}
+.pill,.st,.tab,.day-chip,.campo-tag,.cpf-ruim,.pj-l,.ct-pills span,.modo-sel,.linkbtn,.fb-clear{border-radius:999px!important}
+.btn,button.tb-btn,.tb-sel,.search,.search input,input:not([type=checkbox]):not([type=radio]),select,textarea,.fin-valor,.tel-add,.copia,.ico-btn{border-radius:14px!important}
+.topnav{background:#fff!important;border-bottom:1px solid #efe6d6!important;box-shadow:0 6px 24px rgba(60,45,20,.06)}
+.topnav .logo{border-radius:16px;overflow:hidden}
+.tab{padding:8px 14px!important;border:1px solid transparent!important;color:var(--ink-3)}
+.tab:hover{background:#f7f0e4!important}
+.tab[aria-selected="true"]{background:linear-gradient(135deg,var(--gold),var(--gold2))!important;color:#fff!important;box-shadow:0 6px 16px rgba(138,106,61,.28)}
+.tab[aria-selected="true"] .i{stroke:#fff}
+#btn-novo,.btn.primary,.btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold2))!important;border:0!important;color:#fff!important;box-shadow:0 8px 18px rgba(138,106,61,.28)}
+.stats .card,.vw-dash .stats > .card{box-shadow:var(--sombra)}
+.vw-dash .stats{gap:14px}
+.vw-dash .card.stat{padding:16px 18px}
+#list .row,.rows .row{border-radius:14px}
+#list .row:hover{background:#f7f0e4}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--gold)!important;box-shadow:0 0 0 4px rgba(160,122,69,.16)}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -1385,8 +1408,7 @@ section.vw-dash{gap:10px!important}
     <nav class="nav" role="tablist" aria-orientation="horizontal">
       <button class="tab" role="tab" id="tab-cad" aria-selected="false" type="button" title="Cadastro"><svg class="i"><use href="#i-plus"/></svg><span>Cadastro</span></button>
       <button class="tab" role="tab" id="tab-inss" aria-selected="false" type="button" title="INSS"><svg class="i"><use href="#i-inss"/></svg><span>INSS</span></button>
-      <button class="tab" role="tab" id="tab-clientes" aria-selected="true" type="button" title="Controle"><svg class="i"><use href="#i-users"/></svg><span>Controle</span></button>
-      <button class="tab" role="tab" id="tab-ct" aria-selected="false" type="button" title="Contestações"><svg class="i"><use href="#i-scale"/></svg><span>Contestações</span></button>
+      <button class="tab" role="tab" id="tab-clientes" aria-selected="true" type="button" title="Controle"><svg class="i"><use href="#i-users"/></svg><span>Controle</span></button>
       <button class="tab admin-only" role="tab" id="tab-fin" aria-selected="false" type="button" title="Financeiro"><svg class="i"><use href="#i-cash"/></svg><span>Financeiro</span></button>
       <button class="tab" role="tab" id="tab-ret" aria-selected="false" type="button" title="Arquivados"><svg class="i"><use href="#i-file"/></svg><span>Arquivados</span></button>
       <button class="tab admin-only" role="tab" id="tab-equipe" aria-selected="false" type="button" title="Configurações"><svg class="i"><use href="#i-gear"/></svg><span>Configurações</span></button>
@@ -1536,7 +1558,7 @@ section.vw-dash{gap:10px!important}
         <div class="card list" id="p-list"></div>
       </section>
 
-      <section id="view-ct" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:14px">
+      <section id="view-ct" class="vw-dash" hidden aria-hidden="true" style="display:none;flex-direction:column;gap:14px">
         <div hidden><button type="button" id="ct-aud-ant"></button><button type="button" id="ct-aud-prox"></button><span id="ct-aud-info"></span><button type="button" id="ct-geral"></button></div>
         <div class="sec-rot">Resumo por resultado</div>
         <div class="stats five ct-stats" id="ct-stats"></div>
@@ -1771,8 +1793,8 @@ section.vw-dash{gap:10px!important}
       <div class="field"><label for="f-vbenef">Valor do benefício</label><input id="f-vbenef" class="fin-valor" type="text" inputmode="numeric"><span class="hint" id="h-vbenef"></span></div>
       <div class="field"><label for="f-vguia">Valor da guia (reembolso)</label><input id="f-vguia" class="fin-valor" type="text" inputmode="numeric"><span class="hint">Guia paga pelo escritório; entra nos honorários.</span></div>
 
-      <div class="section-lbl">Contestação do INSS</div>
-      <div class="field full"><label for="f-tese">Teses da contestação</label><input id="f-tese" placeholder="Ex.: ausência de início de prova material, perda da qualidade de segurada"></div>
+      <div class="section-lbl" hidden>Contestação do INSS</div>
+      <div class="field full" hidden><label for="f-tese">Teses da contestação</label><input id="f-tese" placeholder="Ex.: ausência de início de prova material, perda da qualidade de segurada"></div>
       <div class="field full"><label for="f-obs">Observações</label><textarea id="f-obs"></textarea></div>
       <details class="field full hist" id="f-hist-box" hidden><summary>Histórico de alterações</summary><div id="f-hist" class="hist-lista"></div></details>
     </div>
@@ -4641,7 +4663,7 @@ section.vw-dash{gap:10px!important}
     } catch(err){ toast(errMsg(err)); }
     finally { $('av-save').disabled = false; }
   });
-  var VIEWS = { d: ['tab-cad', 'view-cad'], i: ['tab-inss', 'view-inss'], c: ['tab-clientes', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-ret', 'view-ret'], t: ['tab-ct', 'view-ct'], e: ['tab-equipe', 'view-equipe'] };
+  var VIEWS = { d: ['tab-cad', 'view-cad'], i: ['tab-inss', 'view-inss'], c: ['tab-clientes', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-ret', 'view-ret'], e: ['tab-equipe', 'view-equipe'] };
   var TITULOS = {
     d: ['Cadastro', 'Clientes ainda sem requerimento no INSS: dados, documentos e prazo'],
     i: ['INSS', 'Requerimentos administrativos: análise, exigências, concessões e indeferimentos'],
