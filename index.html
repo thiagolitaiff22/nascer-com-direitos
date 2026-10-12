@@ -1671,6 +1671,43 @@ td,.row{font-size:13px}
   :root[data-theme="dark"] .topnav #btn-novo{background:transparent!important;color:#d4b483!important;border-color:rgba(212,180,131,.55)!important}
   :root[data-theme="dark"] .topnav #btn-novo:hover{background:rgba(212,180,131,.14)!important}
 }
+
+/* ---------- figura do estado nos cartões das regiões ---------- */
+.reg-mapa{display:grid;place-items:center;width:68px;height:68px;border-radius:20px;background:var(--gsoft,#f8f1e4);flex:none;font-weight:700;color:var(--g2,#8a6a3d);font-size:15px}
+.reg-mapa img{width:46px;height:46px;object-fit:contain;display:block}
+.reg-card.on .reg-mapa{background:rgba(160,122,69,.2)}
+:root[data-theme="dark"] .reg-mapa{background:rgba(212,180,131,.12)}
+.reg-card{padding:14px 18px}
+
+/* ---------- cabeçalho: logo + nome em uma linha, sem botão ao lado ---------- */
+.topnav .side-toggle,.topnav .side-acts{display:none!important}
+@media (min-width:1000px){
+  .app:not(.collapsed) .topnav .brand{padding-right:0!important;align-items:center!important;padding-top:4px!important}
+  .app:not(.collapsed) .topnav .brand b{white-space:nowrap;font-size:13.5px;letter-spacing:-.005em}
+  .app:not(.collapsed) .topnav .brand > div:not(.logo) span{white-space:nowrap;font-size:10.5px}
+  .app:not(.collapsed) .topnav .brand .logo img{height:54px!important;max-width:50px!important}
+}
+/* ---------- cartão do usuário com pop-up ---------- */
+.topnav{position:sticky}
+.topnav .side-foot{position:relative;cursor:pointer;border-radius:14px;padding:10px 8px!important;gap:10px;align-items:center;transition:background .15s}
+.topnav .side-foot:hover{background:var(--hover)}
+.topnav .side-foot .user-nome{min-width:0;flex:1;display:flex;flex-direction:column;align-items:flex-start}
+.topnav .side-foot .user-nome b{font-size:12.5px;line-height:1.25;white-space:normal;overflow-wrap:anywhere}
+.topnav .side-foot .user-dica{font-size:11px;color:var(--ink-3)}
+.topnav .side-foot .user-chev{width:16px;height:16px;color:var(--ink-3);flex:none}
+.user-pop{position:absolute;left:12px;right:12px;bottom:78px;z-index:60;background:var(--panel,#fff);border:1px solid var(--gline,var(--line));border-radius:16px;box-shadow:0 18px 40px rgba(60,45,20,.18);padding:6px;display:flex;flex-direction:column;gap:2px}
+.user-pop[hidden]{display:none}
+.user-pop button{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border:0;background:none;border-radius:11px;font:inherit;font-size:13.5px;color:var(--ink);cursor:pointer;text-align:left}
+.user-pop button:hover{background:var(--hover)}
+.user-pop button .i{width:18px;height:18px;color:var(--ink-3);flex:none}
+.user-pop .sair{color:var(--red,#b91c1c);border-top:1px solid var(--gline,var(--line));border-radius:0 0 11px 11px;margin-top:2px}
+.user-pop .sair .i{color:inherit}
+:root[data-theme="dark"] .user-pop{background:#1b1712;border-color:#3b3328;box-shadow:0 18px 40px rgba(0,0,0,.5)}
+.app.collapsed .topnav .side-foot .user-nome,.app.collapsed .topnav .side-foot .user-chev{display:none}
+.app.collapsed .topnav .side-foot{justify-content:center}
+.app.collapsed .user-pop{left:6px;right:auto;width:210px}
+/* o pop-up do usuário fica por cima do conteúdo, mesmo com o menu recolhido */
+.topnav{overflow:visible!important}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -1756,7 +1793,12 @@ td,.row{font-size:13px}
       <small id="sync">Conectando à base…</small>
       
       <button class="btn primary" id="btn-novo" type="button"><svg class="i"><use href="#i-plus"/></svg>Novo cadastro</button>
-      <div class="side-foot"><div class="av" id="me-av">E</div><div><b id="me"></b><button type="button" class="linkbtn" id="btn-sair">Sair</button></div></div>
+      <div class="side-foot" id="user-card" role="button" tabindex="0" aria-haspopup="menu" aria-expanded="false" title="Menu do usuário"><div class="av" id="me-av">E</div><div class="user-nome"><b id="me"></b><span class="user-dica">Menu</span></div><svg class="i user-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 14l5-5 5 5"/></svg></div>
+      <div class="user-pop" id="user-pop" role="menu" hidden>
+        <button type="button" role="menuitem" id="pop-side"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9.5 4v16"/></svg><span id="pop-side-t">Esconder menu</span></button>
+        <button type="button" role="menuitem" id="pop-theme"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><span id="pop-theme-t">Modo escuro</span></button>
+        <button type="button" role="menuitem" id="btn-sair" class="sair"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><span>Sair</span></button>
+      </div>
     </div>
   </header>
   <div class="main">
@@ -3538,6 +3580,10 @@ td,.row{font-size:13px}
     var uf = String(g.uf || g.id || '').toUpperCase();
     return '<span class="uf-flag" title="' + esc(g.nome) + '"><img src="img/flags/' + esc(uf) + '.svg" alt="' + esc(uf) + '" onerror="this.parentNode.classList.add(\'sem-img\');this.replaceWith(document.createTextNode(this.alt))"></span>';
   }
+  function mapaReg(g){
+    var uf = String(g.uf || g.id || '').toUpperCase();
+    return '<span class="reg-mapa" title="' + esc(g.nome) + '"><img src="img/mapas/' + esc(uf) + '.svg" alt="' + esc(uf) + '" onerror="this.replaceWith(document.createTextNode(this.alt))"></span>';
+  }
   function ufFlag(r){
     var p = r && r.responsavelId ? prospById(r.responsavelId) : null, g = regiaoDe(p);
     return g ? ufFlagReg(g) : '';
@@ -3552,7 +3598,7 @@ td,.row{font-size:13px}
       var ps = state.prosp.filter(function(p){ return p.regiaoId === g.id; });
       var nCli = state.rows.filter(function(r){ var p = prospById(r.responsavelId); return p && p.regiaoId === g.id; }).length;
       return '<button type="button" class="reg-card' + (regAberta === g.id ? ' on' : '') + '" data-reg="' + esc(g.id) + '" aria-pressed="' + (regAberta === g.id) + '">' +
-        ufFlagReg(g).replace('uf-flag', 'uf-flag grande') + '<div><b>' + esc(g.nome) + '</b><span>' + ps.length + (ps.length === 1 ? ' parceiro' : ' parceiros') + ' · ' + nCli + (nCli === 1 ? ' cliente' : ' clientes') + '</span></div></button>';
+        mapaReg(g) + '<div><b>' + esc(g.nome) + '</b><span>' + ps.length + (ps.length === 1 ? ' parceiro' : ' parceiros') + ' · ' + nCli + (nCli === 1 ? ' cliente' : ' clientes') + '</span></div></button>';
     }).join('');
     var det = $('reg-det');
     var g = regAberta ? regiaoPorId(regAberta) : null;
@@ -3587,6 +3633,22 @@ td,.row{font-size:13px}
     } catch(e){}
     renderRegioes(); render();
   }
+  /* ---------- pop-up do usuário: esconder menu, modo escuro e sair ---------- */
+  (function(){
+    var card = $('user-card'), pop = $('user-pop'); if (!card || !pop) return;
+    function abrir(v){ pop.hidden = !v; card.setAttribute('aria-expanded', String(v)); atualizar(); }
+    function atualizar(){
+      var rec = $('app').classList.contains('collapsed'), esc = document.documentElement.getAttribute('data-theme') === 'dark';
+      $('pop-side-t').textContent = rec ? 'Mostrar menu' : 'Esconder menu';
+      $('pop-theme-t').textContent = esc ? 'Modo claro' : 'Modo escuro';
+    }
+    card.addEventListener('click', function(e){ e.stopPropagation(); abrir(pop.hidden); });
+    card.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); abrir(pop.hidden); } });
+    document.addEventListener('click', function(e){ if (!pop.hidden && !e.target.closest('#user-pop')) abrir(false); });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !pop.hidden) abrir(false); });
+    $('pop-side').addEventListener('click', function(){ $('btn-side').click(); abrir(false); });
+    $('pop-theme').addEventListener('click', function(){ $('btn-theme').click(); abrir(false); });
+  })();
   function render(){ renderRegioes(); renderContratos(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
   var clQ = '';
   // stage of each process, derived from what is already recorded (no extra typing)
