@@ -1914,6 +1914,12 @@ td,.row{font-size:13px}
 .est-row.pros.fechado .est-toggle .i{transform:rotate(-90deg)}
 .est-toggle:disabled{opacity:.35;cursor:default}
 :root[data-theme="dark"] .est-toggle{background:#1b1712;border-color:#2e2820}
+
+.fp-reg-box{display:flex;align-items:center;gap:8px}
+.fp-reg-box input{flex:1;min-width:0}
+.fp-flag{display:inline-flex;align-items:center;flex:none}
+.fp-flag:empty{display:none}
+.fp-flag .cid-flag,.fp-flag img{width:26px;height:18px;border-radius:3px;object-fit:cover;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2447,7 +2453,7 @@ td,.row{font-size:13px}
       <div class="field"><label for="fp-tel">Telefone / WhatsApp</label><input id="fp-tel" inputmode="tel" placeholder="(97) 00000-0000" class="tnum"></div>
       <div class="field"><label for="fp-regiao">Região de atuação</label><select id="fp-regiao"></select></div>
       <div class="field full" id="fp-pros-box"><label for="fp-prospectador">Prospectador responsável</label><select id="fp-prospectador"></select><span class="hint">Quem trouxe este parceiro (conta para a remuneração dele).</span></div>
-      <div class="field"><label for="fp-reg">Cidade</label><input id="fp-reg" list="fp-cidades" autocomplete="off" placeholder="Ex.: Manaus"><datalist id="fp-cidades"></datalist></div>
+      <div class="field"><label for="fp-reg">Cidade</label><div class="fp-reg-box"><span id="fp-reg-flag" class="fp-flag"></span><input id="fp-reg" list="fp-cidades" autocomplete="off" placeholder="Ex.: Manaus"></div><datalist id="fp-cidades"></datalist></div>
       <div class="field full"><label for="fp-pal">Palavras do endereço</label><input id="fp-pal" placeholder="Ex.: curumitá, nogueira"><span class="hint">Clientes cujo endereço tiver uma dessas palavras ficam com este parceiro. Separe por vírgula.</span></div>
     </div>
     <div class="f-foot">
@@ -3941,16 +3947,16 @@ td,.row{font-size:13px}
     if (c && c.length) return flags(c);
     fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados/' + uf + '/municipios?orderBy=nome').then(function(r){ return r.json(); }).then(function(l){
       var n = (l || []).map(function(m){ return { i: String(m.id), n: m.nome }; });
-      if (n.length){ try { localStorage.setItem('nascer-cid2-' + uf, JSON.stringify(n)); } catch(e){} flags(n); }
+      if (n.length){ try { localStorage.setItem('nascer-cid2-' + uf, JSON.stringify(n)); } catch(e){} renderEstadoLista(); atualizarFlagParc(); flags(n); }
     }).catch(function(){});
   }
   function bandeiraCidade(g, nome){
     var uf = String((g && (g.uf || g.id)) || '').slice(0, 2).toUpperCase();
     if (uf && nome){
-      var l = lerLS('nascer-cid2-' + uf), m = lerLS('nascer-flag-' + uf);
-      if (l && m){
+      var l = lerLS('nascer-cid2-' + uf), m = lerLS('nascer-flag-' + uf) || {};
+      if (l){
         var alvo = semAcentoC(nome), it = l.filter(function(x){ return semAcentoC(x.n) === alvo; })[0];
-        var id6 = it ? it.i.slice(0, 6) : '', u = it ? (m[id6] || (cidLocal && cidLocal[id6] ? 'img/cidades/' + cidLocal[id6] : '')) : '';
+        var id6 = it ? it.i.slice(0, 6) : '', u = it ? ((cidLocal && cidLocal[id6] ? 'img/cidades/' + cidLocal[id6] : '') || m[id6] || '') : '';
         if (u) return '<img class="cid-flag" alt="" loading="lazy" src="' + esc(u) + '">';
       } else carregarBandeiras(uf);
     }
@@ -5814,6 +5820,7 @@ td,.row{font-size:13px}
     $('fp-nome').value = p ? p.nome || '' : '';
     $('fp-tel').value = p ? p.telefone || '' : '';
     $('fp-reg').value = p ? p.regiao || '' : '';
+    setTimeout(atualizarFlagParc, 0);
     $('fp-tipo').value = p && p.tipo === 'clinica' ? 'clinica' : 'pessoa';
     $('fp-clinica').value = p ? p.clinica || '' : '';
     $('fp-clinica-box').hidden = $('fp-tipo').value !== 'clinica';
@@ -5832,6 +5839,14 @@ td,.row{font-size:13px}
   $('fp-cancel').addEventListener('click', function(){ dlgP.close(); });
   // cidades do estado escolhido (lista do IBGE, guardada depois da primeira consulta)
   var cidadesCache = {};
+  // bandeira da cidade ao lado do campo Cidade (parceiro)
+  function atualizarFlagParc(){
+    var el = $('fp-reg-flag'); if (!el) return;
+    var nome = $('fp-reg').value.trim(), g = regiaoPorId($('fp-regiao').value);
+    el.innerHTML = nome && g ? bandeiraCidade(g, nome) : '';
+  }
+  $('fp-reg').addEventListener('input', atualizarFlagParc);
+  $('fp-reg').addEventListener('change', atualizarFlagParc);
   function cidadesDoEstado(){
     var g = regiaoPorId($('fp-regiao').value), uf = g ? String(g.uf || g.id).toUpperCase() : '', dl = $('fp-cidades');
     if (!uf){ dl.innerHTML = ''; return; }
@@ -5844,7 +5859,7 @@ td,.row{font-size:13px}
       pintar(nomes);
     }).catch(function(){});
   }
-  $('fp-regiao').addEventListener('change', function(){ cidadesDoEstado(); prosPreencher($('fp-regiao').value, ''); });
+  $('fp-regiao').addEventListener('change', function(){ cidadesDoEstado(); prosPreencher($('fp-regiao').value, ''); atualizarFlagParc(); });
   $('fp-tipo').addEventListener('change', function(){ $('fp-clinica-box').hidden = this.value !== 'clinica'; if (this.value === 'clinica') $('fp-clinica').focus(); });
   $('fp-tel').addEventListener('input', function(e){ e.target.value = maskTel(e.target.value); });
   function pcol(){ return state.db.collection('prospectadores'); }

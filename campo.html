@@ -720,7 +720,7 @@ html,body{overflow-x:hidden}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 8;
+  var APP_VERSAO = 9;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1083,7 +1083,7 @@ html,body{overflow-x:hidden}
     bandeirasUF0(uf, function(m){
       bandeirasLocais(function(loc){
         var r = {}; Object.keys(m).forEach(function(k){ r[k] = m[k]; });
-        Object.keys(loc).forEach(function(k){ if (!r[k]) r[k] = 'img/cidades/' + loc[k]; });
+        Object.keys(loc).forEach(function(k){ r[k] = 'img/cidades/' + loc[k]; });
         flagMem[uf] = r; cb(r);
       });
     });
@@ -1095,6 +1095,7 @@ html,body{overflow-x:hidden}
     cidadesUF(uf, function(l){
       if (!l.length) return cb({});
       var pre = l[0].i.slice(0, 2);
+      if (pre === '13' || pre === '15' || pre === '16') return cb({});   // AM, PA e AP: todas as bandeiras já vêm no pacote
       var q = 'SELECT ?c ?f WHERE { ?m wdt:P1585 ?c . ?m wdt:P41 ?f . FILTER(STRSTARTS(STR(?c), "' + pre + '")) }';
       fetch('https://query.wikidata.org/sparql?format=json&origin=*&query=' + encodeURIComponent(q)).then(function(r){ return r.json(); }).then(function(d){
         var m = {};
