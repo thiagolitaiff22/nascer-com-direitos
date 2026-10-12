@@ -715,7 +715,7 @@ html,body{overflow-x:hidden}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 5;
+  var APP_VERSAO = 6;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -737,6 +737,14 @@ html,body{overflow-x:hidden}
   // dados do cadastro em andamento (ficam no celular até o envio)
   // cadastro antigo, sem o tipo guardado: conta como segurada especial
   function tipoAtual(){ return 'urbana'; }   // foco: segurada urbana (paga a guia); não existe mais a escolha do tipo
+  // data digitada como dd/mm/aaaa; guardada como aaaa-mm-dd
+  function isoParaBr(iso){ var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return m ? m[3] + '/' + m[2] + '/' + m[1] : ''; }
+  function brParaIso(br){
+    var m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(br || ''); if (!m) return '';
+    var d = +m[1], mes = +m[2], a = +m[3], dt = new Date(a, mes - 1, d);
+    if (a < 2000 || a > 2100 || dt.getFullYear() !== a || dt.getMonth() !== mes - 1 || dt.getDate() !== d) return '';
+    return m[3] + '-' + m[2] + '-' + m[1];
+  }
   function gestante(){ return true; }   // o sistema atende só gestantes: o que importa é a data prevista do parto
   // telefone no padrão (DDD) 00000-0000
   function maskFone(v){ var d = String(v || '').replace(/\D/g, '').slice(0, 11); if (!d) return ''; if (d.length <= 2) return '(' + d; if (d.length <= 6) return '(' + d.slice(0, 2) + ') ' + d.slice(2); if (d.length <= 10) return '(' + d.slice(0, 2) + ') ' + d.slice(2, 6) + '-' + d.slice(6); return '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7); }
@@ -1258,7 +1266,7 @@ html,body{overflow-x:hidden}
         '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-fone"/></svg><input id="fone" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="(92) 99999-9999" value="' + esc(maskFone(lsGet('campo_fone'))) + '"></label>' +
       '</div>' +
       '<div class="rot">Gestação</div><div class="dados">' +
-        '<label class="fone' + (lsGet('campo_dpp') ? '' : ' falta') + '" id="l-dpp"><svg viewBox="0 0 24 24"><use href="#i-cal"/></svg><span class="rc">Data prevista do parto</span><input id="dpp" type="date" value="' + esc(lsGet('campo_dpp')) + '"></label>' +
+        '<label class="fone' + (lsGet('campo_dpp') ? '' : ' falta') + '" id="l-dpp"><svg viewBox="0 0 24 24"><use href="#i-cal"/></svg><span class="rc">Data prevista do parto</span><input id="dpp" type="text" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="dd/mm/aaaa" value="' + esc(isoParaBr(lsGet('campo_dpp'))) + '"></label>' +
       '</div>') +
       '<div class="rot">' + (completando ? 'Documentos que faltam' : 'Documentos') + '</div><div class="grid">' + visiveis.map(function(d){
         var f = d.k === 'rg_frente' ? rgFotos() : fotos[d.k];
@@ -1284,7 +1292,13 @@ html,body{overflow-x:hidden}
     $('fone').addEventListener('input', function(){ this.value = maskFone(this.value); lsSet('campo_fone', this.value); });
     $('nome').addEventListener('input', function(){ lsSet('campo_nome', this.value); $('l-nome').classList.toggle('falta', !this.value.trim()); });
     $('nome').addEventListener('blur', function(){ this.value = bonito(this.value); lsSet('campo_nome', this.value); });
-    if ($('dpp')) $('dpp').addEventListener('change', function(){ lsSet('campo_dpp', this.value); var l = $('l-dpp'); if (l) l.classList.toggle('falta', !this.value); });
+    if ($('dpp')) $('dpp').addEventListener('input', function(){
+      var d = this.value.replace(/\D/g, '').slice(0, 8), t = d;
+      if (d.length > 4) t = d.slice(0, 2) + '/' + d.slice(2, 4) + '/' + d.slice(4); else if (d.length > 2) t = d.slice(0, 2) + '/' + d.slice(2);
+      this.value = t;
+      var iso = brParaIso(t); lsSet('campo_dpp', iso);
+      var l = $('l-dpp'); if (l) l.classList.toggle('falta', !iso);
+    });
     }
     if ($('som')) $('som').addEventListener('click', function(){ falar(falta.length ? 'Digite o nome e o número da cliente. Depois toque em cada quadro e tire a foto, encaixando o documento no quadro. Faltam: ' + falta.map(function(d){ return d.t; }).join(', ') + '. Quando terminar, aperte o botão verde, enviar.' : 'Tudo pronto. Aperte o botão verde, enviar.'); });
     Array.prototype.forEach.call(document.querySelectorAll('.doc'), function(b){
@@ -1991,7 +2005,7 @@ html,body{overflow-x:hidden}
     var nm = ($('nome') || {}).value || '';
     if (!nm.trim()){ falar('Digite o nome completo da cliente.'); alert('Digite o nome completo da cliente.'); $('nome').focus(); return; }
     if (!foneOk(($('fone') || {}).value)){ alert('Informe o telefone com DDD, por exemplo (92) 99999-9999.'); if ($('fone')) $('fone').focus(); return; }
-    if (!lsGet('campo_dpp')){ alert('Informe a data prevista do parto.'); if ($('dpp')) $('dpp').focus(); return; }
+    if (!lsGet('campo_dpp')){ alert('Informe a data prevista do parto, por exemplo 15/03/2027.'); if ($('dpp')) $('dpp').focus(); return; }
     var falta = DOCS.filter(function(d){ return obrig(d) && !fotos[d.k]; });
     if (falta.length){
       falar('Está faltando: ' + falta.map(function(d){ return d.t; }).join(', ') + '. Quer enviar assim mesmo?');
