@@ -1601,6 +1601,17 @@ td,.row{font-size:13px}
 
 .guia-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:600;white-space:nowrap}
 .guia-link .i{width:16px;height:16px}
+
+/* ---------- botão de esconder o menu: ícone de painel, no topo do menu ao lado da logo ---------- */
+@media (min-width:1000px){
+  .topnav .side-toggle{position:absolute;top:16px;right:10px;order:0;width:34px;height:34px;padding:0;margin:0;display:grid;place-items:center;border:0;background:none;border-radius:10px;color:var(--ink-3);cursor:pointer;z-index:2}
+  .topnav .side-toggle:hover{background:var(--hover);color:var(--ink)}
+  .topnav .side-toggle .i{width:20px;height:20px;transform:none!important}
+  .app:not(.collapsed) .topnav .brand{padding-right:40px!important}
+  .app.collapsed .topnav .side-toggle{position:static;align-self:center;margin:0 0 10px}
+  .topnav .side-acts{padding-top:6px}
+  .app.collapsed .topnav .side-acts{flex-direction:row}
+}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -1670,6 +1681,7 @@ td,.row{font-size:13px}
 <div class="app" id="app" hidden>
   <header class="topnav">
     <div class="brand"><div class="logo"><img src="img/logo-nascer-t.png" alt="Nascer com Direitos"></div><div><b>Nascer com Direitos</b><span>Salário-maternidade</span></div></div>
+    <button type="button" class="side-toggle" id="btn-side" title="Esconder o menu" aria-label="Esconder o menu" aria-expanded="true"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9.5 4v16"/></svg></button>
     <nav class="nav" role="tablist" aria-orientation="horizontal">
       <div class="nav-lbl" aria-hidden="true">Comercial</div><button class="tab" role="tab" id="tab-cad" aria-selected="false" type="button" title="Cadastro"><svg class="i"><use href="#i-plus"/></svg><span>Cadastro</span></button>
       <button class="tab" role="tab" id="tab-ctr" aria-selected="false" type="button" title="Contratos fechados"><svg class="i"><use href="#i-check"/></svg><span>Contratos fechados</span></button>
@@ -1680,7 +1692,7 @@ td,.row{font-size:13px}
       <button class="tab" role="tab" id="tab-ret" aria-selected="false" type="button" title="Arquivados"><svg class="i"><use href="#i-file"/></svg><span>Arquivados</span></button>
       <button class="tab admin-only" role="tab" id="tab-equipe" aria-selected="false" type="button" title="Configurações"><svg class="i"><use href="#i-gear"/></svg><span>Configurações</span></button>
     </nav>
-    <div class="side-acts"><button type="button" class="side-toggle" id="btn-side" title="Esconder o menu" aria-label="Esconder o menu" aria-expanded="true"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button><button class="icon-btn theme-btn" id="btn-theme" type="button" aria-label="Modo escuro" title="Modo escuro"><svg class="i"><use id="theme-ico" href="#i-moon"/></svg></button></div>
+    <div class="side-acts"><button class="icon-btn theme-btn" id="btn-theme" type="button" aria-label="Modo escuro" title="Modo escuro"><svg class="i"><use id="theme-ico" href="#i-moon"/></svg></button></div>
     <div class="top-right">
       <small id="sync">Conectando à base…</small>
       
