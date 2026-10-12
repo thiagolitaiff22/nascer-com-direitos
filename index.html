@@ -1549,7 +1549,7 @@ td,.row{font-size:13px}
       <button class="tab" role="tab" id="tab-ctr" aria-selected="false" type="button" title="Contratos fechados"><svg class="i"><use href="#i-check"/></svg><span>Contratos fechados</span></button>
       <button class="tab" role="tab" id="tab-nasc" aria-selected="false" type="button" title="Aguardando nascimento"><svg class="i"><use href="#i-clock"/></svg><span>Aguardando nascimento</span></button>
       <button class="tab" role="tab" id="tab-inss" aria-selected="false" type="button" title="INSS"><svg class="i"><use href="#i-inss"/></svg><span>INSS</span></button>
-      <button class="tab" role="tab" id="tab-clientes" aria-selected="true" type="button" title="Justiça"><svg class="i"><use href="#i-users"/></svg><span>Justiça</span></button>
+      <button class="tab" role="tab" id="tab-clientes" aria-selected="true" type="button" title="Judicial"><svg class="i"><use href="#i-users"/></svg><span>Judicial</span></button>
       <button class="tab admin-only" role="tab" id="tab-fin" aria-selected="false" type="button" title="Financeiro"><svg class="i"><use href="#i-cash"/></svg><span>Financeiro</span></button>
       <button class="tab" role="tab" id="tab-ret" aria-selected="false" type="button" title="Arquivados"><svg class="i"><use href="#i-file"/></svg><span>Arquivados</span></button>
       <button class="tab admin-only" role="tab" id="tab-equipe" aria-selected="false" type="button" title="Configurações"><svg class="i"><use href="#i-gear"/></svg><span>Configurações</span></button>
@@ -1563,7 +1563,7 @@ td,.row{font-size:13px}
   </header>
   <div class="main">
     <div class="content">
-      <div class="ph"><div><h1 id="pg-tit">Clientes</h1><p id="pg-sub">Salário-maternidade · INSS e Justiça</p></div></div>
+      <div class="ph"><div><h1 id="pg-tit">Clientes</h1><p id="pg-sub">Salário-maternidade · INSS e Judicial</p></div></div>
 
   <div class="banner" id="banner" hidden></div>
 
@@ -1624,7 +1624,7 @@ td,.row{font-size:13px}
         </div>
         <div class="sec-rot">Requerimentos no INSS</div>
         <div class="card list" id="inss-list"></div>
-        <p class="foot-note"><b>Concedido</b>: o benefício foi aprovado; a cliente vai para o Financeiro até o pagamento. <b>Indeferido</b>: use <b>Entrar na Justiça</b> e preencha o número do processo; a cliente passa para o Controle. <b>Exigência</b>: o INSS pediu documento; o prazo aparece em vermelho quando faltam 5 dias ou menos.</p>
+        <p class="foot-note"><b>Concedido</b>: o benefício foi aprovado; a cliente vai para o Financeiro até o pagamento. <b>Indeferido</b>: use <b>Entrar no Judicial</b> e preencha o número do processo; a cliente passa para o Controle. <b>Exigência</b>: o INSS pediu documento; o prazo aparece em vermelho quando faltam 5 dias ou menos.</p>
       </section>
 
       <section id="view-clientes" class="vw-dash" style="display:flex;flex-direction:column;gap:18px">
@@ -1785,7 +1785,7 @@ td,.row{font-size:13px}
         <div class="stats three r-stats">
           <button type="button" class="card stat r-arq" id="r-arq" title="Mostrar só os pagos"><div class="stat-h"><svg class="i"><use href="#i-file"/></svg>Pagos e arquivados<span class="help" title="Benefícios já pagos e encerrados. Saem do fluxo e ficam aqui.">?</span></div><div class="stat-v tnum" id="r-s4">0</div><div class="stat-c" id="r-s4-c">&nbsp;</div><div class="stat-viz"></div></button>
           <div class="card stat"><div class="stat-h"><svg class="i"><use href="#i-cash"/></svg>Benefícios pagos<span class="help" title="Soma dos benefícios pagos às clientes arquivadas.">?</span></div><div class="stat-v tnum" id="r-s1">0</div><div class="stat-c" id="r-s1-c">&nbsp;</div><div class="stat-viz" id="r-v1"></div></div>
-          <div class="card stat"><div class="stat-h"><svg class="i"><use href="#i-bellx"/></svg>Encerrados sem êxito<span class="help" title="Indeferidos que não foram para a Justiça e ações improcedentes ou extintas, já encerradas.">?</span></div><div class="stat-v tnum" id="r-s2">0</div><div class="stat-c">não geraram honorários</div><div class="stat-viz" id="r-v2"></div></div>
+          <div class="card stat"><div class="stat-h"><svg class="i"><use href="#i-bellx"/></svg>Encerrados sem êxito<span class="help" title="Indeferidos que não foram para o Judicial e ações improcedentes ou extintas, já encerradas.">?</span></div><div class="stat-v tnum" id="r-s2">0</div><div class="stat-c">não geraram honorários</div><div class="stat-viz" id="r-v2"></div></div>
           <div class="card stat"><div class="stat-h"><svg class="i"><use href="#i-users"/></svg>Novo benefício<span class="help" title="Mães já atendidas que podem ter direito de novo (outro filho). Marque quem já foi contatada.">?</span></div><div class="stat-v tnum" id="r-s3">0</div><div class="stat-c">já contatadas</div><div class="stat-viz" id="r-v3"></div></div>
         </div>
         <div class="card termo" id="r-termo" hidden></div>
@@ -2324,7 +2324,7 @@ td,.row{font-size:13px}
   function noControle(r){ return !!String(r.processo || '').trim() && !r.arquivado && !jaRealizada(r); }
   // Cadastro: ainda sem requerimento no INSS e sem número de processo
   function noCadastro(r){ return !String(r.processo || '').trim() && !requerido(r) && !r.arquivado && !r.contratoEm; }
-  // INSS: requerimento feito, ainda sem ação na Justiça
+  // INSS: requerimento feito, ainda sem ação judicial
   function noInss(r){ return !String(r.processo || '').trim() && requerido(r) && !r.arquivado; }
   function passEtapaCl(r, f){
     if (!noControle(r)) return false;
@@ -2867,7 +2867,7 @@ td,.row{font-size:13px}
   var MES_ABR = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
   var MES_EXT = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
   function mesLabel(ym, longo){ var p = ym.split('-'); return longo ? MES_EXT[+p[1] - 1] + ' de ' + p[0] : MES_ABR[+p[1] - 1] + '/' + p[0].slice(2); }
-  // encerrado sem êxito: perdeu na Justiça (improcedente/extinto) ou indeferido no INSS e arquivado sem ação
+  // encerrado sem êxito: perdeu no Judicial (improcedente/extinto) ou indeferido no INSS e arquivado sem ação
   function encerradoSemExito(r){ return !!r.arquivado && !ganhou(r) && (r.resultado === 'improcedente' || r.resultado === 'extinto' || r.inssStatus === 'indeferido' || !!r.motivoArquivo); }
   function arquivadoPago(r){ return !!r.arquivado && !encerradoSemExito(r); }
   function renderRet(){
@@ -2898,7 +2898,7 @@ td,.row{font-size:13px}
         (pago ? '<button type="button" class="toggle" data-act="contato" data-id="' + esc(r.id) + '" aria-pressed="' + (r.contatadoRetorno ? 'true' : 'false') + '" title="Mãe já atendida: pode ter direito de novo com outro filho"><span class="dot"></span>' + (r.contatadoRetorno ? 'Contatada' : 'Marcar contatada') + '</button>' : '');
       html += '<div class="row" style="grid-template-columns:var(--rcols)">' + nameCell(r) +
         '<div><span class="lbl">Contato</span><div class="val">' + esc(fmtTel(r.contato) || '—') + '</div></div>' +
-        '<div><span class="lbl">Benefício</span><div class="val">' + (pago ? brl(r.recebimento && r.recebimento.valor ? r.recebimento.valor : valorBenef(r)) : '—') + '</div><div class="mini">' + (origem(r) === 'inss' ? 'INSS' : 'Justiça') + (r.crianca ? ' · ' + esc(r.crianca) : '') + '</div></div>' +
+        '<div><span class="lbl">Benefício</span><div class="val">' + (pago ? brl(r.recebimento && r.recebimento.valor ? r.recebimento.valor : valorBenef(r)) : '—') + '</div><div class="mini">' + (origem(r) === 'inss' ? 'INSS' : 'Judicial') + (r.crianca ? ' · ' + esc(r.crianca) : '') + '</div></div>' +
         '<div><span class="lbl">Encerrado em</span><div class="val">' + (r.arquivadoEm ? fmtDate(String(r.arquivadoEm).slice(0, 10)) : '—') + '</div></div>' +
         '<div><span class="lbl">Situação</span><div class="cell-stack">' + st + '</div></div>' +
         editCell(r) + '</div>';
@@ -3013,7 +3013,7 @@ td,.row{font-size:13px}
     });
     box.innerHTML = html;
   }
-  /* INSS: requerimentos feitos e ainda sem ação na Justiça */
+  /* INSS: requerimentos feitos e ainda sem ação judicial */
   var inssQ = '', inssSit = '', inssAberto = {};
   var INSS_PRAZO_ANALISE = 30;   // dias que o INSS tem para analisar o salário-maternidade (acordo no STF, RE 1.171.152)
   function statusInss(r){ return r.inssStatus && INSS[r.inssStatus] ? r.inssStatus : 'analise'; }
@@ -3035,7 +3035,7 @@ td,.row{font-size:13px}
     var k = statusInss(r);
     if (k === 'analise'){
       var d = diasDesde(r.der);
-      return analiseAtrasada(r) ? '<span class="prazo-tag crit" title="O INSS passou dos ' + INSS_PRAZO_ANALISE + ' dias para decidir. Dá para cobrar na Justiça.">Análise atrasada · ' + d + ' dias</span>' : '<span class="mini">Aguardando o INSS' + (d != null ? ' · ' + d + (d === 1 ? ' dia' : ' dias') : '') + '</span>';
+      return analiseAtrasada(r) ? '<span class="prazo-tag crit" title="O INSS passou dos ' + INSS_PRAZO_ANALISE + ' dias para decidir. Dá para cobrar no Judicial.">Análise atrasada · ' + d + ' dias</span>' : '<span class="mini">Aguardando o INSS' + (d != null ? ' · ' + d + (d === 1 ? ' dia' : ' dias') : '') + '</span>';
     }
     if (k === 'exigencia'){
       var n = daysUntil(r.exigenciaPrazo);
@@ -3043,7 +3043,7 @@ td,.row{font-size:13px}
         '<button type="button" class="btn inss-acao" data-iact="cumprida" data-id="' + esc(r.id) + '" title="O documento foi enviado ao INSS: volta para análise">Exigência cumprida</button>';
     }
     if (k === 'concedido') return '<span class="mini">' + (r.pagamento === 'pago' ? 'Pago' : 'Acompanhe o pagamento no Financeiro') + '</span>';
-    return '<button type="button" class="btn inss-acao" data-iact="ajuizar" data-id="' + esc(r.id) + '" title="Preencher o número do processo">Entrar na Justiça</button>';
+    return '<button type="button" class="btn inss-acao" data-iact="ajuizar" data-id="' + esc(r.id) + '" title="Preencher o número do processo">Entrar no Judicial</button>';
   }
   function renderInss(){
     var box = $('inss-list'); if (!box) return;
@@ -3055,7 +3055,7 @@ td,.row{font-size:13px}
     var decididos = conta.concedido + conta.indeferido;
     var cardI = function(ico, rot, n, cap, cor, filtro){ return '<div class="card stat cad-filtro' + (inssSit === filtro ? ' ativo' : '') + '" role="button" tabindex="0" aria-pressed="' + (inssSit === filtro) + '" data-inss-filtro="' + filtro + '" title="Mostrar na lista" data-cor-fixa="1" style="--cor-linha:var(' + cor + ')"><div class="stat-h"><svg class="i"><use href="#' + ico + '"/></svg>' + rot + '</div><div class="stat-v tnum">' + n + '</div><div class="stat-c">' + cap + '</div><div class="stat-viz"></div></div>'; };
     $('inss-stats').innerHTML =
-      cardI('i-inss', 'Requerimentos', todos.length, 'no INSS, ainda sem ação na Justiça', '--line-2', '') +
+      cardI('i-inss', 'Requerimentos', todos.length, 'no INSS, ainda sem ação judicial', '--line-2', '') +
       cardI('i-clock', 'Em análise', conta.analise, (emAnalise.length ? 'média de ' + media + ' dias' : 'nenhum em análise') + (atras ? ' · ' + atras + ' passaram de ' + INSS_PRAZO_ANALISE + ' dias' : ''), '--blue', 'analise') +
       cardI('i-bellx', 'Exigências', conta.exigencia, vence ? vence + ' com prazo em até 5 dias' : 'o INSS pediu documento', '--amber', 'exigencia') +
       cardI('i-check', 'Concedidos', conta.concedido, (decididos ? Math.round(conta.concedido / decididos * 100) + '% dos decididos' : 'nenhum decidido ainda') + ' · vão para o Financeiro', '--green', 'concedido') +
@@ -3133,7 +3133,7 @@ td,.row{font-size:13px}
     var k = sel.value, antes = { inssStatus: r.inssStatus || '', inssDecisaoEm: r.inssDecisaoEm || '' };
     var p = { inssStatus: k, atualizadoEm: new Date().toISOString() };
     if ((k === 'concedido' || k === 'indeferido') && !r.inssDecisaoEm) p.inssDecisaoEm = iso(new Date());
-    try { await patchRow(r.id, p); toast(INSS[k][0] + ': ' + r.nome + (k === 'exigencia' ? '. Abra o cadastro para lançar o prazo.' : k === 'indeferido' ? '. Use Entrar na Justiça quando tiver o processo.' : ''), 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); }); }
+    try { await patchRow(r.id, p); toast(INSS[k][0] + ': ' + r.nome + (k === 'exigencia' ? '. Abra o cadastro para lançar o prazo.' : k === 'indeferido' ? '. Use Entrar no Judicial quando tiver o processo.' : ''), 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); }); }
     catch(err){ sel.value = statusInss(r); toast(errMsg(err)); }
   });
   document.addEventListener('click', function(e){ if (e.target.closest && e.target.closest('select[data-inss]')) e.stopPropagation(); }, true);
@@ -3596,14 +3596,14 @@ td,.row{font-size:13px}
   function honorariosDe(v, r){ return v * FIN_HONORARIOS + valorGuia(r); }
   function honorarios(r){ return honorariosDe(valorBenef(r), r); }
   function origem(r){ return String(r.processo || '').trim() ? 'justica' : 'inss'; }
-  // perdeu de vez: improcedente/extinto, ou indeferido no INSS sem ação na Justiça e já arquivado
+  // perdeu de vez: improcedente/extinto, ou indeferido no INSS sem ação judicial e já arquivado
   function perdeu(r){ return r.resultado === 'improcedente' || r.resultado === 'extinto' || (r.inssStatus === 'indeferido' && !String(r.processo || '').trim() && r.arquivado); }
   // em andamento: requerido ou na Justiça, ainda sem ganho nem perda
   function emAndamento(r){ return !ganhou(r) && !perdeu(r) && !r.arquivado && (requerido(r) || !!String(r.processo || '').trim()); }
   function renderFin(){
     var body = $('fin-body'); if (!body) return;
     var selO = $('fin-aud-sel'), nO = function(k){ return state.rows.filter(function(r){ return ganhou(r) && (!k || origem(r) === k); }).length; };
-    selO.innerHTML = '<option value="">INSS e Justiça · ' + nO('') + '</option><option value="inss">Concedidos no INSS · ' + nO('inss') + '</option><option value="justica">Ganhos na Justiça · ' + nO('justica') + '</option>';
+    selO.innerHTML = '<option value="">INSS e Judicial · ' + nO('') + '</option><option value="inss">Concedidos no INSS · ' + nO('inss') + '</option><option value="justica">Ganhos no Judicial · ' + nO('justica') + '</option>';
     selO.value = finSessao; selO.classList.toggle('ativo', !!finSessao);
     var base = state.rows.filter(function(r){ return !finSessao || origem(r) === finSessao; });
     var proc = base.filter(ganhou);
@@ -3636,7 +3636,7 @@ td,.row{font-size:13px}
     $('fin-count').textContent = lista.length + (lista.length === 1 ? ' ganho' : ' ganhos');
     body.innerHTML = lista.map(function(r){
       var v = valorBenef(r), h = honorarios(r);
-      return '<tr data-ct="' + esc2(r.id) + '"><td class="nome">' + esc2(r.nome) + '</td><td>' + (origem(r) === 'inss' ? '<span class="pill ok">INSS</span>' : '<span class="pill blue">Justiça</span>') + '</td><td class="n">' + esc2(origem(r) === 'inss' ? (r.nb ? 'NB ' + r.nb : r.protocoloInss || '—') : r.processo) + '</td>' +
+      return '<tr data-ct="' + esc2(r.id) + '"><td class="nome">' + esc2(r.nome) + '</td><td>' + (origem(r) === 'inss' ? '<span class="pill ok">INSS</span>' : '<span class="pill blue">Judicial</span>') + '</td><td class="n">' + esc2(origem(r) === 'inss' ? (r.nb ? 'NB ' + r.nb : r.protocoloInss || '—') : r.processo) + '</td>' +
         '<td class="dir"><input class="fin-valor" type="text" inputmode="numeric" data-valor="' + esc2(r.id) + '" value="' + moedaTxt(v) + '" title="Valor total do benefício desta cliente"></td>' +
         '<td class="dir"><input class="fin-valor" type="text" inputmode="numeric" data-guia="' + esc2(r.id) + '" value="' + moedaTxt(valorGuia(r)) + '" title="Valor da guia paga pelo escritório (entra nos honorários)"></td>' +
         '<td class="dir n">' + brl(h) + '</td><td class="dir n">' + brl(v - h) + '</td>' +
@@ -3887,7 +3887,7 @@ td,.row{font-size:13px}
     var q = function(t){ return '"' + String(t == null ? '' : t).replace(/"/g, '""') + '"'; };
     var L = linhasAno(finAno);
     var csv = [['Data do pagamento', 'Cliente', 'CPF', 'Origem', 'NB / processo', 'Valor do benefício', 'Onde caiu', 'Honorários + guia', 'Valor da cliente', 'Acerto em', 'Forma', 'Prospectador', 'Valor do prospectador'].map(q).join(';')]
-      .concat(L.map(function(x){ var r = x.r; return [br(x.data), r.nome, r.cpf, origem(r) === 'inss' ? 'INSS' : 'Justiça', origem(r) === 'inss' ? r.nb : r.processo, n2(x.valor), x.onde === 'escritorio' ? 'Escritório' : 'Cliente', n2(x.hon), n2(x.valor - x.hon), br(x.pagoEm), x.forma, prospName(r.responsavelId) || '', n2(x.prosp)].map(q).join(';'); }));
+      .concat(L.map(function(x){ var r = x.r; return [br(x.data), r.nome, r.cpf, origem(r) === 'inss' ? 'INSS' : 'Judicial', origem(r) === 'inss' ? r.nb : r.processo, n2(x.valor), x.onde === 'escritorio' ? 'Escritório' : 'Cliente', n2(x.hon), n2(x.valor - x.hon), br(x.pagoEm), x.forma, prospName(r.responsavelId) || '', n2(x.prosp)].map(q).join(';'); }));
     baixarArquivo('Faturamento ' + finAno + '.csv', new Blob(['\ufeff' + csv.join('\r\n')], { type: 'text/csv;charset=utf-8' }));
   });
 
@@ -3907,7 +3907,7 @@ td,.row{font-size:13px}
     { k: 'lembrete', t: 'Lembrete agora', d: 'Manda um lembrete único para todos com audiência num dia escolhido.', ajuda: 'Envio manual, com intervalo seguro entre as mensagens.' },
     { k: 'datajud', t: 'Tribunal (DataJud)', d: 'Consulta os processos no tribunal escolhido todo dia às 7h: audiência, sentença, RPV.', ajuda: 'Chave pública do CNJ. Escolha o tribunal (TRF1 ou TJAM) no cartão.' },
     { k: 'claude', t: 'IA (ChatGPT)', d: 'Só confere quais documentos estão na pasta do cliente (botão Conferir documentos). Não preenche dados.', ajuda: 'Clique para colar a chave da API do ChatGPT.' },
-    { k: 'drive', t: 'Google Drive', d: 'Cria a pasta de cada cliente em CLIENTES e move entre Pendentes, No INSS, Na Justiça e Arquivados.', ajuda: 'Funciona pelo script do Google do Cadastro pelo celular.', painel: 'celular' },
+    { k: 'drive', t: 'Google Drive', d: 'Cria a pasta de cada cliente em CLIENTES e move entre Pendentes, No INSS, No Judicial e Arquivados.', ajuda: 'Funciona pelo script do Google do Cadastro pelo celular.', painel: 'celular' },
     { k: 'celular', t: 'Cadastro pelo celular', d: 'O prospectador tira as fotos dos documentos e a cliente cai no Cadastro.', ajuda: 'O link de cada prospectador fica no cartão dele, em Prospectadores.' }
   ];
   var igScript = null; // resposta do script do Google (Drive e Claude)
@@ -4977,13 +4977,13 @@ td,.row{font-size:13px}
   var TITULOS = {
     d: ['Cadastro', 'Clientes ainda sem requerimento no INSS: dados, documentos e prazo'],
     i: ['INSS', 'Requerimentos administrativos: análise, exigências, concessões e indeferimentos'],
-    c: ['Justiça', 'Ações na Justiça: acompanhamento do processo até a sentença e o pagamento'],
+    c: ['Judicial', 'Ações judiciais: acompanhamento do processo até a sentença e o pagamento'],
     k: ['Contratos fechados', 'Clientes com contrato assinado: regularizar documentos e requerer no INSS'],
     n: ['Aguardando nascimento', 'Contratos fechados de gestantes: esperando o bebê nascer para requerer'],
     a: ['Audiências', 'Pauta por dia, avisos e convites'],
     l: ['Clientes', 'Todas as clientes e a etapa de cada caso'],
     p: ['Pós-audiência', 'Resultados, conclusos, recursos e pagamentos'],
-    f: ['Financeiro', 'Benefícios ganhos no INSS e na Justiça: honorários, guias e acerto com as clientes'],
+    f: ['Financeiro', 'Benefícios ganhos no INSS e no Judicial: honorários, guias e acerto com as clientes'],
     r: ['Arquivados', 'Benefícios pagos e casos encerrados · mães que podem ter um novo benefício'],
     t: ['Contestações', 'Audiência, resultado e teses da contestação do INSS'],
     e: ['Configurações', 'Equipe, integrações e prospectadores']
