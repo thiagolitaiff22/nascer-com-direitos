@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Nascer com Direitos</string>
+    <string name="title_activity_main">Nascer com Direitos</string>
+    <string name="package_name">br.com.nascercomdireitos.app</string>
+    <string name="custom_url_scheme">br.com.nascercomdireitos.app</string>
+</resources>

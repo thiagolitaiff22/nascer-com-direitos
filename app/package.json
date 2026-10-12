@@ -1,0 +1,18 @@
+{
+  "name": "nascer-com-direitos",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Nascer com Direitos · aplicativo do prospectador (cadastro de clientes sem internet)",
+  "scripts": {
+    "montar": "node montar.js"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/cli": "^8.5.3",
+    "@capacitor/core": "^8.5.3"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.5"
+  }
+}

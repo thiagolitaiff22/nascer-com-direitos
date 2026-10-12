@@ -1,0 +1,18 @@
+{
+  "name": "Nascer com Direitos",
+  "short_name": "Nascer c/ Direitos",
+  "description": "Nascer com Direitos · cadastro de clientes do salário-maternidade",
+  "id": "campo.html",
+  "start_url": "campo.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#a07a45",
+  "icons": [
+    { "src": "img/icone-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "img/icone-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "img/icone-512-mask.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "campo-icone.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
