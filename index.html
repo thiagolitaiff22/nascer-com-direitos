@@ -1860,6 +1860,9 @@ td,.row{font-size:13px}
 
 /* acesso do parceiro: só usuário e senha (sem link) */
 .field:has(#cp-link),#cp-novo,#cp-copiar,#cp-whats{display:none!important}
+
+#pros-box{margin-top:6px}
+#pros-box .sec-rot{margin:4px 0 10px}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2192,6 +2195,7 @@ td,.row{font-size:13px}
           </div></div></div>
         <div class="reg-grid" id="reg-grid"></div>
         <div class="card reg-det" id="reg-det" hidden></div>
+        <div id="pros-box" hidden><div class="sec-rot">Prospectadores</div><div class="prosp-grid" id="pros-list"></div></div>
         <div class="sec-title" id="parc-titulo" hidden>Parceiros</div>
         <div class="prosp-head" id="parc-head" hidden>
           <p class="view-desc">Quem cadastra as clientes pelo aplicativo. Cada parceiro pertence a um estado de atuação.</p>
@@ -2388,6 +2392,7 @@ td,.row{font-size:13px}
       <div class="field" id="fp-clinica-box"><label for="fp-clinica">Nome da clínica</label><input id="fp-clinica" autocomplete="off" placeholder="Aparece no topo do aplicativo"></div>
       <div class="field"><label for="fp-tel">Telefone / WhatsApp</label><input id="fp-tel" inputmode="tel" placeholder="(97) 00000-0000" class="tnum"></div>
       <div class="field"><label for="fp-regiao">Região de atuação</label><select id="fp-regiao"></select></div>
+      <div class="field full" id="fp-pros-box"><label for="fp-prospectador">Prospectador responsável</label><select id="fp-prospectador"></select><span class="hint">Quem trouxe este parceiro (conta para a remuneração dele).</span></div>
       <div class="field"><label for="fp-reg">Cidade</label><input id="fp-reg" list="fp-cidades" autocomplete="off" placeholder="Ex.: Manaus"><datalist id="fp-cidades"></datalist></div>
       <div class="field full"><label for="fp-pal">Palavras do endereço</label><input id="fp-pal" placeholder="Ex.: curumitá, nogueira"><span class="hint">Clientes cujo endereço tiver uma dessas palavras ficam com este parceiro. Separe por vírgula.</span></div>
     </div>
@@ -2650,6 +2655,10 @@ td,.row{font-size:13px}
   function sit(r){ var s = r.situacao || (r.avisado ? 'avisado' : 'pendente'); return s === 'dr_thiago' ? 'pendente' : s; }
   function norm(s){ return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
   function prospById(id){ return state.prosp.find(function(p){ return p.id === id; }); }
+  // prospectador = funcionário que procura os parceiros (entra no app e cria o login deles)
+  function ehProspectador(p){ return !!p && p.perfil === 'prospectador'; }
+  function soParceiros(){ return state.prosp.filter(function(p){ return !ehProspectador(p); }); }
+  function prospectadoresDe(estado){ return state.prosp.filter(function(p){ return ehProspectador(p) && (!estado || p.regiaoId === estado); }); }
   function prospName(id){ var p = id && prospById(id); return p ? p.nome : ''; }
   function prospForAddress(end){
     var e = norm(end);
@@ -3126,7 +3135,7 @@ td,.row{font-size:13px}
     });
     var sel = $('fb-resp'), cnt = function(v){ return conta({ resp: v }); };
     sel.innerHTML = '<option value="">Todos (' + cnt('') + ')</option><option value="-">Sem responsável (' + cnt('-') + ')</option>' +
-      state.prosp.map(function(p){ return '<option value="' + esc(p.id) + '">' + esc(p.nome) + ' (' + cnt(p.id) + ')</option>'; }).join('');
+      soParceiros().map(function(p){ return '<option value="' + esc(p.id) + '">' + esc(p.nome) + ' (' + cnt(p.id) + ')</option>'; }).join('');
     if (state.resp && state.resp !== '-' && !prospById(state.resp)) state.resp = '';
     sel.value = state.resp; sel.classList.toggle('ativo', !!state.resp); if (state.resp) avancados++;
     $('fb-badge').hidden = !avancados; $('fb-badge').textContent = avancados;
@@ -3330,9 +3339,28 @@ td,.row{font-size:13px}
         '<span class="pp-n tnum">' + x.n + (x.n === 1 ? ' cliente' : ' clientes') + '</span>' + st + '</button>';
     }).join('') + '</div>';
   }
+  function renderProspectadores(){
+    var caixa = $('pros-box'), box = $('pros-list'); if (!caixa || !box) return;
+    if (!regAberta){ caixa.hidden = true; box.innerHTML = ''; return; }
+    var lista = prospectadoresDe(regAberta).sort(function(a, b){ return (a.nome || '').localeCompare(b.nome || '', 'pt-BR'); });
+    caixa.hidden = false;
+    box.innerHTML = lista.length ? lista.map(function(p){
+      var seus = soParceiros().filter(function(x){ return x.prospectadorId === p.id; }), ids = seus.map(function(x){ return x.id; });
+      var cli = state.rows.filter(function(r){ return ids.indexOf(r.responsavelId) >= 0; });
+      var contr = cli.filter(function(r){ return !!r.contratoEm; }).length, conc = cli.filter(function(r){ return r.inssStatus === 'concedido'; }).length;
+      var ini = (p.nome || '?').charAt(0).toUpperCase();
+      return '<div class="card prosp"><div class="prosp-top"><div class="prosp-av">' + esc(ini) + '</div><div><b>' + esc(p.nome) + '</b>' +
+        (p.telefone ? '<span class="small tnum">' + esc(p.telefone) + '</span>' : '<span class="pill warn" style="margin-top:3px">Telefone não informado</span>') +
+        '<span class="small">Prospectador</span></div></div>' +
+        '<div class="prosp-nums"><div><b>' + seus.length + '</b><span>parceiros</span></div><div><b>' + cli.length + '</b><span>indicações</span></div><div><b>' + contr + '</b><span>contratos</span></div><div><b>' + conc + '</b><span>concedidos</span></div></div>' +
+        '<div class="prosp-actions">' + (isAdmin() ? '<button type="button" class="btn" data-pact="link" data-id="' + esc(p.id) + '"><svg class="i"><use href="#i-phone"/></svg>Aplicativo</button>' : '') +
+        '<button type="button" class="btn" data-pact="edit" data-id="' + esc(p.id) + '">Editar</button></div></div>';
+    }).join('') : '<div class="card empty">Nenhum prospectador neste estado ainda. Clique em <b>Novo prospectador</b>.</div>';
+  }
   function renderProsp(){
     var box = $('prosp-list');
-    var doEstado = state.prosp.filter(function(p){ return regAberta && p.regiaoId === regAberta; });
+    renderProspectadores();
+    var doEstado = soParceiros().filter(function(p){ return regAberta && p.regiaoId === regAberta; });
     if (!regAberta){ box.innerHTML = ''; return; }
     if (!doEstado.length){ box.innerHTML = '<div class="card empty">Nenhum parceiro neste estado ainda. Clique em <b>Novo parceiro</b> acima.</div>'; return; }
     box.innerHTML = doEstado.slice().sort(function(a, b){ return (a.nome || '').localeCompare(b.nome || '', 'pt-BR'); }).map(function(p){
@@ -3344,6 +3372,7 @@ td,.row{font-size:13px}
       var ini = (p.nome || '?').replace(/^(dona|dom|seu|sr\.?|sra\.?)\s+/i, '').charAt(0).toUpperCase();
       return '<div class="card prosp">' +
         '<div class="prosp-top"><div class="prosp-av">' + esc(ini) + '</div><div><b>' + esc(p.tipo === 'clinica' && p.clinica ? p.clinica : p.nome) + '</b>' + (p.tipo === 'clinica' ? '<span class="small">Clínica · ' + esc(p.nome) + '</span>' : '') +
+          (p.prospectadorId && prospById(p.prospectadorId) ? '<span class="small">Prospectador: ' + esc(prospById(p.prospectadorId).nome) + '</span>' : '') +
           (p.telefone ? '<span class="small tnum">' + esc(p.telefone) + '</span>' : '<span class="pill warn" style="margin-top:3px">Telefone não informado</span>') +
           (regiaoDe(p) ? '<span class="small reg-linha">' + ufFlagReg(regiaoDe(p)) + (p.regiao ? esc(p.regiao) + ' · ' : '') + esc(regiaoDe(p).nome) + '</span>' : (p.regiao ? '<span class="small">' + esc(p.regiao) + '</span>' : '<span class="pill warn" style="margin-top:3px">Sem região</span>')) + '</div></div>' +
                 '<div class="prosp-nums"><div><b>' + mine.length + '</b><span>clientes</span></div><div><b>' + mine.filter(function(r){ return !!r.contratoEm; }).length + '</b><span>contratos</span></div><div><b>' + mine.filter(function(r){ return r.inssStatus === 'concedido'; }).length + '</b><span>concedidos</span></div></div>' +
@@ -3780,20 +3809,21 @@ td,.row{font-size:13px}
     var box = $('reg-grid'); if (!box) return;
     regUfOpcoes();
     box.innerHTML = state.regioes.map(function(g){
-      var ps = state.prosp.filter(function(p){ return p.regiaoId === g.id; });
+      var ps = soParceiros().filter(function(p){ return p.regiaoId === g.id; });
+      var nPros = prospectadoresDe(g.id).length;
       var nCli = state.rows.filter(function(r){ var p = prospById(r.responsavelId); return p && p.regiaoId === g.id; }).length;
       return '<button type="button" class="reg-card' + (regAberta === g.id ? ' on' : '') + '" data-reg="' + esc(g.id) + '" aria-pressed="' + (regAberta === g.id) + '">' + mapaReg(g) +
         '<div class="reg-info"><b>' + ufFlagReg(g) + esc(g.nome) + '</b>' +
         '<span class="reg-resp">' + (g.responsavel ? 'Responsável: <em>' + esc(g.responsavel) + '</em>' : '<em class="sem">Responsável não definido</em>') + '</span>' +
-        '<span>' + ps.length + (ps.length === 1 ? ' parceiro' : ' parceiros') + ' · ' + nCli + (nCli === 1 ? ' cliente' : ' clientes') + '</span></div></button>';
+        '<span>' + nPros + (nPros === 1 ? ' prospectador' : ' prospectadores') + ' · ' + ps.length + (ps.length === 1 ? ' parceiro' : ' parceiros') + '</span><span>' + nCli + (nCli === 1 ? ' cliente' : ' clientes') + '</span></div></button>';
     }).join('');
     var det = $('reg-det');
     var g = regAberta ? regiaoPorId(regAberta) : null;
     if (!g){ det.hidden = true; det.innerHTML = ''; return; }
-    var ps = state.prosp.filter(function(p){ return p.regiaoId === g.id; }).sort(function(a, b){ return (a.nome || '').localeCompare(b.nome || '', 'pt-BR'); });
+    var ps = soParceiros().filter(function(p){ return p.regiaoId === g.id; }).sort(function(a, b){ return (a.nome || '').localeCompare(b.nome || '', 'pt-BR'); });
     var nomes = (state.equipe || []).map(function(u){ return u.nome; }).filter(Boolean);
     det.hidden = false;
-    det.innerHTML = '<div class="reg-det-h">' + ufFlagReg(g) + '<b>' + esc(g.nome) + '</b><span class="mini">' + ps.length + (ps.length === 1 ? ' parceiro' : ' parceiros') + '</span><button type="button" class="btn primary reg-novo-parc" data-reg-novo="' + esc(g.id) + '"><svg class="i"><use href="#i-plus"/></svg>Novo parceiro em ' + esc(g.nome) + '</button></div>' +
+    det.innerHTML = '<div class="reg-det-h">' + ufFlagReg(g) + '<b>' + esc(g.nome) + '</b><span class="mini">' + ps.length + (ps.length === 1 ? ' parceiro' : ' parceiros') + '</span><button type="button" class="btn primary reg-novo-parc" data-reg-novo="' + esc(g.id) + '"><svg class="i"><use href="#i-plus"/></svg>Novo parceiro</button><button type="button" class="btn reg-novo-parc" data-reg-novo-pros="' + esc(g.id) + '"><svg class="i"><use href="#i-plus"/></svg>Novo prospectador</button></div>' +
       '<div class="reg-resp-edit"><label for="reg-resp-in">Responsável pelo estado</label>' +
         (isAdmin() ? '<div class="reg-resp-row"><input id="reg-resp-in" list="reg-resp-dl" autocomplete="off" placeholder="Nome do responsável" value="' + esc(g.responsavel || '') + '"><datalist id="reg-resp-dl">' + nomes.map(function(n){ return '<option value="' + esc(n) + '">'; }).join('') + '</datalist><button type="button" class="btn" id="reg-resp-salvar" data-reg-id="' + esc(g.id) + '">Salvar</button>' + (ps.length ? '' : '<button type="button" class="btn danger" id="reg-remover" data-reg-id="' + esc(g.id) + '">Remover estado</button>') + '</div>'
                     : '<div class="reg-resp-nome">' + (g.responsavel ? esc(g.responsavel) : 'Não definido') + '</div>') + '</div>' +
@@ -3802,6 +3832,7 @@ td,.row{font-size:13px}
   }
   $('reg-det').addEventListener('click', async function(e){
     var nv = e.target.closest('[data-reg-novo]'); if (nv){ openProsp(null, nv.dataset.regNovo); return; }
+    var np = e.target.closest('[data-reg-novo-pros]'); if (np){ openProsp(null, np.dataset.regNovoPros, 'prospectador'); return; }
     var s = e.target.closest('#reg-resp-salvar'), rm = e.target.closest('#reg-remover');
     if (s){
       var g = regiaoPorId(s.dataset.regId); if (!g) return;
@@ -4584,7 +4615,7 @@ td,.row{font-size:13px}
     var dig = String(cpProsp.telefone || cpProsp.contato || '').replace(/\D/g, '');
     var appUrl = location.origin + location.pathname.replace(/[^/]*$/, '') + 'campo.html';
     var nomeMsg = cpProsp.tipo === 'clinica' && cpProsp.clinica ? cpProsp.clinica : String(cpProsp.nome || '').split(' ')[0];
-    var txt = 'Olá, ' + nomeMsg + '! Este é o aplicativo Nascer com Direitos, para cadastrar as clientes.' + String.fromCharCode(10, 10) +
+    var txt = 'Olá, ' + nomeMsg + '! Este é o aplicativo Nascer com Direitos, ' + (cpProsp.perfil === 'prospectador' ? 'para cadastrar os parceiros e acompanhar os contratos deles.' : 'para cadastrar as clientes.') + String.fromCharCode(10, 10) +
       'iPhone: abra este endereço no Safari, toque em Compartilhar e em Adicionar à Tela de Início:' + String.fromCharCode(10) + appUrl + String.fromCharCode(10, 10) +
       'Android: baixe e instale:' + String.fromCharCode(10) + APK_URL + String.fromCharCode(10, 10) +
       'Entre com:' + String.fromCharCode(10) + 'Usuário: ' + u + String.fromCharCode(10) + 'Senha: ' + cpSenhaNova;
@@ -5176,9 +5207,9 @@ td,.row{font-size:13px}
     $('f-hora').value = r ? r.audHora || '' : '';
     $('f-online').checked = !!(r && r.online);
     $('f-situacao').value = r ? sit(r) : 'pendente';
-    $('f-resp').innerHTML = '<option value="">Sem parceiro</option>' + state.prosp.map(function(p){ return '<option value="' + esc(p.id) + '">' + esc(p.nome) + '</option>'; }).join('');
+    $('f-resp').innerHTML = '<option value="">Sem parceiro</option>' + soParceiros().map(function(p){ return '<option value="' + esc(p.id) + '">' + esc(p.nome) + '</option>'; }).join('');
     $('f-resp').value = r && prospById(r.responsavelId) ? r.responsavelId : '';
-    $('f-aviso-resp').innerHTML = '<option value="">O próprio parceiro</option>' + state.prosp.map(function(p){ return '<option value="' + esc(p.id) + '">' + esc(p.nome) + '</option>'; }).join('');
+    $('f-aviso-resp').innerHTML = '<option value="">O próprio parceiro</option>' + soParceiros().map(function(p){ return '<option value="' + esc(p.id) + '">' + esc(p.nome) + '</option>'; }).join('');
     $('f-aviso-resp').value = r && prospById(r.avisoRespId) ? r.avisoRespId : '';
     $('f-avisoem').value = r && r.avisadoEm ? String(r.avisadoEm).slice(0, 10) : '';
     $('f-avisadoa').value = r ? r.avisadoA || '' : '';
@@ -5598,9 +5629,15 @@ td,.row{font-size:13px}
   $('r-f').addEventListener('change', function(e){ state.r.f = e.target.value; renderRet(); });
   $('r-q').addEventListener('input', function(e){ state.r.q = e.target.value.trim(); renderRet(); });
   var dlgP = $('dlg-prosp'), pEditing = null, pDelArmed = false;
-  function openProsp(p, estadoPreset){
+  var pPerfil = 'parceiro';
+  function prosPreencher(estado, sel){
+    $('fp-prospectador').innerHTML = '<option value="">Sem prospectador</option>' + prospectadoresDe(estado).map(function(x){ return '<option value="' + esc(x.id) + '"' + (x.id === sel ? ' selected' : '') + '>' + esc(x.nome) + '</option>'; }).join('');
+  }
+  function openProsp(p, estadoPreset, perfilPreset){
     pEditing = p ? p.id : null;
-    $('fp-title').textContent = p ? 'Editar parceiro' : 'Novo parceiro';
+    pPerfil = (p && ehProspectador(p)) || perfilPreset === 'prospectador' ? 'prospectador' : 'parceiro';
+    var ehPros = pPerfil === 'prospectador';
+    $('fp-title').textContent = (p ? 'Editar ' : 'Novo ') + (ehPros ? 'prospectador' : 'parceiro');
     $('fp-nome').value = p ? p.nome || '' : '';
     $('fp-tel').value = p ? p.telefone || '' : '';
     $('fp-reg').value = p ? p.regiao || '' : '';
@@ -5609,6 +5646,11 @@ td,.row{font-size:13px}
     $('fp-clinica-box').hidden = $('fp-tipo').value !== 'clinica';
     regSelectPreencher(p ? p.regiaoId || '' : (estadoPreset || ''));
     cidadesDoEstado();
+    var ehProsDlg = pPerfil === 'prospectador';
+    ['fp-tipo', 'fp-reg'].forEach(function(id){ $(id).closest('.field').hidden = ehProsDlg; });
+    $('fp-clinica-box').hidden = ehProsDlg || $('fp-tipo').value !== 'clinica';
+    $('fp-pros-box').hidden = ehProsDlg;
+    prosPreencher($('fp-regiao').value, p ? p.prospectadorId || '' : '');
     $('fp-pal').value = p ? (p.palavrasEndereco || []).join(', ') : '';
     $('fp-del').hidden = !p; pDelArmed = false; $('fp-del').classList.remove('armed'); $('fp-del').textContent = 'Excluir';
     dlgP.showModal(); $('fp-nome').focus();
@@ -5629,7 +5671,7 @@ td,.row{font-size:13px}
       pintar(nomes);
     }).catch(function(){});
   }
-  $('fp-regiao').addEventListener('change', cidadesDoEstado);
+  $('fp-regiao').addEventListener('change', function(){ cidadesDoEstado(); prosPreencher($('fp-regiao').value, ''); });
   $('fp-tipo').addEventListener('change', function(){ $('fp-clinica-box').hidden = this.value !== 'clinica'; if (this.value === 'clinica') $('fp-clinica').focus(); });
   $('fp-tel').addEventListener('input', function(e){ e.target.value = maskTel(e.target.value); });
   function pcol(){ return state.db.collection('prospectadores'); }
@@ -5643,6 +5685,9 @@ td,.row{font-size:13px}
       palavrasEndereco: $('fp-pal').value.split(',').map(function(s){ return s.trim(); }).filter(Boolean),
       ativo: true, criadoEm: prev.criadoEm || new Date().toISOString(), atualizadoEm: new Date().toISOString() };
     if (prev.valorIndicacao) data.valorIndicacao = prev.valorIndicacao;
+    if (pPerfil === 'prospectador'){ data.perfil = 'prospectador'; data.tipo = 'pessoa'; data.clinica = ''; data.regiao = ''; }
+    else { var pr = $('fp-prospectador').value || ''; if (pr) data.prospectadorId = pr; }
+    if (prev.criadoPor) data.criadoPor = prev.criadoPor;
     $('fp-save').disabled = true;
     try {
       if (state.db){ await (pEditing ? pcol().doc(pEditing) : pcol().doc()).set(data); }
@@ -5657,7 +5702,7 @@ td,.row{font-size:13px}
       dlgP.close(); toast('Parceiro excluído. Os clientes dele ficaram sem responsável.');
     } catch(err){ toast(errMsg(err)); }
   });
-  $('prosp-list').addEventListener('click', async function(e){
+  var clickProsp = async function(e){
     var b = e.target.closest('[data-pact]'); if (!b) return;
     var p = prospById(b.dataset.id); if (!p) return;
     if (b.dataset.pact === 'edit') return openProsp(p);
@@ -5672,7 +5717,9 @@ td,.row{font-size:13px}
       }
       toast(ok + ' cliente(s) atribuído(s) a ' + p.nome);
     }
-  });
+  };
+  $('prosp-list').addEventListener('click', clickProsp);
+  $('pros-list').addEventListener('click', clickProsp);
 
   /* ---------- Word: delivery list + cut-out hearing invitations ---------- */
   var DOC_MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];

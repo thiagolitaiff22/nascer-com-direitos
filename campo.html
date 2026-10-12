@@ -612,6 +612,20 @@ html[data-tema="dark"] .login #ver-senha{color:#d4b483!important}
 .login .fone svg{width:18px!important;height:18px!important}
 .login .enviar{height:50px!important;font-size:16px!important;margin-top:30px!important;border-radius:12px!important}
 .login-nota{font-size:12.5px!important;margin:20px 8px 0!important;line-height:1.5!important;opacity:.95}
+
+/* ---------- prospectador ---------- */
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:4px;border-radius:14px;background:var(--gsoft,#f8f1e4);margin:0 0 12px}
+.seg button{border:0;background:none;padding:11px;border-radius:11px;font:inherit;font-weight:600;font-size:14.5px;color:var(--ink2)}
+.seg button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(60,45,20,.12)}
+.mini-btn{flex:none;border:1px solid var(--line2);background:var(--card);color:var(--g2,#8a6a3d);border-radius:999px;padding:6px 10px;font:inherit;font-size:12.5px;font-weight:600}
+.nota-form{font-size:13px;color:var(--ink2);margin:10px 4px 0}
+.acesso-caixa{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;text-align:left;padding:14px 16px;border-radius:14px;background:var(--gsoft,#f8f1e4);margin:10px 0 14px}
+.acesso-caixa span{font-size:13px;color:var(--ink2)}
+.acesso-caixa b{font-size:15px;word-break:break-all}
+html[data-tema="dark"] .seg{background:rgba(212,180,131,.1)}
+html[data-tema="dark"] .seg button[aria-pressed="true"]{background:#2c251c;color:#f8f2e8}
+html[data-tema="dark"] .acesso-caixa{background:rgba(212,180,131,.1)}
+html[data-tema="dark"] .mini-btn{background:#1b1712;border-color:#4b4132;color:#d4b483}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
 </head>
@@ -856,7 +870,9 @@ html[data-tema="dark"] .login #ver-senha{color:#d4b483!important}
   function maiusculas(d){ if (d && d.clientes) d.clientes.forEach(function(c){ if (c.nome) c.nome = bonito(c.nome); if (c.crianca) c.crianca = bonito(c.crianca); }); return d; }   // (nome da função antigo) padrão: Primeira letra maiúscula
   try { painel = maiusculas(JSON.parse(lsGet('campo_painel') || 'null')); } catch(e){}
   function montarCasca(){
-    if ($('vista')) return;
+    var perfilCasca = ehProspectador() ? 'p' : 'c';
+    if ($('vista') && $('app').dataset.perfil === perfilCasca) return;
+    $('app').dataset.perfil = perfilCasca;
     $('app').innerHTML =
       '<div class="topo"><div class="logo"><img src="img/logo-nascer-t.png" alt="Nascer com Direitos"></div>' +
         '<div class="quem"><b id="topo-nome"></b><span id="topo-sub">Parceira</span></div><div class="sinc" id="sinc"><i></i><span></span></div>' +
@@ -864,8 +880,8 @@ html[data-tema="dark"] .login #ver-senha{color:#d4b483!important}
       '<main class="vista" id="vista"></main>' +
       '<nav class="abas" id="abas">' +
         '<button type="button" data-aba="painel"><svg><use href="#i-painel"/></svg>Painel</button>' +
-        '<button type="button" data-aba="novo"><svg><use href="#i-novo"/></svg>Novo cadastro<span class="bolha" id="bolha" hidden></span></button>' +
-        '<button type="button" data-aba="clientes"><svg><use href="#i-grupo"/></svg>Clientes</button>' +
+        '<button type="button" data-aba="novo"><svg><use href="#i-novo"/></svg>' + (ehProspectador() ? 'Novo parceiro' : 'Novo cadastro') + '<span class="bolha" id="bolha" hidden></span></button>' +
+        '<button type="button" data-aba="clientes"><svg><use href="#i-grupo"/></svg>' + (ehProspectador() ? 'Parceiros' : 'Clientes') + '</button>' +
       '</nav>';
     $('abas').addEventListener('click', function(e){ var b = e.target.closest('[data-aba]'); if (b) irPara(b.dataset.aba); });
     $('tema').addEventListener('click', function(){
@@ -885,16 +901,196 @@ html[data-tema="dark"] .login #ver-senha{color:#d4b483!important}
     });
   }
   window.addEventListener('online', sincronia); window.addEventListener('offline', sincronia);
+
+  /* ---------- prospectador: cria o login dos parceiros e vê os números deles ---------- */
+  var SITE = 'https://thiagolitaiff22.github.io/nascer-com-direitos/';
+  var pp = null;   // { parceiros: [...], atualizado }
+  function ehProspectador(){ return !!(quem && quem.perfil === 'prospectador'); }
+  function chamar(nome, corpo){
+    return fetch(CFG.url + '/rest/v1/rpc/' + nome, { method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) })
+      .then(function(r){ return r.json(); });
+  }
+  function carregarProsp(){
+    if (!CFG_OK || !token || navigator.onLine === false) return Promise.resolve();
+    return chamar('prosp_painel', { p_token: token }).then(function(d){
+      if (d && d.parceiros){ pp = d; lsSet('campo_pp', JSON.stringify(d)); if (aba !== 'novo' && $('vista') && !document.querySelector('.tela')) telaInicial(); }
+    }).catch(function(){});
+  }
+  function listaProsp(){
+    if (!pp){ try { pp = JSON.parse(lsGet('campo_pp') || 'null'); } catch(e){} }
+    return (pp && pp.parceiros) || [];
+  }
+  function nomeParc(x){ return x.tipo === 'clinica' && x.clinica ? bonito(x.clinica) : bonito(x.nome); }
+  function somaProsp(l){ return l.reduce(function(a, x){ a.ind += +x.indicacoes || 0; a.con += +x.contratos || 0; a.cnc += +x.concedidos || 0; a.pag += +x.pagos || 0; a.gui += +x.guiasPagas || 0; return a; }, { ind: 0, con: 0, cnc: 0, pag: 0, gui: 0 }); }
+  function linhaParc(x){
+    return '<div data-parc="' + esc(x.id) + '"><span class="nm"><b>' + esc(nomeParc(x)) + '</b><span>' + esc(x.cidade ? bonito(x.cidade) : (x.tipo === 'clinica' ? 'Clínica' : 'Parceiro')) +
+      ' · ' + (+x.indicacoes || 0) + (+x.indicacoes === 1 ? ' indicação' : ' indicações') + '</span>' +
+      (x.ativo === false ? '<span class="falta-l">Acesso bloqueado</span>' : '') + '</span><small>' + (+x.contratos || 0) + (+x.contratos === 1 ? ' contrato' : ' contratos') + '</small></div>';
+  }
+  function vistaProspPainel(){
+    var l = listaProsp(), t = somaProsp(l), primeiro = String((quem && quem.nome) || '').trim().split(/\s+/)[0];
+    $('vista').innerHTML =
+      '<div class="ola"><b>Olá' + (primeiro ? ', ' + esc(bonito(primeiro)) : '') + '!</b><span>Seus parceiros e os contratos que eles trouxeram</span></div>' +
+      '<div class="hero"><small>Parceiros que você trouxe</small><span class="num">' + l.length + '</span>' +
+        '<div class="lin"><span><b>' + t.ind + '</b> indicações</span><span><b>' + t.con + '</b> contratos</span><span><b>' + t.cnc + '</b> concedidos</span></div></div>' +
+      '<div class="kpis"><div class="kpi" style="--c:var(--ok)"><small>Contratos fechados</small><b>' + t.con + '</b></div>' +
+        '<div class="kpi" style="--c:var(--warn)"><small>Guias pagas</small><b>' + t.gui + '</b></div>' +
+        '<div class="kpi" style="--c:var(--ok)"><small>Concedidos</small><b>' + t.cnc + '</b></div>' +
+        '<div class="kpi" style="--c:var(--line2)"><small>Pagos</small><b>' + t.pag + '</b></div></div>' +
+      '<div class="rot">Seus parceiros' + (l.length ? ' · ' + l.length : '') + '</div>' +
+      (l.length ? '<div class="lista">' + l.slice(0, 8).map(linhaParc).join('') + '</div>' + (l.length > 8 ? '<button type="button" class="sair" id="ver-todos">Ver todos os parceiros</button>' : '')
+                : '<div class="vazio">Você ainda não cadastrou parceiros. Toque em <b>Novo parceiro</b>.</div>') +
+      '<button type="button" class="sair" id="sair"><svg><use href="#i-sair"/></svg>Sair desta conta</button>' +
+      '<div class="versao">Nascer com Direitos · versão ' + APP_VERSAO + '</div>';
+    $('vista').onclick = function(e){
+      var p = e.target.closest('[data-parc]'); if (p) return fichaParceiro(p.dataset.parc);
+      if (e.target.closest('#ver-todos')) irPara('clientes');
+    };
+    $('sair').onclick = sair;
+  }
+  var buscaParc = '';
+  function vistaProspLista(){
+    var l = listaProsp();
+    $('vista').innerHTML =
+      '<label class="busca"><svg><use href="#i-busca"/></svg><input id="busca-parc" placeholder="Buscar parceiro" value="' + esc(buscaParc) + '" autocomplete="off"></label>' +
+      '<div id="lista-parc"></div>';
+    function pintar(){
+      var q = buscaParc.toLowerCase(), f = l.filter(function(x){ return !q || (nomeParc(x) + ' ' + bonito(x.nome) + ' ' + (x.cidade || '')).toLowerCase().indexOf(q) >= 0; });
+      $('lista-parc').innerHTML = '<div class="rot">' + f.length + (f.length === 1 ? ' parceiro' : ' parceiros') + '</div>' +
+        (f.length ? '<div class="lista">' + f.map(linhaParc).join('') + '</div>' : '<div class="vazio">' + (l.length ? 'Nenhum parceiro com esse nome.' : 'Você ainda não cadastrou parceiros.') + '</div>');
+    }
+    pintar();
+    $('busca-parc').addEventListener('input', function(){ buscaParc = this.value; pintar(); });
+    $('vista').onclick = function(e){ var p = e.target.closest('[data-parc]'); if (p) fichaParceiro(p.dataset.parc); };
+  }
+  function gerarSenha(){
+    var a = 'abcdefghjkmnpqrstuvwxyz23456789', s = '', v = new Uint8Array(8);
+    try { crypto.getRandomValues(v); } catch(e){ for (var i = 0; i < 8; i++) v[i] = Math.floor(Math.random() * 256); }
+    for (var j = 0; j < 8; j++) s += a.charAt(v[j] % a.length);
+    return s;
+  }
+  function sugerirUsuario(nome){
+    var t = String(nome || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ').trim().split(/\s+/).filter(function(p){ return p && ['de', 'da', 'do', 'das', 'dos', 'e'].indexOf(p) < 0; });
+    if (!t.length) return '';
+    return (t.length > 1 ? t[0] + '.' + t[t.length - 1] : t[0]).slice(0, 26);
+  }
+  function mensagemAcesso(nome, usuario, senha){
+    var NL = String.fromCharCode(10);
+    return 'Olá, ' + nome + '! Você agora tem acesso ao aplicativo Nascer com Direitos, para cadastrar as clientes.' + NL + NL +
+      'iPhone: abra este endereço no Safari, toque em Compartilhar e em Adicionar à Tela de Início:' + NL + SITE + 'campo.html' + NL + NL +
+      'Android: baixe e instale:' + NL + SITE + 'app/download/nascer-com-direitos.apk' + NL + NL +
+      'Entre com:' + NL + 'Usuário: ' + usuario + NL + 'Senha: ' + senha;
+  }
+  function enviarZap(tel, texto){
+    var d = String(tel || '').replace(/\D/g, '');
+    window.open('https://wa.me/' + (d.length >= 10 ? '55' + d.replace(/^55/, '') : '') + '?text=' + encodeURIComponent(texto), '_blank', 'noopener');
+  }
+  function acessoCriado(nome, tel, usuario, senha){
+    var t = tela('<svg viewBox="0 0 24 24" style="stroke:var(--ok)"><use href="#i-ok"/></svg><b>Parceiro cadastrado</b><p>' + esc(nome) + '</p>' +
+      '<div class="acesso-caixa"><span>Usuário</span><b>' + esc(usuario) + '</b><span>Senha</span><b>' + esc(senha) + '</b></div>' +
+      '<button id="t-zap">Mandar o acesso no WhatsApp</button><button class="sec2" id="t-copia">Copiar usuário e senha</button><button class="sec2" id="t-fecha">Fechar</button>');
+    t.querySelector('#t-zap').onclick = function(){ enviarZap(tel, mensagemAcesso(nome.split(' ')[0], usuario, senha)); };
+    t.querySelector('#t-copia').onclick = function(){
+      var txt = 'Usuário: ' + usuario + String.fromCharCode(10) + 'Senha: ' + senha;
+      (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function(){ alert('Copiado.'); }, function(){ alert(txt); });
+    };
+    t.querySelector('#t-fecha').onclick = function(){ t.remove(); irPara('clientes'); carregarProsp(); };
+  }
+  var novoP = { tipo: 'pessoa', nome: '', clinica: '', fone: '', cidade: '', usuario: '', senha: '', userEditado: false };
+  function vistaProspNovo(){
+    if (!novoP.senha) novoP.senha = gerarSenha();
+    var clin = novoP.tipo === 'clinica', uf = String((quem && quem.regiaoId) || '').slice(0, 2).toUpperCase();
+    $('vista').innerHTML =
+      '<div class="rot" style="margin-top:0">Quem é o parceiro</div>' +
+      '<div class="seg" id="np-tipo"><button type="button" data-t="pessoa" aria-pressed="' + !clin + '">Pessoa</button><button type="button" data-t="clinica" aria-pressed="' + clin + '">Clínica</button></div>' +
+      '<div class="dados">' +
+        '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-pessoa"/></svg><input id="np-nome" autocomplete="off" autocapitalize="words" placeholder="' + (clin ? 'Nome do responsável pela clínica' : 'Nome completo do parceiro') + '" value="' + esc(novoP.nome) + '"></label>' +
+        (clin ? '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-grupo"/></svg><input id="np-clinica" autocomplete="off" autocapitalize="words" placeholder="Nome da clínica" value="' + esc(novoP.clinica) + '"></label>' : '') +
+        '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-fone"/></svg><input id="np-fone" inputmode="tel" maxlength="15" placeholder="(92) 99999-9999" value="' + esc(maskFone(novoP.fone)) + '"></label>' +
+        '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-casa"/></svg><input id="np-cidade" list="np-cidades" autocomplete="off" autocapitalize="words" placeholder="Cidade" value="' + esc(novoP.cidade) + '"><datalist id="np-cidades"></datalist></label>' +
+      '</div>' +
+      '<div class="rot">Acesso ao aplicativo</div><div class="dados">' +
+        '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-pessoa"/></svg><input id="np-usuario" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Usuário" value="' + esc(novoP.usuario) + '"></label>' +
+        '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-cadeado"/></svg><input id="np-senha" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Senha" value="' + esc(novoP.senha) + '"><button type="button" id="np-gerar" class="mini-btn">gerar outra</button></label>' +
+      '</div><p class="nota-form">O parceiro entra com este usuário e esta senha. Anote ou mande pelo WhatsApp quando terminar.</p>' +
+      '<div class="barra"><button class="enviar" id="np-criar"><svg viewBox="0 0 24 24"><use href="#i-ok"/></svg>Criar parceiro</button></div>';
+    var ref = function(){ novoP.nome = $('np-nome').value; if ($('np-clinica')) novoP.clinica = $('np-clinica').value; novoP.fone = $('np-fone').value; novoP.cidade = $('np-cidade').value; novoP.usuario = $('np-usuario').value; novoP.senha = $('np-senha').value; };
+    $('np-tipo').onclick = function(e){ var b = e.target.closest('[data-t]'); if (!b) return; ref(); novoP.tipo = b.dataset.t; vistaProspNovo(); };
+    $('np-nome').addEventListener('input', function(){ novoP.nome = this.value; if (!novoP.userEditado && novoP.tipo === 'pessoa'){ novoP.usuario = sugerirUsuario(this.value); $('np-usuario').value = novoP.usuario; } });
+    if ($('np-clinica')) $('np-clinica').addEventListener('input', function(){ novoP.clinica = this.value; if (!novoP.userEditado){ novoP.usuario = sugerirUsuario(this.value); $('np-usuario').value = novoP.usuario; } });
+    $('np-nome').addEventListener('blur', function(){ this.value = bonito(this.value); novoP.nome = this.value; });
+    if ($('np-clinica')) $('np-clinica').addEventListener('blur', function(){ this.value = bonito(this.value); novoP.clinica = this.value; });
+    $('np-cidade').addEventListener('blur', function(){ this.value = bonito(this.value); novoP.cidade = this.value; });
+    $('np-fone').addEventListener('input', function(){ this.value = maskFone(this.value); novoP.fone = this.value; });
+    $('np-usuario').addEventListener('input', function(){ novoP.userEditado = true; this.value = this.value.toLowerCase().replace(/[^a-z0-9._-]/g, ''); novoP.usuario = this.value; });
+    $('np-senha').addEventListener('input', function(){ novoP.senha = this.value; });
+    $('np-gerar').onclick = function(){ novoP.senha = gerarSenha(); $('np-senha').value = novoP.senha; };
+    // cidades do estado (lista do IBGE)
+    if (uf){
+      var cache; try { cache = JSON.parse(localStorage.getItem('nascer-cid-' + uf) || 'null'); } catch(e){}
+      var pintar = function(l){ var dl = $('np-cidades'); if (dl) dl.innerHTML = l.map(function(n){ return '<option value="' + esc(n) + '">'; }).join(''); };
+      if (cache && cache.length) pintar(cache);
+      else fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados/' + uf + '/municipios?orderBy=nome').then(function(r){ return r.json(); }).then(function(l){
+        var n = (l || []).map(function(m){ return m.nome; }); try { localStorage.setItem('nascer-cid-' + uf, JSON.stringify(n)); } catch(e){} pintar(n);
+      }).catch(function(){});
+    }
+    $('np-criar').onclick = function(){
+      ref();
+      var nome = bonito(novoP.nome), clinica = bonito(novoP.clinica), cidade = bonito(novoP.cidade);
+      if (nome.length < 3){ alert('Informe o nome do parceiro.'); $('np-nome').focus(); return; }
+      if (novoP.tipo === 'clinica' && clinica.length < 2){ alert('Informe o nome da clínica.'); $('np-clinica').focus(); return; }
+      if (!foneOk(novoP.fone)){ alert('Informe o telefone com DDD, por exemplo (92) 99999-9999.'); $('np-fone').focus(); return; }
+      if (!cidade){ alert('Informe a cidade do parceiro.'); $('np-cidade').focus(); return; }
+      if (!/^[a-z0-9._-]{3,30}$/.test(novoP.usuario)){ alert('O usuário precisa ter de 3 a 30 letras ou números, sem espaço nem acento.'); $('np-usuario').focus(); return; }
+      if (novoP.senha.length < 6){ alert('A senha precisa ter pelo menos 6 caracteres.'); $('np-senha').focus(); return; }
+      if (navigator.onLine === false) return alert('Sem internet agora. Para cadastrar um parceiro é preciso estar conectado.');
+      var b = this; b.disabled = true; b.lastChild.textContent = 'Criando…';
+      chamar('prosp_criar_parceiro', { p_token: token, p_nome: nome, p_tipo: novoP.tipo, p_clinica: novoP.tipo === 'clinica' ? clinica : '', p_cidade: cidade, p_telefone: novoP.fone, p_usuario: novoP.usuario, p_senha: novoP.senha })
+        .then(function(d){
+          if (d && d.ok){
+            var rotulo = novoP.tipo === 'clinica' ? clinica : nome, tel = novoP.fone, usr = d.usuario, sen = novoP.senha;
+            novoP = { tipo: 'pessoa', nome: '', clinica: '', fone: '', cidade: '', usuario: '', senha: '', userEditado: false };
+            acessoCriado(rotulo, tel, usr, sen);
+          } else { alert((d && (d.erro || d.message)) || 'Não foi possível criar o parceiro.'); }
+        })
+        .catch(function(){ alert('Sem internet agora. Tente de novo.'); })
+        .then(function(){ if (document.body.contains(b)){ b.disabled = false; b.lastChild.textContent = 'Criar parceiro'; } });
+    };
+  }
+  function fichaParceiro(id){
+    var x = listaProsp().filter(function(p){ return p.id === id; })[0]; if (!x) return;
+    var t = tela('<b>' + esc(nomeParc(x)) + '</b><p>' + esc(x.tipo === 'clinica' ? 'Clínica · ' + bonito(x.nome) : 'Parceiro') + (x.cidade ? ' · ' + esc(bonito(x.cidade)) : '') + '</p>' +
+      '<div class="acesso-caixa"><span>Usuário</span><b>' + esc(x.usuario || '—') + '</b><span>Situação</span><b>' + (x.ativo === false ? 'Acesso bloqueado' : 'Ativo') + '</b>' +
+      '<span>Indicações</span><b>' + (+x.indicacoes || 0) + '</b><span>Contratos</span><b>' + (+x.contratos || 0) + '</b><span>Concedidos</span><b>' + (+x.concedidos || 0) + '</b></div>' +
+      '<button id="t-senha">Gerar nova senha e mandar</button>' + (x.telefone ? '<button class="sec2" id="t-ligar">Ligar para o parceiro</button>' : '') +
+      '<button class="sec2" id="t-ativo">' + (x.ativo === false ? 'Liberar o acesso' : 'Bloquear o acesso') + '</button><button class="sec2" id="t-fecha">Fechar</button>');
+    t.querySelector('#t-fecha').onclick = function(){ t.remove(); };
+    if (t.querySelector('#t-ligar')) t.querySelector('#t-ligar').onclick = function(){ location.href = 'tel:' + String(x.telefone).replace(/\D/g, ''); };
+    t.querySelector('#t-senha').onclick = function(){
+      if (!confirm('Gerar uma nova senha para ' + nomeParc(x) + '? A senha antiga deixa de funcionar.')) return;
+      var s = gerarSenha();
+      chamar('prosp_trocar_senha', { p_token: token, p_parceiro: x.id, p_senha: s }).then(function(d){
+        if (d && d.ok){ t.remove(); acessoCriado(nomeParc(x), x.telefone, x.usuario, s); } else alert((d && d.erro) || 'Não foi possível trocar a senha.');
+      }).catch(function(){ alert('Sem internet agora. Tente de novo.'); });
+    };
+    t.querySelector('#t-ativo').onclick = function(){
+      var novo = x.ativo === false;
+      chamar('prosp_ativar', { p_token: token, p_parceiro: x.id, p_ativo: novo }).then(function(d){
+        if (d && d.ok){ x.ativo = novo; t.remove(); carregarProsp(); telaInicial(); } else alert((d && d.erro) || 'Não foi possível alterar o acesso.');
+      }).catch(function(){ alert('Sem internet agora. Tente de novo.'); });
+    };
+  }
   function telaInicial(){
     montarCasca();
     var clin = quem && quem.tipo === 'clinica' && quem.clinica;
     $('topo-nome').textContent = clin ? bonito(quem.clinica) : bonito((quem && quem.nome) || '') || 'Parceiro';
-    $('topo-sub').textContent = clin ? 'Clínica parceira' : 'Parceira';
+    $('topo-sub').textContent = ehProspectador() ? 'Prospectador' : clin ? 'Clínica parceira' : 'Parceira';
     Array.prototype.forEach.call(document.querySelectorAll('#abas [data-aba]'), function(b){ b.setAttribute('aria-current', b.dataset.aba === aba ? 'true' : 'false'); });
     $('vista').className = 'vista' + (aba === 'novo' ? ' novo' : '');
     $('vista').onclick = null;   // cada aba põe o seu próprio clique
     document.body.classList.toggle('na-novo', aba === 'novo');
     sincronia();
+    if (ehProspectador()) return aba === 'novo' ? vistaProspNovo() : aba === 'clientes' ? vistaProspLista() : vistaProspPainel();
     if (aba === 'painel') return vistaPainel();
     if (aba === 'clientes') return vistaClientes();
     vistaNovo();
@@ -1004,6 +1200,7 @@ html[data-tema="dark"] .login #ver-senha{color:#d4b483!important}
     });
   }
   function carregarPainel(){
+    if (ehProspectador()) return carregarProsp();
     if (!CFG_OK || buscandoPainel || !token || navigator.onLine === false) return Promise.resolve();
     buscandoPainel = true;
     return fetch(CFG.url + '/rest/v1/rpc/campo_painel', { method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_token: token }) })
