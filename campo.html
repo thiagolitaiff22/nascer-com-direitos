@@ -660,6 +660,8 @@ html,body{overflow-x:hidden}
 .cid-folha .cid-flag{display:block!important;width:26px!important;height:18px!important;min-width:26px;border-radius:3px!important}
 .cid-folha .cid-flag.vazio{background:transparent!important;border:1.5px dashed var(--line2,#d8cdb8);box-shadow:none!important;opacity:.8}
 .cid-folha .cid-item span:not(.cid-flag){flex:1}
+
+.cid-flag.mini{width:18px;height:12px;border-radius:2px;display:inline-block;vertical-align:-1px;margin-right:5px;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
 </head>
@@ -957,7 +959,7 @@ html,body{overflow-x:hidden}
   function nomeParc(x){ return x.tipo === 'clinica' && x.clinica ? bonito(x.clinica) : bonito(x.nome); }
   function somaProsp(l){ return l.reduce(function(a, x){ a.ind += +x.indicacoes || 0; a.con += +x.contratos || 0; a.cnc += +x.concedidos || 0; a.pag += +x.pagos || 0; a.gui += +x.guiasPagas || 0; return a; }, { ind: 0, con: 0, cnc: 0, pag: 0, gui: 0 }); }
   function linhaParc(x){
-    return '<div data-parc="' + esc(x.id) + '"><span class="nm"><b>' + esc(nomeParc(x)) + '</b><span>' + esc(x.cidade ? bonito(x.cidade) : (x.tipo === 'clinica' ? 'Clínica' : 'Parceiro')) +
+    return '<div data-parc="' + esc(x.id) + '"><span class="nm"><b>' + esc(nomeParc(x)) + '</b><span>' + (x.cidade ? '<img class="cid-flag mini" data-cid="' + esc(bonito(x.cidade)) + '" alt="" hidden>' : '') + esc(x.cidade ? bonito(x.cidade) : (x.tipo === 'clinica' ? 'Clínica' : 'Parceiro')) +
       ' · ' + (+x.indicacoes || 0) + (+x.indicacoes === 1 ? ' indicação' : ' indicações') + '</span>' +
       (x.ativo === false ? '<span class="falta-l">Acesso bloqueado</span>' : '') + '</span><small>' + (+x.contratos || 0) + (+x.contratos === 1 ? ' contrato' : ' contratos') + '</small></div>';
   }
@@ -1102,6 +1104,20 @@ html,body{overflow-x:hidden}
     f.querySelector('#cid-x').onclick = function(){ f.remove(); };
     f.addEventListener('click', function(e){ if (e.target === f) f.remove(); });
   }
+  // preenche as bandeirinhas de cidade que aparecem nas listas e na ficha do parceiro
+  function preencherBandeiras(){
+    var uf = String((quem && quem.regiaoId) || '').slice(0, 2).toUpperCase(); if (!uf) return;
+    var imgs = document.querySelectorAll('img.cid-flag[data-cid]:not([src])'); if (!imgs.length) return;
+    bandeirasUF(uf, function(){
+      var l = cidMem[uf] || [], m = flagMem[uf] || {};
+      Array.prototype.forEach.call(document.querySelectorAll('img.cid-flag[data-cid]:not([src])'), function(im){
+        var alvo = semAcento(im.getAttribute('data-cid')), it = l.filter(function(x){ return semAcento(x.n) === alvo; })[0];
+        var u = it && m[it.i.slice(0, 6)]; if (u){ im.src = u; im.hidden = false; }
+      });
+    });
+  }
+  var flagTimer = 0;
+  new MutationObserver(function(){ clearTimeout(flagTimer); flagTimer = setTimeout(preencherBandeiras, 60); }).observe(document.body, { childList: true, subtree: true });
   var novoP = { tipo: 'pessoa', nome: '', clinica: '', fone: '', cidade: '', usuario: '', senha: '', userEditado: false };
   function vistaProspNovo(){
     if (!novoP.senha) novoP.senha = gerarSenha();
@@ -1164,7 +1180,7 @@ html,body{overflow-x:hidden}
   }
   function fichaParceiro(id){
     var x = listaProsp().filter(function(p){ return p.id === id; })[0]; if (!x) return;
-    var t = tela('<b>' + esc(nomeParc(x)) + '</b><p>' + esc(x.tipo === 'clinica' ? 'Clínica · ' + bonito(x.nome) : 'Parceiro') + (x.cidade ? ' · ' + esc(bonito(x.cidade)) : '') + '</p>' +
+    var t = tela('<b>' + esc(nomeParc(x)) + '</b><p>' + esc(x.tipo === 'clinica' ? 'Clínica · ' + bonito(x.nome) : 'Parceiro') + (x.cidade ? ' · <img class="cid-flag mini" data-cid="' + esc(bonito(x.cidade)) + '" alt="" hidden> ' + esc(bonito(x.cidade)) : '') + '</p>' +
       '<div class="acesso-caixa"><span>Usuário</span><b>' + esc(x.usuario || '—') + '</b><span>Situação</span><b>' + (x.ativo === false ? 'Acesso bloqueado' : 'Ativo') + '</b>' +
       '<span>Indicações</span><b>' + (+x.indicacoes || 0) + '</b><span>Contratos</span><b>' + (+x.contratos || 0) + '</b><span>Concedidos</span><b>' + (+x.concedidos || 0) + '</b></div>' +
       '<button id="t-senha">Gerar nova senha e mandar</button>' + (x.telefone ? '<button class="sec2" id="t-ligar">Ligar para o parceiro</button>' : '') +
