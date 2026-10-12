@@ -535,6 +535,28 @@ html[data-tema="dark"] ::placeholder{color:#9c8f77!important}
 /* cabeçalho com fundo sólido: nada passa por baixo dele ao rolar */
 .topo{background:var(--bg)!important;border-bottom:1px solid var(--gline,var(--line))!important;position:sticky;top:0;z-index:8;padding:8px 12px 8px!important;margin:0 -16px 6px;backdrop-filter:saturate(1.2)}
 html[data-tema="dark"] .topo{background:#14110d!important;border-bottom-color:#2e2820!important}
+
+/* etiqueta "Obrigatório": legível, no fluxo do cartão (não cobre o ícone) */
+.doc .estrela{position:static!important;display:inline-flex;align-items:center;align-self:flex-start;margin:0 0 8px!important;padding:4px 10px!important;border-radius:999px;background:#fdecc8!important;color:#7a4a05!important;font-size:12.5px!important;font-weight:700!important;letter-spacing:0!important;text-transform:none!important;line-height:1.1}
+.doc .estrela::after{content:"Obrigatório"!important;font-weight:700!important}
+.doc.req{padding-top:12px}
+html[data-tema="dark"] .doc .estrela{background:rgba(251,191,36,.2)!important;color:#fde68a!important}
+
+/* ---------- lista de clientes: calma, uma cor só; a situação vira uma etiqueta discreta ---------- */
+.lista > div{box-shadow:none!important;padding:15px 16px!important;gap:12px}
+.lista > div::before{display:none!important}
+.lista .nm b{font-size:16px!important;font-weight:600;color:var(--ink)!important}
+.lista .nm span{font-size:13.5px!important;color:var(--ink2)!important}
+.lista .nm .falta-l{color:var(--warn)!important;font-weight:500!important;margin-top:2px}
+.lista small{display:inline-flex!important;align-items:center;gap:7px;flex:none;max-width:46%;padding:6px 12px;border-radius:999px;background:var(--gsoft,#f8f1e4);color:var(--ink)!important;font-size:13px!important;font-weight:600;text-align:left;line-height:1.2}
+.lista small::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ink2);flex:none}
+.lista > div:has(i.ok) small::before{background:var(--ok)}
+.lista > div:has(i.warn) small::before,.lista > div:has(i.red) small::before{background:var(--warn)}
+.lista > div:has(i.blue) small::before,.lista > div:has(i.teal) small::before,.lista > div:has(i.indigo) small::before,.lista > div:has(i.purple) small::before{background:var(--g1,#a07a45)}
+.lista > div:has(i.ok) small,.lista > div:has(i.warn) small,.lista > div:has(i.blue) small,.lista > div:has(i.red) small,.lista > div:has(i.teal) small,.lista > div:has(i.indigo) small,.lista > div:has(i.purple) small,.lista > div:has(i.gray) small{color:var(--ink)!important}
+html[data-tema="dark"] .lista small{background:rgba(212,180,131,.12)!important;color:#f8f2e8!important}
+html[data-tema="dark"] .lista .nm .falta-l{color:#fbbf24!important}
+html[data-tema="dark"] .lista > div:has(i.ok) small::before{background:#4ade80}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
 </head>
