@@ -1892,6 +1892,10 @@ td,.row{font-size:13px}
 .est-cfg-nome b{display:flex;align-items:center;gap:6px}
 .est-cfg-resp{flex:1;min-width:220px}
 :root[data-theme="dark"] .est-cfg-linha{background:#1b1712;border-color:#2e2820}
+.dlg-x{margin-left:auto;width:34px;height:34px;border-radius:50%;border:1px solid var(--gline,var(--line));background:var(--panel,#fff);color:var(--ink-2,#5a4f3f);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:none;padding:0}
+.dlg-x:hover{background:var(--gsoft,#f8f1e4)}
+.dlg-x .i{width:16px;height:16px}
+:root[data-theme="dark"] .dlg-x{background:#1b1712;border-color:#2e2820;color:#e8dcc4}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2449,21 +2453,21 @@ td,.row{font-size:13px}
 
 <dialog id="dlg-campo">
   <form class="f" method="dialog">
-    <div class="f-head"><div class="ph-tile" style="margin:0"><svg class="i"><use href="#i-phone"/></svg></div><h2 id="cp-title">Acesso do parceiro</h2></div>
+    <div class="f-head"><div class="ph-tile" style="margin:0"><svg class="i"><use href="#i-phone"/></svg></div><h2 id="cp-title">Acesso do parceiro</h2><button type="button" class="dlg-x" id="cp-x" aria-label="Fechar" title="Fechar"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <div class="f-body">
       <div class="field full"><div class="sec-rot" style="margin:0">Aplicativo (Android)</div><span class="hint">O parceiro instala o aplicativo <b>Nascer com Direitos</b>, entra com o usuário e a senha abaixo e cadastra as clientes mesmo sem internet. Os cadastros sobem sozinhos quando tiver sinal e aparecem em <b>Cadastro</b>, na conta deste parceiro.</span></div>
       <div class="field"><label for="cp-usuario">Usuário</label><input id="cp-usuario" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="ex.: lene"></div>
       <div class="field"><label for="cp-senha">Senha</label><div style="display:flex;gap:6px"><input id="cp-senha" autocomplete="new-password" placeholder="digite ou gere" style="flex:1;min-width:0"><button class="btn" type="button" id="cp-gerar" title="Gera uma senha fácil de digitar">Gerar</button><button class="btn primary" type="button" id="cp-salvar-senha" title="Salva e já vale no aplicativo">Salvar</button></div></div>
       <div class="field full"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn" type="button" id="cp-whats-app">Mandar acesso no WhatsApp</button><a class="btn" id="cp-apk" target="_blank" rel="noopener">Baixar o aplicativo</a></div><span class="small" id="cp-login-status"></span></div>
-      <div class="field full" style="margin-top:6px"><div class="sec-rot" style="margin:0">Ou pelo navegador (link)</div><span class="hint">Quem tem o link cadastra em nome deste parceiro, sem senha.</span></div>
-      <div class="field full"><label for="cp-link">Link</label><input id="cp-link" readonly></div>
-      <div class="field full" id="cp-aviso" hidden><span class="rep-aviso">O envio para o Drive ainda não está ligado: veja em Configurações › Cadastro pelo celular. Até lá, as fotos ficam guardadas no celular do parceiro.</span></div>
+      <div class="field full" style="display:none"><label for="cp-link">Link</label><input id="cp-link" readonly></div>
+      <div class="field full" id="cp-aviso" hidden style="display:none"><span class="rep-aviso">O envio para o Drive ainda não está ligado: veja em Configurações › Cadastro pelo celular. Até lá, as fotos ficam guardadas no celular do parceiro.</span></div>
     </div>
     <div class="f-foot">
-      <button class="btn" type="button" id="cp-novo" title="O link antigo para de funcionar">Gerar outro link</button>
+      <button class="btn" type="button" id="cp-novo" style="display:none">Gerar outro link</button>
       <div class="right">
-        <a class="btn" id="cp-whats" target="_blank" rel="noopener">Abrir no WhatsApp</a>
-        <button class="btn primary" type="button" id="cp-copiar">Copiar link</button>
+        <a class="btn" id="cp-whats" target="_blank" rel="noopener" style="display:none">Abrir no WhatsApp</a>
+        <button class="btn" type="button" id="cp-copiar" style="display:none">Copiar link</button>
+        <button class="btn primary" type="button" id="cp-fechar">Fechar</button>
       </div>
     </div>
   </form>
@@ -4700,6 +4704,8 @@ td,.row{font-size:13px}
     var p = String(nome || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/^(dona|seu|sr|sra)\.?\s+/, '').split(/\s+/).filter(Boolean);
     return (p[0] || 'prospectador').replace(/[^a-z0-9]/g, '').slice(0, 20);
   }
+  $('cp-x').addEventListener('click', function(){ $('dlg-campo').close(); });
+  $('cp-fechar').addEventListener('click', function(){ $('dlg-campo').close(); });
   $('cp-senha').addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); $('cp-salvar-senha').click(); } });
   $('cp-gerar').addEventListener('click', function(){
     // senha fácil de digitar no celular: só números (6) , sem sequência óbvia
