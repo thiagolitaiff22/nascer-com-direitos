@@ -626,6 +626,20 @@ html[data-tema="dark"] .seg{background:rgba(212,180,131,.1)}
 html[data-tema="dark"] .seg button[aria-pressed="true"]{background:#2c251c;color:#f8f2e8}
 html[data-tema="dark"] .acesso-caixa{background:rgba(212,180,131,.1)}
 html[data-tema="dark"] .mini-btn{background:#1b1712;border-color:#4b4132;color:#d4b483}
+
+/* ---------- margens laterais maiores, respeitando a área segura de cada celular ---------- */
+:root{--gx:max(22px,env(safe-area-inset-left));--gxr:max(22px,env(safe-area-inset-right))}
+.vista{padding-left:var(--gx)!important;padding-right:var(--gxr)!important}
+.topo{padding-left:var(--gx)!important;padding-right:var(--gxr)!important}
+.wrap{padding-left:var(--gx)!important;padding-right:var(--gxr)!important}
+.folha > div{padding-left:var(--gx)!important;padding-right:var(--gxr)!important}
+.barra{padding-left:var(--gx)!important;padding-right:var(--gxr)!important}
+.abas{left:max(18px,env(safe-area-inset-left))!important;right:max(18px,env(safe-area-inset-right))!important}
+#barra-envio{left:max(18px,env(safe-area-inset-left))!important;right:max(18px,env(safe-area-inset-right))!important}
+.tela{padding-left:max(22px,env(safe-area-inset-left));padding-right:max(22px,env(safe-area-inset-right))}
+.ver .topo,.rec .topo,.ver .ctl,.rec .ctl{padding-left:var(--gx)!important;padding-right:var(--gxr)!important}
+.lista div{padding:13px 16px!important}
+.kpi{padding:14px 16px 12px!important}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
 </head>
