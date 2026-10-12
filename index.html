@@ -1786,6 +1786,15 @@ td,.row{font-size:13px}
   .app:not(.collapsed) .topnav .side-acts{justify-content:flex-end!important;margin-top:auto;padding:8px 10px 6px 6px!important}
   .app:not(.collapsed) .topnav .nav{flex:1 1 auto}
 }
+
+/* ---------- adicionar estado: o seletor só aparece ao apertar o botão ---------- */
+.reg-novo{position:relative;display:block!important}
+.reg-novo select{min-width:0;width:100%}
+.reg-add-pop{position:absolute;right:0;top:calc(100% + 8px);z-index:30;width:280px;padding:14px;border-radius:16px;background:var(--panel,#fff);border:1px solid var(--gline,var(--line));box-shadow:0 18px 40px rgba(60,45,20,.18);display:flex;flex-direction:column;gap:8px}
+.reg-add-pop[hidden]{display:none}
+.reg-add-pop label{font-size:12px;font-weight:600;color:var(--ink-3)}
+.reg-add-btns{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+:root[data-theme="dark"] .reg-add-pop{background:#1b1712;border-color:#3b3328;box-shadow:0 18px 40px rgba(0,0,0,.5)}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2110,7 +2119,12 @@ td,.row{font-size:13px}
         <div class="sec-title">Regiões de atuação</div>
         <div class="prosp-head">
           <p class="view-desc">Cada estado tem um responsável e os parceiros que atuam nele. Clique em um estado para ver os parceiros.</p>
-          <div class="reg-novo admin-only"><select id="reg-uf" aria-label="Estado a adicionar"></select><button class="btn" id="reg-add" type="button"><svg class="i"><use href="#i-plus"/></svg>Adicionar estado</button></div></div>
+          <div class="reg-novo admin-only"><button class="btn" id="reg-add" type="button" aria-haspopup="true"><svg class="i"><use href="#i-plus"/></svg>Adicionar estado</button>
+          <div class="reg-add-pop" id="reg-add-pop" hidden>
+            <label for="reg-uf">Qual estado?</label>
+            <select id="reg-uf" aria-label="Estado a adicionar"></select>
+            <div class="reg-add-btns"><button type="button" class="btn" id="reg-add-cancel">Cancelar</button><button type="button" class="btn primary" id="reg-add-ok">Adicionar</button></div>
+          </div></div></div>
         <div class="reg-grid" id="reg-grid"></div>
         <div class="card reg-det" id="reg-det" hidden></div>
         <div class="sec-title">Parceiros</div>
@@ -3722,10 +3736,13 @@ td,.row{font-size:13px}
   async function regSalvar(){
     if (state.db) await state.db.collection('config').doc('regioes').set({ lista: state.regioes });
   }
-  $('reg-add').addEventListener('click', async function(){
+  $('reg-add').addEventListener('click', function(){ var p = $('reg-add-pop'); p.hidden = !p.hidden; if (!p.hidden){ regUfOpcoes(); $('reg-uf').focus(); } });
+  $('reg-add-cancel').addEventListener('click', function(){ $('reg-add-pop').hidden = true; });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !$('reg-add-pop').hidden) $('reg-add-pop').hidden = true; });
+  $('reg-add-ok').addEventListener('click', async function(){
     var uf = $('reg-uf').value; if (!uf){ $('reg-uf').focus(); toast('Escolha o estado'); return; }
     state.regioes = state.regioes.concat([{ id: uf, nome: ESTADOS[uf], uf: uf, responsavel: '' }]);
-    try { await regSalvar(); regAberta = uf; toast('Estado adicionado: ' + ESTADOS[uf]); }
+    try { await regSalvar(); regAberta = uf; $('reg-add-pop').hidden = true; toast('Estado adicionado: ' + ESTADOS[uf]); }
     catch(err){ state.regioes.pop(); toast(errMsg(err)); }
     renderRegioes(); renderProsp();
   });
