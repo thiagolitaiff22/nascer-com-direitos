@@ -10,7 +10,7 @@
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://SEU-USUARIO.github.io/nascer-com-direitos/*", "http://localhost:5173/*"],
+      "matches": ["https://thiagolitaiff22.github.io/nascer-com-direitos/*", "http://localhost:5173/*"],
       "js": ["bi.js"],
       "run_at": "document_start"
     }

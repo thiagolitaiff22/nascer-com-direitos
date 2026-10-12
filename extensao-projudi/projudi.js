@@ -11,7 +11,7 @@
   }
   var pedido = null; try { pedido = JSON.parse(sessionStorage.getItem(CHAVE) || 'null'); } catch(e){}
   if (!pedido || Date.now() - pedido.em > 10 * 60 * 1000) return;
-  var BI = decodeURIComponent(pedido.bi || '') || 'https://SEU-USUARIO.github.io';
+  var BI = decodeURIComponent(pedido.bi || '') || 'https://thiagolitaiff22.github.io';
 
   var espera = function(ms){ return new Promise(function(r){ setTimeout(r, ms); }); };
   var aviso = (function(){
