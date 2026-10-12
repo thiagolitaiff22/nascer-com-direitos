@@ -3355,14 +3355,15 @@ td,.row{font-size:13px}
         '<div class="prosp-nums"><div><b>' + seus.length + '</b><span>parceiros</span></div><div><b>' + cli.length + '</b><span>indicações</span></div><div><b>' + contr + '</b><span>contratos</span></div><div><b>' + conc + '</b><span>concedidos</span></div></div>' +
         '<div class="prosp-actions">' + (isAdmin() ? '<button type="button" class="btn" data-pact="link" data-id="' + esc(p.id) + '"><svg class="i"><use href="#i-phone"/></svg>Aplicativo</button>' : '') +
         '<button type="button" class="btn" data-pact="edit" data-id="' + esc(p.id) + '">Editar</button></div></div>';
-    }).join('') : '<div class="card empty">Nenhum prospectador neste estado ainda. Clique em <b>Novo prospectador</b>.</div>';
+    }).join('') : '';
+    caixa.hidden = !lista.length;
   }
   function renderProsp(){
     var box = $('prosp-list');
     renderProspectadores();
     var doEstado = soParceiros().filter(function(p){ return regAberta && p.regiaoId === regAberta; });
     if (!regAberta){ box.innerHTML = ''; return; }
-    if (!doEstado.length){ box.innerHTML = '<div class="card empty">Nenhum parceiro neste estado ainda. Clique em <b>Novo parceiro</b> acima.</div>'; return; }
+    if (!doEstado.length){ box.innerHTML = ''; return; }
     box.innerHTML = doEstado.slice().sort(function(a, b){ return (a.nome || '').localeCompare(b.nome || '', 'pt-BR'); }).map(function(p){
       var mine = state.rows.filter(function(r){ return r.responsavelId === p.id; });
       var fut = mine.filter(isFuture), av = fut.filter(function(r){ return r.avisado; }).length;
