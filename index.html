@@ -1896,6 +1896,16 @@ td,.row{font-size:13px}
 .dlg-x:hover{background:var(--gsoft,#f8f1e4)}
 .dlg-x .i{width:16px;height:16px}
 :root[data-theme="dark"] .dlg-x{background:#1b1712;border-color:#2e2820;color:#e8dcc4}
+
+/* lista do estado: colunas fixas e alinhadas em todas as linhas */
+.est-row{grid-template-columns:minmax(0,2.3fr) minmax(0,1.3fr) 84px 84px 96px 244px!important;padding:12px 16px!important}
+.est-row.parc{padding-left:16px!important}
+.est-row.parc .est-nome{padding-left:28px}
+.est-row.parc::before{left:18px!important;width:10px!important;bottom:50%!important}
+.est-row > :nth-child(3),.est-row > :nth-child(4),.est-row > :nth-child(5){text-align:center;justify-self:center}
+.est-row.head > :nth-child(6){visibility:hidden}
+.est-cid .cid-flag{width:22px;height:15px;border-radius:3px;object-fit:cover;margin-right:8px;flex:none;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+.est-acoes{flex-wrap:nowrap!important}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -3905,6 +3915,37 @@ td,.row{font-size:13px}
     }
   });
   function box_est(id){ return $('cfg-estados').querySelector('input[data-est="' + id + '"]'); }
+  // bandeira da cidade (Wikidata); enquanto não houver, mostra a do estado
+  var cidFlagCarga = {};
+  function semAcentoC(s){ return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim(); }
+  function lerLS(k){ try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch(e){ return null; } }
+  function carregarBandeiras(uf){
+    if (cidFlagCarga[uf]) return; cidFlagCarga[uf] = 1;
+    function flags(l){
+      var q = 'SELECT ?c ?f WHERE { ?m wdt:P1585 ?c . ?m wdt:P41 ?f . FILTER(STRSTARTS(STR(?c), "' + l[0].i.slice(0, 2) + '")) }';
+      fetch('https://query.wikidata.org/sparql?format=json&origin=*&query=' + encodeURIComponent(q)).then(function(r){ return r.json(); }).then(function(d){
+        var m = {}; ((d && d.results && d.results.bindings) || []).forEach(function(b){ var u = String(b.f.value).replace(/^http:/, 'https:'); m[String(b.c.value).slice(0, 6)] = u + (u.indexOf('?') < 0 ? '?width=64' : ''); });
+        if (Object.keys(m).length){ try { localStorage.setItem('nascer-flag-' + uf, JSON.stringify(m)); } catch(e){} renderEstadoLista(); }
+      }).catch(function(){});
+    }
+    var c = lerLS('nascer-cid2-' + uf);
+    if (c && c.length) return flags(c);
+    fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados/' + uf + '/municipios?orderBy=nome').then(function(r){ return r.json(); }).then(function(l){
+      var n = (l || []).map(function(m){ return { i: String(m.id), n: m.nome }; });
+      if (n.length){ try { localStorage.setItem('nascer-cid2-' + uf, JSON.stringify(n)); } catch(e){} flags(n); }
+    }).catch(function(){});
+  }
+  function bandeiraCidade(g, nome){
+    var uf = String((g && (g.uf || g.id)) || '').slice(0, 2).toUpperCase();
+    if (uf && nome){
+      var l = lerLS('nascer-cid2-' + uf), m = lerLS('nascer-flag-' + uf);
+      if (l && m){
+        var alvo = semAcentoC(nome), it = l.filter(function(x){ return semAcentoC(x.n) === alvo; })[0];
+        if (it && m[it.i.slice(0, 6)]) return '<img class="cid-flag" alt="" loading="lazy" src="' + esc(m[it.i.slice(0, 6)]) + '">';
+      } else carregarBandeiras(uf);
+    }
+    return ufFlagReg(g);
+  }
   function renderEstadoLista(){
     var box = $('estado-lista'); if (!box) return;
     var g = regAberta ? regiaoPorId(regAberta) : null;
@@ -3924,7 +3965,7 @@ td,.row{font-size:13px}
       var n = nums([p.id]);
       return '<div class="est-row parc"><div class="est-nome"><b>' + esc(p.tipo === 'clinica' && p.clinica ? p.clinica : p.nome) + '</b><span class="mini">' +
           (p.tipo === 'clinica' ? 'Clínica · ' + esc(p.nome) + ' · ' : '') + esc(p.telefone || 'sem telefone') + '</span></div>' +
-        '<div class="est-cid">' + ufFlagReg(g) + esc(p.regiao || '—') + '</div>' +
+        '<div class="est-cid">' + bandeiraCidade(g, p.regiao) + esc(p.regiao || '—') + '</div>' +
         '<div class="tnum">' + n.cli + '</div><div class="tnum">' + n.con + '</div><div class="tnum">' + n.cnc + '</div>' + acoes(p, true) + '</div>';
     }
     var html = '<div class="est-row head"><div>Nome</div><div>Cidade</div><div>Clientes</div><div>Contratos</div><div>Concedidos</div><div></div></div>';

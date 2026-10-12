@@ -640,6 +640,26 @@ html,body{overflow-x:hidden}
 .ver .topo,.rec .topo,.ver .ctl,.rec .ctl{padding-left:var(--gx)!important;padding-right:var(--gxr)!important}
 .lista div{padding:13px 16px!important}
 .kpi{padding:14px 16px 12px!important}
+
+/* ---------- escolha de cidade (lista do estado, pesquisa e bandeira) ---------- */
+.cid-campo{position:relative;cursor:pointer}
+.cid-campo input[readonly]{cursor:pointer;caret-color:transparent}
+.cid-seta{width:20px;height:20px;flex:none;color:var(--ink2)}
+.cid-flag{width:26px;height:18px;border-radius:3px;object-fit:cover;flex:none;box-shadow:0 0 0 1px rgba(0,0,0,.12);background:#fff}
+.cid-flag.vazio{box-shadow:none;background:var(--soft,#f1ece2);opacity:.7;border-radius:4px}
+.cid-folha{display:flex;flex-direction:column;max-height:86dvh;max-height:86vh}
+.cid-busca{width:100%;height:46px;border:1px solid var(--line);border-radius:14px;padding:0 14px;font:inherit;font-size:16px;background:var(--card,#fff);color:inherit;margin:0 0 10px}
+.cid-lista{overflow:auto;-webkit-overflow-scrolling:touch;min-height:120px;flex:1;border:1px solid var(--line);border-radius:14px;background:var(--card,#fff)}
+.cid-item{display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;border:0;border-top:1px solid var(--line);background:none;font:inherit;font-size:16px;color:inherit;text-align:left}
+.cid-item:first-child{border-top:0}
+.cid-item:active,.cid-item.atual{background:var(--gsoft,#f8f1e4)}
+.cid-item.atual{font-weight:700}
+.cid-vazio{margin:0;padding:18px 14px;color:var(--ink2);font-size:14px;text-align:center}
+.cid-cancela{margin-top:12px;height:48px;border-radius:14px;border:1px solid var(--line);background:none;font:inherit;font-weight:600;color:inherit}
+.cid-folha .cid-busca{height:48px!important;padding:0 16px!important;border-radius:14px!important;border:1px solid var(--line)!important;font-size:16px!important;display:block;box-sizing:border-box}
+.cid-folha .cid-flag{display:block!important;width:26px!important;height:18px!important;min-width:26px;border-radius:3px!important}
+.cid-folha .cid-flag.vazio{background:transparent!important;border:1.5px dashed var(--line2,#d8cdb8);box-shadow:none!important;opacity:.8}
+.cid-folha .cid-item span:not(.cid-flag){flex:1}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
 </head>
@@ -1010,6 +1030,78 @@ html,body{overflow-x:hidden}
     };
     t.querySelector('#t-fecha').onclick = function(){ t.remove(); irPara('clientes'); carregarProsp(); };
   }
+  var ESTADOS_NOME = { AC: 'Acre', AL: 'Alagoas', AP: 'Amapá', AM: 'Amazonas', BA: 'Bahia', CE: 'Ceará', DF: 'Distrito Federal', ES: 'Espírito Santo', GO: 'Goiás', MA: 'Maranhão', MT: 'Mato Grosso', MS: 'Mato Grosso do Sul', MG: 'Minas Gerais', PA: 'Pará', PB: 'Paraíba', PR: 'Paraná', PE: 'Pernambuco', PI: 'Piauí', RJ: 'Rio de Janeiro', RN: 'Rio Grande do Norte', RS: 'Rio Grande do Sul', RO: 'Rondônia', RR: 'Roraima', SC: 'Santa Catarina', SP: 'São Paulo', SE: 'Sergipe', TO: 'Tocantins' };
+  function semAcento(s){ return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim(); }
+  function lerCache(k){ try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch(e){ return null; } }
+  function gravarCache(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+  var cidMem = {}, flagMem = {};
+  // municípios do estado (IBGE): [{i: código, n: nome}]
+  function cidadesUF(uf, cb){
+    if (cidMem[uf]) return cb(cidMem[uf]);
+    var c = lerCache('nascer-cid2-' + uf);
+    if (c && c.length){ cidMem[uf] = c; return cb(c); }
+    fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados/' + uf + '/municipios?orderBy=nome').then(function(r){ return r.json(); }).then(function(l){
+      var n = (l || []).map(function(m){ return { i: String(m.id), n: m.nome }; });
+      if (n.length){ cidMem[uf] = n; gravarCache('nascer-cid2-' + uf, n); }
+      cb(n);
+    }).catch(function(){ cb([]); });
+  }
+  // bandeiras dos municípios (Wikidata/Wikimedia): { código de 6 dígitos: endereço da imagem }
+  function bandeirasUF(uf, cb){
+    if (flagMem[uf]) return cb(flagMem[uf]);
+    var c = lerCache('nascer-flag-' + uf);
+    if (c && Object.keys(c).length){ flagMem[uf] = c; return cb(c); }
+    cidadesUF(uf, function(l){
+      if (!l.length) return cb({});
+      var pre = l[0].i.slice(0, 2);
+      var q = 'SELECT ?c ?f WHERE { ?m wdt:P1585 ?c . ?m wdt:P41 ?f . FILTER(STRSTARTS(STR(?c), "' + pre + '")) }';
+      fetch('https://query.wikidata.org/sparql?format=json&origin=*&query=' + encodeURIComponent(q)).then(function(r){ return r.json(); }).then(function(d){
+        var m = {};
+        ((d && d.results && d.results.bindings) || []).forEach(function(b){
+          var cod = String(b.c.value).slice(0, 6), u = String(b.f.value).replace(/^http:/, 'https:');
+          if (!m[cod]) m[cod] = u + (u.indexOf('?') < 0 ? '?width=64' : '');
+        });
+        if (Object.keys(m).length){ flagMem[uf] = m; gravarCache('nascer-flag-' + uf, m); }
+        cb(m);
+      }).catch(function(){ cb({}); });
+    });
+  }
+  function bandeiraDe(uf, nome, cb){
+    cidadesUF(uf, function(l){
+      var alvo = semAcento(nome), it = l.filter(function(x){ return semAcento(x.n) === alvo; })[0];
+      if (!it) return cb('');
+      bandeirasUF(uf, function(m){ cb(m[it.i.slice(0, 6)] || ''); });
+    });
+  }
+  function pintarBandeiraCampo(uf){
+    var im = $('np-cflag'); if (!im) return;
+    var nome = $('np-cidade') ? $('np-cidade').value : '';
+    if (!nome){ im.hidden = true; return; }
+    bandeiraDe(uf, nome, function(u){ if (u){ im.src = u; im.hidden = false; } else im.hidden = true; });
+  }
+  function escolherCidade(uf, atual, ok){
+    var f = document.createElement('div'); f.className = 'folha';
+    f.innerHTML = '<div class="cid-folha"><div class="puxa"></div><h3>Cidade</h3><p class="sub">' + esc(ESTADOS_NOME[uf] || uf) + ' · escolha na lista ou pesquise</p>' +
+      '<input class="cid-busca" type="search" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Pesquisar cidade">' +
+      '<div class="cid-lista" id="cid-lista"><p class="cid-vazio">Carregando as cidades…</p></div><button type="button" class="cid-cancela" id="cid-x">Cancelar</button></div>';
+    document.body.appendChild(f);
+    var lista = [], flags = {}, busca = f.querySelector('.cid-busca'), box = f.querySelector('#cid-lista');
+    function pintar(){
+      var q = semAcento(busca.value);
+      var v = lista.filter(function(x){ return !q || semAcento(x.n).indexOf(q) >= 0; });
+      box.innerHTML = v.length ? v.map(function(x){
+        var u = flags[x.i.slice(0, 6)];
+        return '<button type="button" class="cid-item' + (semAcento(x.n) === semAcento(atual) ? ' atual' : '') + '" data-n="' + esc(x.n) + '">' +
+          (u ? '<img class="cid-flag" loading="lazy" alt="" src="' + esc(u) + '">' : '<span class="cid-flag vazio"></span>') + '<span>' + esc(x.n) + '</span></button>';
+      }).join('') : '<p class="cid-vazio">Nenhuma cidade com esse nome.</p>';
+    }
+    cidadesUF(uf, function(l){ lista = l; pintar(); if (!l.length) box.innerHTML = '<p class="cid-vazio">Sem internet para carregar as cidades. Tente de novo com sinal.</p>';
+      bandeirasUF(uf, function(m){ flags = m; pintar(); }); });
+    busca.addEventListener('input', pintar);
+    box.addEventListener('click', function(e){ var b = e.target.closest('.cid-item'); if (!b) return; var n = b.dataset.n; f.remove(); ok(n); });
+    f.querySelector('#cid-x').onclick = function(){ f.remove(); };
+    f.addEventListener('click', function(e){ if (e.target === f) f.remove(); });
+  }
   var novoP = { tipo: 'pessoa', nome: '', clinica: '', fone: '', cidade: '', usuario: '', senha: '', userEditado: false };
   function vistaProspNovo(){
     if (!novoP.senha) novoP.senha = gerarSenha();
@@ -1021,7 +1113,7 @@ html,body{overflow-x:hidden}
         '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-pessoa"/></svg><input id="np-nome" autocomplete="off" autocapitalize="words" placeholder="' + (clin ? 'Nome do responsável pela clínica' : 'Nome completo do parceiro') + '" value="' + esc(novoP.nome) + '"></label>' +
         (clin ? '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-grupo"/></svg><input id="np-clinica" autocomplete="off" autocapitalize="words" placeholder="Nome da clínica" value="' + esc(novoP.clinica) + '"></label>' : '') +
         '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-fone"/></svg><input id="np-fone" inputmode="tel" maxlength="15" placeholder="(92) 99999-9999" value="' + esc(maskFone(novoP.fone)) + '"></label>' +
-        '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-casa"/></svg><input id="np-cidade" list="np-cidades" autocomplete="off" autocapitalize="words" placeholder="Cidade" value="' + esc(novoP.cidade) + '"><datalist id="np-cidades"></datalist></label>' +
+        '<label class="fone cid-campo"><svg viewBox="0 0 24 24"><use href="#i-casa"/></svg><img class="cid-flag" id="np-cflag" alt="" hidden><input id="np-cidade" autocomplete="off" autocapitalize="words" placeholder="' + (uf ? 'Escolher a cidade' : 'Cidade') + '" value="' + esc(novoP.cidade) + '"' + (uf ? ' readonly' : '') + '>' + (uf ? '<svg class="cid-seta" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '') + '</label>' +
       '</div>' +
       '<div class="rot">Acesso ao aplicativo</div><div class="dados">' +
         '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-pessoa"/></svg><input id="np-usuario" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Usuário" value="' + esc(novoP.usuario) + '"></label>' +
@@ -1039,14 +1131,13 @@ html,body{overflow-x:hidden}
     $('np-usuario').addEventListener('input', function(){ novoP.userEditado = true; this.value = this.value.toLowerCase().replace(/[^a-z0-9._-]/g, ''); novoP.usuario = this.value; });
     $('np-senha').addEventListener('input', function(){ novoP.senha = this.value; });
     $('np-gerar').onclick = function(){ novoP.senha = gerarSenha(); $('np-senha').value = novoP.senha; };
-    // cidades do estado (lista do IBGE)
+    // cidades do estado: lista completa para pesquisar e escolher, com a bandeira de cada uma
     if (uf){
-      var cache; try { cache = JSON.parse(localStorage.getItem('nascer-cid-' + uf) || 'null'); } catch(e){}
-      var pintar = function(l){ var dl = $('np-cidades'); if (dl) dl.innerHTML = l.map(function(n){ return '<option value="' + esc(n) + '">'; }).join(''); };
-      if (cache && cache.length) pintar(cache);
-      else fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados/' + uf + '/municipios?orderBy=nome').then(function(r){ return r.json(); }).then(function(l){
-        var n = (l || []).map(function(m){ return m.nome; }); try { localStorage.setItem('nascer-cid-' + uf, JSON.stringify(n)); } catch(e){} pintar(n);
-      }).catch(function(){});
+      var abrir = function(e){ if (e) e.preventDefault(); ref(); escolherCidade(uf, novoP.cidade, function(n){ novoP.cidade = n; $('np-cidade').value = n; pintarBandeiraCampo(uf); }); };
+      $('np-cidade').addEventListener('click', abrir);
+      $('np-cidade').addEventListener('focus', function(){ this.blur(); });
+      $('np-cidade').parentNode.querySelector('.cid-seta').addEventListener('click', abrir);
+      pintarBandeiraCampo(uf);
     }
     $('np-criar').onclick = function(){
       ref();
