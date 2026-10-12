@@ -1499,6 +1499,9 @@ td,.row{font-size:13px}
   .topnav #sync{padding:2px 8px!important}
   .topnav .side-foot{margin-top:2px!important;padding-top:10px!important}
 }
+
+/* WhatsApp: o sistema não faz disparo; os painéis ficam fora da tela */
+[data-painel="liderhub"],[data-painel="regua"],[data-painel="lembrete"],#av-card{display:none!important}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -3926,9 +3929,6 @@ td,.row{font-size:13px}
     celular: '<svg viewBox="0 0 40 40"><rect width="40" height="40" rx="9" fill="#7C3AED"/><rect x="14" y="9" width="12" height="22" rx="2.5" fill="none" stroke="#fff" stroke-width="2.4"/><path d="M18.5 26.5h3" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>'
   };
   var IG = [
-    { k: 'liderhub', t: 'LiderHub', d: 'WhatsApp do Pós-venda. É por ele que saem os avisos de audiência às clientes.', ajuda: 'Chave do workspace Pós-venda, em LiderHub › Configurações › Credenciais API.' },
-    { k: 'regua', t: 'Régua de avisos', d: 'Avisa sozinho o cliente 3 dias antes e na véspera da audiência, das 8h às 18h.', ajuda: 'Precisa do LiderHub. Liga e desliga dentro do cartão.' },
-    { k: 'lembrete', t: 'Lembrete agora', d: 'Manda um lembrete único para todos com audiência num dia escolhido.', ajuda: 'Envio manual, com intervalo seguro entre as mensagens.' },
     { k: 'datajud', t: 'Tribunal (DataJud)', d: 'Consulta os processos no tribunal escolhido todo dia às 7h: audiência, sentença, RPV.', ajuda: 'Chave pública do CNJ. Escolha o tribunal (TRF1 ou TJAM) no cartão.' },
     { k: 'claude', t: 'IA (ChatGPT)', d: 'Só confere quais documentos estão na pasta do cliente (botão Conferir documentos). Não preenche dados.', ajuda: 'Clique para colar a chave da API do ChatGPT.' },
     { k: 'drive', t: 'Google Drive', d: 'Cria a pasta de cada cliente em CLIENTES e move entre Pendentes, No INSS, No Judicial e Arquivados.', ajuda: 'Funciona pelo script do Google do Cadastro pelo celular.', painel: 'celular' },
@@ -5712,7 +5712,7 @@ td,.row{font-size:13px}
     if (iniciado){ render(); return; }
     iniciado = true;
     state.db = DB;
-    if (f.data === 'admin'){ lhStatus(); rgCarregar(); djStatus(); avMontar(); cpStatus(); clStatus(); }
+    if (f.data === 'admin'){ djStatus(); cpStatus(); clStatus(); }
     function carimbo(){ var n = new Date(); $('sync').textContent = 'Atualizado: ' + n.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ', ' + n.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }
     function caiu(){ $('sync').textContent = 'Conexão interrompida'; banner('A conexão com a base foi interrompida. Recarregue a página.'); }
     watchTable('clientes', function(rows){ state.rows = rows; banner(''); carimbo(); render(); acertarNomesDoApp(); ligarPastasQueFaltam(); }, caiu);
