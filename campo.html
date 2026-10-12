@@ -437,12 +437,112 @@ body{background:transparent!important}
 .lista > div:has(i.indigo){box-shadow:inset 3px 0 0 #8a6a3d}.lista > div:has(i.indigo) small{color:#8a6a3d}
 .lista > div:has(i.purple){box-shadow:inset 3px 0 0 #7e22ce}.lista > div:has(i.purple) small{color:#7e22ce}
 input,select,textarea{color-scheme:light}
+
+/* ================= visual do BI: Inter, cartões leves, modo escuro dourado ================= */
+html{--g1:#a07a45;--g2:#8a6a3d;--gsoft:#f8f1e4;--gline:#efe6d6}
+body{font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;font-size:15px}
+/* topo limpo: logo sem moldura */
+.topo{background:transparent!important;border-bottom:0!important;box-shadow:none!important;padding:10px 4px 6px}
+.topo .logo,.topo .logo{background:none!important;border:0!important;box-shadow:none!important;border-radius:0!important;width:auto!important;height:auto!important;overflow:visible!important}
+.topo .logo img{height:52px;width:auto;object-fit:contain;display:block;filter:drop-shadow(0 2px 6px rgba(138,106,61,.22))}
+.topo .quem b{font-size:16px;font-weight:700;letter-spacing:-.01em}
+.topo .quem span{font-size:12.5px;color:var(--ink2)}
+.tema{flex:none;width:38px;height:38px;border-radius:12px;border:1px solid var(--gline);background:var(--card);color:var(--ink2);display:grid;place-items:center;padding:0}
+.tema svg{width:19px;height:19px}
+.tema .lua{display:none}
+html[data-tema="dark"] .tema .sol{display:none}
+html[data-tema="dark"] .tema .lua{display:inline}
+.sinc{background:var(--card)!important}
+/* boas-vindas e destaque */
+.ola b{font-size:24px;font-weight:700;letter-spacing:-.02em}
+.hero{border-radius:22px!important;padding:20px 20px 18px!important;background:linear-gradient(140deg,#a58049,#8f6f40)!important;box-shadow:0 10px 26px rgba(138,106,61,.22)!important}
+.hero::after{display:none!important}
+.hero .num{font-size:60px!important;font-weight:600!important}
+.hero .lin{margin-top:6px}
+/* cartões de indicadores: simples, rótulo normal, sem barra colorida */
+.kpis{gap:12px!important}
+.kpi{border-radius:18px!important;padding:16px!important;box-shadow:var(--sombra-leve,0 1px 3px rgba(60,45,20,.05))!important}
+.kpi::before{display:none!important}
+.kpi small{font-size:13px!important;font-weight:600;text-transform:none!important;letter-spacing:0!important;color:var(--ink2)!important;white-space:normal!important}
+.kpi b{font-size:30px!important;font-weight:700!important;color:var(--ink)!important;margin-top:8px!important}
+.kpi small::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c,var(--line2));margin-right:7px;vertical-align:1px}
+.funil{height:8px!important;border-radius:6px!important}
+.legenda{display:none!important}
+.rot{font-size:13px!important;letter-spacing:0!important;text-transform:none!important;font-weight:700;color:var(--ink)!important}
+/* listas e formulários */
+.lista,.vazio,.aviso-fila{border-radius:18px!important;box-shadow:var(--sombra-leve,0 1px 3px rgba(60,45,20,.05))!important}
+.busca,.fone,.doc,.chips button{box-shadow:none!important}
+.doc{border-radius:18px!important}
+.abas{box-shadow:0 8px 24px rgba(60,45,20,.12)!important}
+.sair{font-weight:600}
+.versao{font-size:12px;color:var(--ink2)}
+/* ---------- modo escuro (dourado sobre marrom-carvão, igual ao BI) ---------- */
+html[data-tema="dark"]:root:not([x]){color-scheme:dark;--bg:#14110d;--card:#1b1712;--soft:#211c16;--ink:#f8f2e8;--ink2:#cfc1a3;--line:#3a3226;--line2:#4b4132;--okbg:rgba(34,197,94,.14);--ok:#4ade80;--warn:#fbbf24;--red:#f87171;--blue:#a5b4fc;--shadow:none;--sombra-leve:none;--gsoft:rgba(212,180,131,.12);--gline:#2e2820}
+html[data-tema="dark"],html[data-tema="dark"] body{background:#14110d!important;color:var(--ink)}
+html[data-tema="dark"] .topo .logo img{filter:brightness(1.55) saturate(1.05) drop-shadow(0 2px 8px rgba(0,0,0,.45))}
+html[data-tema="dark"] .sinc,html[data-tema="dark"] .tema,html[data-tema="dark"] .kpi,html[data-tema="dark"] .lista,html[data-tema="dark"] .auds,html[data-tema="dark"] .vazio,html[data-tema="dark"] .aviso-fila,html[data-tema="dark"] .lig,html[data-tema="dark"] .aviso-fila button,html[data-tema="dark"] .sair,html[data-tema="dark"] .busca,html[data-tema="dark"] .chips button,html[data-tema="dark"] .fone,html[data-tema="dark"] .doc,html[data-tema="dark"] .abas,html[data-tema="dark"] .entrar,html[data-tema="dark"] .tela > div,html[data-tema="dark"] .login .fone,html[data-tema="dark"] .folha > div,html[data-tema="dark"] .tempo .pt{background:#1b1712!important;border-color:#2e2820!important;color:var(--ink)!important;box-shadow:none!important}
+html[data-tema="dark"] .abas{box-shadow:0 10px 28px rgba(0,0,0,.5)!important}
+html[data-tema="dark"] .abas button{color:var(--ink2)}
+html[data-tema="dark"] .abas button[aria-current="true"],html[data-tema="dark"] .abas button[data-aba="novo"]{color:#d4b483}
+html[data-tema="dark"] .abas button[data-aba="novo"] svg{background:linear-gradient(135deg,#c9a46a,#a98650)!important;color:#1b1712!important;box-shadow:0 8px 20px rgba(0,0,0,.4),0 0 0 6px #14110d!important}
+html[data-tema="dark"] .kpi b{color:var(--ink)!important}
+html[data-tema="dark"] .chips button[aria-pressed="true"]{background:#c9a46a!important;border-color:#c9a46a!important;color:#1b1712!important}
+html[data-tema="dark"] .doc.feito{background:rgba(34,197,94,.1)!important;border-color:rgba(74,222,128,.5)!important}
+html[data-tema="dark"] .doc svg,html[data-tema="dark"] .fone svg{color:#d4b483}
+html[data-tema="dark"] .enviar[disabled]{background:#2a241b!important;color:#8a7c64!important}
+html[data-tema="dark"] .enviar:not([disabled]){background:linear-gradient(135deg,#c9a46a,#a98650)!important;color:#1b1712!important}
+html[data-tema="dark"] .enviar:not([disabled]) svg{stroke:#1b1712}
+html[data-tema="dark"] .barra{background:linear-gradient(rgba(20,17,13,0),#14110d 40%)!important}
+html[data-tema="dark"] .aviso-docs{background:rgba(251,191,36,.1)!important;border-color:rgba(251,191,36,.35)!important;color:var(--ink)!important}
+html[data-tema="dark"] .login-logo{background:none!important;box-shadow:none!important}
+html[data-tema="dark"] input,html[data-tema="dark"] textarea,html[data-tema="dark"] select{color:var(--ink);background:transparent}
+html[data-tema="dark"] ::placeholder{color:#7d705a}
+html[data-tema="dark"] .lista > div + div,html[data-tema="dark"] .lista > div{border-color:#2e2820!important}
+html[data-tema="dark"] .hero{background:linear-gradient(140deg,#7d6038,#5f4829)!important}
+
+/* ---------- legibilidade: letra maior e contraste forte nos dois modos ---------- */
+html,body{font-size:16px}
+.topo .quem b{font-size:17px!important}
+.topo .quem span{font-size:13px!important}
+.ola span{font-size:14px!important;color:var(--ink2)!important}
+.hero small{font-size:14px!important}
+.hero .lin{font-size:14px!important}
+.kpi small{font-size:14px!important;line-height:1.25}
+.kpi b{font-size:32px!important}
+.aviso-docs b{font-size:16px!important}
+.aviso-docs small{font-size:13.5px!important;color:var(--ink2)!important}
+.lista b,.lista strong{font-size:16px}
+.lista small,.lista span{font-size:14px}
+.chips button{font-size:14.5px!important;padding:9px 14px!important}
+.busca input,.fone input{font-size:16px!important}
+.doc .t{font-size:15px!important;font-weight:700}
+.doc .s{font-size:13px!important;color:var(--ink2)!important}
+.abas button{font-size:12.5px!important;font-weight:600}
+.rot{font-size:14px!important}
+html[data-tema="dark"] .kpi small,html[data-tema="dark"] .ola span,html[data-tema="dark"] .topo .quem span,html[data-tema="dark"] .aviso-docs small,html[data-tema="dark"] .doc .s,html[data-tema="dark"] .versao{color:#cfc1a3!important}
+html[data-tema="dark"] .topo .quem b,html[data-tema="dark"] .ola b,html[data-tema="dark"] .kpi b,html[data-tema="dark"] .rot,html[data-tema="dark"] .lista b,html[data-tema="dark"] .doc .t{color:#f8f2e8!important}
+html[data-tema="dark"] .aviso-docs .n{background:#d97706!important;color:#14110d!important}
+html[data-tema="dark"] .abas button{color:#cfc1a3!important}
+html[data-tema="dark"] .abas button[aria-current="true"]{color:#e0c48f!important}
+html[data-tema="dark"] ::placeholder{color:#9c8f77!important}
+
+/* ---------- documentos: obrigatórios e "quando possível" ---------- */
+.grupo-opc{margin-top:22px}
+.grupo-opc .rot small{font-weight:500;color:var(--ink2);margin-left:6px}
+.doc.opc{border-style:dashed!important}
+.video-mini{background:#7c3aed!important;font-size:13px!important;letter-spacing:.04em}
+
+/* cabeçalho com fundo sólido: nada passa por baixo dele ao rolar */
+.topo{background:var(--bg)!important;border-bottom:1px solid var(--gline,var(--line))!important;position:sticky;top:0;z-index:8;padding:8px 12px 8px!important;margin:0 -16px 6px;backdrop-filter:saturate(1.2)}
+html[data-tema="dark"] .topo{background:#14110d!important;border-bottom-color:#2e2820!important}
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/><path d="M8 9h2"/></symbol>
-  <symbol id="i-pena" viewBox="0 0 24 24"><path d="M3 21l3-1 11-11-2-2L4 18z"/><path d="M14 6l2-2 4 4-2 2"/><path d="M3 21h18"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="3"/><path d="M16 10l5-3v10l-5-3z"/></symbol>
+<symbol id="i-pena" viewBox="0 0 24 24"><path d="M3 21l3-1 11-11-2-2L4 18z"/><path d="M14 6l2-2 4 4-2 2"/><path d="M3 21h18"/></symbol>
   <symbol id="i-id" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="11" r="2.4"/><path d="M4.8 16.5c.6-1.6 1.8-2.4 3.2-2.4s2.6.8 3.2 2.4M14 10h5M14 13h4"/></symbol>
   <symbol id="i-idv" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h12M6 12h12M6 15h7"/></symbol>
   <symbol id="i-casa" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></symbol>
@@ -469,6 +569,8 @@ input,select,textarea{color-scheme:light}
   <div class="aviso" id="carregando"><b>Abrindo…</b></div>
 </div>
 <input type="file" id="foto" accept="image/*" capture="environment">
+<input type="file" id="video-cam" accept="video/*" capture="environment">
+<input type="file" id="video-arq" accept="video/*">
 <input type="file" id="anexo" accept="image/*,application/pdf" multiple>
 
 <script src="vendor/jspdf.umd.min.js"></script>
@@ -483,29 +585,22 @@ input,select,textarea{color-scheme:light}
   var TIPOS = { especial: 'Rural / pescadora', urbana: 'Urbana / contribuinte' };
   // req: true = obrigatório para todas; tipos: obrigatório só para esses tipos de segurada
   var DOCS = [
-    { k: 'procuracao', arq: 'Procuração e contrato', t: 'Procuração e contrato', s: 'assinados', ic: 'i-pena', req: true, fala: 'Tire a foto da procuração e do contrato assinados. Se tiver mais de uma folha, toque de novo para a próxima.', multi: true },
     { k: 'rg_frente', arq: 'RG - frente', t: 'RG', s: 'da mãe, frente e verso', lado: 'Frente', ic: 'i-id', req: true, fala: 'Tire a foto da frente do RG, o lado com a foto.' },
     { k: 'rg_verso', arq: 'RG - verso', t: 'RG', s: 'verso', lado: 'Verso', oculto: true, ic: 'i-idv', fala: 'Agora o verso do RG.' },
     { k: 'cpf', arq: 'CPF', t: 'CPF', s: 'da mãe', ic: 'i-id', req: true, fala: 'Tire a foto do CPF da cliente.' },
-    { k: 'certidao', arq: 'Certidão de nascimento', t: 'Certidão de nascimento', s: 'da criança (ou termo de guarda/adoção)', ic: 'i-bebe', req: true, fala: 'Tire a foto da certidão de nascimento da criança.', multi: true },
-    { k: 'residencia', arq: 'Comprovante de residência', t: 'Comprovante de residência', s: 'conta de água, telefone ou declaração', ic: 'i-casa', req: true, fala: 'Tire a foto do comprovante de residência.' },
-    { k: 'cliente', arq: 'Foto da cliente', t: 'Foto da cliente', s: 'rosto, na casa dela', ic: 'i-pessoa', req: true, fala: 'Tire uma foto do rosto da cliente, de frente.' },
-    { k: 'autodeclaracao', arq: 'Autodeclaração rural', t: 'Autodeclaração rural', s: 'do segurado especial, assinada', ic: 'i-pena', tipos: ['especial'], fala: 'Tire a foto da autodeclaração rural assinada.', multi: true },
-    { k: 'rural', arq: 'Provas de atividade rural', t: 'Provas rurais', s: 'ITR, sindicato, RGP, CAF/DAP, certidões', ic: 'i-rural', tipos: ['especial'], fala: 'Tire a foto das provas de atividade rural.', multi: true },
-    { k: 'ctps', arq: 'CTPS e contribuições', t: 'CTPS / CNIS', s: 'carteira de trabalho, CNIS ou guias', ic: 'i-idv', tipos: ['urbana'], fala: 'Tire a foto da carteira de trabalho, do CNIS ou das guias.', multi: true },
-    { k: 'arogo', arq: 'Documentos de quem assina a rogo', t: 'A rogo', s: 'RG e CPF de quem assina pela cliente', ic: 'i-dedo', fala: 'Tire a foto do RG e do CPF da pessoa que assina pela cliente.', multi: true },
-    { k: 'outro', arq: 'Outro documento', t: 'Outros', s: 'outros documentos', ic: 'i-mais', fala: 'Foto de outro documento.', multi: true }
+    { k: 'titulo', arq: 'Título de eleitor', t: 'Título de eleitor', s: 'frente e, se tiver, o verso', ic: 'i-id', req: true, multi: true, fala: 'Tire a foto do título de eleitor. Se tiver verso, toque de novo para a próxima foto.' },
+    { k: 'video', arq: 'Vídeo de concordância', t: 'Vídeo de concordância', s: 'a cliente aceitando os termos do contrato', ic: 'i-video', opcional: true, video: true, fala: 'Grave um vídeo curto com a cliente concordando com os termos do contrato.' },
+    { k: 'procuracao', arq: 'Contrato e procuração', t: 'Contrato e procuração', s: 'fotografe os dois, um em seguida do outro', ic: 'i-pena', opcional: true, multi: true, fala: 'Tire a foto do contrato e, em seguida, da procuração. Toque de novo para cada folha.' }
   ];
   // formato do enquadramento: cartão (RG/CPF, deitado), folha (A4, em pé) ou rosto (oval)
-  var MOLDURA = { procuracao: 'folha', rg_frente: 'cartao', rg_verso: 'cartao', cpf: 'cartao', certidao: 'folha', residencia: 'folha', autodeclaracao: 'folha', rural: 'folha', ctps: 'folha', arogo: 'cartao', outro: 'folha', cliente: 'livre' };
+  var MOLDURA = { procuracao: 'folha', rg_frente: 'cartao', rg_verso: 'cartao', cpf: 'cartao', titulo: 'cartao' };
   var DICA = { cartao: 'Coloque o documento dentro do quadro e segure firme', folha: 'Coloque a folha inteira dentro do quadro e segure firme', livre: 'Rosto da cliente dentro do círculo' };
   // dados do cadastro em andamento (ficam no celular até o envio)
   // cadastro antigo, sem o tipo guardado: conta como segurada especial
-  function tipoAtual(){ var t = lsGet('campo_tipo'); return TIPOS[t] ? t : 'especial'; }
+  function tipoAtual(){ return 'urbana'; }   // foco: segurada urbana (paga a guia); não existe mais a escolha do tipo
   function gestante(){ return lsGet('campo_gestante') === '1'; }
   // o documento é obrigatório neste cadastro? (certidão: a gestante pode mandar depois do parto)
   function obrig(d){
-    if (d.k === 'certidao') return !gestante();
     if (d.tipos) return d.tipos.indexOf(tipoAtual()) >= 0;
     return !!d.req;
   }
@@ -544,7 +639,7 @@ input,select,textarea{color-scheme:light}
     if (!ks.length) return tx('readwrite', function(s){ s.delete(RASC()); }).catch(function(){});
     var f = {}, ps = [];
     ks.forEach(function(k){ f[k] = fotos[k].map(function(x){
-      var o = { w: x.w, h: x.h, pdf: !!x.pdf, nome: x.nome, tipo: x.blob && x.blob.type };
+      var o = { w: x.w, h: x.h, pdf: !!x.pdf, video: !!x.video, nome: x.nome, tipo: x.blob && x.blob.type };
       ps.push(paraBytes(x.blob).then(function(b){ o.buf = b; }, function(){ o.blob = x.blob; }));
       return o;
     }); });
@@ -553,7 +648,7 @@ input,select,textarea{color-scheme:light}
   function abrirRascunho(){
     return tx('readonly', function(s){ return s.get(RASC()); }).then(function(r){
       if (!r || !r.fotos) return;
-      Object.keys(r.fotos).forEach(function(k){ fotos[k] = r.fotos[k].map(function(x){ var bl = deBytes(x, x.pdf ? 'application/pdf' : 'image/jpeg'); return x.pdf ? { pdf: true, blob: bl, nome: x.nome } : { blob: bl, w: x.w, h: x.h, url: URL.createObjectURL(bl) }; }); });
+      Object.keys(r.fotos).forEach(function(k){ fotos[k] = r.fotos[k].map(function(x){ var bl = deBytes(x, x.pdf ? 'application/pdf' : x.video ? (x.tipo || 'video/mp4') : 'image/jpeg'); return x.pdf ? { pdf: true, blob: bl, nome: x.nome } : x.video ? { video: true, blob: bl, nome: x.nome, url: URL.createObjectURL(bl) } : { blob: bl, w: x.w, h: x.h, url: URL.createObjectURL(bl) }; }); });
       if (r.local) local = r.local;
     }).catch(function(){});
   }
@@ -659,7 +754,7 @@ input,select,textarea{color-scheme:light}
   /* ---------- telas ---------- */
   /* ---------- casca do aplicativo: barra de cima, três abas e as vistas ---------- */
   var aba = lsGet('campo_aba') || 'painel', painel = null, filtroCli = 'todos', buscaCli = '';
-  var NOME_DOC = { procuracao: 'Procuração', rg_frente: 'RG', cpf: 'CPF', certidao: 'Certidão de nascimento', residencia: 'Comprovante de residência', cliente: 'Foto da cliente', autodeclaracao: 'Autodeclaração rural', rural: 'Provas de atividade rural', ctps: 'CTPS / CNIS' };
+  var NOME_DOC = { procuracao: 'Contrato e procuração', rg_frente: 'RG', cpf: 'CPF', titulo: 'Título de eleitor', video: 'Vídeo de concordância', certidao: 'Certidão de nascimento', residencia: 'Comprovante de residência', cliente: 'Foto da cliente', autodeclaracao: 'Autodeclaração rural', rural: 'Provas rurais', ctps: 'CTPS / CNIS', arogo: 'Documentos a rogo', outro: 'Outro documento' };
   function faltas(c){ return (c && Array.isArray(c.faltaDocs) ? c.faltaDocs : []).filter(function(k){ return NOME_DOC[k]; }); }
   function nomesFaltas(l){ return l.map(function(k){ return NOME_DOC[k]; }).join(', '); }
   // completando: cliente já cadastrado que o prospectador está completando ({ id, nome, faltaDocs })
@@ -681,8 +776,9 @@ input,select,textarea{color-scheme:light}
   function montarCasca(){
     if ($('vista')) return;
     $('app').innerHTML =
-      '<div class="topo"><div class="logo"><img src="img/logo-nascer.png" alt="Nascer com Direitos"></div>' +
-        '<div class="quem"><b id="topo-nome"></b><span>Nascer com Direitos</span></div><div class="sinc" id="sinc"><i></i><span></span></div></div>' +
+      '<div class="topo"><div class="logo"><img src="img/logo-nascer-t.png" alt="Nascer com Direitos"></div>' +
+        '<div class="quem"><b id="topo-nome"></b><span>Salário-maternidade</span></div><div class="sinc" id="sinc"><i></i><span></span></div>' +
+        '<button type="button" class="tema" id="tema" aria-label="Trocar entre modo claro e escuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle class="sol" cx="12" cy="12" r="4"/><path class="sol" d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/><path class="lua" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button></div>' +
       '<main class="vista" id="vista"></main>' +
       '<nav class="abas" id="abas">' +
         '<button type="button" data-aba="painel"><svg><use href="#i-painel"/></svg>Painel</button>' +
@@ -690,6 +786,11 @@ input,select,textarea{color-scheme:light}
         '<button type="button" data-aba="clientes"><svg><use href="#i-grupo"/></svg>Clientes</button>' +
       '</nav>';
     $('abas').addEventListener('click', function(e){ var b = e.target.closest('[data-aba]'); if (b) irPara(b.dataset.aba); });
+    $('tema').addEventListener('click', function(){
+      var novo = document.documentElement.getAttribute('data-tema') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-tema', novo);
+      try { localStorage.setItem('nascer_tema', novo); } catch(e){}
+    });
   }
   function irPara(a){ aba = a; lsSet('campo_aba', a); window.scrollTo(0, 0); telaInicial(); if (a !== 'novo') carregarPainel(); }
   function sincronia(){
@@ -704,7 +805,7 @@ input,select,textarea{color-scheme:light}
   window.addEventListener('online', sincronia); window.addEventListener('offline', sincronia);
   function telaInicial(){
     montarCasca();
-    $('topo-nome').textContent = (quem && quem.nome) || 'Prospectador';
+    $('topo-nome').textContent = (quem && quem.nome) || 'Parceiro';
     Array.prototype.forEach.call(document.querySelectorAll('#abas [data-aba]'), function(b){ b.setAttribute('aria-current', b.dataset.aba === aba ? 'true' : 'false'); });
     $('vista').className = 'vista' + (aba === 'novo' ? ' novo' : '');
     $('vista').onclick = null;   // cada aba põe o seu próprio clique
@@ -717,25 +818,11 @@ input,select,textarea{color-scheme:light}
   function vistaNovo(){
     guardarRascunho();
     var n = Object.keys(fotos).length;
-    // começo do cadastro: escolher o tipo de segurada (cadastro antigo já começado, sem tipo: segurada especial)
-    if (!completando && !TIPOS[lsGet('campo_tipo')]){
-      if (n || lsGet('campo_nome').trim()) lsSet('campo_tipo', 'especial');
-      else {
-        $('vista').innerHTML = '<div class="rot" style="margin-top:0">Novo cadastro · tipo de segurada</div>' +
-          '<div class="tipos" id="tipos">' +
-            '<button type="button" data-tipo="especial"><svg><use href="#i-rural"/></svg><span style="margin:0;color:inherit"><b>Rural / pescadora</b><span>agricultora, pescadora, ribeirinha (segurada especial)</span></span></button>' +
-            '<button type="button" class="urb" data-tipo="urbana"><svg><use href="#i-idv"/></svg><span style="margin:0;color:inherit"><b>Urbana / contribuinte</b><span>carteira assinada, MEI, contribuinte ou desempregada</span></span></button>' +
-          '</div>';
-        $('tipos').onclick = function(e){ var b = e.target.closest('[data-tipo]'); if (!b) return; lsSet('campo_tipo', b.dataset.tipo); telaInicial(); };
-        return;
-      }
-    }
     var falta = DOCS.filter(function(d){ return obrig(d) && !fotos[d.k]; });
     var visiveis = DOCS.filter(function(d){ return !d.oculto && (completando ? completando.faltaDocs.indexOf(d.k) >= 0 : serve(d)); });
     var gest = gestante();
     $('vista').innerHTML = (completando ?
       '<div class="completar"><small>Completar documentos de</small><b>' + esc(completando.nome) + '</b><span>Tire só as fotos que estavam faltando e envie.</span><button type="button" id="cancelar-comp">Cancelar</button></div>' :
-      '<div class="tipo-sel">Segurada: <b>' + esc(TIPOS[tipoAtual()]) + '</b><button type="button" id="trocar-tipo">Trocar</button></div>' +
       '<div class="rot" style="margin-top:0">Dados da cliente</div><div class="dados">' +
         '<label class="fone' + (lsGet('campo_nome').trim() ? '' : ' falta') + '" id="l-nome"><svg viewBox="0 0 24 24"><use href="#i-pessoa"/></svg><input id="nome" autocomplete="off" autocapitalize="characters" placeholder="Nome completo da cliente" value="' + esc(lsGet('campo_nome')) + '"></label>' +
         '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-fone"/></svg><input id="fone" inputmode="tel" placeholder="Número de telefone" value="' + esc(lsGet('campo_fone')) + '"></label>' +
@@ -757,6 +844,14 @@ input,select,textarea{color-scheme:light}
       }).join('') + '</div>' +
 
       '<div class="barra"><button class="enviar" id="enviar"' + (n ? '' : ' disabled') + '><svg viewBox="0 0 24 24"><use href="#i-env"/></svg>Enviar cadastro</button></div>';
+    (function(){
+      var g1 = document.querySelector('#vista .grid'), ops = Array.prototype.slice.call(document.querySelectorAll('#vista .doc[data-k="video"], #vista .doc[data-k="procuracao"]'));
+      if (!g1 || !ops.length || completando) return;
+      var box = document.createElement('div'); box.className = 'grupo-opc';
+      box.innerHTML = '<div class="rot">Quando possível<small>o closer também pode fazer depois</small></div><div class="grid"></div>';
+      ops.forEach(function(c){ c.classList.add('opc'); box.querySelector('.grid').appendChild(c); });
+      g1.parentNode.insertBefore(box, g1.nextSibling);
+    })();
     if (completando){ $('cancelar-comp').onclick = cancelarComplemento; if ($('enviar')) $('enviar').lastChild.textContent = 'Enviar documentos'; }
     else {
     $('fone').addEventListener('input', function(){ lsSet('campo_fone', this.value); });
@@ -767,11 +862,6 @@ input,select,textarea{color-scheme:light}
     if ($('crianca-nasc')) $('crianca-nasc').addEventListener('change', function(){ lsSet('campo_crianca_nasc', this.value); });
     if ($('dpp')) $('dpp').addEventListener('change', function(){ lsSet('campo_dpp', this.value); });
     $('gestante').addEventListener('change', function(){ lsSet('campo_gestante', this.checked ? '1' : ''); telaInicial(); });
-    $('trocar-tipo').onclick = function(){
-      var novo = tipoAtual() === 'especial' ? 'urbana' : 'especial';
-      if (!confirm('Trocar para segurada ' + TIPOS[novo].toLowerCase() + '? Os documentos obrigatórios mudam.')) return;
-      lsSet('campo_tipo', novo); telaInicial();
-    };
     }
     if ($('som')) $('som').addEventListener('click', function(){ falar(falta.length ? 'Digite o nome e o número da cliente. Depois toque em cada quadro e tire a foto, encaixando o documento no quadro. Faltam: ' + falta.map(function(d){ return d.t; }).join(', ') + '. Quando terminar, aperte o botão verde, enviar.' : 'Tudo pronto. Aperte o botão verde, enviar.'); });
     Array.prototype.forEach.call(document.querySelectorAll('.doc'), function(b){
@@ -779,6 +869,7 @@ input,select,textarea{color-scheme:light}
         var ap = e.target.closest('[data-apagar]');
         if (ap){ e.stopPropagation(); if (confirm('Apagar as fotos de ' + DOCS.filter(function(d){ return d.k === ap.dataset.apagar; })[0].t + '?')){ delete fotos[ap.dataset.apagar]; if (ap.dataset.apagar === 'rg_frente') delete fotos.rg_verso; telaInicial(); } return; }
         var d = DOCS.filter(function(x){ return x.k === b.dataset.k; })[0];
+        if (d.video) return fotos[d.k] && fotos[d.k].length ? verVideo(d) : escolherVideo(d);
         if (d.k === 'rg_frente') return rgFotos().length ? conferirRG() : escolher(d);
         if (fotos[d.k] && fotos[d.k].length) return conferir(d);
         escolher(d);
@@ -791,10 +882,10 @@ input,select,textarea{color-scheme:light}
   /* ---------- situação de cada cliente (mesma regra do sistema) ---------- */
   // etapas que o prospectador vê (ESPECIFICACAO §7): [rótulo, classe da lista, cor]
   var ETP = {
-    preparo: ['Em preparação', 'gray', 'var(--ink2)'], inss: ['No INSS', 'teal', '#0369a1'],
+    preparo: ['Em cadastro', 'gray', 'var(--ink2)'], inss: ['No INSS', 'teal', '#0369a1'],
     exigencia: ['INSS pediu documento', 'warn', 'var(--warn)'], indeferido: ['Indeferido · vai para a Justiça', 'purple', '#7e22ce'],
-    protocolado: ['Na Justiça', 'indigo', '#8a6a3d'], marcada: ['Audiência marcada', 'blue', 'var(--blue)'],
-    ganhou: ['Ganhou', 'ok', 'var(--ok)'], faltou: ['Faltou à audiência', 'red', 'var(--red)'], perdeu: ['Não ganhou', 'red', 'var(--red)']
+    protocolado: ['No judicial', 'indigo', '#8a6a3d'], marcada: ['Audiência marcada', 'blue', 'var(--blue)'],
+    ganhou: ['Concedido', 'ok', 'var(--ok)'], faltou: ['Faltou à audiência', 'red', 'var(--red)'], perdeu: ['Não ganhou', 'red', 'var(--red)']
   };
   var ORDEM_ETP = ['preparo', 'inss', 'exigencia', 'indeferido', 'protocolado', 'marcada', 'ganhou', 'faltou', 'perdeu'];
   function hojeISO(){ var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
@@ -804,8 +895,7 @@ input,select,textarea{color-scheme:light}
     if (c.resultado === 'ausente' || c.comparecimento === 'faltou') return 'faltou';
     if (c.resultado === 'improcedente' || c.resultado === 'extinto') return 'perdeu';
     // audiência que já passou sem resultado: continua "Na Justiça" (o prospectador não vê quem aguarda sentença)
-    if (c.audData){ var n = diasAte(c.audData); if (n != null && (n > 0 || (n === 0 && !c.resultado && !c.concluso))) return 'marcada'; return 'protocolado'; }
-    if (c.protocolado) return 'protocolado';
+    if (c.audData || c.protocolado) return 'protocolado';   // sem audiência: tudo que está na Justiça é "No judicial"
     if (c.inssStatus === 'indeferido') return 'indeferido';
     if (c.inssStatus === 'exigencia') return 'exigencia';
     if (c.requerido || c.inssStatus === 'analise') return 'inss';
@@ -859,27 +949,20 @@ input,select,textarea{color-scheme:light}
       '<div class="ola"><b>Olá' + (primeiro ? ', ' + esc(primeiro.charAt(0) + primeiro.slice(1).toLowerCase()) : '') + '!</b><span>' + h.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' }) +
         (atual ? ' · atualizado às ' + atual.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '') + '</span></div>' +
       '<div class="hero"><small>Clientes indicadas por você</small><span class="num">' + cl.length + '</span>' +
-        '<div class="lin"><span><b>' + (cont.inss || 0) + '</b> no INSS</span><span><b>' + (cont.marcada || 0) + '</b> com audiência marcada</span><span><b>' + ganharam + '</b> ganharam</span></div></div>' +
+        '<div class="lin"><span><b>' + (cont.inss || 0) + '</b> no INSS</span><span><b>' + (cont.protocolado || 0) + '</b> no judicial</span><span><b>' + ganharam + '</b> concedidos</span></div></div>' +
       '<div id="aviso-fila"></div>' +
       (comFalta.length ? '<button type="button" class="aviso-docs" data-ir="faltam"><span class="n">' + comFalta.length + '</span><span><b>' + (comFalta.length === 1 ? 'cliente com documento faltando' : 'clientes com documentos faltando') + '</b><small>Toque para ver quais e completar</small></span></button>' : '') +
       '<div class="kpis">' +
         kpi('Clientes indicadas', cl.length, 'var(--ink)', 'todos', 'todo') +
-        kpi('Em preparação', cont.preparo || 0, 'var(--line2)', 'preparo') +
+        kpi('Em cadastro', cont.preparo || 0, 'var(--line2)', 'preparo') +
         kpi('No INSS', cont.inss || 0, ETP.inss[2], 'inss') +
         kpi('INSS pediu documento', cont.exigencia || 0, ETP.exigencia[2], 'exigencia') +
         kpi('Indeferidos', cont.indeferido || 0, ETP.indeferido[2], 'indeferido') +
-        kpi('Na Justiça', cont.protocolado || 0, ETP.protocolado[2], 'protocolado') +
-        kpi('Audiência marcada', cont.marcada || 0, 'var(--blue)', 'marcada') +
-        kpi('Ganharam', ganharam, 'var(--ok)', 'ganharam', 'largo') +
+        kpi('No judicial', cont.protocolado || 0, ETP.protocolado[2], 'protocolado') +
+        kpi('Concedidos', ganharam, 'var(--ok)', 'ganharam') +
       '</div>' +
       (cl.length ? '<div class="funil">' + ORDEM_ETP.map(function(k){ return cont[k] ? '<span style="width:' + (cont[k] / cl.length * 100) + '%;background:' + (k === 'preparo' ? 'var(--line2)' : ETP[k][2]) + '"></span>' : ''; }).join('') + '</div>' +
         '<div class="legenda">' + ORDEM_ETP.filter(function(k){ return cont[k]; }).map(function(k){ return '<span><i style="background:' + (k === 'preparo' ? 'var(--line2)' : ETP[k][2]) + '"></i>' + ETP[k][0] + ' ' + cont[k] + '</span>'; }).join('') + '</div>' : '') +
-      '<div class="rot">Próximas audiências' + (prox.length ? ' · ' + prox.length : '') + '</div>' +
-      (prox.length ? '<div class="auds">' + prox.slice(0, 15).map(function(c){
-        var p = String(c.audData).split('-'), tl = telLink(c);
-        return '<div data-cli="' + esc(c.id) + '"><div class="dia"><b>' + p[2] + '</b><span>' + MES[+p[1] - 1] + '</span></div><div class="info"><b>' + esc(c.nome) + '</b><span>' + quando(c.audData) + (c.audHora ? ' · ' + esc(c.audHora) : '') + ' · ' + (c.online ? 'online (vídeo)' : 'no Fórum') + '</span></div>' +
-          (tl ? '<a class="lig" href="' + tl + '"><svg><use href="#i-fone"/></svg>Ligar</a>' : '') + '</div>';
-      }).join('') + '</div>' : '<div class="vazio">Nenhuma audiência marcada para as suas clientes agora.</div>') +
       (cl.length ? '' : '<div class="vazio" style="margin-top:12px">' + (navigator.onLine === false && !painel ? 'Sem internet: o painel aparece quando o celular tiver sinal.' : 'As clientes que você indicar aparecem aqui, com a situação de cada uma.') + '</div>') +
       '<button type="button" class="sair" id="sair"><svg><use href="#i-sair"/></svg>Sair desta conta</button>' +
       '<div class="versao">Nascer com Direitos · versão ' + APP_VERSAO + '</div>';
@@ -972,6 +1055,35 @@ input,select,textarea{color-scheme:light}
     });
   }
   // tirar foto agora ou anexar o que a cliente mandou (WhatsApp, galeria, arquivos)
+  /* ---------- vídeo de concordância (opcional) ---------- */
+  var VIDEO_MAX = 45 * 1024 * 1024;   // o envio pelo script do Google aguenta até uns 45 MB
+  function escolherVideo(d){
+    var t = tela('<b>Vídeo de concordância</b><p>A cliente dizendo que concorda com os termos do contrato. Vídeo curto, de até 30 segundos.</p>' +
+      '<button id="t-grava">Gravar vídeo agora</button><button class="sec2" id="t-arq">Escolher da galeria</button><button class="sec2" id="t-cancela">Cancelar</button>');
+    t.querySelector('#t-grava').onclick = function(){ t.remove(); atual = d; $('video-cam').value = ''; $('video-cam').click(); };
+    t.querySelector('#t-arq').onclick = function(){ t.remove(); atual = d; $('video-arq').value = ''; $('video-arq').click(); };
+    t.querySelector('#t-cancela').onclick = function(){ t.remove(); };
+  }
+  function pegarVideo(inp){
+    var arq = inp.files && inp.files[0]; inp.value = ''; if (!arq || !atual) return;
+    if (arq.size > VIDEO_MAX){ alert('O vídeo ficou grande demais (' + Math.round(arq.size / 1048576) + ' MB). Grave um mais curto, de até 30 segundos.'); return; }
+    var d = atual;
+    if (fotos[d.k] && fotos[d.k][0] && fotos[d.k][0].url) try { URL.revokeObjectURL(fotos[d.k][0].url); } catch(e){}
+    fotos[d.k] = [{ video: true, blob: arq, nome: arq.name || 'video.mp4', url: URL.createObjectURL(arq) }];
+    telaInicial();
+    verVideo(d);
+  }
+  $('video-cam').addEventListener('change', function(){ pegarVideo(this); });
+  $('video-arq').addEventListener('change', function(){ pegarVideo(this); });
+  function verVideo(d){
+    var x = (fotos[d.k] || [])[0]; if (!x){ return escolherVideo(d); }
+    var t = tela('<b>Vídeo de concordância</b><video controls playsinline preload="metadata" src="' + x.url + '" style="width:100%;max-height:46vh;border-radius:14px;background:#000;margin:8px 0"></video>' +
+      '<p>' + Math.max(1, Math.round((x.blob.size || 0) / 1048576)) + ' MB · pronto para enviar</p>' +
+      '<button id="t-ok">Está bom</button><button class="sec2" id="t-novo">Gravar de novo</button><button class="sec2" id="t-apaga">Apagar vídeo</button>');
+    t.querySelector('#t-ok').onclick = function(){ t.remove(); };
+    t.querySelector('#t-novo').onclick = function(){ t.remove(); escolherVideo(d); };
+    t.querySelector('#t-apaga').onclick = function(){ t.remove(); delete fotos[d.k]; telaInicial(); };
+  }
   function escolher(d){
     var t = tela('<b>' + esc(d.k === 'rg_frente' ? 'RG' : d.t) + '</b><p>Como quer colocar este documento?</p>' +
       '<button id="t-foto">Tirar foto agora</button><button class="sec2" id="t-anexo">Anexar (galeria, WhatsApp ou PDF)</button><button class="sec2" id="t-cancela">Cancelar</button>');
@@ -1358,7 +1470,7 @@ input,select,textarea{color-scheme:light}
       conferir(d, true);
     }).catch(function(){ processando(false); alert('Não deu para usar esta foto. Tire de novo.'); });
   }
-  function miniatura(x){ return x.pdf ? '<span class="pdf-mini">PDF</span>' : '<img alt="" src="' + x.url + '">'; }
+  function miniatura(x){ return x.video ? '<span class="pdf-mini video-mini">VÍDEO</span>' : x.pdf ? '<span class="pdf-mini">PDF</span>' : '<img alt="" src="' + x.url + '">'; }
   function figuraDe(x, rotulo){ return '<figure>' + (x.pdf ? '<div class="pdf-fig"><b>PDF anexado</b><span>' + esc(x.nome || '') + '</span></div>' : '<img alt="" src="' + x.url + '">') + (rotulo ? '<figcaption>' + rotulo + '</figcaption>' : ''); }
   function rgFotos(){ return (fotos.rg_frente || []).concat(fotos.rg_verso || []); }
   // botão "Ajustar recorte" em cada foto que veio do recorte (abre os cantos para mexer)
@@ -1468,14 +1580,8 @@ input,select,textarea{color-scheme:light}
     var t = tela('<svg viewBox="0 0 24 24" style="stroke:var(--ok)"><use href="#i-nuvem"/></svg><b>Preparando…</b><p id="t-prep">Montando os documentos</p>');
     // arquivos que vão para a pasta (ESPECIFICACAO §5): procuração separada; RG + CPF + comprovante de residência juntos em DOCUMENTOS PESSOAIS
     var GRUPOS_ARQ = [
-      { nome: 'PROCURAÇÃO', ks: ['procuracao'] },
-      { nome: 'DOCUMENTOS PESSOAIS', ks: ['rg_frente', 'rg_verso', 'cpf', 'residencia'] },
-      { nome: 'CERTIDÃO DE NASCIMENTO', ks: ['certidao'] },
-      { nome: 'AUTODECLARAÇÃO RURAL', ks: ['autodeclaracao'] },
-      { nome: 'PROVAS DE ATIVIDADE RURAL', ks: ['rural'] },
-      { nome: 'CTPS E CONTRIBUIÇÕES', ks: ['ctps'] },
-      { nome: 'DOCUMENTOS A ROGO', ks: ['arogo'] },
-      { nome: 'OUTROS DOCUMENTOS', ks: ['outro'] }
+      { nome: 'CONTRATO E PROCURAÇÃO', ks: ['procuracao'] },
+      { nome: 'DOCUMENTOS PESSOAIS', ks: ['rg_frente', 'rg_verso', 'cpf', 'titulo'] }
     ];
     var nDocs = GRUPOS_ARQ.filter(function(g){ return g.ks.some(function(k){ return fotos[k]; }); }).length, nFeito = 0;
     var id = Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
@@ -1492,6 +1598,8 @@ input,select,textarea{color-scheme:light}
       p = p.then(function(){ var pe = $('t-prep'); if (pe) pe.textContent = 'Montando ' + g.nome.toLowerCase() + ' (' + (++nFeito) + ' de ' + nDocs + ')…'; return new Promise(function(ok){ setTimeout(ok, 30); }); })
            .then(function(){ return pdfDe(imgs).then(function(pdf){ arquivos.push({ nome: g.nome + sufixo + '.pdf', mime: 'application/pdf', blob: pdf }); }); });
     });
+    // vídeo de concordância: vai como veio (sem virar PDF)
+    (fotos.video || []).forEach(function(x, i){ var ext = /quicktime/i.test(x.blob.type) ? 'mov' : /webm/i.test(x.blob.type) ? 'webm' : 'mp4'; arquivos.push({ nome: 'VÍDEO DE CONCORDÂNCIA' + sufixo + (i ? ' ' + (i + 1) : '') + '.' + ext, mime: x.blob.type || 'video/mp4', blob: x.blob }); });
     // foto da cliente: imagem na pasta + miniatura para aparecer no sistema
     var fc = (fotos.cliente || []).filter(function(x){ return !x.pdf; });
     fc.forEach(function(x, i){ arquivos.push({ nome: 'FOTO DA CLIENTE' + sufixo + (fc.length > 1 ? ' ' + (i + 1) : '') + '.jpg', mime: 'image/jpeg', blob: x.blob }); });
@@ -1697,7 +1805,7 @@ input,select,textarea{color-scheme:light}
   var APP = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
   // entrada: usuário e senha que o escritório cadastrou (ou o link antigo, se a pessoa tiver)
   function pedirLink(msg){
-    $('app').innerHTML = '<div class="login"><div class="entrar"><img class="login-logo" src="img/logo-nascer.png" alt="Nascer com Direitos">' +
+    $('app').innerHTML = '<div class="login"><div class="entrar"><img class="login-logo" src="img/logo-nascer-t.png" alt="Nascer com Direitos">' +
       '<b class="login-t">Nascer com Direitos</b><p class="login-s">Salário-maternidade<br>' + esc(msg || 'Use o usuário e a senha que a equipe passou para você.') + '</p>' +
       '<label class="login-rot" for="usuario">Usuário</label><label class="fone" style="margin:0 0 14px"><svg viewBox="0 0 24 24"><use href="#i-pessoa"/></svg><input id="usuario" placeholder="seu usuário" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false"></label>' +
       '<label class="login-rot" for="senha">Senha</label><label class="fone" style="margin:0"><svg viewBox="0 0 24 24"><use href="#i-cadeado"/></svg><input id="senha" type="password" placeholder="sua senha" autocomplete="current-password"><button type="button" id="ver-senha" style="border:0;background:none;color:var(--ink2);font:inherit;font-size:14px">mostrar</button></label>' +
