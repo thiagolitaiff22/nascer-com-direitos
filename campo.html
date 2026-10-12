@@ -662,6 +662,14 @@ html,body{overflow-x:hidden}
 .cid-folha .cid-item span:not(.cid-flag){flex:1}
 
 .cid-flag.mini{width:18px;height:12px;border-radius:2px;display:inline-block;vertical-align:-1px;margin-right:5px;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+/* barras de pesquisa maiores */
+.cid-folha .cid-busca{-webkit-appearance:none!important;appearance:none!important;height:56px!important;min-height:56px;padding:0 18px!important;font-size:18px!important;border-radius:16px!important;border:1.5px solid var(--line2,#d8cdb8)!important;background:#fff!important;margin-bottom:12px!important}
+.cid-folha .cid-busca::-webkit-search-cancel-button{-webkit-appearance:none}
+.cid-folha .cid-busca::placeholder{font-size:18px;color:var(--ink2)}
+.cid-folha .cid-item{padding:15px 14px!important;font-size:17px!important}
+.busca{min-height:54px;padding-left:16px!important;padding-right:16px!important;border-radius:16px!important}
+.busca svg{width:22px!important;height:22px!important}
+.busca input{font-size:17px!important;padding:15px 0!important}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
 </head>
@@ -704,7 +712,7 @@ html,body{overflow-x:hidden}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 3;
+  var APP_VERSAO = 4;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
