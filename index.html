@@ -1799,6 +1799,13 @@ td,.row{font-size:13px}
 /* ---------- ordem dos botões do rodapé: modo claro/escuro à esquerda, recolher à direita ---------- */
 .topnav .side-acts #btn-theme{order:-1}
 .topnav .side-acts #btn-side{order:1}
+
+/* ---------- nome no topo do menu: letra um pouco maior ---------- */
+@media (min-width:1000px){
+  .app:not(.collapsed) .topnav .brand b{font-size:15px!important}
+  .app:not(.collapsed) .topnav .brand > div:not(.logo) span{font-size:12px!important}
+  .app:not(.collapsed) .topnav .brand{gap:10px}
+}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
