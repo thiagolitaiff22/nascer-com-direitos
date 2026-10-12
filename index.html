@@ -1486,6 +1486,19 @@ td,.row{font-size:13px}
   .topnav .nav .tab:hover{background:#fbf7ef!important}
   :root[data-theme="dark"] .topnav .nav .tab:hover{background:#262019!important}
 }
+
+/* ---------- menu lateral: sem barra de rolagem, mais compacto, rodapé sempre visível ---------- */
+@media (min-width:1000px){
+  .topnav{overflow:hidden!important;gap:2px!important;padding:16px 12px 12px!important}
+  .topnav .brand{padding-bottom:10px!important}
+  .topnav #btn-novo{height:38px!important;margin:0 0 6px!important}
+  .topnav .nav{flex:1 1 auto;min-height:0;overflow-y:auto!important;overflow-x:hidden;scrollbar-width:none;-ms-overflow-style:none;gap:1px!important}
+  .topnav .nav::-webkit-scrollbar{display:none;width:0;height:0}
+  .topnav .nav button{padding:8px 12px!important}
+  .topnav .nav-lbl{padding:12px 14px 4px!important}
+  .topnav #sync{padding:2px 8px!important}
+  .topnav .side-foot{margin-top:2px!important;padding-top:10px!important}
+}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
