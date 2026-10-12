@@ -15,8 +15,8 @@
  * NO INSS (tem DER ou protocolo do requerimento), NA JUSTIÇA (tem número de processo) ou ARQUIVADOS (pago e arquivado).
  * Uma pasta em ARQUIVADOS nunca sai de lá automaticamente.
  */
-var SUPABASE_URL = 'https://COLE_AQUI.supabase.co';
-var SUPABASE_KEY = 'COLE_AQUI_A_CHAVE_PUBLICA'; // chave pública do site
+var SUPABASE_URL = 'https://rqgaliouhuulycbxxmjd.supabase.co';
+var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM'; // chave pública do site
 var PASTA_CLIENTES = 'COLE_AQUI_O_ID_DA_PASTA_CLIENTES'; // NASCER COM DIREITOS › CLIENTES
 var PENDENTES = 'PENDENTES DE REQUERIMENTO', NO_INSS = 'NO INSS', NA_JUSTICA = 'NA JUSTIÇA', ARQUIVADOS = 'ARQUIVADOS';
 var ETAPAS = { pendente: PENDENTES, inss: NO_INSS, justica: NA_JUSTICA, arquivado: ARQUIVADOS };
