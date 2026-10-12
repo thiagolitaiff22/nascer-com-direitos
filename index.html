@@ -1395,6 +1395,37 @@ body{font-feature-settings:"cv11","ss01";-webkit-font-smoothing:antialiased}
 th{font-size:12.5px!important;font-weight:600!important;letter-spacing:0!important;text-transform:none!important;color:var(--ink-3)!important}
 td,.row{font-size:14px}
 @media (min-width:1000px){.topnav{overflow-x:hidden!important}.topnav .side-foot{min-width:0}.topnav .side-foot > div:not(.av){min-width:0;overflow:hidden}.topnav .side-foot b{white-space:normal;overflow-wrap:anywhere;line-height:1.3}}
+
+/* ---------- proporções mais enxutas: menu lateral estreito e fontes menores ---------- */
+body{font-size:13.5px}
+@media (min-width:1000px){
+  .app{grid-template-columns:216px minmax(0,1fr)}
+  .topnav{padding:18px 12px 14px;gap:4px}
+  .topnav .brand{padding:0 6px 14px;gap:10px}
+  .topnav .brand .logo{width:38px;height:38px;border-radius:13px}
+  .topnav .brand b{font-size:13.5px}
+  .topnav .brand span{font-size:11px}
+  .topnav #btn-novo{height:40px;font-size:13px;margin-bottom:10px}
+  .topnav .nav{gap:2px}
+  .topnav .nav button{padding:9px 12px!important;font-size:13px;gap:10px;border-radius:12px!important}
+  .topnav .nav button svg.i{width:17px;height:17px}
+  .topnav .nav .tab[aria-selected="true"]::before{left:-12px;top:8px;bottom:8px;width:3px}
+  .topnav #sync{font-size:10.5px}
+  .topnav .side-foot b{font-size:12px}
+  .content{padding:26px 30px 48px;gap:18px}
+}
+.ph h1{font-size:23px!important}
+.ph p{font-size:13px!important}
+.vw-dash .stats{gap:14px!important}
+.vw-dash .stat{padding:16px 18px!important}
+.vw-dash .stat-h{font-size:12.5px!important;gap:10px!important}
+.vw-dash .stat-h svg.i{width:36px!important;height:36px!important;padding:9px!important;border-radius:12px!important}
+.vw-dash .stat-v{font-size:27px!important;margin-top:10px!important}
+.vw-dash .stat-c{font-size:12px!important}
+.sec-rot,.rot{font-size:13.5px!important}
+th{font-size:11.5px!important}
+td,.row{font-size:13px}
+.btn,.tb-sel,.search input,select,input:not([type=checkbox]):not([type=radio]){font-size:13px}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
