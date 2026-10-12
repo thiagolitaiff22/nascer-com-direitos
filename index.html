@@ -1843,6 +1843,12 @@ td,.row{font-size:13px}
 #ctr-list .guia-sel{margin-top:6px}
 #ctr-list .guia-sel.ok{color:var(--green,#15803d)}
 #ctr-list .guia-sel.warn{color:var(--amber,#b45309)}
+
+/* ---------- o sistema não faz aviso: a equipe conversa com a cliente pelo WhatsApp ---------- */
+.field:has(#f-data),.field:has(#f-hora),.field:has(#f-online),.field:has(#f-situacao),.field:has(#f-aviso-resp),.field:has(#f-avisoem),.field:has(#f-meio),.field:has(#f-avisadoa),.field:has(#f-comp),#f-falta-wrap,.field:has(#fp-pal){display:none!important}
+#view-clientes #cl-aud-sel,#view-clientes #fb-sit,#view-clientes #btn-pj,#view-clientes #fb-mais,#view-clientes #fb-painel,#view-clientes #list-sum,#view-clientes #list-title,#view-clientes .sec-rot{display:none!important}
+#list .row{grid-template-columns:minmax(0,2.6fr) minmax(0,1.6fr) minmax(0,1.4fr) 36px!important}
+#list .row > :nth-child(4),#list .row > :nth-child(5){display:none!important}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2177,7 +2183,7 @@ td,.row{font-size:13px}
         <div class="card reg-det" id="reg-det" hidden></div>
         <div class="sec-title">Parceiros</div>
         <div class="prosp-head">
-          <p class="view-desc">Quem é responsável por avisar cada cliente. Clientes novos são atribuídos automaticamente pelas palavras do endereço.</p>
+          <p class="view-desc">Quem cadastra as clientes pelo aplicativo. Cada parceiro pertence a um estado de atuação.</p>
           <button class="btn" id="btn-prosp-novo" type="button"><svg class="i"><use href="#i-plus"/></svg>Novo parceiro</button>
         </div>
         <div class="prosp-grid" id="prosp-list"></div>
@@ -3323,9 +3329,7 @@ td,.row{font-size:13px}
         '<div class="prosp-top"><div class="prosp-av">' + esc(ini) + '</div><div><b>' + esc(p.nome) + '</b>' +
           (p.telefone ? '<span class="small tnum">' + esc(p.telefone) + '</span>' : '<span class="pill warn" style="margin-top:3px">Telefone não informado</span>') +
           (regiaoDe(p) ? '<span class="small reg-linha">' + ufFlagReg(regiaoDe(p)) + esc(regiaoDe(p).nome) + (p.regiao ? ' · ' + esc(p.regiao) : '') + '</span>' : (p.regiao ? '<span class="small">' + esc(p.regiao) + '</span>' : '<span class="pill warn" style="margin-top:3px">Sem região</span>')) + '</div></div>' +
-        '<div class="prosp-nums"><div><b>' + mine.length + '</b><span>clientes</span></div><div><b>' + av + '</b><span>avisados</span></div><div><b>' + aAvisar + '</b><span>a avisar</span></div><div><b>' + sc + '</b><span>sem contato</span></div></div>' +
-        pautaProsp(p, fut) +
-        ((p.palavrasEndereco || []).length ? '<div class="small">Endereços com: ' + p.palavrasEndereco.map(function(k){ return '<span class="tag-kw">' + esc(k) + '</span>'; }).join('') + '</div>' : '') +
+                '<div class="prosp-nums"><div><b>' + mine.length + '</b><span>clientes</span></div><div><b>' + mine.filter(function(r){ return !!r.contratoEm; }).length + '</b><span>contratos</span></div><div><b>' + mine.filter(function(r){ return r.inssStatus === 'concedido'; }).length + '</b><span>concedidos</span></div></div>' +
         '<div class="prosp-actions"><button type="button" class="btn" data-pact="ver" data-id="' + esc(p.id) + '">Ver clientes</button>' + (isAdmin() ? '<button type="button" class="btn" data-pact="link" data-id="' + esc(p.id) + '"><svg class="i"><use href="#i-phone"/></svg>Aplicativo</button>' : '') + '<button type="button" class="btn" data-pact="edit" data-id="' + esc(p.id) + '">Editar</button>' +
           (soltos ? '<button type="button" class="btn" data-pact="aplicar" data-id="' + esc(p.id) + '">Atribuir ' + soltos + ' cliente(s) do endereço</button>' : '') + '</div>' +
       '</div>';
@@ -3847,6 +3851,8 @@ td,.row{font-size:13px}
     sec.addEventListener('click', function(e){ var b = e.target.closest('[data-cfg-tab]'); if (b) ir(b.dataset.cfgTab); });
     try { ir(sessionStorage.getItem('nascer-cfg') || 'equipe'); } catch(e){ ir('equipe'); }
   })();
+  // sem audiência e sem aviso: some o título da seção de audiência do formulário
+  Array.prototype.forEach.call(document.querySelectorAll('.section-lbl'), function(e){ if (/^Audiência$/.test(e.textContent.trim())) e.hidden = true; });
   function render(){ renderRegioes(); renderContratos(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
   var clQ = '';
   // stage of each process, derived from what is already recorded (no extra typing)
