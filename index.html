@@ -1906,6 +1906,14 @@ td,.row{font-size:13px}
 .est-row.head > :nth-child(6){visibility:hidden}
 .est-cid .cid-flag{width:22px;height:15px;border-radius:3px;object-fit:cover;margin-right:8px;flex:none;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
 .est-acoes{flex-wrap:nowrap!important}
+
+.est-nome-pros{flex-direction:row;align-items:center;gap:10px}
+.est-txt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.est-toggle{width:28px;height:28px;border-radius:50%;border:1px solid var(--gline,var(--line));background:var(--panel,#fff);color:var(--ink-2,#5a4f3f);display:inline-flex;align-items:center;justify-content:center;flex:none;padding:0;cursor:pointer}
+.est-toggle .i{width:15px;height:15px;transition:transform .15s}
+.est-row.pros.fechado .est-toggle .i{transform:rotate(-90deg)}
+.est-toggle:disabled{opacity:.35;cursor:default}
+:root[data-theme="dark"] .est-toggle{background:#1b1712;border-color:#2e2820}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -3972,9 +3980,10 @@ td,.row{font-size:13px}
     pros.forEach(function(pr){
       var seus = parc.filter(function(p){ return p.prospectadorId === pr.id; }).sort(function(a, b){ return (a.nome || '').localeCompare(b.nome || '', 'pt-BR'); });
       var n = nums(seus.map(function(x){ return x.id; }));
-      html += '<div class="est-row pros"><div class="est-nome"><b>' + esc(pr.nome) + '</b><span class="mini">Prospectador · ' + esc(pr.telefone || 'sem telefone') + ' · ' + seus.length + (seus.length === 1 ? ' parceiro' : ' parceiros') + '</span></div>' +
+      var fechado = !!estColaps[pr.id];
+      html += '<div class="est-row pros' + (fechado ? ' fechado' : '') + '"><div class="est-nome est-nome-pros"><button type="button" class="est-toggle" data-pcol="' + esc(pr.id) + '" aria-expanded="' + !fechado + '" title="' + (fechado ? 'Mostrar' : 'Ocultar') + ' os parceiros"' + (seus.length ? '' : ' disabled') + '><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button><div class="est-txt"><b>' + esc(pr.nome) + '</b><span class="mini">Prospectador · ' + esc(pr.telefone || 'sem telefone') + ' · ' + seus.length + (seus.length === 1 ? ' parceiro' : ' parceiros') + '</span></div></div>' +
         '<div></div><div class="tnum">' + n.cli + '</div><div class="tnum">' + n.con + '</div><div class="tnum">' + n.cnc + '</div>' + acoes(pr, false) + '</div>';
-      html += seus.map(linhaParceiro).join('');
+      if (!fechado) html += seus.map(linhaParceiro).join('');
     });
     var soltos = parc.filter(function(p){ return !p.prospectadorId || !pros.some(function(x){ return x.id === p.prospectadorId; }); }).sort(function(a, b){ return (a.nome || '').localeCompare(b.nome || '', 'pt-BR'); });
     if (soltos.length){
@@ -3983,7 +3992,12 @@ td,.row{font-size:13px}
     box.hidden = !(pros.length || soltos.length);
     box.innerHTML = box.hidden ? '' : html;
   }
-  $('estado-lista').addEventListener('click', function(e){ clickProsp(e); });
+  var estColaps = {};
+  $('estado-lista').addEventListener('click', function(e){
+    var t = e.target.closest('[data-pcol]');
+    if (t){ estColaps[t.dataset.pcol] = !estColaps[t.dataset.pcol]; renderEstadoLista(); return; }
+    clickProsp(e);
+  });
   $('reg-det').addEventListener('click', async function(e){
     if (e.target.closest('[data-reg-voltar]')){ regAberta = ''; renderRegioes(); return; }
     var nv = e.target.closest('[data-reg-novo]'); if (nv){ openProsp(null, nv.dataset.regNovo); return; }
