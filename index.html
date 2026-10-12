@@ -1857,6 +1857,9 @@ td,.row{font-size:13px}
 .reg-det-h{flex-wrap:wrap}
 .reg-novo-parc{margin-left:auto}
 #prosp-list:empty{display:none}
+
+/* acesso do parceiro: só usuário e senha (sem link) */
+.field:has(#cp-link),#cp-novo,#cp-copiar,#cp-whats{display:none!important}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -4551,7 +4554,7 @@ td,.row{font-size:13px}
       if (novo) toast('Link novo gerado. O antigo não funciona mais.');
     } catch(err){ toast(errMsg(err)); }
   }
-  var APK_URL = location.origin + location.pathname.replace(/[^/]*$/, '') + 'app/download/rl-advogados.apk', cpSenhaNova = '';
+  var APK_URL = location.origin + location.pathname.replace(/[^/]*$/, '') + 'app/download/nascer-com-direitos.apk', cpSenhaNova = '';
   function sugerirUsuario(nome){
     var p = String(nome || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/^(dona|seu|sr|sra)\.?\s+/, '').split(/\s+/).filter(Boolean);
     return (p[0] || 'prospectador').replace(/[^a-z0-9]/g, '').slice(0, 20);
@@ -4579,7 +4582,12 @@ td,.row{font-size:13px}
     if (!cpSenhaNova) return toast('Digite ou gere a senha e clique em Salvar primeiro');
     if ($('cp-senha').value.trim() !== cpSenhaNova) return toast('A senha do campo ainda não foi salva: clique em Salvar');
     var dig = String(cpProsp.telefone || cpProsp.contato || '').replace(/\D/g, '');
-    var txt = 'Olá, ' + String(cpProsp.nome || '').split(' ')[0] + '! Este é o aplicativo para cadastrar os clientes, funciona mesmo sem internet.\n\n1. Baixe e instale: ' + APK_URL + '\n2. Abra o aplicativo RL Advogados e entre com:\nUsuário: ' + u + '\nSenha: ' + cpSenhaNova;
+    var appUrl = location.origin + location.pathname.replace(/[^/]*$/, '') + 'campo.html';
+    var nomeMsg = cpProsp.tipo === 'clinica' && cpProsp.clinica ? cpProsp.clinica : String(cpProsp.nome || '').split(' ')[0];
+    var txt = 'Olá, ' + nomeMsg + '! Este é o aplicativo Nascer com Direitos, para cadastrar as clientes.' + String.fromCharCode(10, 10) +
+      'iPhone: abra este endereço no Safari, toque em Compartilhar e em Adicionar à Tela de Início:' + String.fromCharCode(10) + appUrl + String.fromCharCode(10, 10) +
+      'Android: baixe e instale:' + String.fromCharCode(10) + APK_URL + String.fromCharCode(10, 10) +
+      'Entre com:' + String.fromCharCode(10) + 'Usuário: ' + u + String.fromCharCode(10) + 'Senha: ' + cpSenhaNova;
     window.open('https://wa.me/' + (dig.length >= 10 ? '55' + dig.replace(/^55/, '') : '') + '?text=' + encodeURIComponent(txt), '_blank', 'noopener');
   });
   $('cp-copiar').addEventListener('click', function(){ var v = $('cp-link').value; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(function(){ toast('Link copiado'); }, function(){ $('cp-link').select(); document.execCommand('copy'); toast('Link copiado'); }); });

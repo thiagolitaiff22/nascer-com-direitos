@@ -598,6 +598,20 @@ html[data-tema="dark"] .login #ver-senha{color:#d4b483!important}
 .login details{font-size:14px!important;color:var(--ink2)!important;margin-top:14px!important}
 .login details summary{padding:8px 0}
 .login details input{color:var(--ink)!important}
+
+/* ================= entrada: tamanhos menores e blocos bem separados ================= */
+.login{padding-top:calc(34px + env(safe-area-inset-top))!important;padding-bottom:calc(34px + env(safe-area-inset-bottom))!important}
+.login .entrar{max-width:330px!important}
+.login-logo{width:128px!important;max-width:44%!important;margin:0 auto 18px!important}
+.login-t{font-size:20px!important;margin:0!important}
+.login-s{font-size:14px!important;line-height:1.55!important;margin:8px auto 32px!important;max-width:290px;color:var(--ink2)!important}
+.login-rot{font-size:13px!important;margin:0 0 8px 2px!important;letter-spacing:.01em}
+.login label.login-rot ~ label.login-rot,.login .login-rot + .fone + .login-rot{margin-top:22px!important}
+.login .fone{height:48px!important;margin:0!important;padding:0 14px!important;border-radius:12px!important}
+.login .fone input{font-size:16px!important}
+.login .fone svg{width:18px!important;height:18px!important}
+.login .enviar{height:50px!important;font-size:16px!important;margin-top:30px!important;border-radius:12px!important}
+.login-nota{font-size:12.5px!important;margin:20px 8px 0!important;line-height:1.5!important;opacity:.95}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
 </head>
@@ -1876,7 +1890,7 @@ html[data-tema="dark"] .login #ver-senha{color:#d4b483!important}
       '<label class="login-rot" for="senha">Senha</label><label class="fone" style="margin:0"><svg viewBox="0 0 24 24"><use href="#i-cadeado"/></svg><input id="senha" type="password" placeholder="sua senha" autocomplete="current-password"><button type="button" id="ver-senha" style="border:0;background:none;color:var(--ink2);font:inherit;font-size:14px">mostrar</button></label>' +
       '<button class="enviar" id="entrar">Entrar</button>' +
       '<p class="login-nota">Precisa de internet só para entrar. Depois o aplicativo funciona sem sinal.</p>' +
-      '<details style="margin-top:18px;font-size:14px;color:var(--ink2)"><summary>Tenho um link do escritório</summary><label class="fone" style="margin:10px 0 0"><input id="link" placeholder="Cole o link aqui" autocomplete="off" style="font-size:15px"></label><button class="enviar" id="entrar-link" style="margin-top:10px;height:48px;font-size:16px;background:var(--pri);color:var(--onpri)">Entrar com o link</button></details></div></div>';
+      '</div></div>';
     $('ver-senha').onclick = function(){ var e = $('senha'); e.type = e.type === 'password' ? 'text' : 'password'; this.textContent = e.type === 'password' ? 'mostrar' : 'esconder'; };
     $('senha').addEventListener('keydown', function(e){ if (e.key === 'Enter') $('entrar').click(); });
     $('entrar').onclick = function(){
@@ -1892,11 +1906,6 @@ html[data-tema="dark"] .login #ver-senha{color:#d4b483!important}
         })
         .catch(function(){ alert('Sem internet agora. Para entrar a primeira vez precisa de sinal.'); })
         .then(function(){ if (document.body.contains(b)){ b.disabled = false; b.textContent = 'Entrar'; } });
-    };
-    $('entrar-link').onclick = function(){
-      var v = $('link').value.trim(), t = (v.match(/t=([A-Za-z0-9_-]+)/) || [])[1] || (/^[A-Za-z0-9_-]{20,}$/.test(v) ? v : '');
-      if (!t) return alert('Link inválido. Copie o link inteiro que o escritório mandou.');
-      token = t; iniciar();
     };
     var uu = lsGet('campo_usuario'); if (uu) $('usuario').value = uu;
   }
