@@ -557,6 +557,15 @@ html[data-tema="dark"] .doc .estrela{background:rgba(251,191,36,.2)!important;co
 html[data-tema="dark"] .lista small{background:rgba(212,180,131,.12)!important;color:#f8f2e8!important}
 html[data-tema="dark"] .lista .nm .falta-l{color:#fbbf24!important}
 html[data-tema="dark"] .lista > div:has(i.ok) small::before{background:#4ade80}
+
+/* ---------- lista de clientes: compacta ---------- */
+.lista > div{padding:11px 14px!important;gap:10px}
+.lista .nm b{font-size:14.5px!important;font-weight:600}
+.lista .nm span{font-size:12.5px!important}
+.lista small{padding:5px 10px!important;font-size:12px!important;max-width:44%}
+.lista small::before{width:7px;height:7px}
+.chips button{font-size:13.5px!important;padding:7px 12px!important}
+.busca{padding-top:2px;padding-bottom:2px}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
 </head>
@@ -629,6 +638,8 @@ html[data-tema="dark"] .lista > div:has(i.ok) small::before{background:#4ade80}
   // aparece no cadastro: o que vale para o tipo escolhido (ou o que já tem foto)
   function serve(d){ return !d.tipos || d.tipos.indexOf(tipoAtual()) >= 0 || !!fotos[d.k]; }
   var $ = function(id){ return document.getElementById(id); };
+  // nome com a primeira letra maiúscula (as cadastradas vêm em MAIÚSCULAS): "Maria das Graças Souza"
+  var bonito = function(n){ return String(n || '').toLowerCase().replace(/(^|\s)([a-zà-ú])/g, function(m, a, b){ return a + b.toUpperCase(); }).replace(/\s(Da|De|Do|Das|Dos|E)(?=\s)/g, function(m){ return m.toLowerCase(); }); };
   var esc = function(t){ return String(t == null ? '' : t).replace(/[&<>"']/g, function(c){ return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
   var token = (location.hash.match(/t=([A-Za-z0-9_-]+)/) || [])[1] || lsGet('campo_token');
   var quem = null, fotos = {}, atual = null, local = null, falandoOk = false; // sem voz: as instruções ficam só escritas na tela
@@ -1016,7 +1027,7 @@ html[data-tema="dark"] .lista > div:has(i.ok) small::before{background:#4ade80}
       $('lista-cli').innerHTML = '<div class="rot">' + l.length + (l.length === 1 ? ' cliente' : ' clientes') + '</div>' + (l.length ? '<div class="lista">' + l.slice(0, 300).map(function(c){
         var k = etapaCli(c), e = ETP[k], sub = k === 'marcada' ? dataBR(c.audData) + (c.audHora ? ' · ' + c.audHora : '') + ' · ' + quando(c.audData) : c.cadastro ? 'indicada em ' + dataBR(c.cadastro) : '';
         var fl = faltas(c);
-        return '<div data-cli="' + esc(c.id) + '"><i class="' + (fl.length ? 'red' : e[1]) + '"></i><span class="nm"><b>' + esc(c.nome || 'Sem nome') + '</b><span>' + esc(sub) + '</span>' + (fl.length ? '<span class="falta-l">Falta: ' + esc(nomesFaltas(fl)) + '</span>' : '') + '</span><small>' + e[0] + '</small></div>';
+        return '<div data-cli="' + esc(c.id) + '"><i class="' + (fl.length ? 'red' : e[1]) + '"></i><span class="nm"><b>' + esc(bonito(c.nome || 'Sem nome')) + '</b><span>' + esc(sub) + '</span>' + (fl.length ? '<span class="falta-l">Falta: ' + esc(nomesFaltas(fl)) + '</span>' : '') + '</span><small>' + e[0] + '</small></div>';
       }).join('') + '</div>' : '<div class="vazio">' + (cl.length ? 'Nenhum cliente neste filtro.' : navigator.onLine === false && !painel ? 'Sem internet: a lista aparece quando o celular tiver sinal.' : 'Você ainda não tem clientes no sistema. Os cadastros enviados aparecem aqui.') + '</div>');
     }
     desenhar();
