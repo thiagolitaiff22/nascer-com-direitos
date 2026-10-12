@@ -1852,6 +1852,11 @@ td,.row{font-size:13px}
 
 /* Contratos fechados: sem etapas internas (documentação ok vai direto para o INSS) */
 #ctr-list select[data-ctr],#ctr-list .inss-acao,#ctr-list .grp-head{display:none!important}
+
+/* parceiros dentro do estado */
+.reg-det-h{flex-wrap:wrap}
+.reg-novo-parc{margin-left:auto}
+#prosp-list:empty{display:none}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2184,8 +2189,8 @@ td,.row{font-size:13px}
           </div></div></div>
         <div class="reg-grid" id="reg-grid"></div>
         <div class="card reg-det" id="reg-det" hidden></div>
-        <div class="sec-title">Parceiros</div>
-        <div class="prosp-head">
+        <div class="sec-title" id="parc-titulo" hidden>Parceiros</div>
+        <div class="prosp-head" id="parc-head" hidden>
           <p class="view-desc">Quem cadastra as clientes pelo aplicativo. Cada parceiro pertence a um estado de atuação.</p>
           <button class="btn" id="btn-prosp-novo" type="button"><svg class="i"><use href="#i-plus"/></svg>Novo parceiro</button>
         </div>
@@ -2380,7 +2385,7 @@ td,.row{font-size:13px}
       <div class="field" id="fp-clinica-box"><label for="fp-clinica">Nome da clínica</label><input id="fp-clinica" autocomplete="off" placeholder="Aparece no topo do aplicativo"></div>
       <div class="field"><label for="fp-tel">Telefone / WhatsApp</label><input id="fp-tel" inputmode="tel" placeholder="(97) 00000-0000" class="tnum"></div>
       <div class="field"><label for="fp-regiao">Região de atuação</label><select id="fp-regiao"></select></div>
-      <div class="field"><label for="fp-reg">Comunidade / localidade</label><input id="fp-reg" placeholder="Ex.: Comunidade do Curumitá"></div>
+      <div class="field"><label for="fp-reg">Cidade</label><input id="fp-reg" list="fp-cidades" autocomplete="off" placeholder="Ex.: Manaus"><datalist id="fp-cidades"></datalist></div>
       <div class="field full"><label for="fp-pal">Palavras do endereço</label><input id="fp-pal" placeholder="Ex.: curumitá, nogueira"><span class="hint">Clientes cujo endereço tiver uma dessas palavras ficam com este parceiro. Separe por vírgula.</span></div>
     </div>
     <div class="f-foot">
@@ -3324,8 +3329,10 @@ td,.row{font-size:13px}
   }
   function renderProsp(){
     var box = $('prosp-list');
-    if (!state.prosp.length){ box.innerHTML = '<div class="card empty">Nenhum parceiro cadastrado. Clique em <b>Novo parceiro</b>.</div>'; return; }
-    box.innerHTML = state.prosp.slice().sort(function(a, b){ return (a.nome || '').localeCompare(b.nome || '', 'pt-BR'); }).map(function(p){
+    var doEstado = state.prosp.filter(function(p){ return regAberta && p.regiaoId === regAberta; });
+    if (!regAberta){ box.innerHTML = ''; return; }
+    if (!doEstado.length){ box.innerHTML = '<div class="card empty">Nenhum parceiro neste estado ainda. Clique em <b>Novo parceiro</b> acima.</div>'; return; }
+    box.innerHTML = doEstado.slice().sort(function(a, b){ return (a.nome || '').localeCompare(b.nome || '', 'pt-BR'); }).map(function(p){
       var mine = state.rows.filter(function(r){ return r.responsavelId === p.id; });
       var fut = mine.filter(isFuture), av = fut.filter(function(r){ return r.avisado; }).length;
       var sc = fut.filter(function(r){ return !r.avisado && sit(r) === 'sem_contato'; }).length;
@@ -3335,7 +3342,7 @@ td,.row{font-size:13px}
       return '<div class="card prosp">' +
         '<div class="prosp-top"><div class="prosp-av">' + esc(ini) + '</div><div><b>' + esc(p.tipo === 'clinica' && p.clinica ? p.clinica : p.nome) + '</b>' + (p.tipo === 'clinica' ? '<span class="small">Clínica · ' + esc(p.nome) + '</span>' : '') +
           (p.telefone ? '<span class="small tnum">' + esc(p.telefone) + '</span>' : '<span class="pill warn" style="margin-top:3px">Telefone não informado</span>') +
-          (regiaoDe(p) ? '<span class="small reg-linha">' + ufFlagReg(regiaoDe(p)) + esc(regiaoDe(p).nome) + (p.regiao ? ' · ' + esc(p.regiao) : '') + '</span>' : (p.regiao ? '<span class="small">' + esc(p.regiao) + '</span>' : '<span class="pill warn" style="margin-top:3px">Sem região</span>')) + '</div></div>' +
+          (regiaoDe(p) ? '<span class="small reg-linha">' + ufFlagReg(regiaoDe(p)) + (p.regiao ? esc(p.regiao) + ' · ' : '') + esc(regiaoDe(p).nome) + '</span>' : (p.regiao ? '<span class="small">' + esc(p.regiao) + '</span>' : '<span class="pill warn" style="margin-top:3px">Sem região</span>')) + '</div></div>' +
                 '<div class="prosp-nums"><div><b>' + mine.length + '</b><span>clientes</span></div><div><b>' + mine.filter(function(r){ return !!r.contratoEm; }).length + '</b><span>contratos</span></div><div><b>' + mine.filter(function(r){ return r.inssStatus === 'concedido'; }).length + '</b><span>concedidos</span></div></div>' +
         '<div class="prosp-actions"><button type="button" class="btn" data-pact="ver" data-id="' + esc(p.id) + '">Ver clientes</button>' + (isAdmin() ? '<button type="button" class="btn" data-pact="link" data-id="' + esc(p.id) + '"><svg class="i"><use href="#i-phone"/></svg>Aplicativo</button>' : '') + '<button type="button" class="btn" data-pact="edit" data-id="' + esc(p.id) + '">Editar</button>' +
           (soltos ? '<button type="button" class="btn" data-pact="aplicar" data-id="' + esc(p.id) + '">Atribuir ' + soltos + ' cliente(s) do endereço</button>' : '') + '</div>' +
@@ -3783,16 +3790,15 @@ td,.row{font-size:13px}
     var ps = state.prosp.filter(function(p){ return p.regiaoId === g.id; }).sort(function(a, b){ return (a.nome || '').localeCompare(b.nome || '', 'pt-BR'); });
     var nomes = (state.equipe || []).map(function(u){ return u.nome; }).filter(Boolean);
     det.hidden = false;
-    det.innerHTML = '<div class="reg-det-h">' + ufFlagReg(g) + '<b>' + esc(g.nome) + '</b><span class="mini">' + ps.length + (ps.length === 1 ? ' parceiro' : ' parceiros') + '</span></div>' +
+    det.innerHTML = '<div class="reg-det-h">' + ufFlagReg(g) + '<b>' + esc(g.nome) + '</b><span class="mini">' + ps.length + (ps.length === 1 ? ' parceiro' : ' parceiros') + '</span><button type="button" class="btn primary reg-novo-parc" data-reg-novo="' + esc(g.id) + '"><svg class="i"><use href="#i-plus"/></svg>Novo parceiro em ' + esc(g.nome) + '</button></div>' +
       '<div class="reg-resp-edit"><label for="reg-resp-in">Responsável pelo estado</label>' +
         (isAdmin() ? '<div class="reg-resp-row"><input id="reg-resp-in" list="reg-resp-dl" autocomplete="off" placeholder="Nome do responsável" value="' + esc(g.responsavel || '') + '"><datalist id="reg-resp-dl">' + nomes.map(function(n){ return '<option value="' + esc(n) + '">'; }).join('') + '</datalist><button type="button" class="btn" id="reg-resp-salvar" data-reg-id="' + esc(g.id) + '">Salvar</button>' + (ps.length ? '' : '<button type="button" class="btn danger" id="reg-remover" data-reg-id="' + esc(g.id) + '">Remover estado</button>') + '</div>'
                     : '<div class="reg-resp-nome">' + (g.responsavel ? esc(g.responsavel) : 'Não definido') + '</div>') + '</div>' +
-      (ps.length ? '<div class="reg-lista">' + ps.map(function(p){
-        var n = state.rows.filter(function(r){ return r.responsavelId === p.id; }).length;
-        return '<div class="reg-item"><div><b>' + esc(p.nome) + '</b><span class="mini">' + esc(p.telefone || 'sem telefone') + (p.regiao ? ' · ' + esc(p.regiao) : '') + '</span></div><span class="mini">' + n + (n === 1 ? ' cliente' : ' clientes') + '</span><button type="button" class="btn" data-reg-edit="' + esc(p.id) + '">Editar</button></div>';
-      }).join('') + '</div>' : '<div class="empty">Nenhum parceiro cadastrado neste estado ainda. Em <b>Novo parceiro</b>, escolha a região de atuação.</div>');
+      '';
+
   }
   $('reg-det').addEventListener('click', async function(e){
+    var nv = e.target.closest('[data-reg-novo]'); if (nv){ openProsp(null, nv.dataset.regNovo); return; }
     var s = e.target.closest('#reg-resp-salvar'), rm = e.target.closest('#reg-remover');
     if (s){
       var g = regiaoPorId(s.dataset.regId); if (!g) return;
@@ -3809,7 +3815,7 @@ td,.row{font-size:13px}
       renderRegioes(); renderProsp();
     }
   });
-  $('reg-grid').addEventListener('click', function(e){ var b = e.target.closest('[data-reg]'); if (!b) return; regAberta = regAberta === b.dataset.reg ? '' : b.dataset.reg; renderRegioes(); });
+  $('reg-grid').addEventListener('click', function(e){ var b = e.target.closest('[data-reg]'); if (!b) return; regAberta = regAberta === b.dataset.reg ? '' : b.dataset.reg; renderRegioes(); renderProsp(); });
   $('reg-det').addEventListener('click', function(e){ var b = e.target.closest('[data-reg-edit]'); if (!b) return; var p = prospById(b.dataset.regEdit); if (p) openProsp(p); });
   async function regSalvar(){
     if (state.db) await state.db.collection('config').doc('regioes').set({ lista: state.regioes });
@@ -5584,7 +5590,7 @@ td,.row{font-size:13px}
   $('r-f').addEventListener('change', function(e){ state.r.f = e.target.value; renderRet(); });
   $('r-q').addEventListener('input', function(e){ state.r.q = e.target.value.trim(); renderRet(); });
   var dlgP = $('dlg-prosp'), pEditing = null, pDelArmed = false;
-  function openProsp(p){
+  function openProsp(p, estadoPreset){
     pEditing = p ? p.id : null;
     $('fp-title').textContent = p ? 'Editar parceiro' : 'Novo parceiro';
     $('fp-nome').value = p ? p.nome || '' : '';
@@ -5593,13 +5599,29 @@ td,.row{font-size:13px}
     $('fp-tipo').value = p && p.tipo === 'clinica' ? 'clinica' : 'pessoa';
     $('fp-clinica').value = p ? p.clinica || '' : '';
     $('fp-clinica-box').hidden = $('fp-tipo').value !== 'clinica';
-    regSelectPreencher(p ? p.regiaoId || '' : '');
+    regSelectPreencher(p ? p.regiaoId || '' : (estadoPreset || ''));
+    cidadesDoEstado();
     $('fp-pal').value = p ? (p.palavrasEndereco || []).join(', ') : '';
     $('fp-del').hidden = !p; pDelArmed = false; $('fp-del').classList.remove('armed'); $('fp-del').textContent = 'Excluir';
     dlgP.showModal(); $('fp-nome').focus();
   }
   $('btn-prosp-novo').addEventListener('click', function(){ openProsp(null); });
   $('fp-cancel').addEventListener('click', function(){ dlgP.close(); });
+  // cidades do estado escolhido (lista do IBGE, guardada depois da primeira consulta)
+  var cidadesCache = {};
+  function cidadesDoEstado(){
+    var g = regiaoPorId($('fp-regiao').value), uf = g ? String(g.uf || g.id).toUpperCase() : '', dl = $('fp-cidades');
+    if (!uf){ dl.innerHTML = ''; return; }
+    function pintar(l){ dl.innerHTML = l.map(function(n){ return '<option value="' + esc(n) + '">'; }).join(''); }
+    if (cidadesCache[uf]) return pintar(cidadesCache[uf]);
+    try { var salvo = JSON.parse(localStorage.getItem('nascer-cid-' + uf) || 'null'); if (salvo && salvo.length){ cidadesCache[uf] = salvo; return pintar(salvo); } } catch(e){}
+    fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados/' + uf + '/municipios?orderBy=nome').then(function(r){ return r.json(); }).then(function(l){
+      var nomes = (l || []).map(function(m){ return m.nome; }); cidadesCache[uf] = nomes;
+      try { localStorage.setItem('nascer-cid-' + uf, JSON.stringify(nomes)); } catch(e){}
+      pintar(nomes);
+    }).catch(function(){});
+  }
+  $('fp-regiao').addEventListener('change', cidadesDoEstado);
   $('fp-tipo').addEventListener('change', function(){ $('fp-clinica-box').hidden = this.value !== 'clinica'; if (this.value === 'clinica') $('fp-clinica').focus(); });
   $('fp-tel').addEventListener('input', function(e){ e.target.value = maskTel(e.target.value); });
   function pcol(){ return state.db.collection('prospectadores'); }
