@@ -1284,7 +1284,7 @@ section.vw-dash{gap:10px!important}
 #f-pasta-msg{display:block;margin-top:6px}
 .ia-preencheu{border-color:var(--blue)!important;box-shadow:0 0 0 1px var(--blue) inset}
 
-/* ---------- cadastro inicial: dados da mãe, tipo de segurada, criança, data do cadastro e prospectador ---------- */
+/* ---------- cadastro inicial: dados da mãe, tipo de segurada, criança, data do cadastro e parceiro ---------- */
 #form.novo .f-body > *{display:none!important}
 #form.novo .f-body > .section-lbl:first-child{display:block!important;order:0}
 #form.novo .f-body > .field:has(#f-nome){display:flex!important;order:1}
@@ -1625,6 +1625,52 @@ td,.row{font-size:13px}
   .topnav #btn-novo{height:36px!important;margin-bottom:2px!important}
   .topnav .side-foot{padding-top:6px!important}
 }
+
+/* ---------- bandeirinha do estado ---------- */
+.uf-flag{display:inline-flex;align-items:center;justify-content:center;width:24px;height:16px;border-radius:3px;overflow:hidden;flex:none;box-shadow:0 0 0 1px rgba(0,0,0,.14);vertical-align:middle;margin-right:6px;background:var(--soft);font-size:9px;font-weight:700;color:var(--ink-3);letter-spacing:.02em}
+.uf-flag img{width:100%;height:100%;object-fit:cover;display:block}
+.uf-flag.grande{width:44px;height:30px;border-radius:5px;margin:0;font-size:12px}
+.uf-flag.sem-img{background:var(--gsoft,#f8f1e4);color:var(--g2,#8a6a3d)}
+.reg-linha{display:flex;align-items:center}
+/* ---------- regiões de atuação (Configurações) ---------- */
+.reg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.reg-card{display:flex;align-items:center;gap:14px;text-align:left;padding:16px 18px;border-radius:18px;border:1px solid var(--gline,var(--line));background:var(--panel,#fff);color:var(--ink);font:inherit;cursor:pointer;box-shadow:var(--sombra-leve,none);transition:border-color .15s,box-shadow .15s}
+.reg-card:hover{border-color:var(--g1,#a07a45)}
+.reg-card.on{border-color:var(--g1,#a07a45);box-shadow:0 0 0 3px rgba(160,122,69,.16)}
+.reg-card b{display:block;font-size:15px}
+.reg-card span{font-size:12.5px;color:var(--ink-3)}
+.reg-det{padding:16px 18px;border-radius:18px}
+.reg-det-h{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.reg-lista{display:flex;flex-direction:column}
+.reg-item{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:14px;align-items:center;padding:10px 4px;border-top:1px solid var(--gline,var(--line))}
+.reg-item b{display:block;font-size:13.5px}
+.reg-novo{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.reg-novo input{min-width:200px}
+:root[data-theme="dark"] .reg-card{background:#1b1712;border-color:#2e2820}
+/* ---------- menu recolhido: mais folgado, grupos separados por linha ---------- */
+@media (min-width:1000px){
+  .app.collapsed{grid-template-columns:88px minmax(0,1fr)}
+  .app.collapsed .topnav .nav{gap:6px!important}
+  .app.collapsed .topnav .nav button{height:46px;padding-top:0!important;padding-bottom:0!important;border-radius:14px!important}
+  .app.collapsed .topnav .nav button svg.i{width:21px;height:21px}
+  .app.collapsed .topnav .nav-lbl{display:block!important;height:1px;padding:0!important;margin:10px 18px;font-size:0!important;background:var(--gline,var(--line));overflow:hidden}
+  .app.collapsed .topnav .nav-lbl:first-child{display:none!important}
+  .app.collapsed .topnav #btn-novo{height:46px!important;border-radius:14px!important;margin-bottom:8px!important}
+  .app.collapsed .topnav .side-toggle{margin-bottom:12px}
+}
+
+/* ---------- cabeçalho do menu: nome em uma linha, botão leve ---------- */
+@media (min-width:1000px){
+  .app:not(.collapsed) .topnav .brand{align-items:flex-end!important;padding-right:0!important;padding-top:6px!important}
+  .app:not(.collapsed) .topnav .brand b{white-space:nowrap;font-size:14px}
+  .app:not(.collapsed) .topnav .brand > div:not(.logo) span{white-space:nowrap;font-size:11.5px}
+  .topnav .side-toggle{top:8px!important;right:8px!important;width:28px!important;height:28px!important}
+  .topnav .side-toggle .i{width:18px!important;height:18px!important}
+  .topnav #btn-novo{background:transparent!important;color:var(--g2)!important;border:1.5px solid var(--g1)!important;box-shadow:none!important;height:40px!important;font-weight:600}
+  .topnav #btn-novo:hover{background:var(--gsoft)!important}
+  :root[data-theme="dark"] .topnav #btn-novo{background:transparent!important;color:#d4b483!important;border-color:rgba(212,180,131,.55)!important}
+  :root[data-theme="dark"] .topnav #btn-novo:hover{background:rgba(212,180,131,.14)!important}
+}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -1696,7 +1742,7 @@ td,.row{font-size:13px}
     <div class="brand"><div class="logo"><img src="img/logo-nascer-t.png" alt="Nascer com Direitos"></div><div><b>Nascer com Direitos</b><span>Salário-maternidade</span></div></div>
     <button type="button" class="side-toggle" id="btn-side" title="Esconder o menu" aria-label="Esconder o menu" aria-expanded="true"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9.5 4v16"/></svg></button>
     <nav class="nav" role="tablist" aria-orientation="horizontal">
-      <div class="nav-lbl" aria-hidden="true">Comercial</div><button class="tab" role="tab" id="tab-cad" aria-selected="false" type="button" title="Cadastro"><svg class="i"><use href="#i-plus"/></svg><span>Cadastro</span></button>
+      <div class="nav-lbl" aria-hidden="true">Comercial</div><button class="tab" role="tab" id="tab-cad" aria-selected="false" type="button" title="Cadastro"><svg class="i"><use href="#i-phone"/></svg><span>Cadastro</span></button>
       <button class="tab" role="tab" id="tab-ctr" aria-selected="false" type="button" title="Contratos fechados"><svg class="i"><use href="#i-check"/></svg><span>Contratos fechados</span></button>
       <button class="tab" role="tab" id="tab-nasc" aria-selected="false" type="button" title="Aguardando nascimento"><svg class="i"><use href="#i-clock"/></svg><span>Aguardando nascimento</span></button>
       <div class="nav-lbl" aria-hidden="true">Processos</div><button class="tab" role="tab" id="tab-inss" aria-selected="false" type="button" title="INSS"><svg class="i"><use href="#i-inss"/></svg><span>INSS</span></button>
@@ -1709,7 +1755,7 @@ td,.row{font-size:13px}
     <div class="top-right">
       <small id="sync">Conectando à base…</small>
       
-      <button class="btn primary" id="btn-novo" type="button"><svg class="i"><use href="#i-plus"/></svg>Novo lead</button>
+      <button class="btn primary" id="btn-novo" type="button"><svg class="i"><use href="#i-plus"/></svg>Novo cadastro</button>
       <div class="side-foot"><div class="av" id="me-av">E</div><div><b id="me"></b><button type="button" class="linkbtn" id="btn-sair">Sair</button></div></div>
     </div>
   </header>
@@ -1784,25 +1830,25 @@ td,.row{font-size:13px}
         <div class="cl-cards">
         <div class="stats">
           <div class="card stat card-filtro" data-card="todos" role="button" tabindex="0">
-            <div class="stat-h"><svg class="i"><use href="#i-users"/></svg>Em controle<span class="help" data-p-help="semtel" data-p-rot="Ver quem está sem telefone" title="Todos os clientes cadastrados. &quot;Com nº de processo&quot; são os que já foram protocolados.|Com telefone: tem número próprio cadastrado.|Via outro cliente: é avisado pelo número de outro cliente (parente ou vizinho).|Prospectador: o contato é feito pelo prospectador da comunidade.|Sem telefone: nenhum meio de contato cadastrado.">?</span></div>
+            <div class="stat-h"><svg class="i"><use href="#i-users"/></svg>Em controle<span class="help" data-p-help="semtel" data-p-rot="Ver quem está sem telefone" title="Todos os clientes cadastrados. &quot;Com nº de processo&quot; são os que já foram protocolados.|Com telefone: tem número próprio cadastrado.|Via outro cliente: é avisado pelo número de outro cliente (parente ou vizinho).|Parceiro: o contato é feito pelo parceiro da comunidade.|Sem telefone: nenhum meio de contato cadastrado.">?</span></div>
             <div class="stat-v tnum" id="s-total">0</div>
             <div class="stat-c" id="s-total-c">&nbsp;</div>
             <div class="stat-viz" id="v-total"></div>
           </div>
           <div class="card stat card-filtro" data-card="marcada" role="button" tabindex="0">
-            <div class="stat-h"><svg class="i"><use href="#i-cal"/></svg>Audiências marcadas<span class="help" data-p-help="todos" data-p-rot="Ver a pauta completa" title="Audiências de hoje em diante, com o período da pauta e quantos dias faltam para a próxima.|Com prospectador: clientes cujo aviso passa pelo prospectador da comunidade.|Sem prospectador: avisados diretamente pelo escritório.">?</span></div>
+            <div class="stat-h"><svg class="i"><use href="#i-cal"/></svg>Audiências marcadas<span class="help" data-p-help="todos" data-p-rot="Ver a pauta completa" title="Audiências de hoje em diante, com o período da pauta e quantos dias faltam para a próxima.|Com parceiro: clientes cujo aviso passa pelo parceiro da comunidade.|Sem parceiro: avisados diretamente pelo escritório.">?</span></div>
             <div class="stat-v tnum" id="s-aud">0</div>
             <div class="stat-c" id="s-aud-c">&nbsp;</div>
             <div class="stat-viz" id="v-aud"></div>
           </div>
           <div class="card stat card-filtro" data-card="avisado" role="button" tabindex="0">
-            <div class="stat-h"><svg class="i"><use href="#i-check"/></svg>Avisados<span class="help" data-p-help="avisar" data-p-rot="Ver quem falta avisar" title="Clientes com audiência marcada que já foram avisados, e a porcentagem sobre o total.|WhatsApp: avisado por mensagem.|Convite: recebeu o convite impresso.|Prospectador: avisado pelo prospectador.|Faltam: ainda não avisados.">?</span></div>
+            <div class="stat-h"><svg class="i"><use href="#i-check"/></svg>Avisados<span class="help" data-p-help="avisar" data-p-rot="Ver quem falta avisar" title="Clientes com audiência marcada que já foram avisados, e a porcentagem sobre o total.|WhatsApp: avisado por mensagem.|Convite: recebeu o convite impresso.|Parceiro: avisado pelo parceiro.|Faltam: ainda não avisados.">?</span></div>
             <div class="stat-v tnum" id="s-avis">0</div>
             <div class="stat-c" id="s-avis-c">&nbsp;</div>
             <div class="stat-viz" id="v-avis"></div>
           </div>
           <div class="card stat card-filtro" data-card="pendente" role="button" tabindex="0">
-            <div class="stat-h"><svg class="i"><use href="#i-bellx"/></svg>Pendentes de aviso<span class="help" data-p-help="semcontato" data-p-rot="Ver quem está sem contato" title="Clientes com audiência marcada que ainda não foram avisados.|Sem contato: tentamos e não conseguimos falar; precisam do convite impresso.|Com prospectador: o aviso depende do prospectador da comunidade.">?</span></div>
+            <div class="stat-h"><svg class="i"><use href="#i-bellx"/></svg>Pendentes de aviso<span class="help" data-p-help="semcontato" data-p-rot="Ver quem está sem contato" title="Clientes com audiência marcada que ainda não foram avisados.|Sem contato: tentamos e não conseguimos falar; precisam do convite impresso.|Com parceiro: o aviso depende do parceiro da comunidade.">?</span></div>
             <div class="stat-v tnum" id="s-pend">0</div>
             <div class="stat-c" id="s-pend-c">&nbsp;</div>
             <div class="stat-viz" id="v-pend"></div>
@@ -1846,7 +1892,7 @@ td,.row{font-size:13px}
         <div class="card list-sum" id="list-sum"></div>
         <div class="sec-rot">Clientes</div>
         <div class="card list" id="list"></div>
-        <p class="foot-note">Situação do aviso: <b>Avisado</b> quando o cliente confirmou; <b>Sem contato</b> quando não foi possível falar com ele. O <b>responsável</b> é o prospectador encarregado de avisar o cliente. Clique no botão da coluna Aviso para marcar ou desmarcar.</p>
+        <p class="foot-note">Situação do aviso: <b>Avisado</b> quando o cliente confirmou; <b>Sem contato</b> quando não foi possível falar com ele. O <b>responsável</b> é o parceiro encarregado de avisar o cliente. Clique no botão da coluna Aviso para marcar ou desmarcar.</p>
       </section>
 
       <section id="view-pos" hidden style="display:flex;flex-direction:column;gap:18px">
@@ -1896,7 +1942,7 @@ td,.row{font-size:13px}
       </section>
 
       <section id="view-fin" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
-        <div class="res-rap fin-sub" role="tablist" aria-label="Parte do financeiro"><button type="button" data-fin="receita" aria-pressed="true">Receita</button><button type="button" data-fin="prosp" aria-pressed="false">Prospectadores</button><button type="button" data-fin="resultado" aria-pressed="false">Resultado</button><button type="button" data-fin="anual" aria-pressed="false">Faturamento anual</button></div>
+        <div class="res-rap fin-sub" role="tablist" aria-label="Parte do financeiro"><button type="button" data-fin="receita" aria-pressed="true">Receita</button><button type="button" data-fin="prosp" aria-pressed="false">Parceiros</button><button type="button" data-fin="resultado" aria-pressed="false">Resultado</button><button type="button" data-fin="anual" aria-pressed="false">Faturamento anual</button></div>
         <div class="fbar">
           <div class="search tb-busca"><svg class="i"><use href="#i-search"/></svg><input id="fin-q" type="search" placeholder="Buscar cliente por nome ou CPF"></div>
           <select id="fin-aud-sel" class="tb-sel" aria-label="Origem"></select>
@@ -1909,16 +1955,16 @@ td,.row{font-size:13px}
         <div class="stats fin-stats" id="fin-stats"></div>
         <div class="fin-regra" id="fin-regra"></div>
         <div class="fin-anual" hidden>
-          <div class="card ct-tab"><table class="ct-tbl fin-tbl"><thead><tr><th>Mês</th><th class="dir">Benefícios pagos</th><th class="dir">Valor dos benefícios</th><th class="dir">Faturamento (honorários + guias)</th><th class="dir">Pago às clientes</th><th class="dir">Prospectadores</th><th class="dir">Líquido</th></tr></thead><tbody id="fin-ano-body"></tbody></table></div>
+          <div class="card ct-tab"><table class="ct-tbl fin-tbl"><thead><tr><th>Mês</th><th class="dir">Benefícios pagos</th><th class="dir">Valor dos benefícios</th><th class="dir">Faturamento (honorários + guias)</th><th class="dir">Pago às clientes</th><th class="dir">Parceiros</th><th class="dir">Líquido</th></tr></thead><tbody id="fin-ano-body"></tbody></table></div>
         </div>
         <div class="fin-receita">
         <div class="card ct-tab"><table class="ct-tbl fin-tbl"><thead><tr><th>Cliente</th><th>Origem</th><th>NB / processo</th><th class="dir">Benefício</th><th class="dir">Guia</th><th class="dir">Honorários</th><th class="dir">Cliente</th><th>Previsão de pagamento</th><th>Pagamento</th><th>Acerto com a cliente</th></tr></thead><tbody id="fin-body"></tbody></table></div>
         </div>
         <div class="fin-resultado" hidden>
-          <div class="card ct-tab"><table class="ct-tbl fin-tbl"><thead><tr><th>Cenário</th><th class="dir">Processos</th><th class="dir">Faturamento do escritório</th><th class="dir">Gasto com prospectadores</th><th class="dir">Resultado líquido</th></tr></thead><tbody id="fin-res-body"></tbody></table></div>
+          <div class="card ct-tab"><table class="ct-tbl fin-tbl"><thead><tr><th>Cenário</th><th class="dir">Processos</th><th class="dir">Faturamento do escritório</th><th class="dir">Gasto com parceiros</th><th class="dir">Resultado líquido</th></tr></thead><tbody id="fin-res-body"></tbody></table></div>
         </div>
         <div class="fin-prosp" hidden>
-          <div class="card ct-tab"><table class="ct-tbl fin-tbl"><thead><tr><th>Prospectador</th><th class="dir">Valor por indicação</th><th class="dir">Indicações</th><th class="dir">Ganhos</th><th class="dir">Clientes já pagas</th><th class="dir">A pagar</th><th class="dir">Previsão</th><th class="dir">Se todos derem certo</th></tr></thead><tbody id="fin-prosp-body"></tbody></table></div>
+          <div class="card ct-tab"><table class="ct-tbl fin-tbl"><thead><tr><th>Parceiro</th><th class="dir">Valor por indicação</th><th class="dir">Indicações</th><th class="dir">Ganhos</th><th class="dir">Clientes já pagas</th><th class="dir">A pagar</th><th class="dir">Previsão</th><th class="dir">Se todos derem certo</th></tr></thead><tbody id="fin-prosp-body"></tbody></table></div>
         </div>
       </section>
 
@@ -1986,7 +2032,7 @@ td,.row{font-size:13px}
           </form>
         </div>
         <div class="card integ" data-painel="celular">
-          <div><b class="integ-t">Cadastro pelo celular</b><p class="integ-d">Script do Google que recebe as fotos dos prospectadores, cria a pasta da cliente no Drive (CLIENTES › PENDENTES DE REQUERIMENTO; vai para NO INSS quando há requerimento, NA JUSTIÇA quando há processo e ARQUIVADOS quando é paga) e confere os documentos com a IA. O código e o passo a passo estão em <b>google/campo.gs</b>. O link de cada prospectador fica no cartão dele, em Prospectadores.</p></div>
+          <div><b class="integ-t">Cadastro pelo celular</b><p class="integ-d">Script do Google que recebe as fotos dos parceiros, cria a pasta da cliente no Drive (CLIENTES › PENDENTES DE REQUERIMENTO; vai para NO INSS quando há requerimento, NA JUSTIÇA quando há processo e ARQUIVADOS quando é paga) e confere os documentos com a IA. O código e o passo a passo estão em <b>google/campo.gs</b>. O link de cada parceiro fica no cartão dele, em Parceiros.</p></div>
           <form id="form-cp" class="integ-form" novalidate autocomplete="off">
             <label for="cp-url">Endereço do script (termina em /exec)</label>
             <input id="cp-url" type="url" autocomplete="off" spellcheck="false" placeholder="https://script.google.com/macros/s/…/exec">
@@ -2032,10 +2078,17 @@ td,.row{font-size:13px}
         </div>
         </div>
         <p class="foot-note">Depois de cadastrar, envie o endereço do sistema ao funcionário. No primeiro uso ele clica em <b>Primeiro acesso</b>, informa o mesmo e-mail cadastrado aqui e cria a senha dele. <b>Administrador</b> faz tudo, inclusive excluir clientes e cuidar da equipe. <b>Assistente</b> cadastra e atualiza clientes, avisos e resultados, e gera convites, mas não exclui registros.</p>
-        <div class="sec-title">Prospectadores</div>
+        <div class="sec-title">Regiões de atuação</div>
+        <div class="prosp-head">
+          <p class="view-desc">Cada região reúne os parceiros que atuam nela. Clique numa região para ver os parceiros dela.</p>
+          <div class="reg-novo admin-only"><input id="reg-nome" placeholder="Nova região (ex.: Roraima)" autocomplete="off"><select id="reg-uf" aria-label="Estado"><option value="AM">AM</option><option value="PA">PA</option><option value="AP">AP</option><option value="RR">RR</option><option value="AC">AC</option><option value="RO">RO</option><option value="TO">TO</option><option value="MA">MA</option><option value="MT">MT</option></select><button class="btn" id="reg-add" type="button"><svg class="i"><use href="#i-plus"/></svg>Adicionar</button></div>
+        </div>
+        <div class="reg-grid" id="reg-grid"></div>
+        <div class="card reg-det" id="reg-det" hidden></div>
+        <div class="sec-title">Parceiros</div>
         <div class="prosp-head">
           <p class="view-desc">Quem é responsável por avisar cada cliente. Clientes novos são atribuídos automaticamente pelas palavras do endereço.</p>
-          <button class="btn" id="btn-prosp-novo" type="button"><svg class="i"><use href="#i-plus"/></svg>Novo prospectador</button>
+          <button class="btn" id="btn-prosp-novo" type="button"><svg class="i"><use href="#i-plus"/></svg>Novo parceiro</button>
         </div>
         <div class="prosp-grid" id="prosp-list"></div>
       </section>
@@ -2046,7 +2099,7 @@ td,.row{font-size:13px}
 
 <dialog id="dlg">
   <form class="f" id="form" novalidate>
-    <div class="f-head"><div class="ph-tile" style="margin:0"><svg class="i"><use href="#i-users"/></svg></div><h2 id="f-title">Novo lead (orgânico)</h2></div>
+    <div class="f-head"><div class="ph-tile" style="margin:0"><svg class="i"><use href="#i-users"/></svg></div><h2 id="f-title">Novo cadastro (orgânico)</h2></div>
     <div class="f-body">
       <div class="section-lbl">Dados da cliente (mãe)</div>
       <div class="field full"><label for="f-nome">Nome completo da mãe</label><input id="f-nome" required autocomplete="off"></div>
@@ -2059,7 +2112,7 @@ td,.row{font-size:13px}
       <div class="field full"><label for="f-contato">Contato (telefone / WhatsApp)</label><input id="f-contato" inputmode="tel" placeholder="(97) 00000-0000" class="tnum"></div>
       <div class="field"><label for="f-tipo">Tipo de segurada</label><select id="f-tipo"><option value="">Não informado</option><option value="especial">Segurada especial (rural / pescadora)</option><option value="urbana">Empregada / urbana</option><option value="individual">Contribuinte individual / MEI / facultativa</option><option value="desempregada">Desempregada (período de graça)</option></select></div>
       <div class="field"><label for="f-ativ">Atividade</label><input id="f-ativ" placeholder="Ex.: agricultora, pescadora, doméstica" list="ativ-list"><datalist id="ativ-list"><option value="Agricultora"><option value="Pescadora artesanal"><option value="Extrativista"><option value="Doméstica"><option value="Comerciária"><option value="Autônoma"></datalist></div>
-      <div class="field full"><label for="f-resp">Prospectador</label><select id="f-resp"><option value="">Sem prospectador</option></select><span class="hint">Quem trouxe a cliente. É ele quem vê a cliente no aplicativo e cuida do aviso da audiência.</span></div>
+      <div class="field full"><label for="f-resp">Parceiro</label><select id="f-resp"><option value="">Sem parceiro</option></select><span class="hint">Quem trouxe a cliente. É ele quem vê a cliente no aplicativo e cuida do aviso da audiência.</span></div>
       <div class="field full" id="f-via-box" hidden><label>Avisada via outro cliente</label><div class="integ-row"><span id="f-via-nome" class="val"></span><button type="button" class="btn" id="f-via-tirar" style="padding:5px 10px;font-size:12.5px">Desfazer vínculo</button></div></div>
       <div class="field full"><label class="chk"><input id="f-regua" type="checkbox"> Enviar avisos automáticos por WhatsApp para esta cliente</label><span class="hint">Telefones preenchidos agora ficam fora da régua até você marcar aqui.</span></div>
 
@@ -2093,9 +2146,9 @@ td,.row{font-size:13px}
       <div class="field full"><label class="chk"><input id="f-online" type="checkbox"> Audiência online (por videochamada)</label></div>
       <div class="field"><label for="f-situacao">Situação do aviso</label>
         <select id="f-situacao"><option value="pendente">Não avisado</option><option value="avisado">Avisado</option><option value="sem_contato">Sem contato</option></select></div>
-      <div class="field"><label for="f-aviso-resp">Responsável pelo aviso</label><select id="f-aviso-resp"><option value="">O próprio prospectador</option></select></div>
+      <div class="field"><label for="f-aviso-resp">Responsável pelo aviso</label><select id="f-aviso-resp"><option value="">O próprio parceiro</option></select></div>
       <div class="field"><label for="f-avisoem">Data do aviso</label><input id="f-avisoem" type="date"></div>
-      <div class="field"><label for="f-meio">Meio do aviso</label><select id="f-meio"><option value="">Não informado</option><option value="whatsapp">WhatsApp</option><option value="convite">Convite</option><option value="prospectador">Prospectador</option><option value="ligacao">Ligação</option><option value="pessoalmente">Pessoalmente</option></select></div>
+      <div class="field"><label for="f-meio">Meio do aviso</label><select id="f-meio"><option value="">Não informado</option><option value="whatsapp">WhatsApp</option><option value="convite">Convite</option><option value="prospectador">Parceiro</option><option value="ligacao">Ligação</option><option value="pessoalmente">Pessoalmente</option></select></div>
       <div class="field"><label for="f-avisadoa">Avisado a quem / observação</label><input id="f-avisadoa" placeholder="Ex.: avisado ao irmão, a filha recebeu"></div>
 
       <div class="section-lbl">Resultado e pagamento</div>
@@ -2127,12 +2180,13 @@ td,.row{font-size:13px}
 
 <dialog id="dlg-prosp">
   <form class="f" id="form-prosp" novalidate>
-    <div class="f-head"><div class="ph-tile" style="margin:0"><svg class="i"><use href="#i-users"/></svg></div><h2 id="fp-title">Novo prospectador</h2></div>
+    <div class="f-head"><div class="ph-tile" style="margin:0"><svg class="i"><use href="#i-users"/></svg></div><h2 id="fp-title">Novo parceiro</h2></div>
     <div class="f-body">
       <div class="field full"><label for="fp-nome">Nome</label><input id="fp-nome" autocomplete="off"></div>
       <div class="field"><label for="fp-tel">Telefone / WhatsApp</label><input id="fp-tel" inputmode="tel" placeholder="(97) 00000-0000" class="tnum"></div>
-      <div class="field"><label for="fp-reg">Região</label><input id="fp-reg" placeholder="Ex.: Comunidade do Curumitá"></div>
-      <div class="field full"><label for="fp-pal">Palavras do endereço</label><input id="fp-pal" placeholder="Ex.: curumitá, nogueira"><span class="hint">Clientes cujo endereço tiver uma dessas palavras ficam com este prospectador. Separe por vírgula.</span></div>
+      <div class="field"><label for="fp-regiao">Região de atuação</label><select id="fp-regiao"></select></div>
+      <div class="field"><label for="fp-reg">Comunidade / localidade</label><input id="fp-reg" placeholder="Ex.: Comunidade do Curumitá"></div>
+      <div class="field full"><label for="fp-pal">Palavras do endereço</label><input id="fp-pal" placeholder="Ex.: curumitá, nogueira"><span class="hint">Clientes cujo endereço tiver uma dessas palavras ficam com este parceiro. Separe por vírgula.</span></div>
     </div>
     <div class="f-foot">
       <button class="btn danger admin-only" type="button" id="fp-del" hidden>Excluir</button>
@@ -2155,15 +2209,15 @@ td,.row{font-size:13px}
 
 <dialog id="dlg-campo">
   <form class="f" method="dialog">
-    <div class="f-head"><div class="ph-tile" style="margin:0"><svg class="i"><use href="#i-phone"/></svg></div><h2 id="cp-title">Acesso do prospectador</h2></div>
+    <div class="f-head"><div class="ph-tile" style="margin:0"><svg class="i"><use href="#i-phone"/></svg></div><h2 id="cp-title">Acesso do parceiro</h2></div>
     <div class="f-body">
-      <div class="field full"><div class="sec-rot" style="margin:0">Aplicativo (Android)</div><span class="hint">O prospectador instala o aplicativo <b>Nascer com Direitos</b>, entra com o usuário e a senha abaixo e cadastra as clientes mesmo sem internet. Os cadastros sobem sozinhos quando tiver sinal e aparecem em <b>Cadastro</b>, na conta deste prospectador.</span></div>
+      <div class="field full"><div class="sec-rot" style="margin:0">Aplicativo (Android)</div><span class="hint">O parceiro instala o aplicativo <b>Nascer com Direitos</b>, entra com o usuário e a senha abaixo e cadastra as clientes mesmo sem internet. Os cadastros sobem sozinhos quando tiver sinal e aparecem em <b>Cadastro</b>, na conta deste parceiro.</span></div>
       <div class="field"><label for="cp-usuario">Usuário</label><input id="cp-usuario" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="ex.: lene"></div>
       <div class="field"><label for="cp-senha">Senha</label><div style="display:flex;gap:6px"><input id="cp-senha" autocomplete="new-password" placeholder="digite ou gere" style="flex:1;min-width:0"><button class="btn" type="button" id="cp-gerar" title="Gera uma senha fácil de digitar">Gerar</button><button class="btn primary" type="button" id="cp-salvar-senha" title="Salva e já vale no aplicativo">Salvar</button></div></div>
       <div class="field full"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn" type="button" id="cp-whats-app">Mandar acesso no WhatsApp</button><a class="btn" id="cp-apk" target="_blank" rel="noopener">Baixar o aplicativo</a></div><span class="small" id="cp-login-status"></span></div>
-      <div class="field full" style="margin-top:6px"><div class="sec-rot" style="margin:0">Ou pelo navegador (link)</div><span class="hint">Quem tem o link cadastra em nome deste prospectador, sem senha.</span></div>
+      <div class="field full" style="margin-top:6px"><div class="sec-rot" style="margin:0">Ou pelo navegador (link)</div><span class="hint">Quem tem o link cadastra em nome deste parceiro, sem senha.</span></div>
       <div class="field full"><label for="cp-link">Link</label><input id="cp-link" readonly></div>
-      <div class="field full" id="cp-aviso" hidden><span class="rep-aviso">O envio para o Drive ainda não está ligado: veja em Configurações › Cadastro pelo celular. Até lá, as fotos ficam guardadas no celular do prospectador.</span></div>
+      <div class="field full" id="cp-aviso" hidden><span class="rep-aviso">O envio para o Drive ainda não está ligado: veja em Configurações › Cadastro pelo celular. Até lá, as fotos ficam guardadas no celular do parceiro.</span></div>
     </div>
     <div class="f-foot">
       <button class="btn" type="button" id="cp-novo" title="O link antigo para de funcionar">Gerar outro link</button>
@@ -2256,7 +2310,7 @@ td,.row{font-size:13px}
         <div class="meios" id="av-meios">
           <label><input type="radio" name="av-meio" value="whatsapp">WhatsApp</label>
           <label><input type="radio" name="av-meio" value="convite">Convite</label>
-          <label><input type="radio" name="av-meio" value="prospectador">Prospectador</label>
+          <label><input type="radio" name="av-meio" value="prospectador">Parceiro</label>
           <label><input type="radio" name="av-meio" value="ligacao">Ligação</label>
           <label><input type="radio" name="av-meio" value="pessoalmente">Pessoalmente</label>
         </div>
@@ -2400,7 +2454,7 @@ td,.row{font-size:13px}
   }
   function precisaConvite(r){ return isFuture(r) && !r.avisado && sit(r) === 'sem_contato'; } // only clients nobody can reach; missing phones are a registration task, not a convite
   function passTel(r, f){ if (!f || f === 'todos') return true; if (f === 'novo') return !!(r.contato && r.telefoneAdicionadoEm); if (f === 'prosp') return pelaProsp(r); if (f === 'via') return !!clienteVia(r); if (f === 'sem') return !temContato(r) && !pelaProsp(r); return temTelefone(r); }
-  // quem cuida do aviso da audiência: o escolhido no cadastro ou, se ninguém, o próprio prospectador
+  // quem cuida do aviso da audiência: o escolhido no cadastro ou, se ninguém, o próprio parceiro
   function respAviso(r){ return r.avisoRespId && prospById(r.avisoRespId) ? r.avisoRespId : r.responsavelId; }
   function passResp(r, f){ if (!f) return true; if (f === '-') return !prospName(respAviso(r)); return respAviso(r) === f; }
   function fmtAny(s){ if (!s) return ''; return /^\d{4}-\d{2}-\d{2}$/.test(s) ? fmtDate(s) : new Date(s).toLocaleDateString('pt-BR'); }
@@ -2518,9 +2572,9 @@ td,.row{font-size:13px}
   function clienteVia(r){ if (temTelefone(r) || !r.contatoVia) return null; var v = state.rows.filter(function(x){ return x.id === r.contatoVia; })[0]; return v && temTelefone(v) ? v : null; }
   function temContato(r){ return temTelefone(r) || !!clienteVia(r); }
   function pelaProsp(r){ return !temContato(r) && !!prospName(respAviso(r)); }
-  function rotuloProsp(r){ var n = prospName(respAviso(r)); return (n.toLowerCase().indexOf('dona ') === 0 ? 'Prospectadora: ' : 'Prospector: ') + n; }
+  function rotuloProsp(r){ var n = prospName(respAviso(r)); return (n.toLowerCase().indexOf('dona ') === 0 ? 'Parceira: ' : 'Prospector: ') + n; }
   function primeiroNome(n){ var p = String(n || '').trim().split(/\s+/); return p.length > 1 ? p[0] + ' ' + p[p.length - 1] : p[0] || ''; }
-  // semProsp: na lista do Cadastro o prospectador já tem coluna própria, então o contato mostra só telefone ou "+ contato"
+  // semProsp: na lista do Cadastro o parceiro já tem coluna própria, então o contato mostra só telefone ou "+ contato"
   // telefone no formato (97) 98122-1955; vários números separados por / ou , são formatados um a um
   function fmtTel(t){
     return String(t || '').split(/\s*([\/,;]|\be\b)\s*/).map(function(p){
@@ -2558,12 +2612,12 @@ td,.row{font-size:13px}
     return '<div class="val">' + fmtShort(r.audData) + (r.audHora ? ' · ' + esc(r.audHora) : '') + '</div>' +
            '<div class="mini ' + cls + '">' + relLabel(n) + '</div>' + modoSwitch(r);
   }
-  var MEIOS = { whatsapp: 'WhatsApp', convite: 'Convite', prospectador: 'Prospectador', ligacao: 'Ligação', pessoalmente: 'Pessoalmente' };
+  var MEIOS = { whatsapp: 'WhatsApp', convite: 'Convite', parceiro: 'Parceiro', ligacao: 'Ligação', pessoalmente: 'Pessoalmente' };
   function passMeio(r, f){ if (!f || f === 'todos') return true; if (!r.avisado) return false; if (f === 'outro') return r.meioAviso === 'ligacao' || r.meioAviso === 'pessoalmente'; return r.meioAviso === f; }
   function soNome(t){
     return String(t || '').trim()
       .replace(/^avisad[oa]s?\s+(pel[oa]s?|a[os]?|à|às|por|para|com)\s+/i, '')
-      .replace(/^(a\s+|o\s+)?(prospectador[a]?|prospector[a]?)\s+/i, '')
+      .replace(/^(a\s+|o\s+)?(parceiro[a]?|prospector[a]?)\s+/i, '')
       .replace(/^(seu|sua|seus|suas)\s+/i, '')
       .trim();
   }
@@ -2573,7 +2627,7 @@ td,.row{font-size:13px}
   function formatarRG(v){ var d = String(v || '').replace(/\D/g, ''); return /^\d{5,13}$/.test(d) && !/[-.]/.test(String(v)) ? d.slice(0, -1) + '-' + d.slice(-1) : String(v || '').trim(); }
   function rgDoc(r){ return String(r.rg || '').trim() || String(r.cpf || '').trim(); }
   document.addEventListener('blur', function(e){ if (e.target && e.target.id === 'f-rg' && e.target.value.trim()) e.target.value = formatarRG(e.target.value); }, true);
-  // documentos que o prospectador não fotografou (o aplicativo grava em faltaDocs)
+  // documentos que o parceiro não fotografou (o aplicativo grava em faltaDocs)
   var DOC_FALTA = { procuracao: 'Procuração', rg_frente: 'RG', cpf: 'CPF', certidao: 'Certidão de nascimento', residencia: 'Comprovante de residência', autodeclaracao: 'Autodeclaração rural', rural: 'Provas de atividade rural', ctps: 'CTPS / contribuições', cliente: 'Foto da cliente' };
   function faltaDocs(r){ return (Array.isArray(r.faltaDocs) ? r.faltaDocs : []).filter(function(k){ return DOC_FALTA[k]; }); }
   // documentos que a IA confere, conforme o tipo de segurada: [chave que a IA devolve, chave do faltaDocs]
@@ -2588,7 +2642,7 @@ td,.row{font-size:13px}
     return docsExigidos(r).filter(function(c){ return !tem[c[0]]; }).map(function(c){ return c[1]; })
       .concat(faltaDocs(r).indexOf('cliente') >= 0 ? ['cliente'] : []);   // a foto da cliente a IA não confere
   }
-  // coluna Documentos do Cadastro: o que o prospectador ainda precisa mandar, um por etiqueta
+  // coluna Documentos do Cadastro: o que o parceiro ainda precisa mandar, um por etiqueta
   // "completa" só com prova: o aplicativo mandou tudo, ou o escritório conferiu a pasta e marcou na ficha
   function docsConferidos(r){ return !faltaDocs(r).length && (r.docsCompletos === true || (r.origem === 'campo' && Array.isArray(r.faltaDocs))); }
   function docsPendentes(r){ return !docsConferidos(r); }
@@ -2701,7 +2755,7 @@ td,.row{font-size:13px}
     var inss = [r.inssStatus && INSS[r.inssStatus] ? INSS[r.inssStatus][0] : '', r.der ? 'DER ' + fmtDate(r.der) : '', r.protocoloInss ? 'protocolo ' + r.protocoloInss : '', r.nb ? 'NB ' + r.nb : ''].filter(Boolean).join(' · ');
     var campos = [
       ['Nome completo', r.nome], ['CPF', r.cpf], ['RG', r.rg || (r.cpf ? r.cpf + ' (mesmo número do CPF)' : '')], ['Nascimento', r.nascimento ? fmtDate(r.nascimento) : ''],
-      ['NIT / PIS', r.nit], ['Telefone', contato], ['Endereço', r.endereco], ['Prospectador', prospName(r.responsavelId)],
+      ['NIT / PIS', r.nit], ['Telefone', contato], ['Endereço', r.endereco], ['Parceiro', prospName(r.responsavelId)],
       ['Tipo de segurada', (TIPOS[r.tipoSegurada] || '') + (r.atividade ? (r.tipoSegurada ? ' · ' : '') + r.atividade : '')], ['Criança', crianca],
       ['Testemunhas', r.tipoSegurada === 'especial' || r.testemunhas ? r.testemunhas : null],
       ['INSS', inss], ['Exigência', r.inssStatus === 'exigencia' ? (r.exigenciaObs || 'sem descrição') + (r.exigenciaPrazo ? ' · prazo ' + fmtDate(r.exigenciaPrazo) : '') : null],
@@ -2711,15 +2765,15 @@ td,.row{font-size:13px}
       ['Aviso', aviso], ['Resultado', res],
       ['Pagamento', r.pagamento && PAG[r.pagamento] ? PAG[r.pagamento][0] : ''], ['Observações', r.obs]
     ].filter(function(c){ return c[1] !== null; });
-    if (compacto) campos = campos.filter(function(c){ return ['Nome completo', 'CPF', 'RG', 'Nascimento', 'NIT / PIS', 'Telefone', 'Endereço', 'Prospectador', 'Tipo de segurada', 'Criança', 'Testemunhas', 'Observações'].indexOf(c[0]) >= 0; });
+    if (compacto) campos = campos.filter(function(c){ return ['Nome completo', 'CPF', 'RG', 'Nascimento', 'NIT / PIS', 'Telefone', 'Endereço', 'Parceiro', 'Tipo de segurada', 'Criança', 'Testemunhas', 'Observações'].indexOf(c[0]) >= 0; });
     var fl = faltaDocs(r);
     var ok = '<i class="fc-ok"><svg class="i"><use href="#i-check"/></svg></i>', nada = '<i class="fc-nao">–</i>';
     var fotoOk = /^data:image\/(jpeg|png);base64,/.test(r.fotoCliente || '');
-    return '<div class="ficha"><div class="ficha-t">Dados do cliente</div>' + (fotoOk ? '<div class="ficha-foto"><img src="' + r.fotoCliente + '" alt="Foto de ' + esc(r.nome) + '"><span>Foto tirada pelo prospectador</span></div>' : '') + (prazoTag(r) ? '<div style="margin:0 0 10px">' + prazoTag(r) + '</div>' : '') + '<div class="ficha-g">' + campos.map(function(c){
+    return '<div class="ficha"><div class="ficha-t">Dados do cliente</div>' + (fotoOk ? '<div class="ficha-foto"><img src="' + r.fotoCliente + '" alt="Foto de ' + esc(r.nome) + '"><span>Foto tirada pelo parceiro</span></div>' : '') + (prazoTag(r) ? '<div style="margin:0 0 10px">' + prazoTag(r) + '</div>' : '') + '<div class="ficha-g">' + campos.map(function(c){
       var v = c[1] == null ? '' : String(c[1]).trim();
       return '<div class="ficha-i">' + (v ? ok : nada) + '<div><span>' + c[0] + '</span><b>' + (v ? esc(v) : '—') + '</b></div></div>';
     }).join('') + '</div>' +
-      (fl.length ? '<div class="falta-docs"><b>Faltam documentos</b><span>O prospectador ainda precisa mandar: ' + esc(faltaTexto(r)) + '. Ele vê esta lista no aplicativo e completa por lá. Se chegou por outro meio, marque como recebido:</span><div>' +
+      (fl.length ? '<div class="falta-docs"><b>Faltam documentos</b><span>O parceiro ainda precisa mandar: ' + esc(faltaTexto(r)) + '. Ele vê esta lista no aplicativo e completa por lá. Se chegou por outro meio, marque como recebido:</span><div>' +
         fl.map(function(k){ return '<button type="button" class="btn" data-act="recebido" data-id="' + esc(r.id) + '" data-doc="' + k + '"><svg class="i"><use href="#i-check"/></svg>Recebi ' + DOC_FALTA[k] + '</button>'; }).join('') + '</div></div>' :
         compacto && !docsConferidos(r) ? '<div class="falta-docs"><b>Documentação não conferida</b><span>Clique em Conferir documentos (a IA olha a pasta) ou abra a pasta no Drive e, se estiver tudo, marque:</span><div><button type="button" class="btn" data-act="docs-ok" data-id="' + esc(r.id) + '"><svg class="i"><use href="#i-check"/></svg>Documentação completa</button></div></div>' : '') +
       '<div class="ficha-acoes"><button type="button" class="btn" data-act="edit" data-id="' + esc(r.id) + '"><svg class="i"><use href="#i-pencil"/></svg>Editar cadastro</button>' +
@@ -2769,7 +2823,7 @@ td,.row{font-size:13px}
     $('v-total').innerHTML = stackBar([
       { l: 'Com telefone', n: rows.length - semTel - viaProsp - viaCli, c: cssVar('--blue') },
       { l: 'Via outro cliente', n: viaCli, c: cssVar('--purple') },
-      { l: 'Prospectador', n: viaProsp, c: cssVar('--amber') },
+      { l: 'Parceiro', n: viaProsp, c: cssVar('--amber') },
       { l: 'Sem telefone', n: semTel, c: cssVar('--line-2') }
     ]);
 
@@ -2787,7 +2841,7 @@ td,.row{font-size:13px}
     $('s-avis-c').textContent = pct(avis.length, fut.length) + '% das audiências marcadas';
     var porMeio = function(m){ return avis.filter(function(r){ return r.meioAviso === m; }).length; };
     var mw = porMeio('whatsapp'), mc = porMeio('convite'), mp = porMeio('prospectador'), mo = avis.length - mw - mc - mp;
-    var partsAv = [{ l: 'WhatsApp', n: mw, c: cssVar('--green') }, { l: 'Convite', n: mc, c: cssVar('--blue') }, { l: 'Prospectador', n: mp, c: cssVar('--amber') }];
+    var partsAv = [{ l: 'WhatsApp', n: mw, c: cssVar('--green') }, { l: 'Convite', n: mc, c: cssVar('--blue') }, { l: 'Parceiro', n: mp, c: cssVar('--amber') }];
     if (mo) partsAv.push({ l: 'Outros', n: mo, c: cssVar('--purple') });
     partsAv.push({ l: 'Faltam', n: pend, c: cssVar('--line-2') });
     $('v-avis').innerHTML = stackBar(partsAv);
@@ -2842,7 +2896,7 @@ td,.row{font-size:13px}
   }
   var OPC = {
     'fb-aviso': ['filter', 'aviso', [['todos', 'Todos'], ['avisar', 'A avisar'], ['semcontato', 'Sem contato'], ['pendente', 'Não avisados (os dois)'], ['avisado', 'Avisados']]],
-    'fb-meio': ['meio', 'meio', [['todos', 'Todos'], ['whatsapp', 'WhatsApp'], ['convite', 'Convite'], ['prospectador', 'Prospectador'], ['outro', 'Ligação ou pessoalmente']]],
+    'fb-meio': ['meio', 'meio', [['todos', 'Todos'], ['whatsapp', 'WhatsApp'], ['convite', 'Convite'], ['prospectador', 'Parceiro'], ['outro', 'Ligação ou pessoalmente']]],
     'fb-aud': ['aud', 'aud', [['todas', 'Todas'], ['semana', 'Próximos 7 dias'], ['online', 'Online'], ['sem', 'Sem data']]],
     'fb-tel': ['tel', 'tel', [['todos', 'Todos'], ['com', 'Com telefone'], ['sem', 'Sem telefone'], ['via', 'Via outro cliente'], ['prosp', 'Pelo prospectador'], ['novo', 'Preenchidos agora']]]
   };
@@ -2938,7 +2992,7 @@ td,.row{font-size:13px}
     renderSum(list);
     var html = '<div class="row head"><div>Cliente</div><div>Processo</div><div>Contato</div><div>Audiência</div><div>Aviso</div><div></div></div>';
     if (!list.length){
-      html += '<div class="empty">' + (state.rows.length ? 'Nenhum cliente neste filtro.' : 'Nenhum cliente cadastrado ainda. Clique em <b>Novo lead</b> para começar.') + '</div>';
+      html += '<div class="empty">' + (state.rows.length ? 'Nenhum cliente neste filtro.' : 'Nenhum cliente cadastrado ainda. Clique em <b>Novo cadastro</b> para começar.') + '</div>';
     }
     list.slice(0, state.limit).forEach(function(r){
       html += '<div class="row' + (clAberto[r.id] ? ' aberto' : '') + '" data-linha="' + esc(r.id) + '">' +
@@ -2956,7 +3010,7 @@ td,.row{font-size:13px}
     }
     $('list').innerHTML = html;
   }
-  function nameCell(r){ return '<div class="c-name"><div class="name">' + esc(r.nome) + '</div><div class="small tnum">' + esc(r.cpf || '') + '</div></div>'; }
+  function nameCell(r){ return '<div class="c-name"><div class="name">' + ufFlag(r) + '' + esc(r.nome) + '</div><div class="small tnum">' + esc(r.cpf || '') + '</div></div>'; }
   function editCell(r){ return '<div class="c-act"><button type="button" class="edit" data-act="edit" data-id="' + esc(r.id) + '">Editar</button></div>'; }
 
   function compCell(r){
@@ -3073,7 +3127,7 @@ td,.row{font-size:13px}
   }
   function renderProsp(){
     var box = $('prosp-list');
-    if (!state.prosp.length){ box.innerHTML = '<div class="card empty">Nenhum prospectador cadastrado. Clique em <b>Novo prospectador</b>.</div>'; return; }
+    if (!state.prosp.length){ box.innerHTML = '<div class="card empty">Nenhum parceiro cadastrado. Clique em <b>Novo parceiro</b>.</div>'; return; }
     box.innerHTML = state.prosp.slice().sort(function(a, b){ return (a.nome || '').localeCompare(b.nome || '', 'pt-BR'); }).map(function(p){
       var mine = state.rows.filter(function(r){ return r.responsavelId === p.id; });
       var fut = mine.filter(isFuture), av = fut.filter(function(r){ return r.avisado; }).length;
@@ -3084,7 +3138,7 @@ td,.row{font-size:13px}
       return '<div class="card prosp">' +
         '<div class="prosp-top"><div class="prosp-av">' + esc(ini) + '</div><div><b>' + esc(p.nome) + '</b>' +
           (p.telefone ? '<span class="small tnum">' + esc(p.telefone) + '</span>' : '<span class="pill warn" style="margin-top:3px">Telefone não informado</span>') +
-          (p.regiao ? '<span class="small">' + esc(p.regiao) + '</span>' : '') + '</div></div>' +
+          (regiaoDe(p) ? '<span class="small reg-linha">' + ufFlagReg(regiaoDe(p)) + esc(regiaoDe(p).nome) + (p.regiao ? ' · ' + esc(p.regiao) : '') + '</span>' : (p.regiao ? '<span class="small">' + esc(p.regiao) + '</span>' : '<span class="pill warn" style="margin-top:3px">Sem região</span>')) + '</div></div>' +
         '<div class="prosp-nums"><div><b>' + mine.length + '</b><span>clientes</span></div><div><b>' + av + '</b><span>avisados</span></div><div><b>' + aAvisar + '</b><span>a avisar</span></div><div><b>' + sc + '</b><span>sem contato</span></div></div>' +
         pautaProsp(p, fut) +
         ((p.palavrasEndereco || []).length ? '<div class="small">Endereços com: ' + p.palavrasEndereco.map(function(k){ return '<span class="tag-kw">' + esc(k) + '</span>'; }).join('') + '</div>' : '') +
@@ -3137,7 +3191,7 @@ td,.row{font-size:13px}
       cardC('i-users', 'Em cadastro', todos.length, 'ainda sem requerimento no INSS' + (conta.gestante ? ' · ' + conta.gestante + ' aguardando o parto' : ''), '--line-2', '') +
       cardC('i-check', 'Prontos para requerer', conta.pronto, 'dados preenchidos e documentação completa', '--green', 'pronto') +
       cardC('i-clock', 'Conferir dados', conta.conferir, 'cadastrados pelo celular', '--amber', 'conferir') +
-      // pendências: documento que o prospectador ainda não mandou ou dados incompletos (cada cliente conta uma vez)
+      // pendências: documento que o parceiro ainda não mandou ou dados incompletos (cada cliente conta uma vez)
       cardC('i-bellx', 'Pendências', todos.filter(function(r){ return docsPendentes(r) || situacaoCad(r)[0] === 'incompleto'; }).length, nFaltaC + ' com documento pendente · ' + conta.incompleto + ' com dados incompletos · ' + semTel + ' sem telefone' + (nPrazo ? ' · ' + nPrazo + ' com prazo perto do fim' : ''), '--red', 'pendencias');
     var nFalta = todos.filter(docsPendentes).length;
     var SITS = [['', 'Todas as situações · ' + todos.length], ['faltam', 'Faltam documentos · ' + nFalta], ['pronto', 'Prontos para requerer · ' + conta.pronto], ['conferir', 'Conferir dados · ' + conta.conferir], ['incompleto', 'Dados incompletos · ' + conta.incompleto], ['gestante', 'Aguardando o parto · ' + conta.gestante], ['prazo', 'Prazo perto do fim · ' + nPrazo], ['pendencias', 'Pendências (documento ou dados)']];
@@ -3147,15 +3201,15 @@ td,.row{font-size:13px}
       // mais recente primeiro (pelo dia do cadastro); no mesmo dia, em ordem alfabética
       .sort(function(a, b){ var da = String(a.dataCadastro || a.criadoEm || '').slice(0, 10), db = String(b.dataCadastro || b.criadoEm || '').slice(0, 10); return db.localeCompare(da) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); });
     $('cad-count').textContent = lista.length + (lista.length === 1 ? ' cliente' : ' clientes');
-    var html = '<div class="row head"><div>Cliente</div><div>Prospectador</div><div>Contato</div><div>Cadastrado</div><div>Documentos</div><div>Situação</div><div></div></div>';
-    if (!lista.length) html += '<div class="empty">' + (todos.length ? 'Nenhum cliente neste filtro.' : 'Nenhum cliente em cadastro. Clique em <b>Novo lead</b> para começar.') + '</div>';
+    var html = '<div class="row head"><div>Cliente</div><div>Parceiro</div><div>Contato</div><div>Cadastrado</div><div>Documentos</div><div>Situação</div><div></div></div>';
+    if (!lista.length) html += '<div class="empty">' + (todos.length ? 'Nenhum cliente neste filtro.' : 'Nenhum cliente em cadastro. Clique em <b>Novo cadastro</b> para começar.') + '</div>';
     lista.slice(0, 300).forEach(function(r){
       var st = situacaoCad(r);
       html += '<div class="row' + (cadAberto[r.id] ? ' aberto' : '') + '" data-linha="' + esc(r.id) + '">' +
-        '<div class="c-name"><div class="name">' + (/^data:image\/(jpeg|png);base64,/.test(r.fotoCliente || '') ? '<img class="av-foto" src="' + r.fotoCliente + '" alt="">' : '') + '<button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome) + '</button>' +
+        '<div class="c-name"><div class="name">' + ufFlag(r) + '' + (/^data:image\/(jpeg|png);base64,/.test(r.fotoCliente || '') ? '<img class="av-foto" src="' + r.fotoCliente + '" alt="">' : '') + '<button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome) + '</button>' +
           '<button type="button" class="nome-copia" data-copiar-nome="' + esc(r.nome) + '" title="Copiar o nome" aria-label="Copiar o nome de ' + esc(r.nome) + '"><svg class="i"><use href="#i-copy"/></svg></button>' +
           (r.pastaUrl ? pastaIco(r) : '<button type="button" class="pasta-falta" data-pasta-cad="' + esc(r.id) + '" title="Pasta não ligada ao cadastro: clique para procurar a pasta dela no Drive" aria-label="Ligar pasta de ' + esc(r.nome) + '"><svg class="i"><use href="#i-folder"/></svg>+</button>') + prazoTag(r) + '</div><div class="addr">' + (r.cpf ? 'CPF ' + esc(r.cpf) : 'CPF não informado') + (r.tipoSegurada ? ' · ' + esc(r.tipoSegurada === 'especial' ? 'rural' : (TIPOS[r.tipoSegurada] || '').split(' ')[0].toLowerCase()) : '') + '</div></div>' +
-        '<div><span class="lbl">Prospectador</span><div class="val">' + esc(prospName(r.responsavelId) || (r.origem === 'organico' ? 'Orgânico' : '—')) + '</div></div>' +
+        '<div><span class="lbl">Parceiro</span><div class="val">' + esc(prospName(r.responsavelId) || (r.origem === 'organico' ? 'Orgânico' : '—')) + '</div></div>' +
         '<div><span class="lbl">Contato</span>' + telCell(r, true) + '</div>' +
         '<div><span class="lbl">Cadastrado</span><div class="val">' + (r.dataCadastro || r.criadoEm ? String(r.dataCadastro || r.criadoEm).slice(0, 10).replace(/^\d\d(\d\d)-(\d\d)-(\d\d)$/, '$3/$2/$1') : '—') + '</div></div>' +
         '<div><span class="lbl">Documentos</span>' + docsCell(r) + '</div>' +
@@ -3227,7 +3281,7 @@ td,.row{font-size:13px}
     if (!lista.length) html += '<div class="empty">' + (todos.length ? 'Nenhum requerimento neste filtro.' : 'Nenhum requerimento no INSS ainda. Na aba <b>Cadastro</b>, use <b>Registrar requerimento</b> nas clientes prontas.') + '</div>';
     lista.slice(0, 300).forEach(function(r){
       html += '<div class="row' + (inssAberto[r.id] ? ' aberto' : '') + '" data-linha="' + esc(r.id) + '">' +
-        '<div class="c-name"><div class="name"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome) + '</button>' + pastaIco(r) + '</div><div class="addr">' + (r.cpf ? 'CPF ' + esc(r.cpf) : 'CPF não informado') + (r.tipoSegurada ? ' · ' + esc(TIPOS[r.tipoSegurada] || '') : '') + '</div></div>' +
+        '<div class="c-name"><div class="name">' + ufFlag(r) + '<button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome) + '</button>' + pastaIco(r) + '</div><div class="addr">' + (r.cpf ? 'CPF ' + esc(r.cpf) : 'CPF não informado') + (r.tipoSegurada ? ' · ' + esc(TIPOS[r.tipoSegurada] || '') : '') + '</div></div>' +
         '<div><span class="lbl">Requerimento</span><div class="val">' + (r.der ? 'DER ' + fmtDate(r.der) : 'DER não informada') + '</div>' + (r.protocoloInss ? '<button type="button" class="copia mini" data-copiar="' + esc(r.protocoloInss) + '" title="Copiar o protocolo">' + esc(r.protocoloInss) + '<svg class="i"><use href="#i-copy"/></svg></button>' : '<div class="mini">sem protocolo</div>') + '</div>' +
         '<div><span class="lbl">Criança</span><div class="val">' + esc(r.crianca || (r.fatoGerador === 'gestante' ? 'Gestante' : '—')) + '</div><div class="mini">' + (r.criancaNasc ? fmtDate(r.criancaNasc) : r.dpp ? 'parto previsto ' + fmtDate(r.dpp) : '') + '</div></div>' +
         '<div><span class="lbl">NB</span><div class="val tnum">' + esc(r.nb || '—') + '</div>' + (r.inssDecisaoEm ? '<div class="mini">decisão ' + fmtDate(r.inssDecisaoEm) + '</div>' : '') + '</div>' +
@@ -3342,7 +3396,7 @@ td,.row{font-size:13px}
     return '<div class="card stat cad-filtro' + (atual === filtro ? ' ativo' : '') + '" role="button" tabindex="0" aria-pressed="' + (atual === filtro) + '" ' + attr + '="' + filtro + '"><div class="stat-h"><svg class="i"><use href="#' + ico + '"/></svg>' + rot + '</div><div class="stat-v tnum">' + n + '</div><div class="stat-c">' + cap + '</div></div>';
   }
   function nomeCell(r){
-    return '<div class="c-name"><div class="name"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome) + '</button>' + pastaIco(r) + '</div><div class="addr">' + (r.cpf ? 'CPF ' + esc(r.cpf) : 'CPF não informado') + (r.tipoSegurada ? ' · ' + esc(TIPOS[r.tipoSegurada] || '') : '') + '</div></div>';
+    return '<div class="c-name"><div class="name">' + ufFlag(r) + '<button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome) + '</button>' + pastaIco(r) + '</div><div class="addr">' + (r.cpf ? 'CPF ' + esc(r.cpf) : 'CPF não informado') + (r.tipoSegurada ? ' · ' + esc(TIPOS[r.tipoSegurada] || '') : '') + '</div></div>';
   }
   function editBtn(r){ return '<button type="button" class="ico-btn" data-act="edit" data-id="' + esc(r.id) + '" title="Editar cadastro" aria-label="Editar ' + esc(r.nome) + '"><svg class="i"><use href="#i-pencil"/></svg></button>'; }
   function renderContratos(){
@@ -3473,7 +3527,67 @@ td,.row{font-size:13px}
     try { aplicar(localStorage.getItem('nascer-menu') === '0'); } catch(e){}
     b.addEventListener('click', function(){ var rec = !app.classList.contains('collapsed'); aplicar(rec); try { localStorage.setItem('nascer-menu', rec ? '0' : '1'); } catch(e){} });
   })();
-  function render(){ renderContratos(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
+
+  /* ---------- Regiões de atuação ---------- */
+  var REGIOES_PADRAO = [{ id: 'AM', nome: 'Amazonas', uf: 'AM' }, { id: 'PA', nome: 'Pará', uf: 'PA' }, { id: 'AP', nome: 'Amapá', uf: 'AP' }];
+  state.regioes = REGIOES_PADRAO.slice();
+  function regiaoPorId(id){ return state.regioes.filter(function(x){ return x.id === id; })[0] || null; }
+  function regiaoDe(p){ return p && p.regiaoId ? regiaoPorId(p.regiaoId) : null; }
+  function ufFlagReg(g){
+    if (!g) return '';
+    var uf = String(g.uf || g.id || '').toUpperCase();
+    return '<span class="uf-flag" title="' + esc(g.nome) + '"><img src="img/flags/' + esc(uf) + '.svg" alt="' + esc(uf) + '" onerror="this.parentNode.classList.add(\'sem-img\');this.replaceWith(document.createTextNode(this.alt))"></span>';
+  }
+  function ufFlag(r){
+    var p = r && r.responsavelId ? prospById(r.responsavelId) : null, g = regiaoDe(p);
+    return g ? ufFlagReg(g) : '';
+  }
+  function regSelectPreencher(sel){
+    $('fp-regiao').innerHTML = '<option value="">Sem região</option>' + state.regioes.map(function(g){ return '<option value="' + esc(g.id) + '"' + (g.id === sel ? ' selected' : '') + '>' + esc(g.nome) + '</option>'; }).join('');
+  }
+  var regAberta = '';
+  function renderRegioes(){
+    var box = $('reg-grid'); if (!box) return;
+    box.innerHTML = state.regioes.map(function(g){
+      var ps = state.prosp.filter(function(p){ return p.regiaoId === g.id; });
+      var nCli = state.rows.filter(function(r){ var p = prospById(r.responsavelId); return p && p.regiaoId === g.id; }).length;
+      return '<button type="button" class="reg-card' + (regAberta === g.id ? ' on' : '') + '" data-reg="' + esc(g.id) + '" aria-pressed="' + (regAberta === g.id) + '">' +
+        ufFlagReg(g).replace('uf-flag', 'uf-flag grande') + '<div><b>' + esc(g.nome) + '</b><span>' + ps.length + (ps.length === 1 ? ' parceiro' : ' parceiros') + ' · ' + nCli + (nCli === 1 ? ' cliente' : ' clientes') + '</span></div></button>';
+    }).join('');
+    var det = $('reg-det');
+    var g = regAberta ? regiaoPorId(regAberta) : null;
+    if (!g){ det.hidden = true; det.innerHTML = ''; return; }
+    var ps = state.prosp.filter(function(p){ return p.regiaoId === g.id; }).sort(function(a, b){ return (a.nome || '').localeCompare(b.nome || '', 'pt-BR'); });
+    det.hidden = false;
+    det.innerHTML = '<div class="reg-det-h">' + ufFlagReg(g) + '<b>Parceiros de ' + esc(g.nome) + '</b><span class="mini">' + ps.length + '</span></div>' +
+      (ps.length ? '<div class="reg-lista">' + ps.map(function(p){
+        var n = state.rows.filter(function(r){ return r.responsavelId === p.id; }).length;
+        return '<div class="reg-item"><div><b>' + esc(p.nome) + '</b><span class="mini">' + esc(p.telefone || 'sem telefone') + (p.regiao ? ' · ' + esc(p.regiao) : '') + '</span></div><span class="mini">' + n + (n === 1 ? ' cliente' : ' clientes') + '</span><button type="button" class="btn" data-reg-edit="' + esc(p.id) + '">Editar</button></div>';
+      }).join('') + '</div>' : '<div class="empty">Nenhum parceiro cadastrado nesta região ainda. Em <b>Novo parceiro</b>, escolha a região de atuação.</div>');
+  }
+  $('reg-grid').addEventListener('click', function(e){ var b = e.target.closest('[data-reg]'); if (!b) return; regAberta = regAberta === b.dataset.reg ? '' : b.dataset.reg; renderRegioes(); });
+  $('reg-det').addEventListener('click', function(e){ var b = e.target.closest('[data-reg-edit]'); if (!b) return; var p = prospById(b.dataset.regEdit); if (p) openProsp(p); });
+  async function regSalvar(){
+    if (state.db) await state.db.collection('config').doc('regioes').set({ lista: state.regioes });
+  }
+  $('reg-add').addEventListener('click', async function(){
+    var nome = $('reg-nome').value.trim(); if (!nome){ $('reg-nome').focus(); toast('Digite o nome da região'); return; }
+    var uf = $('reg-uf').value, id = uf;
+    if (regiaoPorId(id)) id = uf + '-' + (state.regioes.length + 1);
+    state.regioes = state.regioes.concat([{ id: id, nome: nome, uf: uf }]);
+    try { await regSalvar(); $('reg-nome').value = ''; toast('Região adicionada: ' + nome); }
+    catch(err){ state.regioes.pop(); toast(errMsg(err)); }
+    renderRegioes(); renderProsp();
+  });
+  async function regioesCarregar(){
+    try {
+      var c = await SB.from('config').select('data').eq('id', 'regioes').maybeSingle();
+      var l = c && c.data && c.data.data && c.data.data.lista;
+      if (Array.isArray(l) && l.length) state.regioes = l;
+    } catch(e){}
+    renderRegioes(); render();
+  }
+  function render(){ renderRegioes(); renderContratos(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
   var clQ = '';
   // stage of each process, derived from what is already recorded (no extra typing)
   var ETAPAS = [
@@ -3549,7 +3663,7 @@ td,.row{font-size:13px}
       (lista.length ? '' : '<div class="empty">Nenhum cliente encontrado.</div>') +
       lista.map(function(r){
         return '<div class="row">' +
-          '<div class="c-name"><div class="name"><span>' + esc(r.nome) + '</span>' + pastaIco(r) + (r.conferirDados ? '<span class="campo-tag" title="Cadastrado pelo celular do prospectador. Confira nome, CPF e endereço com os documentos da pasta e salve o cadastro.">Celular · conferir</span>' : '') + '</div><div class="addr">' + esc(r.endereco || 'Endereço não informado') + '</div></div>' +
+          '<div class="c-name"><div class="name">' + ufFlag(r) + '<span>' + esc(r.nome) + '</span>' + pastaIco(r) + (r.conferirDados ? '<span class="campo-tag" title="Cadastrado pelo celular do parceiro. Confira nome, CPF e endereço com os documentos da pasta e salve o cadastro.">Celular · conferir</span>' : '') + '</div><div class="addr">' + esc(r.endereco || 'Endereço não informado') + '</div></div>' +
           '<div><span class="lbl">CPF</span><div class="val">' + esc(r.cpf || '—') + '</div></div>' +
           '<div><span class="lbl">Processo</span><div class="val" style="font-size:12.5px">' + esc(r.processo || '—') + '</div></div>' +
           '<div><span class="lbl">Contato</span>' + telCell(r) + '</div>' +
@@ -3743,7 +3857,7 @@ td,.row{font-size:13px}
   var MESES_BENEFICIO = 4;    // 120 dias de salário-maternidade
   var FIN_HONORARIOS = 0.3;   // honorários: 30% do benefício + o valor da guia
   var finSessao = '', finPag = '', finQ = '', finParte = 'receita';
-  var FIN_INDICACAO = 80;     // o prospectador ganha R$ 80 por cliente indicada, quando ela recebe
+  var FIN_INDICACAO = 80;     // o parceiro ganha R$ 80 por cliente indicada, quando ela recebe
   var brl = function(v){ return (Number(v) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0, maximumFractionDigits: 2 }); };
   // campos de valor sempre em formato de dinheiro (R$ 2.000,00): o que se digita entra como centavos
   function moedaTxt(v){ return (Number(v) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
@@ -4028,7 +4142,7 @@ td,.row{font-size:13px}
       card('i-cash', 'Faturamento ' + finAno, brl(hon), 'ok', L.length + (L.length === 1 ? ' benefício pago' : ' benefícios pagos') + ' · somam ' + brl(soma('valor')), 100, '--green') +
       card('i-users', 'Ficou com as clientes', brl(rep), '', (L.length - aReceber.length - aPagar.length) + ' acertos feitos', soma('valor') ? rep / soma('valor') * 100 : 0, '--blue') +
       card('i-clock', 'Acertos pendentes', String(aReceber.length + aPagar.length), aReceber.length + aPagar.length ? 'crit' : '', aReceber.length + ' honorários a receber · ' + aPagar.length + ' clientes a pagar', aReceber.length + aPagar.length ? 100 : 0, '--red') +
-      card('i-scale', 'Prospectadores', brl(pr), '', 'indicações das clientes acertadas', hon ? pr / hon * 100 : 0, '--amber') +
+      card('i-scale', 'Parceiros', brl(pr), '', 'indicações das clientes acertadas', hon ? pr / hon * 100 : 0, '--amber') +
       card('i-check', 'Líquido ' + finAno, brl(hon - pr), 'ok', 'faturamento menos prospectadores', hon ? (hon - pr) / hon * 100 : 0, '--green');
     $('fin-regra').innerHTML = 'Conta pela <b>data em que o benefício foi pago</b> (botão <b>Benefício pago</b> na Receita). Faturamento = ' + Math.round(FIN_HONORARIOS * 100) + '% de honorários + guias. Use <b>Baixar planilha do ano</b> para o fechamento anual (contador / imposto de renda).';
     $('fin-count').textContent = L.length + (L.length === 1 ? ' benefício' : ' benefícios');
@@ -4045,7 +4159,7 @@ td,.row{font-size:13px}
     var br = function(d){ return d ? d.split('-').reverse().join('/') : ''; };
     var q = function(t){ return '"' + String(t == null ? '' : t).replace(/"/g, '""') + '"'; };
     var L = linhasAno(finAno);
-    var csv = [['Data do pagamento', 'Cliente', 'CPF', 'Origem', 'NB / processo', 'Valor do benefício', 'Onde caiu', 'Honorários + guia', 'Valor da cliente', 'Acerto em', 'Forma', 'Prospectador', 'Valor do prospectador'].map(q).join(';')]
+    var csv = [['Data do pagamento', 'Cliente', 'CPF', 'Origem', 'NB / processo', 'Valor do benefício', 'Onde caiu', 'Honorários + guia', 'Valor da cliente', 'Acerto em', 'Forma', 'Parceiro', 'Valor do prospectador'].map(q).join(';')]
       .concat(L.map(function(x){ var r = x.r; return [br(x.data), r.nome, r.cpf, origem(r) === 'inss' ? 'INSS' : 'Judicial', origem(r) === 'inss' ? r.nb : r.processo, n2(x.valor), x.onde === 'escritorio' ? 'Escritório' : 'Cliente', n2(x.hon), n2(x.valor - x.hon), br(x.pagoEm), x.forma, prospName(r.responsavelId) || '', n2(x.prosp)].map(q).join(';'); }));
     baixarArquivo('Faturamento ' + finAno + '.csv', new Blob(['\ufeff' + csv.join('\r\n')], { type: 'text/csv;charset=utf-8' }));
   });
@@ -4064,7 +4178,7 @@ td,.row{font-size:13px}
     { k: 'datajud', t: 'Tribunal (DataJud)', d: 'Consulta os processos no tribunal escolhido todo dia às 7h: audiência, sentença, RPV.', ajuda: 'Chave pública do CNJ. Escolha o tribunal (TRF1 ou TJAM) no cartão.' },
     { k: 'claude', t: 'IA (ChatGPT)', d: 'Só confere quais documentos estão na pasta do cliente (botão Conferir documentos). Não preenche dados.', ajuda: 'Clique para colar a chave da API do ChatGPT.' },
     { k: 'drive', t: 'Google Drive', d: 'Cria a pasta de cada cliente em CLIENTES e move entre Pendentes, No INSS, No Judicial e Arquivados.', ajuda: 'Funciona pelo script do Google do Cadastro pelo celular.', painel: 'celular' },
-    { k: 'celular', t: 'Cadastro pelo celular', d: 'O prospectador tira as fotos dos documentos e a cliente cai no Cadastro.', ajuda: 'O link de cada prospectador fica no cartão dele, em Prospectadores.' }
+    { k: 'celular', t: 'Cadastro pelo celular', d: 'O parceiro tira as fotos dos documentos e a cliente cai no Cadastro.', ajuda: 'O link de cada parceiro fica no cartão dele, em Parceiros.' }
   ];
   var igScript = null; // resposta do script do Google (Drive e Claude)
   function igAtivo(k){
@@ -4129,7 +4243,7 @@ td,.row{font-size:13px}
     try {
       var r = await SB.rpc('campo_link', { p_prosp: p.id, p_novo: !!novo }); if (r.error) throw r.error;
       var u = linkCampo(r.data);
-      $('cp-title').textContent = 'Acesso do prospectador · ' + p.nome;
+      $('cp-title').textContent = 'Acesso do parceiro · ' + p.nome;
       $('cp-link').value = u;
       var dig = String(p.telefone || p.contato || '').replace(/\D/g, '');
       var txt = 'Olá, ' + String(p.nome || '').split(' ')[0] + '! Este é o seu link para cadastrar clientes pelo celular. É só abrir, tirar as fotos dos documentos e apertar Enviar:\n' + u;
@@ -4325,7 +4439,7 @@ td,.row{font-size:13px}
       card('i-users', 'Gasto com prospectadores', brl(prev[4]), 'crit', 'na previsão · hoje ' + brl(cen[1][4]), prev[3] ? prev[4] / prev[3] * 100 : 0, '--red') +
       card('i-check', 'Resultado líquido', brl(prev[3] - prev[4]), 'ok', 'previsão menos prospectadores', prev[3] ? (prev[3] - prev[4]) / prev[3] * 100 : 0, '--green') +
       card('i-scale', 'Se todos derem certo', brl(cen[3][3] - cen[3][4]), 'proj', 'líquido com todos os casos em aberto', 100, '--purple');
-    $('fin-regra').innerHTML = 'Faturamento = <b>' + Math.round(FIN_HONORARIOS * 100) + '%</b> do benefício + a guia de cada ganho. Gasto com prospectadores = valor por indicação de cada um. Resultado líquido = faturamento menos prospectadores.';
+    $('fin-regra').innerHTML = 'Faturamento = <b>' + Math.round(FIN_HONORARIOS * 100) + '%</b> do benefício + a guia de cada ganho. Gasto com parceiros = valor por indicação de cada um. Resultado líquido = faturamento menos parceiros.';
     $('fin-count').textContent = base.length + (base.length === 1 ? ' cliente' : ' clientes');
     $('fin-res-body').innerHTML = cen.map(function(c, i){
       return '<tr' + (i === 2 ? ' class="fin-destaque"' : '') + '><td class="nome">' + c[0] + '<div class="mini">' + c[1] + '</div></td><td class="dir n">' + c[2] + '</td><td class="dir n">' + brl(c[3]) + '</td><td class="dir n fin-custo">− ' + brl(c[4]) + '</td><td class="dir n fin-apagar">' + brl(c[3] - c[4]) + '</td></tr>';
@@ -4338,7 +4452,7 @@ td,.row{font-size:13px}
       var g = grupos[id].filter(function(r){ return buscaCliente(r, finQ); }), p = g.filter(ganhou);
       var pagos = p.filter(function(r){ return r.repasse && r.repasse.data; }).length;
       var v = valorInd(id);
-      return { id: id, nome: prospName(id) || 'Prospectador removido', valor: v, ind: g.length, proc: p.length, pagos: pagos, apagar: pagos * v, prev: (p.length - pagos) * v, pot: g.length * v };
+      return { id: id, nome: prospName(id) || 'Parceiro removido', valor: v, ind: g.length, proc: p.length, pagos: pagos, apagar: pagos * v, prev: (p.length - pagos) * v, pot: g.length * v };
     }).filter(function(x){ return x.ind; }).sort(function(a, b){ return b.apagar - a.apagar || b.ind - a.ind || a.nome.localeCompare(b.nome, 'pt'); });
     var soma = function(k){ return linhas.reduce(function(a, x){ return a + x[k]; }, 0); };
     var ind = soma('ind'), apagar = soma('apagar'), prev = soma('prev'), pot = soma('pot');
@@ -4347,7 +4461,7 @@ td,.row{font-size:13px}
       card('i-cash', 'A pagar', brl(apagar), 'ok', soma('pagos') + ' clientes já acertadas', pot ? apagar / pot * 100 : 0, '--green') +
       card('i-clock', 'Previsão', brl(prev), 'warn', 'ganhos ainda sem acerto', pot ? prev / pot * 100 : 0, '--amber') +
       card('i-scale', 'Se todos derem certo', brl(pot), 'proj', 'todas as indicações pagas', 100, '--purple');
-    $('fin-regra').innerHTML = 'Cada prospectador tem o <b>seu valor por indicação</b> (padrão ' + brl(FIN_INDICACAO) + '; mude na coluna da tabela). Entra em <b>A pagar</b> quando o acerto com a cliente foi feito; os ganhos ainda sem acerto ficam em <b>Previsão</b>; <b>Se todos derem certo</b> é o total caso todas as clientes indicadas por ele ganhem.';
+    $('fin-regra').innerHTML = 'Cada parceiro tem o <b>seu valor por indicação</b> (padrão ' + brl(FIN_INDICACAO) + '; mude na coluna da tabela). Entra em <b>A pagar</b> quando o acerto com a cliente foi feito; os ganhos ainda sem acerto ficam em <b>Previsão</b>; <b>Se todos derem certo</b> é o total caso todas as clientes indicadas por ele ganhem.';
     $('fin-count').textContent = linhas.length + (linhas.length === 1 ? ' prospectador' : ' prospectadores');
     $('fin-prosp-body').innerHTML = linhas.map(function(x){
       return '<tr><td class="nome">' + esc(x.nome) + '</td><td class="dir">' + (prospById(x.id) ? '<input class="fin-valor" type="text" inputmode="numeric" data-pind="' + esc(x.id) + '" value="' + moedaTxt(x.valor) + '" title="Quanto ' + esc(x.nome) + ' ganha por cliente indicada">' : brl(x.valor)) + '</td><td class="dir n">' + x.ind + '</td><td class="dir n">' + x.proc + '</td><td class="dir n">' + x.pagos + '</td><td class="dir n fin-apagar">' + brl(x.apagar) + '</td><td class="dir n">' + brl(x.prev) + '</td><td class="dir n fin-proj">' + brl(x.pot) + '</td></tr>';
@@ -4699,7 +4813,7 @@ td,.row{font-size:13px}
 
   /* ---------- form ---------- */
   var dlg = $('dlg'), delArmed = false;
-  var CAMPOS_HIST = { avisoRespId: 'Responsável pelo aviso', nome: 'Nome', cpf: 'CPF', rg: 'RG', endereco: 'Endereço', contato: 'Telefone', contatoVia: 'Avisado via cliente', audData: 'Data da audiência', audHora: 'Hora da audiência', online: 'Online', avisado: 'Aviso', situacao: 'Situação', meioAviso: 'Meio do aviso', avisadoA: 'Quem recebeu', avisadoEm: 'Data do aviso', responsavelId: 'Prospectador', processo: 'Processo', protocolo: 'Ajuizamento', nascimento: 'Nascimento da mãe', nit: 'NIT', tipoSegurada: 'Tipo de segurada', atividade: 'Atividade', fatoGerador: 'Fato gerador', crianca: 'Criança', criancaNasc: 'Nascimento da criança', dpp: 'Parto previsto', testemunhas: 'Testemunhas', der: 'DER', protocoloInss: 'Protocolo INSS', nb: 'NB', inssStatus: 'Situação no INSS', exigenciaPrazo: 'Prazo da exigência', exigenciaObs: 'Exigência', inssDecisaoEm: 'Decisão do INSS', motivoIndeferimento: 'Motivo do indeferimento', valorBeneficio: 'Valor do benefício', valorGuia: 'Valor da guia', comparecimento: 'Comparecimento', resultado: 'Resultado', concluso: 'Concluso', motivoConcluso: 'Motivo do concluso', embargos: 'Recurso do INSS', pagamento: 'Pagamento', obs: 'Observações', pastaUrl: 'Pasta', foraDaRegua: 'Fora da régua', docs: 'Documentos' };
+  var CAMPOS_HIST = { avisoRespId: 'Responsável pelo aviso', nome: 'Nome', cpf: 'CPF', rg: 'RG', endereco: 'Endereço', contato: 'Telefone', contatoVia: 'Avisado via cliente', audData: 'Data da audiência', audHora: 'Hora da audiência', online: 'Online', avisado: 'Aviso', situacao: 'Situação', meioAviso: 'Meio do aviso', avisadoA: 'Quem recebeu', avisadoEm: 'Data do aviso', responsavelId: 'Parceiro', processo: 'Processo', protocolo: 'Ajuizamento', nascimento: 'Nascimento da mãe', nit: 'NIT', tipoSegurada: 'Tipo de segurada', atividade: 'Atividade', fatoGerador: 'Fato gerador', crianca: 'Criança', criancaNasc: 'Nascimento da criança', dpp: 'Parto previsto', testemunhas: 'Testemunhas', der: 'DER', protocoloInss: 'Protocolo INSS', nb: 'NB', inssStatus: 'Situação no INSS', exigenciaPrazo: 'Prazo da exigência', exigenciaObs: 'Exigência', inssDecisaoEm: 'Decisão do INSS', motivoIndeferimento: 'Motivo do indeferimento', valorBeneficio: 'Valor do benefício', valorGuia: 'Valor da guia', comparecimento: 'Comparecimento', resultado: 'Resultado', concluso: 'Concluso', motivoConcluso: 'Motivo do concluso', embargos: 'Recurso do INSS', pagamento: 'Pagamento', obs: 'Observações', pastaUrl: 'Pasta', foraDaRegua: 'Fora da régua', docs: 'Documentos' };
   function valorHist(k, v){
     if (v === null || v === undefined || v === '') return '(vazio)';
     if (typeof v === 'boolean') return v ? 'sim' : 'não';
@@ -4739,7 +4853,7 @@ td,.row{font-size:13px}
     state.editing = r ? r.id : null;
     $('form').classList.toggle('novo', !r || !!compacto); // cadastro inicial: só os dados do cliente
     $('form').classList.toggle('com-pasta', !!(r && (comPasta || !r.pastaUrl)));   // sem pasta ligada: mostra o campo para colar o link
-    $('f-title').textContent = r ? 'Editar cliente' : 'Novo lead (orgânico)';
+    $('f-title').textContent = r ? 'Editar cliente' : 'Novo cadastro (orgânico)';
     $('f-nome').value = r ? r.nome || '' : '';
     $('f-cpf').value = r ? r.cpf || '' : '';
     $('f-rg').value = r ? r.rg || '' : '';
@@ -4753,9 +4867,9 @@ td,.row{font-size:13px}
     $('f-hora').value = r ? r.audHora || '' : '';
     $('f-online').checked = !!(r && r.online);
     $('f-situacao').value = r ? sit(r) : 'pendente';
-    $('f-resp').innerHTML = '<option value="">Sem prospectador</option>' + state.prosp.map(function(p){ return '<option value="' + esc(p.id) + '">' + esc(p.nome) + '</option>'; }).join('');
+    $('f-resp').innerHTML = '<option value="">Sem parceiro</option>' + state.prosp.map(function(p){ return '<option value="' + esc(p.id) + '">' + esc(p.nome) + '</option>'; }).join('');
     $('f-resp').value = r && prospById(r.responsavelId) ? r.responsavelId : '';
-    $('f-aviso-resp').innerHTML = '<option value="">O próprio prospectador</option>' + state.prosp.map(function(p){ return '<option value="' + esc(p.id) + '">' + esc(p.nome) + '</option>'; }).join('');
+    $('f-aviso-resp').innerHTML = '<option value="">O próprio parceiro</option>' + state.prosp.map(function(p){ return '<option value="' + esc(p.id) + '">' + esc(p.nome) + '</option>'; }).join('');
     $('f-aviso-resp').value = r && prospById(r.avisoRespId) ? r.avisoRespId : '';
     $('f-avisoem').value = r && r.avisadoEm ? String(r.avisadoEm).slice(0, 10) : '';
     $('f-avisadoa').value = r ? r.avisadoA || '' : '';
@@ -5180,6 +5294,7 @@ td,.row{font-size:13px}
     $('fp-nome').value = p ? p.nome || '' : '';
     $('fp-tel').value = p ? p.telefone || '' : '';
     $('fp-reg').value = p ? p.regiao || '' : '';
+    regSelectPreencher(p ? p.regiaoId || '' : '');
     $('fp-pal').value = p ? (p.palavrasEndereco || []).join(', ') : '';
     $('fp-del').hidden = !p; pDelArmed = false; $('fp-del').classList.remove('armed'); $('fp-del').textContent = 'Excluir';
     dlgP.showModal(); $('fp-nome').focus();
@@ -5192,7 +5307,7 @@ td,.row{font-size:13px}
     e.preventDefault();
     var nome = $('fp-nome').value.trim(); if (!nome){ $('fp-nome').focus(); toast('Informe o nome do prospectador'); return; }
     var prev = pEditing ? prospById(pEditing) || {} : {};
-    var data = { nome: nome, telefone: $('fp-tel').value.trim(), regiao: $('fp-reg').value.trim(),
+    var data = { nome: nome, telefone: $('fp-tel').value.trim(), regiao: $('fp-reg').value.trim(), regiaoId: $('fp-regiao').value,
       palavrasEndereco: $('fp-pal').value.split(',').map(function(s){ return s.trim(); }).filter(Boolean),
       ativo: true, criadoEm: prev.criadoEm || new Date().toISOString(), atualizadoEm: new Date().toISOString() };
     if (prev.valorIndicacao) data.valorIndicacao = prev.valorIndicacao;
@@ -5200,14 +5315,14 @@ td,.row{font-size:13px}
     try {
       if (state.db){ await (pEditing ? pcol().doc(pEditing) : pcol().doc()).set(data); }
       else { var pid = pEditing || 'mp' + (++memId); state.prosp = state.prosp.filter(function(x){ return x.id !== pid; }).concat([Object.assign({ id: pid }, data)]); render(); }
-      dlgP.close(); toast(pEditing ? 'Prospectador atualizado' : 'Prospectador cadastrado');
+      dlgP.close(); toast(pEditing ? 'Parceiro atualizado' : 'Parceiro cadastrado');
     } catch(err){ toast(errMsg(err)); } finally { $('fp-save').disabled = false; }
   });
   $('fp-del').addEventListener('click', async function(){
     if (!pDelArmed){ pDelArmed = true; this.classList.add('armed'); this.textContent = 'Confirmar exclusão'; return; }
     try {
       if (state.db) await pcol().doc(pEditing).delete(); else { state.prosp = state.prosp.filter(function(x){ return x.id !== pEditing; }); render(); }
-      dlgP.close(); toast('Prospectador excluído. Os clientes dele ficaram sem responsável.');
+      dlgP.close(); toast('Parceiro excluído. Os clientes dele ficaram sem responsável.');
     } catch(err){ toast(errMsg(err)); }
   });
   $('prosp-list').addEventListener('click', async function(e){
@@ -5845,6 +5960,7 @@ td,.row{font-size:13px}
     if (iniciado){ render(); return; }
     iniciado = true;
     state.db = DB;
+    regioesCarregar();
     if (f.data === 'admin'){ djStatus(); cpStatus(); clStatus(); }
     function carimbo(){ var n = new Date(); $('sync').textContent = 'Atualizado: ' + n.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ', ' + n.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }
     function caiu(){ $('sync').textContent = 'Conexão interrompida'; banner('A conexão com a base foi interrompida. Recarregue a página.'); }
