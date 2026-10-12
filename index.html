@@ -1598,6 +1598,9 @@ td,.row{font-size:13px}
   .topnav .side-acts button{width:32px;height:32px}
   .topnav .side-foot .av{width:28px;height:28px}
 }
+
+.guia-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:600;white-space:nowrap}
+.guia-link .i{width:16px;height:16px}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -1720,7 +1723,7 @@ td,.row{font-size:13px}
         <div class="fbar">
           <div class="search tb-busca"><svg class="i"><use href="#i-search"/></svg><input id="ctr-q" type="search" autocomplete="off" placeholder="Buscar cliente por nome ou CPF"></div>
           <select id="ctr-sit" class="tb-sel" aria-label="Filtrar"></select>
-          <span class="tb-fim fb-count tnum" id="ctr-count"></span>
+          <a class="btn guia-link" id="ctr-guia" href="https://sal.rfb.gov.br/home" target="_blank" rel="noopener noreferrer" title="Abre o SAL da Receita Federal: gerar a guia e fazer o pagamento"><svg class="i"><use href="#i-cash"/></svg>Gerar e pagar guia</a><span class="tb-fim fb-count tnum" id="ctr-count"></span>
         </div>
         <div class="sec-rot">Clientes com contrato fechado</div>
         <div class="card list" id="ctr-list"></div>
