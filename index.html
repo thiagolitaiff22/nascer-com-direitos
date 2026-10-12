@@ -1429,11 +1429,52 @@ td,.row{font-size:13px}
 
 /* ---------- escala geral: o sistema inteiro um pouco menor em telas de computador ---------- */
 @media (min-width:1000px){
-  html{zoom:.84}
-  .topnav{height:calc(100vh / .84)!important}
-  .main,.app{min-height:calc(100vh / .84)}
+  html{zoom:.92}
+  .topnav{height:calc(100vh / .92)!important}
+  .main,.app{min-height:calc(100vh / .92)}
 }
 .app th,.app .thead > *{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ---------- Contratos fechados / Aguardando nascimento ---------- */
+#ctr-list .row,#nasc-list .row{grid-template-columns:minmax(0,2.2fr) minmax(0,1.2fr) minmax(0,1.1fr) minmax(0,1.5fr) minmax(190px,1.4fr) 36px!important;align-items:center;gap:16px!important;min-height:46px;padding-top:6px!important;padding-bottom:6px!important}
+#nasc-list .row{grid-template-columns:minmax(0,2.2fr) minmax(0,1.2fr) minmax(0,1.1fr) minmax(0,1.2fr) minmax(0,1.4fr) minmax(150px,1fr)!important}
+#ctr-list .row[data-linha],#nasc-list .row[data-linha]{cursor:pointer}
+#ctr-list .row[data-linha]:hover,#nasc-list .row[data-linha]:hover{background:var(--hover)}
+#ctr-list .row.aberto,#nasc-list .row.aberto{background:var(--soft)}
+#ctr-list .c-name .name,#nasc-list .c-name .name{font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+#ctr-list .nome-abrir,#nasc-list .nome-abrir{white-space:normal;overflow-wrap:anywhere}
+#ctr-list .c-name .addr,#nasc-list .c-name .addr{font-size:12px;color:var(--ink-3)}
+#ctr-list .c-act,#nasc-list .c-act{justify-content:flex-end;gap:8px;display:flex;align-items:center}
+.grp-head{grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:14px 16px 8px;font-size:12.5px;font-weight:700;color:var(--ink-2);border-top:1px solid var(--gline,var(--line))}
+.grp-head .tnum{font-weight:600;color:var(--ink-3)}
+.grp-head.crit{color:var(--red)}.grp-head.warn{color:var(--amber)}.grp-head.ok{color:var(--green)}
+/* Justiça: sem audiência (esconde os cartões que eram de audiência e de aviso) */
+#view-clientes .stats > .card:not([data-card="todos"]){display:none!important}
+/* ---------- tema escuro: dourado sobre marrom-carvão ---------- */
+:root[data-theme="dark"]{--bg:#14110d;--panel:#1b1712;--soft:#211c16;--hover:#262019;--active:#2c251c;--line:#2e2820;--line-2:#3b3328;--ink:#f6f0e6;--ink-2:#dcd2c0;--ink-3:#a8997f;--tile:#211c16;--g1:#c9a46a;--g2:#d4b483;--gsoft:rgba(212,180,131,.14);--gline:#2e2820;--sombra-leve:0 1px 2px rgba(0,0,0,.35);--sombra:0 1px 2px rgba(0,0,0,.35)}
+:root[data-theme="dark"] body{background:#14110d;color:var(--ink)}
+:root[data-theme="dark"] .topnav{background:#1b1712!important;border-right:1px solid #2e2820!important}
+:root[data-theme="dark"] .card,:root[data-theme="dark"] .ig-card,:root[data-theme="dark"] .integ,:root[data-theme="dark"] .list-sum,:root[data-theme="dark"] .vw-dash .stat,:root[data-theme="dark"] dialog{background:#1b1712!important;border:1px solid #2e2820!important;box-shadow:none!important;color:var(--ink)}
+:root[data-theme="dark"] .row.head,:root[data-theme="dark"] .f-foot{background:#211c16!important}
+:root[data-theme="dark"] input:not([type=checkbox]):not([type=radio]),:root[data-theme="dark"] select,:root[data-theme="dark"] textarea,:root[data-theme="dark"] .search,:root[data-theme="dark"] .tb-sel,:root[data-theme="dark"] .btn{background:#211c16!important;border-color:#3b3328!important;color:var(--ink)!important}
+:root[data-theme="dark"] .btn:hover,:root[data-theme="dark"] .tab:hover{background:#2c251c!important}
+:root[data-theme="dark"] #btn-novo,:root[data-theme="dark"] .btn.primary{background:#c9a46a!important;color:#1b1712!important;box-shadow:none!important}
+:root[data-theme="dark"] .topnav .nav .tab[aria-selected="true"]{background:rgba(212,180,131,.14)!important;color:#d4b483!important}
+:root[data-theme="dark"] .topnav .nav .tab[aria-selected="true"]::before{background:#d4b483!important}
+:root[data-theme="dark"] .vw-dash .stat-h svg.i{background:rgba(212,180,131,.14)!important;color:#d4b483!important;stroke:#d4b483}
+:root[data-theme="dark"] .topnav .brand .logo{background:#211c16;border-color:#2e2820}
+:root[data-theme="dark"] #ctr-list .row:hover,:root[data-theme="dark"] #nasc-list .row:hover,:root[data-theme="dark"] #cad-list .row:hover,:root[data-theme="dark"] #inss-list .row:hover{background:#262019}
+:root[data-theme="dark"] input:focus,:root[data-theme="dark"] select:focus,:root[data-theme="dark"] textarea:focus{border-color:#c9a46a!important;box-shadow:0 0 0 3px rgba(201,164,106,.2)!important}
+
+/* ajuste de colunas das listas novas */
+#ctr-list .row{grid-template-columns:minmax(0,1.9fr) minmax(0,1fr) minmax(0,.9fr) minmax(0,1.2fr) minmax(0,1.3fr) 36px!important;gap:12px!important}
+#nasc-list .row{grid-template-columns:minmax(0,1.9fr) minmax(0,1fr) minmax(0,.9fr) minmax(0,1fr) minmax(0,1.2fr) minmax(0,.9fr)!important;gap:12px!important}
+#ctr-list .cad-sit,#nasc-list .cad-sit{white-space:normal;line-height:1.25}
+#ctr-list .inss-sel,#nasc-list .inss-sel,#cad-list .inss-sel{max-width:100%;width:100%}
+#ctr-list .inss-acao,#nasc-list .inss-acao{margin-top:6px}
+#nasc-list .c-act{flex-wrap:wrap}
+#ctr-list .docs-pend,#nasc-list .docs-pend{position:relative;cursor:help}
+#ctr-list .docs-tip,#nasc-list .docs-tip{display:none}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -1505,8 +1546,10 @@ td,.row{font-size:13px}
     <div class="brand"><div class="logo"><img src="img/logo-nascer.png" alt=""></div><div><b>Nascer com Direitos</b><span>Salário-maternidade</span></div></div>
     <nav class="nav" role="tablist" aria-orientation="horizontal">
       <button class="tab" role="tab" id="tab-cad" aria-selected="false" type="button" title="Cadastro"><svg class="i"><use href="#i-plus"/></svg><span>Cadastro</span></button>
+      <button class="tab" role="tab" id="tab-ctr" aria-selected="false" type="button" title="Contratos fechados"><svg class="i"><use href="#i-check"/></svg><span>Contratos fechados</span></button>
+      <button class="tab" role="tab" id="tab-nasc" aria-selected="false" type="button" title="Aguardando nascimento"><svg class="i"><use href="#i-clock"/></svg><span>Aguardando nascimento</span></button>
       <button class="tab" role="tab" id="tab-inss" aria-selected="false" type="button" title="INSS"><svg class="i"><use href="#i-inss"/></svg><span>INSS</span></button>
-      <button class="tab" role="tab" id="tab-clientes" aria-selected="true" type="button" title="Controle"><svg class="i"><use href="#i-users"/></svg><span>Controle</span></button>
+      <button class="tab" role="tab" id="tab-clientes" aria-selected="true" type="button" title="Justiça"><svg class="i"><use href="#i-users"/></svg><span>Justiça</span></button>
       <button class="tab admin-only" role="tab" id="tab-fin" aria-selected="false" type="button" title="Financeiro"><svg class="i"><use href="#i-cash"/></svg><span>Financeiro</span></button>
       <button class="tab" role="tab" id="tab-ret" aria-selected="false" type="button" title="Arquivados"><svg class="i"><use href="#i-file"/></svg><span>Arquivados</span></button>
       <button class="tab admin-only" role="tab" id="tab-equipe" aria-selected="false" type="button" title="Configurações"><svg class="i"><use href="#i-gear"/></svg><span>Configurações</span></button>
@@ -1545,6 +1588,30 @@ td,.row{font-size:13px}
         </div>
         <div class="sec-rot">Clientes em cadastro</div>
         <div class="card list" id="cad-list"></div>
+      </section>
+
+      <section id="view-ctr" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
+        <div class="sec-rot">Resumo dos contratos fechados</div>
+        <div class="stats" id="ctr-stats"></div>
+        <div class="fbar">
+          <div class="search tb-busca"><svg class="i"><use href="#i-search"/></svg><input id="ctr-q" type="search" autocomplete="off" placeholder="Buscar cliente por nome ou CPF"></div>
+          <select id="ctr-sit" class="tb-sel" aria-label="Filtrar"></select>
+          <span class="tb-fim fb-count tnum" id="ctr-count"></span>
+        </div>
+        <div class="sec-rot">Clientes com contrato fechado</div>
+        <div class="card list" id="ctr-list"></div>
+      </section>
+
+      <section id="view-nasc" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
+        <div class="sec-rot">Resumo das gestantes</div>
+        <div class="stats" id="nasc-stats"></div>
+        <div class="fbar">
+          <div class="search tb-busca"><svg class="i"><use href="#i-search"/></svg><input id="nasc-q" type="search" autocomplete="off" placeholder="Buscar cliente por nome ou CPF"></div>
+          <select id="nasc-sit" class="tb-sel" aria-label="Filtrar"></select>
+          <span class="tb-fim fb-count tnum" id="nasc-count"></span>
+        </div>
+        <div class="sec-rot">Contratos fechados aguardando o nascimento</div>
+        <div class="card list" id="nasc-list"></div>
       </section>
 
       <section id="view-inss" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
@@ -2256,7 +2323,7 @@ td,.row{font-size:13px}
   // Controle: protocolado, não arquivado e com a audiência ainda por acontecer (depois vai para o Financeiro)
   function noControle(r){ return !!String(r.processo || '').trim() && !r.arquivado && !jaRealizada(r); }
   // Cadastro: ainda sem requerimento no INSS e sem número de processo
-  function noCadastro(r){ return !String(r.processo || '').trim() && !requerido(r) && !r.arquivado; }
+  function noCadastro(r){ return !String(r.processo || '').trim() && !requerido(r) && !r.arquivado && !r.contratoEm; }
   // INSS: requerimento feito, ainda sem ação na Justiça
   function noInss(r){ return !String(r.processo || '').trim() && requerido(r) && !r.arquivado; }
   function passEtapaCl(r, f){
@@ -2940,7 +3007,7 @@ td,.row{font-size:13px}
         '<div><span class="lbl">Contato</span>' + telCell(r, true) + '</div>' +
         '<div><span class="lbl">Cadastrado</span><div class="val">' + (r.dataCadastro || r.criadoEm ? String(r.dataCadastro || r.criadoEm).slice(0, 10).replace(/^\d\d(\d\d)-(\d\d)-(\d\d)$/, '$3/$2/$1') : '—') + '</div></div>' +
         '<div><span class="lbl">Documentos</span>' + docsCell(r) + '</div>' +
-        '<div><span class="lbl">Situação</span><span class="cad-sit ' + st[2] + '">' + st[1] + '</span>' + (st[0] === 'pronto' ? '<button type="button" class="btn inss-acao" data-act="requerer" data-id="' + esc(r.id) + '" title="Lançar o requerimento feito no Meu INSS">Registrar requerimento</button>' : '') + '</div>' +
+        '<div><span class="lbl">Situação</span><span class="cad-sit ' + st[2] + '">' + st[1] + '</span>' + leadSelect(r) + '<button type="button" class="btn inss-acao" data-act="fechar" data-id="' + esc(r.id) + '" title="O contrato foi assinado: a cliente vai para Contratos fechados">Fechar contrato</button>' + '</div>' +
         '<div class="c-act"><button type="button" class="ico-btn" data-act="edit" data-id="' + esc(r.id) + '" title="Editar cadastro" aria-label="Editar ' + esc(r.nome) + '"><svg class="i"><use href="#i-pencil"/></svg></button></div>' +
       '</div>' + (cadAberto[r.id] ? fichaCliente(r, true) : '');
     });
@@ -3104,11 +3171,155 @@ td,.row{font-size:13px}
     if (cadAberto[ln.dataset.linha]) delete cadAberto[ln.dataset.linha]; else cadAberto[ln.dataset.linha] = 1;
     renderCad();
   });
-  function render(){ renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
+
+  /* ---------- Cadastro como lead, Contratos fechados e Aguardando nascimento ---------- */
+  var LEAD = { novo: 'Novo lead', contato: 'Em contato', sem_resposta: 'Sem resposta', retornar: 'Retornar depois', perdido: 'Perdido (não fechou)' };
+  function leadSelect(r){
+    var k = LEAD[r.leadStatus] ? r.leadStatus : 'novo';
+    return '<select class="inss-sel" data-lead="' + esc(r.id) + '" aria-label="Situação do contato com ' + esc(r.nome) + '">' +
+      Object.keys(LEAD).map(function(x){ return '<option value="' + x + '"' + (x === k ? ' selected' : '') + '>' + LEAD[x] + '</option>'; }).join('') + '</select>';
+  }
+  var CTR_ETAPAS = { regularizar: ['Regularizar documentos', 'crit'], conferencia: ['Em conferência', 'warn'], pronto: ['Pronto para requerer', 'ok'] };
+  function fechado(r){ return !!r.contratoEm && !r.arquivado && !String(r.processo || '').trim() && !requerido(r); }
+  function aguardaNasc(r){ return fechado(r) && r.fatoGerador === 'gestante' && !r.criancaNasc; }
+  function noContratos(r){ return fechado(r) && !aguardaNasc(r); }
+  function etapaCtr(r){ if (r.ctrEtapa && CTR_ETAPAS[r.ctrEtapa]) return r.ctrEtapa; return (docsPendentes(r) || dadosFaltando(r).length) ? 'regularizar' : 'pronto'; }
+  var ctrSit = '', ctrQ = '', ctrAberto = {}, nascSit = '', nascQ = '', nascAberto = {};
+  function buscaOk(r, q){ if (!q) return true; var s = semAcento(q), d = digits(q); return semAcento(r.nome || '').indexOf(s) >= 0 || (!!d && digits(r.cpf || '').indexOf(d) >= 0); }
+  function cardLista(attr, ico, rot, n, cap, filtro, atual){
+    return '<div class="card stat cad-filtro' + (atual === filtro ? ' ativo' : '') + '" role="button" tabindex="0" aria-pressed="' + (atual === filtro) + '" ' + attr + '="' + filtro + '"><div class="stat-h"><svg class="i"><use href="#' + ico + '"/></svg>' + rot + '</div><div class="stat-v tnum">' + n + '</div><div class="stat-c">' + cap + '</div></div>';
+  }
+  function nomeCell(r){
+    return '<div class="c-name"><div class="name"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome) + '</button>' + pastaIco(r) + '</div><div class="addr">' + (r.cpf ? 'CPF ' + esc(r.cpf) : 'CPF não informado') + (r.tipoSegurada ? ' · ' + esc(TIPOS[r.tipoSegurada] || '') : '') + '</div></div>';
+  }
+  function editBtn(r){ return '<button type="button" class="ico-btn" data-act="edit" data-id="' + esc(r.id) + '" title="Editar cadastro" aria-label="Editar ' + esc(r.nome) + '"><svg class="i"><use href="#i-pencil"/></svg></button>'; }
+  function renderContratos(){
+    var box = $('ctr-list'); if (!box) return;
+    var todos = state.rows.filter(noContratos), c = { regularizar: 0, conferencia: 0, pronto: 0 };
+    todos.forEach(function(r){ c[etapaCtr(r)]++; });
+    $('ctr-stats').innerHTML =
+      cardLista('data-ctr-filtro', 'i-users', 'Contratos fechados', todos.length, 'esperando o requerimento no INSS', '', ctrSit) +
+      cardLista('data-ctr-filtro', 'i-bellx', 'Regularizar documentos', c.regularizar, 'falta documento ou dado da cliente', 'regularizar', ctrSit) +
+      cardLista('data-ctr-filtro', 'i-clock', 'Em conferência', c.conferencia, 'a equipe está conferindo', 'conferencia', ctrSit) +
+      cardLista('data-ctr-filtro', 'i-check', 'Prontos para requerer', c.pronto, 'documentação completa', 'pronto', ctrSit);
+    $('ctr-sit').innerHTML = [['', 'Todas as etapas · ' + todos.length]].concat(Object.keys(CTR_ETAPAS).map(function(k){ return [k, CTR_ETAPAS[k][0] + ' · ' + c[k]]; }))
+      .map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === ctrSit ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
+    var ordem = { regularizar: 0, conferencia: 1, pronto: 2 };
+    var lista = todos.filter(function(r){ return (!ctrSit || etapaCtr(r) === ctrSit) && buscaOk(r, ctrQ); })
+      .sort(function(a, b){ return ordem[etapaCtr(a)] - ordem[etapaCtr(b)] || String(a.contratoEm).localeCompare(String(b.contratoEm)) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); });
+    $('ctr-count').textContent = lista.length + (lista.length === 1 ? ' cliente' : ' clientes');
+    var html = '<div class="row head"><div>Cliente</div><div>Contato</div><div>Contrato</div><div>Documentos</div><div>Etapa</div><div></div></div>';
+    if (!lista.length) html += '<div class="empty">' + (todos.length ? 'Nenhuma cliente neste filtro.' : 'Nenhum contrato fechado ainda. No <b>Cadastro</b>, use <b>Fechar contrato</b> quando a cliente assinar.') + '</div>';
+    var ultimo = '';
+    lista.slice(0, 300).forEach(function(r){
+      var k = etapaCtr(r);
+      if (!ctrSit && k !== ultimo){ ultimo = k; html += '<div class="grp-head ' + CTR_ETAPAS[k][1] + '">' + CTR_ETAPAS[k][0] + ' <span class="tnum">' + c[k] + '</span></div>'; }
+      html += '<div class="row' + (ctrAberto[r.id] ? ' aberto' : '') + '" data-linha="' + esc(r.id) + '">' + nomeCell(r) +
+        '<div><span class="lbl">Contato</span>' + telCell(r, true) + '</div>' +
+        '<div><span class="lbl">Contrato</span><div class="val">' + fmtDate(String(r.contratoEm).slice(0, 10)) + '</div><div class="mini">' + esc(prospName(r.responsavelId) || '') + '</div></div>' +
+        '<div><span class="lbl">Documentos</span>' + docsCell(r) + '</div>' +
+        '<div><span class="lbl">Etapa</span><select class="inss-sel ' + CTR_ETAPAS[k][1] + '" data-ctr="' + esc(r.id) + '" aria-label="Etapa de ' + esc(r.nome) + '">' +
+          Object.keys(CTR_ETAPAS).map(function(x){ return '<option value="' + x + '"' + (x === k ? ' selected' : '') + '>' + CTR_ETAPAS[x][0] + '</option>'; }).join('') + '</select>' +
+          (k === 'pronto' ? '<button type="button" class="btn inss-acao" data-act="requerer" data-id="' + esc(r.id) + '" title="Lançar o requerimento feito no Meu INSS">Registrar requerimento</button>' : '') + '</div>' +
+        '<div class="c-act">' + editBtn(r) + '</div></div>' + (ctrAberto[r.id] ? fichaCliente(r) : '');
+    });
+    box.innerHTML = html;
+  }
+  function pedeRequerer(r){ var d = parseDate(r.dpp); if (!d) return null; d.setDate(d.getDate() - 28); return iso(d); }
+  function renderNasc(){
+    var box = $('nasc-list'); if (!box) return;
+    var todos = state.rows.filter(aguardaNasc);
+    var pode = todos.filter(function(r){ var n = daysUntil(pedeRequerer(r)); return n != null && n <= 0; });
+    var atras = todos.filter(function(r){ var n = daysUntil(r.dpp); return n != null && n < 0; });
+    var pend = todos.filter(docsPendentes);
+    $('nasc-stats').innerHTML =
+      cardLista('data-nasc-filtro', 'i-clock', 'Aguardando nascimento', todos.length, 'contratos fechados de gestantes', '', nascSit) +
+      cardLista('data-nasc-filtro', 'i-check', 'Já podem requerer', pode.length, 'a partir de 28 dias antes do parto', 'pode', nascSit) +
+      cardLista('data-nasc-filtro', 'i-bellx', 'Passou da data prevista', atras.length, 'confirmar se o bebê nasceu', 'atrasou', nascSit) +
+      cardLista('data-nasc-filtro', 'i-bellx', 'Documentos pendentes', pend.length, 'falta documento ou dado', 'docs', nascSit);
+    $('nasc-sit').innerHTML = [['', 'Todas · ' + todos.length], ['pode', 'Já podem requerer · ' + pode.length], ['atrasou', 'Passou da data prevista · ' + atras.length], ['docs', 'Documentos pendentes · ' + pend.length]]
+      .map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === nascSit ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
+    var lista = todos.filter(function(r){
+      if (nascSit === 'pode' && pode.indexOf(r) < 0) return false;
+      if (nascSit === 'atrasou' && atras.indexOf(r) < 0) return false;
+      if (nascSit === 'docs' && !docsPendentes(r)) return false;
+      return buscaOk(r, nascQ);
+    }).sort(function(a, b){ return String(a.dpp || '9999').localeCompare(String(b.dpp || '9999')) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); });
+    $('nasc-count').textContent = lista.length + (lista.length === 1 ? ' cliente' : ' clientes');
+    var html = '<div class="row head"><div>Cliente</div><div>Contato</div><div>Parto previsto</div><div>Pode requerer a partir de</div><div>Documentos</div><div></div></div>';
+    if (!lista.length) html += '<div class="empty">' + (todos.length ? 'Nenhuma cliente neste filtro.' : 'Nenhuma gestante com contrato fechado. Elas aparecem aqui quando o fato gerador é <b>Ainda gestante</b>.') + '</div>';
+    lista.slice(0, 300).forEach(function(r){
+      var n = daysUntil(r.dpp), pr = pedeRequerer(r), np = daysUntil(pr);
+      html += '<div class="row' + (nascAberto[r.id] ? ' aberto' : '') + '" data-linha="' + esc(r.id) + '">' + nomeCell(r) +
+        '<div><span class="lbl">Contato</span>' + telCell(r, true) + '</div>' +
+        '<div><span class="lbl">Parto previsto</span><div class="val">' + (r.dpp ? fmtDate(r.dpp) : '<span class="muted-dash">não informado</span>') + '</div>' + (n != null ? '<div class="mini">' + (n < 0 ? 'passou há ' + (-n) + ' dias' : n === 0 ? 'é hoje' : 'faltam ' + n + ' dias') + '</div>' : '') + '</div>' +
+        '<div><span class="lbl">Pode requerer</span><div class="val">' + (pr ? fmtDate(pr) : '—') + '</div>' + (np != null ? '<div class="mini">' + (np <= 0 ? '<b>já pode requerer</b>' : 'em ' + np + ' dias') + '</div>' : '') + '</div>' +
+        '<div><span class="lbl">Documentos</span>' + docsCell(r) + '</div>' +
+        '<div class="c-act"><button type="button" class="btn inss-acao" data-act="nasceu" data-id="' + esc(r.id) + '" title="O bebê nasceu: informar a data e liberar para requerer">Nasceu</button>' + editBtn(r) + '</div>' +
+      '</div>' + (nascAberto[r.id] ? fichaCliente(r) : '');
+    });
+    box.innerHTML = html;
+  }
+  function acharRow(id){ return state.rows.filter(function(x){ return x.id === id; })[0]; }
+  function ligarLista(prefixo, getAberto, render){
+    $(prefixo + '-list').addEventListener('click', function(e){
+      var b = e.target.closest('[data-act]');
+      if (b){
+        var r = acharRow(b.dataset.id);
+        if (b.dataset.act === 'edit'){ if (r) openForm(r); return; }
+        if (b.dataset.act === 'requerer'){ if (r) abrirRequerimento(r); return; }
+        if (b.dataset.act === 'nasceu'){ if (!r) return; openForm(r); $('f-fato').value = 'parto'; $('f-fato').dispatchEvent(new Event('change')); setTimeout(function(){ $('f-cnasc').focus(); }, 60); toast('Informe a data de nascimento da criança e salve'); return; }
+      }
+      var ln = b && b.dataset.act === 'abrir' ? { dataset: { linha: b.dataset.id } } : e.target.closest('[data-linha]');
+      if (!ln || (!b && e.target.closest('a,button,select,input,label,.ficha'))) return;
+      var ab = getAberto(); if (ab[ln.dataset.linha]) delete ab[ln.dataset.linha]; else ab[ln.dataset.linha] = 1;
+      render();
+    });
+  }
+  ligarLista('ctr', function(){ return ctrAberto; }, renderContratos);
+  ligarLista('nasc', function(){ return nascAberto; }, renderNasc);
+  function filtroCards(el, attr, set, render){
+    el.addEventListener('click', function(e){ var c = e.target.closest('[' + attr + ']'); if (!c) return; set(c.getAttribute(attr)); render(); });
+    el.addEventListener('keydown', function(e){ if (e.key !== 'Enter' && e.key !== ' ') return; var c = e.target.closest('[' + attr + ']'); if (!c) return; e.preventDefault(); set(c.getAttribute(attr)); render(); });
+  }
+  filtroCards($('ctr-stats'), 'data-ctr-filtro', function(f){ ctrSit = ctrSit === f ? '' : f; }, renderContratos);
+  filtroCards($('nasc-stats'), 'data-nasc-filtro', function(f){ nascSit = nascSit === f ? '' : f; }, renderNasc);
+  $('ctr-sit').addEventListener('change', function(){ ctrSit = this.value; renderContratos(); });
+  $('nasc-sit').addEventListener('change', function(){ nascSit = this.value; renderNasc(); });
+  $('ctr-q').addEventListener('input', function(){ ctrQ = this.value.trim(); renderContratos(); });
+  $('nasc-q').addEventListener('input', function(){ nascQ = this.value.trim(); renderNasc(); });
+  document.addEventListener('click', function(e){ if (e.target.closest && e.target.closest('select[data-lead],select[data-ctr]')) e.stopPropagation(); }, true);
+  document.addEventListener('change', async function(e){
+    var sl = e.target.closest && e.target.closest('select[data-lead],select[data-ctr]'); if (!sl) return;
+    var r = acharRow(sl.dataset.lead || sl.dataset.ctr); if (!r) return;
+    try {
+      if (sl.dataset.ctr){
+        var antesC = { ctrEtapa: r.ctrEtapa || '' };
+        await patchRow(r.id, { ctrEtapa: sl.value, atualizadoEm: new Date().toISOString() });
+        toast(CTR_ETAPAS[sl.value][0] + ': ' + r.nome, 'Desfazer', function(){ patchRow(r.id, antesC).catch(function(e2){ toast(errMsg(e2)); }); });
+      } else {
+        var antesL = { leadStatus: r.leadStatus || '', arquivado: !!r.arquivado, arquivadoEm: r.arquivadoEm || '' };
+        var p = { leadStatus: sl.value, atualizadoEm: new Date().toISOString() };
+        if (sl.value === 'perdido'){ p.arquivado = true; p.arquivadoEm = iso(new Date()); }
+        await patchRow(r.id, p);
+        toast(LEAD[sl.value] + ': ' + r.nome + (sl.value === 'perdido' ? ' (foi para Arquivados)' : ''), 'Desfazer', function(){ patchRow(r.id, antesL).catch(function(e2){ toast(errMsg(e2)); }); });
+      }
+    } catch(err){ toast(errMsg(err)); render(); }
+  });
+  $('cad-list').addEventListener('click', async function(e){
+    var b = e.target.closest('[data-act="fechar"]'); if (!b) return;
+    var r = acharRow(b.dataset.id); if (!r) return;
+    try {
+      await patchRow(r.id, { contratoEm: iso(new Date()), leadStatus: 'fechado', atualizadoEm: new Date().toISOString() });
+      toast('Contrato fechado: ' + r.nome + ' foi para Contratos fechados', 'Desfazer', function(){ patchRow(r.id, { contratoEm: '', leadStatus: r.leadStatus || '' }).catch(function(e2){ toast(errMsg(e2)); }); });
+    } catch(err){ toast(errMsg(err)); }
+  });
+  function render(){ renderContratos(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
   var clQ = '';
   // stage of each process, derived from what is already recorded (no extra typing)
   var ETAPAS = [
-    ['cadastrado', 'Cadastrada', '--ink-3'],
+    ['cadastrado', 'Cadastrada (lead)', '--ink-3'],
+    ['contrato', 'Contrato fechado', '--amber'],
     ['requerido', 'No INSS', '--blue'],
     ['exigencia', 'Exigência do INSS', '--amber'],
     ['concedido', 'Concedido no INSS', '--green'],
@@ -3134,6 +3345,7 @@ td,.row{font-size:13px}
     if (r.inssStatus === 'indeferido') return 'indeferido';
     if (r.inssStatus === 'exigencia') return 'exigencia';
     if (requerido(r)) return 'requerido';
+    if (r.contratoEm) return 'contrato';
     return 'cadastrado';
   }
   function nomeEtapa(k){ if (k === '__novidade') return 'novidades do tribunal'; var e = ETAPAS.filter(function(x){ return x[0] === k; })[0]; return e ? e[1] : k; }
@@ -4761,11 +4973,13 @@ td,.row{font-size:13px}
     } catch(err){ toast(errMsg(err)); }
     finally { $('av-save').disabled = false; }
   });
-  var VIEWS = { d: ['tab-cad', 'view-cad'], i: ['tab-inss', 'view-inss'], c: ['tab-clientes', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-ret', 'view-ret'], e: ['tab-equipe', 'view-equipe'] };
+  var VIEWS = { d: ['tab-cad', 'view-cad'], i: ['tab-inss', 'view-inss'], k: ['tab-ctr', 'view-ctr'], n: ['tab-nasc', 'view-nasc'], c: ['tab-clientes', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-ret', 'view-ret'], e: ['tab-equipe', 'view-equipe'] };
   var TITULOS = {
     d: ['Cadastro', 'Clientes ainda sem requerimento no INSS: dados, documentos e prazo'],
     i: ['INSS', 'Requerimentos administrativos: análise, exigências, concessões e indeferimentos'],
-    c: ['Controle', 'Ações na Justiça: avisos e audiências até a audiência acontecer'],
+    c: ['Justiça', 'Ações na Justiça: acompanhamento do processo até a sentença e o pagamento'],
+    k: ['Contratos fechados', 'Clientes com contrato assinado: regularizar documentos e requerer no INSS'],
+    n: ['Aguardando nascimento', 'Contratos fechados de gestantes: esperando o bebê nascer para requerer'],
     a: ['Audiências', 'Pauta por dia, avisos e convites'],
     l: ['Clientes', 'Todas as clientes e a etapa de cada caso'],
     p: ['Pós-audiência', 'Resultados, conclusos, recursos e pagamentos'],
