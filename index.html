@@ -1863,6 +1863,35 @@ td,.row{font-size:13px}
 
 #pros-box{margin-top:6px}
 #pros-box .sec-rot{margin:4px 0 10px}
+
+/* ---------- página do estado: lista (prospectador e, embaixo, os parceiros dele) ---------- */
+.reg-voltar{margin-right:6px}
+.est-lista{overflow:hidden}
+.est-row{display:grid;grid-template-columns:minmax(0,2.4fr) minmax(0,1.3fr) 70px 80px 90px auto;gap:12px;align-items:center;padding:12px 16px;border-top:1px solid var(--gline,var(--line))}
+.est-row.head{border-top:0;background:var(--soft);font-size:12px;font-weight:600;color:var(--ink-3)}
+.est-row.pros{background:var(--gsoft,#f8f1e4)}
+.est-row.pros .est-nome b{font-size:14.5px}
+.est-row.parc{padding-left:40px;position:relative}
+.est-row.parc::before{content:"";position:absolute;left:22px;top:0;bottom:50%;width:12px;border-left:2px solid var(--gline,var(--line));border-bottom:2px solid var(--gline,var(--line));border-bottom-left-radius:8px}
+.est-row.grupo{background:var(--soft)}
+.est-nome{display:flex;flex-direction:column;gap:2px;min-width:0}
+.est-nome b{font-size:13.5px;overflow:hidden;text-overflow:ellipsis}
+.est-cid{display:flex;align-items:center;font-size:13px}
+.est-acoes{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+.est-acoes .btn{padding:6px 10px;font-size:12.5px}
+:root[data-theme="dark"] .est-row.pros{background:rgba(212,180,131,.1)}
+:root[data-theme="dark"] .est-row.head,:root[data-theme="dark"] .est-row.grupo{background:#211c16}
+
+#view-equipe[data-cfg-ativa="equipe"] [data-cfg="estados"],#view-equipe[data-cfg-ativa="integ"] [data-cfg="estados"]{display:none!important}
+#view-equipe[data-cfg-ativa="estados"] [data-cfg="equipe"],#view-equipe[data-cfg-ativa="estados"] [data-cfg="integ"]{display:none!important}
+.est-cfg{display:flex;flex-direction:column;gap:12px}
+.est-cfg-linha{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:16px;background:var(--panel,#fff);border:1px solid var(--gline,var(--line));flex-wrap:wrap}
+.est-cfg-linha .reg-mapa{width:48px;height:48px;border-radius:14px}
+.est-cfg-linha .reg-mapa img{width:34px;height:34px}
+.est-cfg-nome{display:flex;flex-direction:column;gap:2px;min-width:150px}
+.est-cfg-nome b{display:flex;align-items:center;gap:6px}
+.est-cfg-resp{flex:1;min-width:220px}
+:root[data-theme="dark"] .est-cfg-linha{background:#1b1712;border-color:#2e2820}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2184,8 +2213,8 @@ td,.row{font-size:13px}
 
 
       <section id="view-parc" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
-        <div class="sec-title">Regiões de atuação</div>
-        <div class="prosp-head">
+        <div class="sec-title" id="reg-titulo">Regiões de atuação</div>
+        <div class="prosp-head" id="reg-intro">
           <p class="view-desc">Cada estado tem um responsável e os parceiros que atuam nele. Clique em um estado para ver os parceiros.</p>
           <div class="reg-novo admin-only"><button class="btn" id="reg-add" type="button" aria-haspopup="true"><svg class="i"><use href="#i-plus"/></svg>Adicionar estado</button>
           <div class="reg-add-pop" id="reg-add-pop" hidden>
@@ -2195,6 +2224,7 @@ td,.row{font-size:13px}
           </div></div></div>
         <div class="reg-grid" id="reg-grid"></div>
         <div class="card reg-det" id="reg-det" hidden></div>
+        <div class="card list est-lista" id="estado-lista" hidden></div>
         <div id="pros-box" hidden><div class="sec-rot">Prospectadores</div><div class="prosp-grid" id="pros-list"></div></div>
         <div class="sec-title" id="parc-titulo" hidden>Parceiros</div>
         <div class="prosp-head" id="parc-head" hidden>
@@ -2208,7 +2238,9 @@ td,.row{font-size:13px}
         <div class="cfg-tabs" role="tablist" aria-label="Configurações">
           <button type="button" class="cfg-tab on" role="tab" data-cfg-tab="equipe" aria-selected="true">Equipe</button>
           <button type="button" class="cfg-tab" role="tab" data-cfg-tab="integ" aria-selected="false">Integrações</button>
+          <button type="button" class="cfg-tab" role="tab" data-cfg-tab="estados" aria-selected="false">Estados</button>
         </div>
+        <div class="est-cfg" id="cfg-estados" data-cfg="estados"></div>
         <div class="sec-title" data-cfg="equipe">Equipe</div>
         <div class="prosp-head" data-cfg="equipe">
           <p class="view-desc">Funcionários com acesso ao sistema. Só quem está nesta lista, e ativo, consegue ver os clientes.</p>
@@ -3341,6 +3373,7 @@ td,.row{font-size:13px}
   }
   function renderProspectadores(){
     var caixa = $('pros-box'), box = $('pros-list'); if (!caixa || !box) return;
+    caixa.hidden = true; box.innerHTML = ''; return;   // agora a página do estado usa uma lista (renderEstadoLista)
     if (!regAberta){ caixa.hidden = true; box.innerHTML = ''; return; }
     var lista = prospectadoresDe(regAberta).sort(function(a, b){ return (a.nome || '').localeCompare(b.nome || '', 'pt-BR'); });
     caixa.hidden = false;
@@ -3360,7 +3393,8 @@ td,.row{font-size:13px}
   }
   function renderProsp(){
     var box = $('prosp-list');
-    renderProspectadores();
+    if (box) box.innerHTML = '';
+    return;
     var doEstado = soParceiros().filter(function(p){ return regAberta && p.regiaoId === regAberta; });
     if (!regAberta){ box.innerHTML = ''; return; }
     if (!doEstado.length){ box.innerHTML = ''; return; }
@@ -3820,18 +3854,93 @@ td,.row{font-size:13px}
     }).join('');
     var det = $('reg-det');
     var g = regAberta ? regiaoPorId(regAberta) : null;
-    if (!g){ det.hidden = true; det.innerHTML = ''; return; }
+    // com um estado aberto, some a grade de estados e aparece a página dele
+    box.hidden = !!g; if ($('reg-titulo')) $('reg-titulo').hidden = !!g; if ($('reg-intro')) $('reg-intro').hidden = !!g;
+    // título da página: nome do estado quando ele está aberto
+    if (state.view === 'g' && $('pg-tit')){ $('pg-tit').textContent = g ? g.nome : 'Parceiros'; $('pg-sub').textContent = g ? 'Prospectadores e os parceiros que cada um trouxe' : 'Estados de atuação, responsável de cada um e os parceiros que cadastram as clientes'; }
+    if (!g){ det.hidden = true; det.innerHTML = ''; if ($('estado-lista')){ $('estado-lista').hidden = true; $('estado-lista').innerHTML = ''; } return; }
     var ps = soParceiros().filter(function(p){ return p.regiaoId === g.id; }).sort(function(a, b){ return (a.nome || '').localeCompare(b.nome || '', 'pt-BR'); });
     var nomes = (state.equipe || []).map(function(u){ return u.nome; }).filter(Boolean);
     det.hidden = false;
-    det.innerHTML = '<div class="reg-det-h">' + ufFlagReg(g) + '<b>' + esc(g.nome) + '</b><span class="mini">' + ps.length + (ps.length === 1 ? ' parceiro' : ' parceiros') + '</span><button type="button" class="btn primary reg-novo-parc" data-reg-novo="' + esc(g.id) + '"><svg class="i"><use href="#i-plus"/></svg>Novo parceiro</button><button type="button" class="btn reg-novo-parc" data-reg-novo-pros="' + esc(g.id) + '"><svg class="i"><use href="#i-plus"/></svg>Novo prospectador</button></div>' +
-      '<div class="reg-resp-edit"><label for="reg-resp-in">Responsável pelo estado</label>' +
-        (isAdmin() ? '<div class="reg-resp-row"><input id="reg-resp-in" list="reg-resp-dl" autocomplete="off" placeholder="Nome do responsável" value="' + esc(g.responsavel || '') + '"><datalist id="reg-resp-dl">' + nomes.map(function(n){ return '<option value="' + esc(n) + '">'; }).join('') + '</datalist><button type="button" class="btn" id="reg-resp-salvar" data-reg-id="' + esc(g.id) + '">Salvar</button>' + (ps.length ? '' : '<button type="button" class="btn danger" id="reg-remover" data-reg-id="' + esc(g.id) + '">Remover estado</button>') + '</div>'
-                    : '<div class="reg-resp-nome">' + (g.responsavel ? esc(g.responsavel) : 'Não definido') + '</div>') + '</div>' +
+    det.innerHTML = '<div class="reg-det-h"><button type="button" class="btn reg-voltar" data-reg-voltar="1"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>Regiões</button>' + ufFlagReg(g) + '<b>' + esc(g.nome) + '</b><span class="mini">' + ps.length + (ps.length === 1 ? ' parceiro' : ' parceiros') + '</span><button type="button" class="btn primary reg-novo-parc" data-reg-novo="' + esc(g.id) + '"><svg class="i"><use href="#i-plus"/></svg>Novo parceiro</button><button type="button" class="btn reg-novo-parc" data-reg-novo-pros="' + esc(g.id) + '"><svg class="i"><use href="#i-plus"/></svg>Novo prospectador</button></div>' +
       '';
-
+    renderEstadoLista();
   }
+  // página do estado: prospectadores e, embaixo de cada um, os parceiros que ele trouxe (em lista)
+
+  /* ---------- Configurações › Estados: responsável de cada estado ---------- */
+  function renderEstadosCfg(){
+    var box = $('cfg-estados'); if (!box) return;
+    var nomes = (state.equipe || []).map(function(u){ return u.nome; }).filter(Boolean);
+    box.innerHTML = '<p class="view-desc">Defina quem é o responsável por cada estado. Ele aparece no cartão do estado, em Parceiros.</p><datalist id="est-resp-dl">' +
+      nomes.map(function(n){ return '<option value="' + esc(n) + '">'; }).join('') + '</datalist>' +
+      state.regioes.map(function(g){
+        var usos = state.prosp.filter(function(p){ return p.regiaoId === g.id; }).length;
+        return '<div class="est-cfg-linha">' + mapaReg(g) + '<div class="est-cfg-nome">' + ufFlagReg(g) + '<b>' + esc(g.nome) + '</b><span class="mini">' + usos + (usos === 1 ? ' cadastro' : ' cadastros') + '</span></div>' +
+          (isAdmin() ? '<input class="est-cfg-resp" data-est="' + esc(g.id) + '" list="est-resp-dl" autocomplete="off" placeholder="Responsável pelo estado" value="' + esc(g.responsavel || '') + '">' +
+            '<button type="button" class="btn" data-est-salvar="' + esc(g.id) + '">Salvar</button>' +
+            (usos ? '' : '<button type="button" class="btn danger" data-est-remover="' + esc(g.id) + '">Remover</button>')
+            : '<span class="reg-resp-nome">' + esc(g.responsavel || 'Não definido') + '</span>') + '</div>';
+      }).join('');
+  }
+  $('cfg-estados').addEventListener('click', async function(e){
+    var s = e.target.closest('[data-est-salvar]'), rm = e.target.closest('[data-est-remover]');
+    if (s){
+      var g = regiaoPorId(s.dataset.estSalvar); if (!g) return;
+      var inp = box_est(s.dataset.estSalvar), antes = g.responsavel || ''; g.responsavel = inp ? inp.value.trim() : antes;
+      try { await regSalvar(); toast('Responsável de ' + g.nome + ': ' + (g.responsavel || 'não definido')); }
+      catch(err){ g.responsavel = antes; toast(errMsg(err)); }
+      renderRegioes(); renderEstadosCfg(); return;
+    }
+    if (rm){
+      var gr = regiaoPorId(rm.dataset.estRemover); if (!gr) return;
+      var lista = state.regioes.slice(); state.regioes = state.regioes.filter(function(x){ return x.id !== gr.id; });
+      try { await regSalvar(); if (regAberta === gr.id) regAberta = ''; toast('Estado removido: ' + gr.nome); }
+      catch(err){ state.regioes = lista; toast(errMsg(err)); }
+      renderRegioes(); renderEstadosCfg();
+    }
+  });
+  function box_est(id){ return $('cfg-estados').querySelector('input[data-est="' + id + '"]'); }
+  function renderEstadoLista(){
+    var box = $('estado-lista'); if (!box) return;
+    var g = regAberta ? regiaoPorId(regAberta) : null;
+    if (!g){ box.hidden = true; box.innerHTML = ''; return; }
+    var parc = soParceiros().filter(function(p){ return p.regiaoId === g.id; });
+    var pros = prospectadoresDe(g.id).sort(function(a, b){ return (a.nome || '').localeCompare(b.nome || '', 'pt-BR'); });
+    function nums(ids){
+      var cli = state.rows.filter(function(r){ return ids.indexOf(r.responsavelId) >= 0; });
+      return { cli: cli.length, con: cli.filter(function(r){ return !!r.contratoEm; }).length, cnc: cli.filter(function(r){ return r.inssStatus === 'concedido'; }).length };
+    }
+    function acoes(p, comVer){
+      return '<div class="est-acoes">' + (comVer ? '<button type="button" class="btn" data-pact="ver" data-id="' + esc(p.id) + '">Ver clientes</button>' : '') +
+        (isAdmin() ? '<button type="button" class="btn" data-pact="link" data-id="' + esc(p.id) + '" title="Usuário e senha do aplicativo">Aplicativo</button>' : '') +
+        '<button type="button" class="btn" data-pact="edit" data-id="' + esc(p.id) + '">Editar</button></div>';
+    }
+    function linhaParceiro(p){
+      var n = nums([p.id]);
+      return '<div class="est-row parc"><div class="est-nome"><b>' + esc(p.tipo === 'clinica' && p.clinica ? p.clinica : p.nome) + '</b><span class="mini">' +
+          (p.tipo === 'clinica' ? 'Clínica · ' + esc(p.nome) + ' · ' : '') + esc(p.telefone || 'sem telefone') + '</span></div>' +
+        '<div class="est-cid">' + ufFlagReg(g) + esc(p.regiao || '—') + '</div>' +
+        '<div class="tnum">' + n.cli + '</div><div class="tnum">' + n.con + '</div><div class="tnum">' + n.cnc + '</div>' + acoes(p, true) + '</div>';
+    }
+    var html = '<div class="est-row head"><div>Nome</div><div>Cidade</div><div>Clientes</div><div>Contratos</div><div>Concedidos</div><div></div></div>';
+    pros.forEach(function(pr){
+      var seus = parc.filter(function(p){ return p.prospectadorId === pr.id; }).sort(function(a, b){ return (a.nome || '').localeCompare(b.nome || '', 'pt-BR'); });
+      var n = nums(seus.map(function(x){ return x.id; }));
+      html += '<div class="est-row pros"><div class="est-nome"><b>' + esc(pr.nome) + '</b><span class="mini">Prospectador · ' + esc(pr.telefone || 'sem telefone') + ' · ' + seus.length + (seus.length === 1 ? ' parceiro' : ' parceiros') + '</span></div>' +
+        '<div></div><div class="tnum">' + n.cli + '</div><div class="tnum">' + n.con + '</div><div class="tnum">' + n.cnc + '</div>' + acoes(pr, false) + '</div>';
+      html += seus.map(linhaParceiro).join('');
+    });
+    var soltos = parc.filter(function(p){ return !p.prospectadorId || !pros.some(function(x){ return x.id === p.prospectadorId; }); }).sort(function(a, b){ return (a.nome || '').localeCompare(b.nome || '', 'pt-BR'); });
+    if (soltos.length){
+      html += '<div class="est-row grupo"><div class="est-nome"><b>Parceiros sem prospectador</b></div></div>' + soltos.map(linhaParceiro).join('');
+    }
+    box.hidden = !(pros.length || soltos.length);
+    box.innerHTML = box.hidden ? '' : html;
+  }
+  $('estado-lista').addEventListener('click', function(e){ clickProsp(e); });
   $('reg-det').addEventListener('click', async function(e){
+    if (e.target.closest('[data-reg-voltar]')){ regAberta = ''; renderRegioes(); return; }
     var nv = e.target.closest('[data-reg-novo]'); if (nv){ openProsp(null, nv.dataset.regNovo); return; }
     var np = e.target.closest('[data-reg-novo-pros]'); if (np){ openProsp(null, np.dataset.regNovoPros, 'prospectador'); return; }
     var s = e.target.closest('#reg-resp-salvar'), rm = e.target.closest('#reg-remover');
@@ -3902,7 +4011,7 @@ td,.row{font-size:13px}
   })();
   // sem audiência e sem aviso: some o título da seção de audiência do formulário
   Array.prototype.forEach.call(document.querySelectorAll('.section-lbl'), function(e){ if (/^Audiência$/.test(e.textContent.trim())) e.hidden = true; });
-  function render(){ renderRegioes(); renderContratos(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
+  function render(){ renderEstadosCfg(); renderRegioes(); renderContratos(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
   var clQ = '';
   // stage of each process, derived from what is already recorded (no extra typing)
   var ETAPAS = [
