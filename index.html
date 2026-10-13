@@ -1936,6 +1936,28 @@ td,.row{font-size:13px}
 #cad-list .cad-docs{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
 :root[data-theme="dark"] #cad-list .tel-btn.zap,:root[data-theme="dark"] #cad-list .tel-btn.ok{background:rgba(70,160,100,.16);border-color:rgba(70,160,100,.5);color:#8fd6a9}
 @media (max-width:900px){ #cad-list .row{grid-template-columns:minmax(0,1fr)!important} }
+
+/* Cadastro condensado */
+#cad-list .row{grid-template-columns:minmax(0,1.7fr) minmax(190px,1.25fr) minmax(130px,.85fr) minmax(250px,1.6fr) minmax(0,1fr) 30px!important;gap:12px!important;min-height:40px!important;padding-top:5px!important;padding-bottom:5px!important}
+#cad-list .row.head{padding-top:6px!important;padding-bottom:6px!important}
+#cad-list .c-name .name{font-size:13px}
+#cad-list .c-name .addr{font-size:11px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cad-list .cad-contato{flex-direction:row!important;align-items:center;gap:6px!important;flex-wrap:nowrap}
+#cad-list .tel-grande{font-size:13.5px;font-weight:700;white-space:nowrap}
+#cad-list .tel-ic{width:26px;height:26px;border-radius:7px;border:1px solid var(--line);background:var(--panel,#fff);color:var(--ink-2,#5a4f3f);display:inline-flex;align-items:center;justify-content:center;padding:0;flex:none;cursor:pointer}
+#cad-list .tel-ic .i{width:14px;height:14px}
+#cad-list .tel-ic.ok{background:#e9f7ee;border-color:#9bd3ad;color:#17653a}
+#cad-list .tel-zap{font-size:11px;font-weight:700;padding:3px 8px;border-radius:7px;background:#e9f7ee;border:1px solid #9bd3ad;color:#17653a;text-decoration:none;white-space:nowrap}
+#cad-list .cad-parto{white-space:nowrap}
+#cad-list .cad-parto .val{font-size:12.5px}
+#cad-list .cad-atend{flex-direction:row!important;align-items:center!important;gap:6px!important}
+#cad-list .cad-atend select{min-width:0;flex:1;font-size:12px}
+#cad-list .cad-atend .inss-acao{white-space:nowrap;padding:4px 9px;font-size:12px;flex:none}
+#cad-list .cad-docs{flex-direction:row!important;align-items:center}
+:root[data-theme="dark"] #cad-list .tel-zap,:root[data-theme="dark"] #cad-list .tel-ic.ok{background:rgba(70,160,100,.16);border-color:rgba(70,160,100,.5);color:#8fd6a9}
+#cad-list .row{grid-template-columns:minmax(0,1.5fr) minmax(240px,1.3fr) minmax(150px,.9fr) minmax(230px,1.5fr) minmax(0,1fr) 30px!important}
+#cad-list .cad-parto{padding-left:4px}
+#cad-list .tel-zap{margin-left:2px}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2903,10 +2925,9 @@ td,.row{font-size:13px}
     var t = foneDe(r);
     if (!t) return '<button type="button" class="tel-add" data-act="tel" data-id="' + esc(r.id) + '" title="Digite o telefone da cliente">+ contato</button>';
     var u = zapUrl(t), num = fmtTel(t), copia = String(t).split(/[\/,;]|\be\b/)[0].trim();
-    return '<div class="tel-grande tnum">' + esc(num) + '</div><div class="tel-acoes">' +
-      '<button type="button" class="btn tel-btn" data-copiar-tel="' + esc(copia) + '" title="Copiar o telefone"><svg class="i"><use href="#i-copy"/></svg>Copiar</button>' +
-      (u ? '<a class="btn tel-btn zap" href="' + u + '" target="_blank" rel="noopener" title="Abrir a conversa no WhatsApp">WhatsApp</a>' : '') +
-      '<button type="button" class="tel-edit mini" data-act="tel" data-id="' + esc(r.id) + '" title="Corrigir o telefone">corrigir</button></div>';
+    return '<span class="tel-grande tnum">' + esc(num) + '</span>' +
+      '<button type="button" class="tel-ic" data-copiar-tel="' + esc(copia) + '" title="Copiar o telefone" aria-label="Copiar o telefone"><svg class="i"><use href="#i-copy"/></svg></button>' +
+      (u ? '<a class="tel-zap" href="' + u + '" target="_blank" rel="noopener" title="Abrir a conversa no WhatsApp">WhatsApp</a>' : '');
   }
   function partoCell(r){
     var d = r.dpp; if (!d) return '<span class="mini">sem data</span>';
@@ -2914,7 +2935,7 @@ td,.row{font-size:13px}
     var sem = Math.round(n / 7);
     var rel = n < 0 ? 'já passou da data' : n === 0 ? 'é hoje' : n < 14 ? 'em ' + n + ' dias' : 'em ' + sem + ' semanas';
     var iso = String(d).slice(0, 10), br = /^\d{4}-\d{2}-\d{2}$/.test(iso) ? iso.slice(8, 10) + '/' + iso.slice(5, 7) + '/' + iso.slice(0, 4) : fmtShort(d);
-    return '<div class="val tnum">' + br + '</div><div class="mini ' + (n < 0 || n <= 14 ? 'warn' : '') + '">' + rel + '</div>';
+    return '<span class="val tnum">' + br + '</span> <span class="mini ' + (n < 0 || n <= 14 ? 'warn' : '') + '">· ' + rel.replace('em ', '').replace(' semanas', ' sem.') + '</span>';
   }
   function telCell(r, semProsp){
     var add = '<button type="button" class="tel-add" data-act="tel" data-id="' + esc(r.id) + '" title="Digite o telefone ou o nome de um cliente que avisa esta pessoa">+ contato</button>';
@@ -3577,7 +3598,7 @@ td,.row{font-size:13px}
         '<div class="cad-contato">' + contatoCloser(r) + '</div>' +
         '<div class="cad-parto">' + partoCell(r) + '</div>' +
         '<div class="cad-atend">' + leadSelect(r) + '<button type="button" class="btn inss-acao" data-act="fechar" data-id="' + esc(r.id) + '" title="O contrato foi assinado: a cliente vai para Contratos fechados">Fechar contrato</button></div>' +
-        '<div class="cad-docs">' + docsCell(r) + (st[0] === 'pronto' ? '' : '<span class="cad-sit ' + st[2] + '">' + st[1] + '</span>') + '</div>' +
+        '<div class="cad-docs" title="' + esc(st[1]) + '">' + docsCell(r) + '</div>' +
         '<div class="c-act"><button type="button" class="ico-btn" data-act="edit" data-id="' + esc(r.id) + '" title="Editar cadastro" aria-label="Editar ' + esc(r.nome) + '"><svg class="i"><use href="#i-pencil"/></svg></button></div>' +
       '</div>' + (cadAberto[r.id] ? fichaCliente(r, true) : '');
     });
