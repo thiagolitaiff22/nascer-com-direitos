@@ -1920,6 +1920,22 @@ td,.row{font-size:13px}
 .fp-flag{display:inline-flex;align-items:center;flex:none}
 .fp-flag:empty{display:none}
 .fp-flag .cid-flag,.fp-flag img{width:26px;height:18px;border-radius:3px;object-fit:cover;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+
+/* Cadastro pensado para o closer: contato grande e copiável */
+#cad-list .row{grid-template-columns:minmax(0,2fr) minmax(210px,1.5fr) minmax(0,.9fr) minmax(190px,1.3fr) minmax(0,1.3fr) 36px!important;align-items:center;gap:16px!important;min-height:78px;padding-top:12px!important;padding-bottom:12px!important}
+#cad-list .row.head{min-height:0;padding-top:8px!important;padding-bottom:8px!important}
+#cad-list .cad-contato{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+#cad-list .tel-grande{font-size:16px;font-weight:700;letter-spacing:.2px}
+#cad-list .tel-acoes{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+#cad-list .tel-btn{padding:5px 10px;font-size:12.5px;display:inline-flex;align-items:center;gap:5px;text-decoration:none}
+#cad-list .tel-btn .i{width:14px;height:14px}
+#cad-list .tel-btn.zap{background:#e9f7ee;border-color:#9bd3ad;color:#17653a}
+#cad-list .tel-btn.ok{background:#e9f7ee;border-color:#9bd3ad;color:#17653a}
+#cad-list .cad-atend{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+#cad-list .cad-atend .inss-acao{justify-content:center}
+#cad-list .cad-docs{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+:root[data-theme="dark"] #cad-list .tel-btn.zap,:root[data-theme="dark"] #cad-list .tel-btn.ok{background:rgba(70,160,100,.16);border-color:rgba(70,160,100,.5);color:#8fd6a9}
+@media (max-width:900px){ #cad-list .row{grid-template-columns:minmax(0,1fr)!important} }
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2875,6 +2891,31 @@ td,.row{font-size:13px}
       return p;
     }).join('').replace(/\s+/g, ' ').trim();
   }
+  // telefone que o closer usa para ligar: o da cliente, ou o do contato por quem ela chegou
+  function foneDe(r){ var via = clienteVia(r); return String((via && via.contato) || r.contato || '').trim(); }
+  function zapUrl(t){
+    var d = String(t || '').split(/[\/,;]|\be\b/)[0].replace(/\D/g, '');
+    if (d.length < 10) return '';
+    if (d.length <= 11) d = '55' + d;
+    return 'https://wa.me/' + d;
+  }
+  function contatoCloser(r){
+    var t = foneDe(r);
+    if (!t) return '<button type="button" class="tel-add" data-act="tel" data-id="' + esc(r.id) + '" title="Digite o telefone da cliente">+ contato</button>';
+    var u = zapUrl(t), num = fmtTel(t), copia = String(t).split(/[\/,;]|\be\b/)[0].trim();
+    return '<div class="tel-grande tnum">' + esc(num) + '</div><div class="tel-acoes">' +
+      '<button type="button" class="btn tel-btn" data-copiar-tel="' + esc(copia) + '" title="Copiar o telefone"><svg class="i"><use href="#i-copy"/></svg>Copiar</button>' +
+      (u ? '<a class="btn tel-btn zap" href="' + u + '" target="_blank" rel="noopener" title="Abrir a conversa no WhatsApp">WhatsApp</a>' : '') +
+      '<button type="button" class="tel-edit mini" data-act="tel" data-id="' + esc(r.id) + '" title="Corrigir o telefone">corrigir</button></div>';
+  }
+  function partoCell(r){
+    var d = r.dpp; if (!d) return '<span class="mini">sem data</span>';
+    var n = daysUntil(d); if (n == null) return '<span class="mini">sem data</span>';
+    var sem = Math.round(n / 7);
+    var rel = n < 0 ? 'já passou da data' : n === 0 ? 'é hoje' : n < 14 ? 'em ' + n + ' dias' : 'em ' + sem + ' semanas';
+    var iso = String(d).slice(0, 10), br = /^\d{4}-\d{2}-\d{2}$/.test(iso) ? iso.slice(8, 10) + '/' + iso.slice(5, 7) + '/' + iso.slice(0, 4) : fmtShort(d);
+    return '<div class="val tnum">' + br + '</div><div class="mini ' + (n < 0 || n <= 14 ? 'warn' : '') + '">' + rel + '</div>';
+  }
   function telCell(r, semProsp){
     var add = '<button type="button" class="tel-add" data-act="tel" data-id="' + esc(r.id) + '" title="Digite o telefone ou o nome de um cliente que avisa esta pessoa">+ contato</button>';
     var via = clienteVia(r);
@@ -2959,6 +3000,12 @@ td,.row{font-size:13px}
       toast(!d.arquivos ? 'A pasta está vazia.' : falta.length ? 'Na pasta falta: ' + falta.map(function(k){ return DOC_FALTA[k]; }).join(', ') + '.' : 'Documentação completa: ' + docsExigidos(r).map(function(c){ return DOC_FALTA[c[1]]; }).join(', ') + '.' + (r.tipoSegurada ? '' : ' Informe o tipo de segurada para conferir também as provas.'));
     } catch(err){ toast('Não foi possível olhar a pasta: ' + (err.message || err)); }
     finally { b.disabled = false; b.textContent = rot; }
+  });
+  // copiar o telefone da cliente (para ligar ou colar no WhatsApp)
+  document.addEventListener('click', async function(e){
+    var b = e.target.closest('[data-copiar-tel]'); if (!b) return;
+    try { await copiarTexto(b.dataset.copiarTel); b.classList.add('ok'); setTimeout(function(){ b.classList.remove('ok'); }, 1500); toast('Telefone copiado: ' + b.dataset.copiarTel); }
+    catch(err){ toast('Não foi possível copiar. Selecione o número e use Ctrl+C.'); }
   });
   // copiar o nome do cliente (para pesquisar no PROJUDI)
   document.addEventListener('click', async function(e){
@@ -3504,26 +3551,33 @@ td,.row{font-size:13px}
       // pendências: documento que o parceiro ainda não mandou ou dados incompletos (cada cliente conta uma vez)
       cardC('i-bellx', 'Pendências', todos.filter(function(r){ return docsPendentes(r) || situacaoCad(r)[0] === 'incompleto'; }).length, nFaltaC + ' com documento pendente · ' + conta.incompleto + ' com dados incompletos · ' + semTel + ' sem telefone' + (nPrazo ? ' · ' + nPrazo + ' com prazo perto do fim' : ''), '--red', 'pendencias');
     var nFalta = todos.filter(docsPendentes).length;
-    var SITS = [['', 'Todas as situações · ' + todos.length], ['faltam', 'Faltam documentos · ' + nFalta], ['pronto', 'Prontos para requerer · ' + conta.pronto], ['conferir', 'Conferir dados · ' + conta.conferir], ['incompleto', 'Dados incompletos · ' + conta.incompleto], ['gestante', 'Aguardando o parto · ' + conta.gestante], ['prazo', 'Prazo perto do fim · ' + nPrazo], ['pendencias', 'Pendências (documento ou dados)']];
+    var SITS = [['', 'Todas as situações · ' + todos.length], ['faltam', 'Faltam documentos · ' + nFalta], ['pronto', 'Prontos para requerer · ' + conta.pronto], ['conferir', 'Conferir dados · ' + conta.conferir], ['incompleto', 'Dados incompletos · ' + conta.incompleto], ['gestante', 'Aguardando o parto · ' + conta.gestante], ['prazo', 'Prazo perto do fim · ' + nPrazo], ['pendencias', 'Pendências (documento ou dados)'],
+      ['l:novo', 'Para ligar (novos) · ' + todos.filter(function(r){ return leadDe(r) === 'novo'; }).length], ['l:retornar', 'Retornar depois · ' + todos.filter(function(r){ return leadDe(r) === 'retornar'; }).length],
+      ['l:sem_resposta', 'Sem resposta · ' + todos.filter(function(r){ return leadDe(r) === 'sem_resposta'; }).length], ['l:contato', 'Em contato · ' + todos.filter(function(r){ return leadDe(r) === 'contato'; }).length]];
     $('cad-sit').innerHTML = SITS.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === cadSit ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
     $('cad-sit').classList.toggle('ativo', !!cadSit);
-    var lista = todos.filter(function(r){ return (!cadSit || (cadSit === 'faltam' ? docsPendentes(r) : cadSit === 'pendencias' ? (docsPendentes(r) || situacaoCad(r)[0] === 'incompleto') : cadSit === 'prazo' ? !!prazoTag(r) : situacaoCad(r)[0] === cadSit)) && buscaCliente(r, cadQ); })
+    var lista = todos.filter(function(r){ return (!cadSit || (cadSit === 'faltam' ? docsPendentes(r) : cadSit === 'pendencias' ? (docsPendentes(r) || situacaoCad(r)[0] === 'incompleto') : cadSit === 'prazo' ? !!prazoTag(r) : /^l:/.test(cadSit) ? leadDe(r) === cadSit.slice(2) : situacaoCad(r)[0] === cadSit)) && buscaCliente(r, cadQ); })
       // mais recente primeiro (pelo dia do cadastro); no mesmo dia, em ordem alfabética
-      .sort(function(a, b){ var da = String(a.dataCadastro || a.criadoEm || '').slice(0, 10), db = String(b.dataCadastro || b.criadoEm || '').slice(0, 10); return db.localeCompare(da) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); });
+      .sort(function(a, b){ var da = String(a.dataCadastro || a.criadoEm || '').slice(0, 10), db = String(b.dataCadastro || b.criadoEm || '').slice(0, 10); return (LEAD_ORDEM[leadDe(a)] - LEAD_ORDEM[leadDe(b)]) || db.localeCompare(da) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); });
     $('cad-count').textContent = lista.length + (lista.length === 1 ? ' cliente' : ' clientes');
-    var html = '<div class="row head"><div>Cliente</div><div>Parceiro</div><div>Contato</div><div>Cadastrado</div><div>Documentos</div><div>Situação</div><div></div></div>';
+    var html = '<div class="row head"><div>Cliente</div><div>Contato · ligar</div><div>Parto previsto</div><div>Atendimento</div><div>Documentos</div><div></div></div>';
     if (!lista.length) html += '<div class="empty">' + (todos.length ? 'Nenhum cliente neste filtro.' : 'Nenhum cliente em cadastro. Clique em <b>Novo cadastro</b> para começar.') + '</div>';
     lista.slice(0, 300).forEach(function(r){
       var st = situacaoCad(r);
-      html += '<div class="row' + (cadAberto[r.id] ? ' aberto' : '') + '" data-linha="' + esc(r.id) + '">' +
-        '<div class="c-name"><div class="name">' + ufFlag(r) + '' + (/^data:image\/(jpeg|png);base64,/.test(r.fotoCliente || '') ? '<img class="av-foto" src="' + r.fotoCliente + '" alt="">' : '') + '<button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome) + '</button>' +
+      var foto = /^data:image\/(jpeg|png);base64,/.test(r.fotoCliente || '') ? '<img class="av-foto" src="' + r.fotoCliente + '" alt="">' : '';
+      var par = prospById(r.responsavelId), parNome = par ? (par.tipo === 'clinica' && par.clinica ? par.clinica : par.nome) : (r.origem === 'organico' ? 'Orgânico' : '');
+      var onde = [parNome ? 'Indicação de ' + parNome : '', par && par.regiao ? par.regiao : ''].filter(Boolean).join(' · ');
+      var dc = String(r.dataCadastro || r.criadoEm || '').slice(0, 10), nd = dc ? -daysUntil(dc) : null;
+      var quando = nd == null ? '' : nd <= 0 ? 'cadastrada hoje' : nd === 1 ? 'cadastrada ontem' : 'cadastrada há ' + nd + ' dias';
+      html += '<div class="row cad-closer' + (cadAberto[r.id] ? ' aberto' : '') + '" data-linha="' + esc(r.id) + '">' +
+        '<div class="c-name"><div class="name">' + ufFlag(r) + foto + '<button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome) + '</button>' +
           '<button type="button" class="nome-copia" data-copiar-nome="' + esc(r.nome) + '" title="Copiar o nome" aria-label="Copiar o nome de ' + esc(r.nome) + '"><svg class="i"><use href="#i-copy"/></svg></button>' +
-          (r.pastaUrl ? pastaIco(r) : '<button type="button" class="pasta-falta" data-pasta-cad="' + esc(r.id) + '" title="Pasta não ligada ao cadastro: clique para procurar a pasta dela no Drive" aria-label="Ligar pasta de ' + esc(r.nome) + '"><svg class="i"><use href="#i-folder"/></svg>+</button>') + prazoTag(r) + '</div><div class="addr">' + (r.cpf ? 'CPF ' + esc(r.cpf) : 'CPF não informado') + (r.tipoSegurada ? ' · ' + esc(r.tipoSegurada === 'especial' ? 'rural' : (TIPOS[r.tipoSegurada] || '').split(' ')[0].toLowerCase()) : '') + '</div></div>' +
-        '<div><span class="lbl">Parceiro</span><div class="val">' + esc(prospName(r.responsavelId) || (r.origem === 'organico' ? 'Orgânico' : '—')) + '</div></div>' +
-        '<div><span class="lbl">Contato</span>' + telCell(r, true) + '</div>' +
-        '<div><span class="lbl">Cadastrado</span><div class="val">' + (r.dataCadastro || r.criadoEm ? String(r.dataCadastro || r.criadoEm).slice(0, 10).replace(/^\d\d(\d\d)-(\d\d)-(\d\d)$/, '$3/$2/$1') : '—') + '</div></div>' +
-        '<div><span class="lbl">Documentos</span>' + docsCell(r) + '</div>' +
-        '<div><span class="lbl">Situação</span><span class="cad-sit ' + st[2] + '">' + st[1] + '</span>' + leadSelect(r) + '<button type="button" class="btn inss-acao" data-act="fechar" data-id="' + esc(r.id) + '" title="O contrato foi assinado: a cliente vai para Contratos fechados">Fechar contrato</button>' + '</div>' +
+          (r.pastaUrl ? pastaIco(r) : '<button type="button" class="pasta-falta" data-pasta-cad="' + esc(r.id) + '" title="Pasta não ligada ao cadastro: clique para procurar a pasta dela no Drive" aria-label="Ligar pasta de ' + esc(r.nome) + '"><svg class="i"><use href="#i-folder"/></svg></button>') + '</div>' +
+          '<div class="addr">' + esc(onde || 'Sem parceiro') + (quando ? ' · ' + quando : '') + '</div></div>' +
+        '<div class="cad-contato">' + contatoCloser(r) + '</div>' +
+        '<div class="cad-parto">' + partoCell(r) + '</div>' +
+        '<div class="cad-atend">' + leadSelect(r) + '<button type="button" class="btn inss-acao" data-act="fechar" data-id="' + esc(r.id) + '" title="O contrato foi assinado: a cliente vai para Contratos fechados">Fechar contrato</button></div>' +
+        '<div class="cad-docs">' + docsCell(r) + (st[0] === 'pronto' ? '' : '<span class="cad-sit ' + st[2] + '">' + st[1] + '</span>') + '</div>' +
         '<div class="c-act"><button type="button" class="ico-btn" data-act="edit" data-id="' + esc(r.id) + '" title="Editar cadastro" aria-label="Editar ' + esc(r.nome) + '"><svg class="i"><use href="#i-pencil"/></svg></button></div>' +
       '</div>' + (cadAberto[r.id] ? fichaCliente(r, true) : '');
     });
@@ -3693,6 +3747,8 @@ td,.row{font-size:13px}
 
   /* ---------- Cadastro como lead, Contratos fechados e Aguardando nascimento ---------- */
   var LEAD = { novo: 'Novo lead', contato: 'Em contato', sem_resposta: 'Sem resposta', retornar: 'Retornar depois', perdido: 'Perdido (não fechou)' };
+  function leadDe(r){ return LEAD[r.leadStatus] ? r.leadStatus : 'novo'; }
+  var LEAD_ORDEM = { novo: 0, retornar: 1, contato: 2, sem_resposta: 3, perdido: 4 };
   function leadSelect(r){
     var k = LEAD[r.leadStatus] ? r.leadStatus : 'novo';
     return '<select class="inss-sel" data-lead="' + esc(r.id) + '" aria-label="Situação do contato com ' + esc(r.nome) + '">' +
