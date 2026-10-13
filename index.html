@@ -2622,8 +2622,8 @@ td,.row{font-size:13px}
   <form class="f" id="form-senha" novalidate>
     <div class="f-head"><h2>Alterar minha senha</h2></div>
     <div class="f-body">
-      <div class="field full"><label for="sn-nova">Nova senha</label><input id="sn-nova" type="password" autocomplete="new-password" placeholder="Mínimo de 6 caracteres"></div>
-      <div class="field full"><label for="sn-rep">Repita a nova senha</label><input id="sn-rep" type="password" autocomplete="new-password"></div>
+      <div class="field full"><label for="sn-nova">Nova senha</label><input id="sn-nova" type="password" inputmode="numeric" autocomplete="new-password" placeholder="Só números, mínimo de 6"></div>
+      <div class="field full"><label for="sn-rep">Repita a nova senha</label><input id="sn-rep" type="password" inputmode="numeric" autocomplete="new-password"></div>
       <div class="field full"><span class="hint" id="sn-msg"></span></div>
     </div>
     <div class="f-foot"><div class="right"><button class="btn" type="button" id="sn-cancel">Cancelar</button><button class="btn primary" type="submit" id="sn-go">Salvar senha</button></div></div>
@@ -2636,7 +2636,7 @@ td,.row{font-size:13px}
     <div class="f-body">
       <div class="field full"><label for="fe-nome">Nome</label><input id="fe-nome" autocomplete="off"></div>
       <div class="field full"><label for="fe-email">Usuário de acesso</label><input id="fe-email" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="ex.: thiago ou nome.sobrenome"><span class="hint">É com este usuário e a senha abaixo que o funcionário entra no sistema. Pode usar um e-mail, se preferir.</span></div>
-      <div class="field full" id="fe-senha-wrap"><label for="fe-senha">Senha de acesso</label><input id="fe-senha" type="password" autocomplete="new-password" placeholder="Mínimo de 6 caracteres"><span class="hint" id="fe-senha-dica">O próprio funcionário pode trocar a senha depois, dentro do sistema.</span></div>
+      <div class="field full" id="fe-senha-wrap"><label for="fe-senha">Senha de acesso</label><input id="fe-senha" type="password" inputmode="numeric" autocomplete="new-password" placeholder="Só números, mínimo de 6"><span class="hint" id="fe-senha-dica">Só números (mínimo de 6). O próprio funcionário pode trocar depois, em Alterar senha.</span></div>
       <div class="field"><label for="fe-funcao">Cargo</label><select id="fe-funcao"><option value="closer">Closer · liga e fecha contratos</option><option value="operacional">Operacional · documentos e requerimentos</option><option value="admin">Administrador · acesso total</option></select></div>
       <div class="field"><label for="fe-ativo">Acesso</label><select id="fe-ativo"><option value="sim">Ativo</option><option value="nao">Bloqueado</option></select></div>
     </div>
@@ -6808,7 +6808,8 @@ td,.row{font-size:13px}
   $('form-senha').addEventListener('submit', async function(e){
     e.preventDefault();
     var a = $('sn-nova').value, b = $('sn-rep').value;
-    if (a.length < 6){ $('sn-msg').textContent = 'A senha precisa ter pelo menos 6 caracteres.'; return; }
+    var soNum = state.me && ehAcessoInterno(state.me.email);   // acesso por usuário: senha só com números
+    if (soNum ? !/^[0-9]{6,}$/.test(a) : a.length < 6){ $('sn-msg').textContent = soNum ? 'Use só números, com pelo menos 6.' : 'A senha precisa ter pelo menos 6 caracteres.'; return; }
     if (a !== b){ $('sn-msg').textContent = 'As duas senhas não são iguais.'; return; }
     $('sn-go').disabled = true; $('sn-msg').textContent = 'Salvando…';
     try {
@@ -6828,8 +6829,8 @@ td,.row{font-size:13px}
     if (!nome){ $('fe-nome').focus(); toast('Informe o nome do funcionário'); return; }
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ $('fe-email').focus(); toast('Informe o usuário de acesso'); return; }
     var interno = ehAcessoInterno(email);
-    if (interno && !eEditing && senhaNova.length < 6){ $('fe-senha').focus(); toast('Defina a senha, com pelo menos 6 caracteres'); return; }
-    if (interno && senhaNova && senhaNova.length < 6){ $('fe-senha').focus(); toast('A senha precisa ter pelo menos 6 caracteres'); return; }
+    if (interno && !eEditing && !senhaNova){ $('fe-senha').focus(); toast('Defina a senha, só com números (mínimo de 6)'); return; }
+    if (interno && senhaNova && !/^[0-9]{6,}$/.test(senhaNova)){ $('fe-senha').focus(); toast('A senha deve ter só números, no mínimo 6'); return; }
     var cargoSel = $('fe-funcao').value;
     var row = { nome: nome, funcao: cargoSel === 'admin' ? 'admin' : 'assistente', cargo: cargoSel, ativo: $('fe-ativo').value === 'sim' };
     $('fe-save').disabled = true;
