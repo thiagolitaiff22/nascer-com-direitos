@@ -1997,6 +1997,11 @@ td,.row{font-size:13px}
 #cad-list .cad-bnd{display:inline-flex;flex:none}
 #cad-list .cad-bnd:empty{display:none}
 #cad-list .cad-bnd img,#cad-list .cad-bnd svg{width:20px;height:14px;border-radius:2px;object-fit:cover;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+
+#cad-list .cad-atraso{color:#c0392b;font-weight:600}
+#cad-list .row.cad-closer .cad-atend{flex:0 0 auto;display:flex;align-items:center;gap:6px}
+#cad-list .row.cad-closer .cad-atend select{width:150px}
+#cad-list .btn.tent{height:34px;padding:0 12px;border-radius:999px;font-size:12px;white-space:nowrap;background:var(--soft,#faf6ee)}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2966,7 +2971,7 @@ td,.row{font-size:13px}
     if (!t) return '<button type="button" class="tel-add" data-act="tel" data-id="' + esc(r.id) + '" title="Digite o telefone da cliente">+ contato</button>';
     var u = zapUrl(t), num = fmtTel(t), copia = String(t).split(/[\/,;]|\be\b/)[0].trim();
     return '<span class="tel-grande tnum">' + esc(num) + '</span>' +
-      '<button type="button" class="tel-ic" data-copiar-tel="' + esc(copia) + '" title="Copiar o telefone" aria-label="Copiar o telefone"><svg class="i"><use href="#i-copy"/></svg></button>' +
+      '<button type="button" class="tel-ic" data-id="' + esc(r.id) + '" data-copiar-tel="' + esc(copia) + '" title="Copiar o telefone" aria-label="Copiar o telefone"><svg class="i"><use href="#i-copy"/></svg></button>' +
       '';
   }
   // de onde é o lead: bandeira e nome da cidade da cliente, e o parceiro que indicou
@@ -2977,6 +2982,8 @@ td,.row{font-size:13px}
     if (cidade) partes.push('<span class="cad-bnd">' + (g ? bandeiraCidade(g, cidade) : '') + '</span><b>' + esc(cidade) + '</b>');
     partes.push(par ? 'indicação de <b>' + esc(parNome) + '</b>' : esc(r.origem === 'organico' ? 'Orgânico' : 'Sem parceiro'));
     if (quando) partes.push(esc(quando));
+    var dcad = String(r.dataCadastro || r.criadoEm || '').slice(0, 10), nd2 = dcad ? -daysUntil(dcad) : null;
+    if (leadDe(r) === 'novo' && nd2 != null && nd2 >= 2) partes.push('<span class="cad-atraso">sem ligação há ' + nd2 + ' dias</span>');
     return partes.join(' · ');
   }
   function partoCell(r){
@@ -3072,10 +3079,28 @@ td,.row{font-size:13px}
     } catch(err){ toast('Não foi possível olhar a pasta: ' + (err.message || err)); }
     finally { b.disabled = false; b.textContent = rot; }
   });
+  // "Não atendeu": soma uma tentativa; com 3 a cliente vira "Sem resposta"
+  document.addEventListener('click', async function(e){
+    var b = e.target.closest && e.target.closest('[data-act="tentativa"]'); if (!b) return;
+    e.stopPropagation();
+    var r = acharRow(b.dataset.id); if (!r) return;
+    var n = (r.tentativas || 0) + 1, ag = new Date().toISOString();
+    var sem = n >= LEAD_TENTATIVAS;
+    try {
+      await patchRow(r.id, { tentativas: n, leadStatus: sem ? 'sem_resposta' : 'contato', ultimoContatoEm: ag, leadMudouEm: ag, atualizadoEm: ag });
+      toast('Tentativa ' + n + ' de ' + LEAD_TENTATIVAS + ': ' + r.nome + (sem ? ' · virou Sem resposta' : ''));
+    } catch(err){ toast(errMsg(err)); }
+  }, true);
   // copiar o telefone da cliente (para ligar ou colar no WhatsApp)
   document.addEventListener('click', async function(e){
     var b = e.target.closest('[data-copiar-tel]'); if (!b) return;
-    try { await copiarTexto(b.dataset.copiarTel); b.classList.add('ok'); setTimeout(function(){ b.classList.remove('ok'); }, 1500); toast('Telefone copiado: ' + b.dataset.copiarTel); }
+    try {
+      await copiarTexto(b.dataset.copiarTel); b.classList.add('ok'); setTimeout(function(){ b.classList.remove('ok'); }, 1500);
+      var rc = b.dataset.id ? acharRow(b.dataset.id) : null, msg = 'Telefone copiado: ' + b.dataset.copiarTel;
+      // quem copia o telefone vai ligar: o lead novo passa para "Em contato" sozinho
+      if (rc && leadDe(rc) === 'novo'){ var ag = new Date().toISOString(); patchRow(rc.id, { leadStatus: 'contato', leadMudouEm: ag, ultimoContatoEm: ag, atualizadoEm: ag }).catch(function(){}); msg += ' · marcado como Em contato'; }
+      toast(msg);
+    }
     catch(err){ toast('Não foi possível copiar. Selecione o número e use Ctrl+C.'); }
   });
   // copiar o nome do cliente (para pesquisar no PROJUDI)
@@ -3630,7 +3655,8 @@ td,.row{font-size:13px}
     var lista = todos.filter(function(r){ return (!cadSit || (cadSit === 'faltam' ? docsPendentes(r) : cadSit === 'pendencias' ? (docsPendentes(r) || situacaoCad(r)[0] === 'incompleto') : cadSit === 'prazo' ? !!prazoTag(r) : /^l:/.test(cadSit) ? leadDe(r) === cadSit.slice(2) : situacaoCad(r)[0] === cadSit)) && buscaCliente(r, cadQ); })
       // mais recente primeiro (pelo dia do cadastro); no mesmo dia, em ordem alfabética
       .sort(function(a, b){ var da = String(a.dataCadastro || a.criadoEm || '').slice(0, 10), db = String(b.dataCadastro || b.criadoEm || '').slice(0, 10); return (LEAD_ORDEM[leadDe(a)] - LEAD_ORDEM[leadDe(b)]) || db.localeCompare(da) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); });
-    $('cad-count').textContent = lista.length + (lista.length === 1 ? ' cliente' : ' clientes');
+    var nParaLigar = todos.filter(function(r){ return leadDe(r) === 'novo'; }).length;
+    $('cad-count').textContent = lista.length + (lista.length === 1 ? ' cliente' : ' clientes') + (nParaLigar ? ' · ' + nParaLigar + ' para ligar' : '');
     var html = '<div class="row head"><div>Cliente</div><div>Telefone</div><div>Atendimento</div><div></div><div></div></div>';
     if (!lista.length) html += '<div class="empty">' + (todos.length ? 'Nenhum cliente neste filtro.' : 'Nenhum cliente em cadastro. Clique em <b>Novo cadastro</b> para começar.') + '</div>';
     lista.slice(0, 300).forEach(function(r){
@@ -3647,7 +3673,7 @@ td,.row{font-size:13px}
         '<div class="c-name"><span class="cad-av">' + esc(ini2) + '</span><div class="cad-nome"><div class="name"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome) + '</button>' + aviso + '</div>' +
           '<div class="addr cad-origem">' + origemLead(r, par, parNome, quando) + '</div></div></div>' +
         '<div class="cad-contato">' + contatoCloser(r) + '</div>' +
-        '<div class="cad-atend">' + leadSelect(r) + '</div>' +
+        '<div class="cad-atend">' + leadSelect(r) + '<button type="button" class="btn tent" data-act="tentativa" data-id="' + esc(r.id) + '" title="Ligou e não atendeu: conta uma tentativa. Com ' + LEAD_TENTATIVAS + ' vira Sem resposta">Não atendeu' + (r.tentativas > 0 ? ' · ' + r.tentativas + '/' + LEAD_TENTATIVAS : '') + '</button></div>' +
         '<div class="cad-fechar"><button type="button" class="btn primary inss-acao" data-act="fechar" data-id="' + esc(r.id) + '" title="O contrato foi assinado: a cliente vai para Contratos fechados">Fechar contrato</button></div>' +
         '<div class="c-act"><button type="button" class="ico-btn" data-act="edit" data-id="' + esc(r.id) + '" title="Editar cadastro" aria-label="Editar ' + esc(r.nome) + '"><svg class="i"><use href="#i-pencil"/></svg></button></div>' +
       '</div>' + (cadAberto[r.id] ? fichaCliente(r, true) : '');
@@ -3818,10 +3844,25 @@ td,.row{font-size:13px}
 
   /* ---------- Cadastro como lead, Contratos fechados e Aguardando nascimento ---------- */
   var LEAD = { novo: 'Novo lead', contato: 'Em contato', sem_resposta: 'Sem resposta', retornar: 'Retornar depois', perdido: 'Perdido (não fechou)' };
-  function leadDe(r){ return LEAD[r.leadStatus] ? r.leadStatus : 'novo'; }
+  // regras automáticas: 3 tentativas sem atender = sem resposta; em contato há mais de 3 dias = sem resposta;
+  // sem resposta há mais de 15 dias = perdido; "retornar depois" volta para "novo lead" na data marcada
+  var LEAD_TENTATIVAS = 3, LEAD_DIAS_CONTATO = 3, LEAD_DIAS_PERDIDO = 15;
+  function diasDesdeIso(s){ if (!s) return null; var d = new Date(s); if (isNaN(d.getTime())) return null; return Math.floor((Date.now() - d.getTime()) / 86400000); }
+  function leadDe(r){
+    var k = LEAD[r.leadStatus] ? r.leadStatus : 'novo';
+    if (k === 'retornar' && r.retornarEm){ var n = daysUntil(r.retornarEm); if (n != null && n <= 0) return 'novo'; }
+    if (k === 'contato' || k === 'sem_resposta'){
+      var d = diasDesdeIso(r.ultimoContatoEm || r.leadMudouEm);
+      if (d != null){
+        if (d > LEAD_DIAS_PERDIDO + LEAD_DIAS_CONTATO) return 'perdido';
+        if (k === 'contato' && d > LEAD_DIAS_CONTATO) return 'sem_resposta';
+      }
+    }
+    return k;
+  }
   var LEAD_ORDEM = { novo: 0, retornar: 1, contato: 2, sem_resposta: 3, perdido: 4 };
   function leadSelect(r){
-    var k = LEAD[r.leadStatus] ? r.leadStatus : 'novo';
+    var k = leadDe(r);
     return '<select class="inss-sel" data-lead="' + esc(r.id) + '" aria-label="Situação do contato com ' + esc(r.nome) + '">' +
       Object.keys(LEAD).map(function(x){ return '<option value="' + x + '"' + (x === k ? ' selected' : '') + '>' + LEAD[x] + '</option>'; }).join('') + '</select>';
   }
@@ -3956,7 +3997,15 @@ td,.row{font-size:13px}
         toast(CTR_ETAPAS[sl.value][0] + ': ' + r.nome, 'Desfazer', function(){ patchRow(r.id, antesC).catch(function(e2){ toast(errMsg(e2)); }); });
       } else {
         var antesL = { leadStatus: r.leadStatus || '', arquivado: !!r.arquivado, arquivadoEm: r.arquivadoEm || '' };
-        var p = { leadStatus: sl.value, atualizadoEm: new Date().toISOString() };
+        var agoraL = new Date().toISOString();
+        var p = { leadStatus: sl.value, leadMudouEm: agoraL, atualizadoEm: agoraL };
+        if (sl.value === 'contato' || sl.value === 'sem_resposta') p.ultimoContatoEm = agoraL;
+        if (sl.value === 'novo'){ p.tentativas = 0; p.retornarEm = ''; }
+        if (sl.value === 'retornar'){
+          var dias = parseInt(window.prompt('Voltar a ligar em quantos dias?', '2'), 10);
+          if (!(dias > 0 && dias < 120)){ render(); return; }
+          var dv = new Date(); dv.setDate(dv.getDate() + dias); p.retornarEm = iso(dv);
+        }
         if (sl.value === 'perdido'){ p.arquivado = true; p.arquivadoEm = iso(new Date()); }
         await patchRow(r.id, p);
         toast(LEAD[sl.value] + ': ' + r.nome + (sl.value === 'perdido' ? ' (foi para Arquivados)' : ''), 'Desfazer', function(){ patchRow(r.id, antesL).catch(function(e2){ toast(errMsg(e2)); }); });
