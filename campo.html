@@ -720,7 +720,7 @@ html,body{overflow-x:hidden}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 10;
+  var APP_VERSAO = 11;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -731,13 +731,16 @@ html,body{overflow-x:hidden}
     { k: 'rg_frente', arq: 'RG - frente', t: 'RG', s: 'da mãe, frente e verso', lado: 'Frente', ic: 'i-id', req: true, fala: 'Tire a foto da frente do RG, o lado com a foto.' },
     { k: 'rg_verso', arq: 'RG - verso', t: 'RG', s: 'verso', lado: 'Verso', oculto: true, ic: 'i-idv', fala: 'Agora o verso do RG.' },
     { k: 'cpf', arq: 'CPF', t: 'CPF', s: 'da mãe', ic: 'i-id', req: true, fala: 'Tire a foto do CPF da cliente.' },
-    { k: 'titulo', arq: 'Título de eleitor - frente', t: 'Título de eleitor', s: 'frente', ic: 'i-id', req: true, fala: 'Tire a foto da frente do título de eleitor.' },
-    { k: 'titulo_verso', arq: 'Título de eleitor - verso', t: 'Título · verso', s: 'verso, se tiver', ic: 'i-idv', opcional: true, fala: 'Agora o verso do título de eleitor, se tiver.' },
+    { k: 'titulo', arq: 'Título de eleitor - frente', t: 'Título de eleitor', s: 'frente e verso, se tiver', lado: 'Frente', ic: 'i-id', req: true, fala: 'Tire a foto da frente do título de eleitor.' },
+    { k: 'titulo_verso', arq: 'Título de eleitor - verso', t: 'Título de eleitor', s: 'verso', lado: 'Verso', oculto: true, ic: 'i-idv', fala: 'Agora o verso do título de eleitor, se tiver.' },
     { k: 'residencia', arq: 'Comprovante de residência', t: 'Comprovante de residência', s: 'da mãe', ic: 'i-casa', req: true, fala: 'Tire a foto do comprovante de residência.' },
     { k: 'video', arq: 'Vídeo de concordância', t: 'Vídeo de concordância', s: 'a cliente aceitando os termos do contrato', ic: 'i-video', opcional: true, video: true, fala: 'Grave um vídeo curto com a cliente concordando com os termos do contrato.' },
     { k: 'procuracao', arq: 'Contrato e procuração', t: 'Contrato e procuração', s: 'fotografe os dois, um em seguida do outro', ic: 'i-pena', opcional: true, multi: true, fala: 'Tire a foto do contrato e, em seguida, da procuração. Toque de novo para cada folha.' }
   ];
   // formato do enquadramento: cartão (RG/CPF, deitado), folha (A4, em pé) ou rosto (oval)
+  // documentos com frente e verso: um cartão só na tela, duas fotos
+  var PARES = { rg_frente: { f: 'rg_frente', v: 'rg_verso', nome: 'RG' }, titulo: { f: 'titulo', v: 'titulo_verso', nome: 'Título de eleitor' } };
+  function parDe(k){ return k === 'rg_verso' ? PARES.rg_frente : k === 'titulo_verso' ? PARES.titulo : PARES[k] || null; }
   var MOLDURA = { procuracao: 'folha', rg_frente: 'cartao', rg_verso: 'cartao', cpf: 'cartao', titulo: 'cartao', titulo_verso: 'cartao', residencia: 'folha' };
   var DICA = { cartao: 'Coloque o documento dentro do quadro e segure firme', folha: 'Coloque a folha inteira dentro do quadro e segure firme', livre: 'Rosto da cliente dentro do círculo' };
   // dados do cadastro em andamento (ficam no celular até o envio)
@@ -1283,9 +1286,9 @@ html,body{overflow-x:hidden}
         '<label class="fone' + (lsGet('campo_dpp') ? '' : ' falta') + '" id="l-dpp"><svg viewBox="0 0 24 24"><use href="#i-cal"/></svg><span class="rc">Data prevista do parto</span><input id="dpp" type="text" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="dd/mm/aaaa" value="' + esc(isoParaBr(lsGet('campo_dpp'))) + '"></label>' +
       '</div>') +
       '<div class="rot">' + (completando ? 'Documentos que faltam' : 'Documentos') + '</div><div class="grid">' + visiveis.map(function(d){
-        var f = d.k === 'rg_frente' ? rgFotos() : fotos[d.k];
-        if (d.k === 'rg_frente' && f.length) return '<button class="doc feito" data-k="' + d.k + '"><div class="thumbs">' + f.map(miniatura).join('') + '</div>' +
-          '<span class="apagar" data-apagar="' + d.k + '" aria-label="Apagar">×</span><div class="marca"><svg viewBox="0 0 24 24"><use href="#i-ok"/></svg>' + (fotos.rg_frente && fotos.rg_verso ? 'RG · frente e verso' : fotos.rg_frente ? 'RG · falta o verso' : 'RG · falta a frente') + '</div></button>';
+        var par = PARES[d.k] || null, f = par ? parFotos(par) : fotos[d.k];
+        if (par && f.length) return '<button class="doc feito" data-k="' + d.k + '"><div class="thumbs">' + f.map(miniatura).join('') + '</div>' +
+          '<span class="apagar" data-apagar="' + d.k + '" aria-label="Apagar">×</span><div class="marca"><svg viewBox="0 0 24 24"><use href="#i-ok"/></svg>' + (fotos[par.f] && fotos[par.v] ? par.nome + ' · frente e verso' : fotos[par.f] ? par.nome + ' · falta o verso' : par.nome + ' · falta a frente') + '</div></button>';
         if (f && f.length) return '<button class="doc feito" data-k="' + d.k + '"><div class="thumbs">' + f.slice(0, 3).map(miniatura).join('') + '</div>' +
           '<span class="apagar" data-apagar="' + d.k + '" aria-label="Apagar">×</span><div class="marca"><svg viewBox="0 0 24 24"><use href="#i-ok"/></svg>' + esc(d.t) + (f.length > 1 ? ' · ' + f.length : '') + ' · ver' + '</div></button>';
         var rq = obrig(d);
@@ -1319,10 +1322,10 @@ html,body{overflow-x:hidden}
     Array.prototype.forEach.call(document.querySelectorAll('.doc'), function(b){
       b.addEventListener('click', function(e){
         var ap = e.target.closest('[data-apagar]');
-        if (ap){ e.stopPropagation(); if (confirm('Apagar as fotos de ' + DOCS.filter(function(d){ return d.k === ap.dataset.apagar; })[0].t + '?')){ delete fotos[ap.dataset.apagar]; if (ap.dataset.apagar === 'rg_frente') delete fotos.rg_verso; telaInicial(); } return; }
+        if (ap){ e.stopPropagation(); if (confirm('Apagar as fotos de ' + DOCS.filter(function(d){ return d.k === ap.dataset.apagar; })[0].t + '?')){ delete fotos[ap.dataset.apagar]; if (PARES[ap.dataset.apagar]) delete fotos[PARES[ap.dataset.apagar].v]; telaInicial(); } return; }
         var d = DOCS.filter(function(x){ return x.k === b.dataset.k; })[0];
         if (d.video) return fotos[d.k] && fotos[d.k].length ? verVideo(d) : escolherVideo(d);
-        if (d.k === 'rg_frente') return rgFotos().length ? conferirRG() : escolher(d);
+        if (PARES[d.k]) return parFotos(PARES[d.k]).length ? conferirRG(null, d.k) : escolher(d);
         if (fotos[d.k] && fotos[d.k].length) return conferir(d);
         escolher(d);
       });
@@ -1538,7 +1541,7 @@ html,body{overflow-x:hidden}
     t.querySelector('#t-apaga').onclick = function(){ t.remove(); delete fotos[d.k]; telaInicial(); };
   }
   function escolher(d){
-    var t = tela('<b>' + esc(d.k === 'rg_frente' ? 'RG' : d.t) + '</b><p>Como quer colocar este documento?</p>' +
+    var t = tela('<b>' + esc(parDe(d.k) ? parDe(d.k).nome : d.t) + '</b><p>Como quer colocar este documento?</p>' +
       '<button id="t-foto">Tirar foto agora</button><button class="sec2" id="t-anexo">Anexar (galeria, WhatsApp ou PDF)</button><button class="sec2" id="t-cancela">Cancelar</button>');
     t.querySelector('#t-foto').onclick = function(){ t.remove(); fotografar(d); };
     t.querySelector('#t-anexo').onclick = function(){ t.remove(); anexar(d); };
@@ -1550,10 +1553,10 @@ html,body{overflow-x:hidden}
     var d0 = atual, aviso = tela('<b>Preparando…</b><p>Lendo os arquivos anexados</p>');
     // RG: o 1º arquivo é a frente e o 2º o verso; documentos de uma folha só ficam com o primeiro
     var alvo = function(n){
-      if (d0.k === 'rg_frente' || d0.k === 'rg_verso') return DOCS.filter(function(x){ return x.k === (n === 0 ? d0.k : 'rg_verso'); })[0];
+      if (parDe(d0.k)) return DOCS.filter(function(x){ return x.k === (n === 0 ? d0.k : parDe(d0.k).v); })[0];
       return d0;
     };
-    var lista = d0.multi || d0.k === 'rg_frente' ? arqs.slice(0, d0.multi ? 20 : 2) : arqs.slice(0, 1);
+    var lista = d0.multi || PARES[d0.k] ? arqs.slice(0, d0.multi ? 20 : 2) : arqs.slice(0, 1);
     var p = Promise.resolve(), ultimo = d0;
     lista.forEach(function(arq, n){
       var d = alvo(n); ultimo = d;
@@ -1590,8 +1593,8 @@ html,body{overflow-x:hidden}
       c.innerHTML = '<video playsinline autoplay muted' + (frente ? ' class="espelho"' : '') + '></video>' +
         '<div class="moldura' + (tipo === 'livre' ? ' oval' : ' guia') + '"><i></i><i></i><i></i><i></i></div>' +
         (tipo !== 'livre' ? '<svg class="deteccao"><polygon></polygon></svg>' : '') +
-        '<div class="dica">' + esc(d.lado ? 'RG' : d.t + (d.s && d.k !== 'cliente' ? ' · ' + d.s : '')) + '<small>' + DICA[tipo] + '</small>' +
-          (d.lado ? '<div class="lados"><button type="button" data-lado="rg_frente">Frente</button><button type="button" data-lado="rg_verso">Verso</button></div>' : '') + '</div>' +
+        '<div class="dica">' + esc(d.lado ? parDe(d.k).nome : d.t + (d.s && d.k !== 'cliente' ? ' · ' + d.s : '')) + '<small>' + DICA[tipo] + '</small>' +
+          (d.lado ? '<div class="lados"><button type="button" data-lado="' + parDe(d.k).f + '">Frente</button><button type="button" data-lado="' + parDe(d.k).v + '">Verso</button></div>' : '') + '</div>' +
         '<button type="button" class="xis" aria-label="Fechar">×</button>' +
         '<div class="ctl"><button type="button" class="fechar">Voltar</button><button type="button" class="disparo" aria-label="Tirar foto"></button><button type="button" class="galeria">Galeria</button></div>';
       document.body.appendChild(c);
@@ -1925,7 +1928,8 @@ html,body{overflow-x:hidden}
   }
   function miniatura(x){ return x.video ? '<span class="pdf-mini video-mini">VÍDEO</span>' : x.pdf ? '<span class="pdf-mini">PDF</span>' : '<img alt="" src="' + x.url + '">'; }
   function figuraDe(x, rotulo){ return '<figure>' + (x.pdf ? '<div class="pdf-fig"><b>PDF anexado</b><span>' + esc(x.nome || '') + '</span></div>' : '<img alt="" src="' + x.url + '">') + (rotulo ? '<figcaption>' + rotulo + '</figcaption>' : ''); }
-  function rgFotos(){ return (fotos.rg_frente || []).concat(fotos.rg_verso || []); }
+  function parFotos(p){ return (fotos[p.f] || []).concat(fotos[p.v] || []); }
+  function rgFotos(){ return parFotos(PARES.rg_frente); }
   // botão "Ajustar recorte" em cada foto que veio do recorte (abre os cantos para mexer)
   function botoesAjuste(t, itens){
     var figs = t.querySelectorAll('.fotos figure');
@@ -1954,22 +1958,23 @@ html,body{overflow-x:hidden}
     });
   }
   function conferirRG(nova, tirada){
-    var lados = [['rg_frente', 'Frente'], ['rg_verso', 'Verso']];
+    var par = parDe(tirada) || PARES.rg_frente;
+    var lados = [[par.f, 'Frente'], [par.v, 'Verso']];
     var t = document.createElement('div'); t.className = 'ver';
-    var faltaVerso = !fotos.rg_verso, faltaFrente = !fotos.rg_frente;
-    t.innerHTML = '<button type="button" class="xis" aria-label="Fechar">×</button><div class="topo">RG · frente e verso<small>Confira se dá para ler tudo, sem sombra e sem borrão</small></div>' +
+    var faltaVerso = !fotos[par.v], faltaFrente = !fotos[par.f];
+    t.innerHTML = '<button type="button" class="xis" aria-label="Fechar">×</button><div class="topo">' + par.nome + ' · frente e verso<small>Confira se dá para ler tudo, sem sombra e sem borrão</small></div>' +
       '<div class="fotos">' + lados.map(function(l){ var x = (fotos[l[0]] || [])[0]; return x ? figuraDe(x, l[1]) + '</figure>' : '<div class="falta-lado">' + l[1] + ' ainda não foi tirada</div>'; }).join('') + '</div>' +
       '<div class="ctl"><button type="button" class="boa">' + (faltaFrente ? 'Tirar a frente' : faltaVerso ? 'Ficou boa · tirar o verso' : 'Ficou boa') + '</button>' +
-        '<div class="linha"><button type="button" class="denovo" data-l="rg_frente">' + (faltaFrente ? 'Tirar frente' : 'Tirar frente de novo') + '</button><button type="button" class="denovo" data-l="rg_verso">' + (faltaVerso ? 'Tirar verso' : 'Tirar verso de novo') + '</button></div></div>';
+        '<div class="linha"><button type="button" class="denovo" data-l="' + par.f + '">' + (faltaFrente ? 'Tirar frente' : 'Tirar frente de novo') + '</button><button type="button" class="denovo" data-l="' + par.v + '">' + (faltaVerso ? 'Tirar verso' : 'Tirar verso de novo') + '</button></div></div>';
     document.body.appendChild(t);
     botoesAjuste(t, lados.filter(function(l){ return fotos[l[0]]; }).map(function(l){ return { doc: DOCS.filter(function(x){ return x.k === l[0]; })[0], foto: fotos[l[0]][0], i: 0 }; }));
     var foto = function(k){ t.remove(); telaInicial(); fotografar(DOCS.filter(function(x){ return x.k === k; })[0]); };
     t.querySelector('.xis').onclick = function(){ t.remove(); telaInicial(); };
-    t.querySelector('.boa').onclick = function(){ if (faltaFrente) return foto('rg_frente'); if (faltaVerso) return foto('rg_verso'); t.remove(); telaInicial(); };
+    t.querySelector('.boa').onclick = function(){ if (faltaFrente) return foto(par.f); if (faltaVerso) return foto(par.v); t.remove(); telaInicial(); };
     t.addEventListener('click', function(e){ var b = e.target.closest('[data-l]'); if (b) foto(b.dataset.l); });
   }
   function conferir(d, nova){
-    if (d.k === 'rg_frente' || d.k === 'rg_verso') return conferirRG(nova, d.k);
+    if (parDe(d.k)) return conferirRG(nova, d.k);
     var f = fotos[d.k] || []; if (!f.length) return telaInicial();
     if (nova) falar('Confira se dá para ler tudo. Se estiver boa, aperte ficou boa.');
     var t = document.createElement('div'); t.className = 'ver';
