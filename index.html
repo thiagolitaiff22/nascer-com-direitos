@@ -2019,6 +2019,14 @@ td,.row{font-size:13px}
 :root[data-theme="dark"] #cad-list select.lead-retornar{background-color:rgba(230,170,60,.2)!important;color:#f0c46b!important}
 :root[data-theme="dark"] #cad-list select.lead-sem_resposta{background-color:rgba(255,255,255,.1)!important;color:#c9c9c9!important}
 :root[data-theme="dark"] #cad-list select.lead-perdido{background-color:rgba(230,90,80,.2)!important;color:#ff9b93!important}
+
+.eq-pedidos{margin:6px 0 14px;padding:14px 16px;border-radius:16px;background:var(--gsoft,#f8f1e4);border:1px solid var(--gline,var(--line))}
+.eq-pedidos .sec-rot{margin:0 0 10px;font-weight:700}
+.eq-ped{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--gline,var(--line));flex-wrap:wrap}
+.eq-ped:first-of-type{border-top:0}
+.eq-ped-info{display:flex;flex-direction:column;gap:2px;min-width:0}
+.eq-ped-acoes{display:flex;gap:8px}
+:root[data-theme="dark"] .eq-pedidos{background:rgba(212,180,131,.1);border-color:#2e2820}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2371,8 +2379,10 @@ td,.row{font-size:13px}
         <div class="sec-title" data-cfg="equipe">Equipe</div>
         <div class="prosp-head" data-cfg="equipe">
           <p class="view-desc">Funcionários com acesso ao sistema. Só quem está nesta lista, e ativo, consegue ver os clientes.</p>
+          <button class="btn" id="btn-eq-link" type="button" title="Copia o endereço do formulário para mandar no grupo"><svg class="i"><use href="#i-copy"/></svg>Link do formulário</button>
           <button class="btn" id="btn-eq-novo" type="button"><svg class="i"><use href="#i-plus"/></svg>Novo funcionário</button>
         </div>
+        <div class="eq-pedidos" id="eq-pedidos" data-cfg="equipe" hidden></div>
         <div class="eq-resumo" id="eq-resumo" data-cfg="equipe"></div>
         <div class="eq-grupos" id="eq-list" data-cfg="equipe"></div>
         <div class="integ-head" data-cfg="integ"><div class="sec-title" style="margin:0">Integrações</div><p class="view-desc">Todas as integrações do escritório num só lugar. Clique no cartão para colar a chave, testar ou ajustar.</p></div>
@@ -6751,6 +6761,7 @@ td,.row{font-size:13px}
     function caiu(){ $('sync').textContent = 'Conexão interrompida'; banner('A conexão com a base foi interrompida. Recarregue a página.'); }
     watchTable('clientes', function(rows){ state.rows = rows; banner(''); carimbo(); render(); acertarNomesDoApp(); ligarPastasQueFaltam(); }, caiu);
     watchTable('prospectadores', function(rows){ state.prosp = rows; render(); }, function(){});
+    if (f.data === 'admin') watchTable('equipe_pedidos', function(rows){ state.pedidos = rows; renderPedidos(); }, function(){}, function(x){ return x; }, 'id');
     watchTable('equipe', function(rows){
       state.equipe = rows;
       var eu = rows.filter(function(u){ return u.email === state.me.email; })[0];
@@ -6996,7 +7007,43 @@ td,.row{font-size:13px}
     if (e && (e.code === '42501' || /row-level|policy/i.test(m))) return 'Só administradores podem mudar a equipe.';
     return 'Não foi possível salvar agora. Tente de novo.';
   }
-  $('btn-eq-novo').addEventListener('click', function(){ openEq(null); });
+  $('btn-eq-novo').addEventListener('click', function(){ pedidoEq = null; openEq(null); });
+
+  /* ---------- pedidos de acesso (formulário enviado no grupo) ---------- */
+  var pedidoEq = null;
+  function linkFormEquipe(){ return location.origin + location.pathname.replace(/[^/]*$/, '') + 'equipe-cadastro.html'; }
+  $('btn-eq-link').addEventListener('click', async function(){
+    var u = linkFormEquipe();
+    try { await copiarTexto(u); toast('Link copiado. Cole no grupo: ' + u); } catch(err){ window.prompt('Copie o endereço do formulário:', u); }
+  });
+  function renderPedidos(){
+    var box = $('eq-pedidos'); if (!box) return;
+    var ps = (state.pedidos || []).filter(function(p){ return p.status === 'pendente'; }).sort(function(a, b){ return String(a.criado_em).localeCompare(String(b.criado_em)); });
+    box.hidden = !ps.length || !isAdmin();
+    if (box.hidden){ box.innerHTML = ''; return; }
+    var FN = { closer: 'Closer', operacional: 'Operacional', outra: 'Outra função' };
+    box.innerHTML = '<div class="sec-rot">Pedidos de acesso · ' + ps.length + '</div>' + ps.map(function(p){
+      return '<div class="eq-ped"><div class="eq-ped-info"><b>' + esc(p.nome) + '</b><span class="mini">' + esc(p.telefone || 'sem telefone') + ' · ' + esc(FN[p.funcao] || p.funcao) + (p.funcao === 'outra' && p.outra ? ': ' + esc(p.outra) : '') + '</span></div>' +
+        '<div class="eq-ped-acoes"><button type="button" class="btn primary" data-ped-aprovar="' + esc(p.id) + '">Aprovar</button><button type="button" class="btn" data-ped-descartar="' + esc(p.id) + '">Descartar</button></div></div>';
+    }).join('');
+  }
+  $('eq-pedidos').addEventListener('click', async function(e){
+    var ap = e.target.closest('[data-ped-aprovar]'), ds = e.target.closest('[data-ped-descartar]');
+    if (ds){
+      try { var r = await SB.from('equipe_pedidos').update({ status: 'descartado' }).eq('id', ds.dataset.pedDescartar); if (r.error) throw r.error; toast('Pedido descartado'); }
+      catch(err){ toast(errMsg(err)); }
+      return;
+    }
+    if (!ap) return;
+    var p = (state.pedidos || []).filter(function(x){ return x.id === ap.dataset.pedAprovar; })[0]; if (!p) return;
+    pedidoEq = p.id;
+    openEq(null);
+    $('fe-nome').value = nomeProprio(p.nome);
+    // usuário sugerido: primeiro nome, sem acento e em minúsculas
+    $('fe-email').value = String(p.nome || '').trim().split(/\s+/)[0].normalize('NFD').replace(new RegExp('[\\u0300-\\u036f]', 'g'), '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    $('fe-funcao').value = p.funcao === 'closer' ? 'closer' : 'operacional';
+    setTimeout(function(){ $('fe-senha').focus(); }, 60);
+  });
   $('btn-senha').addEventListener('click', function(){ $('sn-nova').value = ''; $('sn-rep').value = ''; $('sn-msg').textContent = ''; $('dlg-senha').showModal(); setTimeout(function(){ $('sn-nova').focus(); }, 30); });
   $('sn-cancel').addEventListener('click', function(){ $('dlg-senha').close(); });
   $('form-senha').addEventListener('submit', async function(e){
@@ -7016,7 +7063,7 @@ td,.row{font-size:13px}
     var b = e.target.closest('[data-eq]'); if (!b) return;
     var u = (state.equipe || []).filter(function(x){ return x.email === b.dataset.eq; })[0]; if (u) openEq(u);
   });
-  $('fe-cancel').addEventListener('click', function(){ dlgE.close(); });
+  $('fe-cancel').addEventListener('click', function(){ pedidoEq = null; dlgE.close(); });
   $('form-eq').addEventListener('submit', async function(e){
     e.preventDefault();
     var nome = nomeProprio($('fe-nome').value.trim()), email = eEditing || usuarioParaEmail($('fe-email').value), senhaNova = $('fe-senha').value;
@@ -7036,6 +7083,7 @@ td,.row{font-size:13px}
         var rs = await SB.rpc('equipe_definir_senha', { p_email: email, p_senha: senhaNova });
         if (rs.error || !rs.data || rs.data.erro){ $('fe-senha').value = ''; toast('Cadastrado, mas a senha não foi definida: ' + ((rs.data && rs.data.erro) || (rs.error && rs.error.message) || 'tente de novo')); return; }
       }
+      if (pedidoEq){ try { await SB.from('equipe_pedidos').update({ status: 'aprovado' }).eq('id', pedidoEq); } catch(x){} pedidoEq = null; }
       dlgE.close(); toast(eEditing ? 'Funcionário atualizado' + (senhaNova ? ' e senha trocada' : '') : 'Funcionário cadastrado. Envie a ele o endereço do sistema.');
     } catch(err){ toast(eqErr(err)); } finally { $('fe-save').disabled = false; }
   });

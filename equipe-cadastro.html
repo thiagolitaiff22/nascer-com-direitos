@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cadastro da equipe · Nascer com Direitos</title>
+<meta name="robots" content="noindex">
+<style>
+:root{--bg:#faf7f2;--card:#fff;--ink:#2b2418;--ink2:#6b5d47;--line:#e6dcc8;--gold:#a07a45;--gold2:#8a6a3d}
+@media (prefers-color-scheme:dark){:root{--bg:#14110d;--card:#1d1812;--ink:#f3ead8;--ink2:#b9a98c;--line:#3a3023}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,"Segoe UI",system-ui,Roboto,sans-serif}
+.wrap{max-width:460px;margin:0 auto;padding:28px 22px 40px}
+.logo{display:block;width:72%;max-width:240px;margin:6px auto 18px}
+h1{font-size:21px;margin:0 0 6px;text-align:center}
+p.sub{margin:0 0 22px;text-align:center;color:var(--ink2);font-size:14.5px}
+label{display:block;font-weight:600;font-size:14px;margin:16px 0 6px}
+input,select{width:100%;height:50px;border:1px solid var(--line);border-radius:14px;padding:0 14px;font:inherit;background:var(--card);color:var(--ink)}
+input:focus,select:focus{outline:2px solid var(--gold);outline-offset:1px}
+button{width:100%;height:54px;margin-top:26px;border:0;border-radius:16px;background:linear-gradient(135deg,#b08a52,#8a6a3d);color:#fff;font:inherit;font-weight:700;font-size:17px;cursor:pointer}
+button:disabled{opacity:.6}
+.msg{margin-top:16px;text-align:center;font-size:14.5px;min-height:22px}
+.msg.err{color:#c0392b}
+.ok{display:none;text-align:center;padding:30px 8px}
+.ok b{display:block;font-size:20px;margin-bottom:8px}
+.ok span{color:var(--ink2)}
+.hp{position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <img class="logo" src="img/logo-nascer-t.png" alt="Nascer com Direitos">
+  <div id="form-box">
+    <h1>Cadastro da equipe</h1>
+    <p class="sub">Preencha seus dados. O escritório vai liberar o seu acesso e avisar você.</p>
+    <form id="f" novalidate autocomplete="off">
+      <label for="nome">Nome completo</label>
+      <input id="nome" autocomplete="name" autocapitalize="words" placeholder="Seu nome completo">
+      <label for="fone">Telefone / WhatsApp</label>
+      <input id="fone" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="(92) 99999-9999">
+      <label for="funcao">Sua função</label>
+      <select id="funcao">
+        <option value="">Escolha…</option>
+        <option value="closer">Closer — liga e fecha contratos</option>
+        <option value="operacional">Operacional — documentos e requerimentos</option>
+        <option value="outra">Outra função</option>
+      </select>
+      <div id="outra-box" style="display:none">
+        <label for="outra">Qual função?</label>
+        <input id="outra" placeholder="Ex.: financeiro, secretária…">
+      </div>
+      <div class="hp"><label for="site">Não preencher</label><input id="site" tabindex="-1" autocomplete="off"></div>
+      <button type="submit" id="go">Enviar cadastro</button>
+      <div class="msg" id="msg" role="status"></div>
+    </form>
+  </div>
+  <div class="ok" id="ok"><b>Cadastro enviado!</b><span>Agora é só aguardar: o escritório vai liberar o seu acesso e avisar você.</span></div>
+</div>
+<script src="config.js"></script>
+<script>
+(function(){
+  var $ = function(i){ return document.getElementById(i); };
+  var CFG = window.QE_CONFIG || {};
+  function bonito(n){ return String(n || '').replace(/\s+/g, ' ').trim().toLowerCase().replace(/(^|[\s'-])([a-zà-ÿ])/g, function(m, a, b){ return a + b.toUpperCase(); }).replace(/\s(De|Da|Do|Das|Dos|E)(?=\s)/g, function(m){ return m.toLowerCase(); }); }
+  function mask(v){ var d = String(v || '').replace(/\D/g, '').slice(0, 11); if (!d) return ''; if (d.length <= 2) return '(' + d; if (d.length <= 6) return '(' + d.slice(0, 2) + ') ' + d.slice(2); if (d.length <= 10) return '(' + d.slice(0, 2) + ') ' + d.slice(2, 6) + '-' + d.slice(6); return '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7); }
+  $('fone').addEventListener('input', function(){ this.value = mask(this.value); });
+  $('nome').addEventListener('blur', function(){ this.value = bonito(this.value); });
+  $('funcao').addEventListener('change', function(){ $('outra-box').style.display = this.value === 'outra' ? 'block' : 'none'; });
+  function msg(t, err){ $('msg').textContent = t || ''; $('msg').className = 'msg' + (err ? ' err' : ''); }
+  $('f').addEventListener('submit', function(e){
+    e.preventDefault();
+    if ($('site').value) return;                                   // robô
+    var nome = bonito($('nome').value), fone = $('fone').value, fn = $('funcao').value, outra = $('outra').value.trim();
+    if (nome.length < 3 || nome.indexOf(' ') < 0){ msg('Escreva o nome completo.', true); $('nome').focus(); return; }
+    var d = fone.replace(/\D/g, ''); if (d.length < 10){ msg('Informe o telefone com DDD.', true); $('fone').focus(); return; }
+    if (!fn){ msg('Escolha a sua função.', true); $('funcao').focus(); return; }
+    if (fn === 'outra' && outra.length < 2){ msg('Diga qual é a função.', true); $('outra').focus(); return; }
+    $('go').disabled = true; msg('Enviando…');
+    fetch(CFG.url + '/rest/v1/rpc/equipe_solicitar', { method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_nome: nome, p_telefone: fone, p_funcao: fn, p_outra: fn === 'outra' ? outra : '' }) })
+      .then(function(r){ return r.json(); })
+      .then(function(d2){
+        if (d2 && d2.ok){ $('form-box').style.display = 'none'; $('ok').style.display = 'block'; window.scrollTo(0, 0); }
+        else { msg((d2 && d2.erro) || 'Não foi possível enviar agora. Tente de novo.', true); $('go').disabled = false; }
+      })
+      .catch(function(){ msg('Sem internet. Tente de novo em instantes.', true); $('go').disabled = false; });
+  });
+})();
+</script>
+</body>
+</html>
