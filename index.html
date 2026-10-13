@@ -1992,6 +1992,11 @@ td,.row{font-size:13px}
 #cad-list .row.cad-closer::before{content:none!important;display:none!important}
 #cad-list .row.cad-closer{box-shadow:none!important;padding-left:20px!important}
 #cad-list .row.cad-closer:hover{background:var(--hover)}
+#cad-list .cad-origem{display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;color:var(--ink-3)}
+#cad-list .cad-origem b{color:var(--ink-2);font-weight:600}
+#cad-list .cad-bnd{display:inline-flex;flex:none}
+#cad-list .cad-bnd:empty{display:none}
+#cad-list .cad-bnd img,#cad-list .cad-bnd svg{width:20px;height:14px;border-radius:2px;object-fit:cover;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -3629,7 +3634,7 @@ td,.row{font-size:13px}
       var ini2 = String(r.nome || '?').trim().charAt(0).toUpperCase();
       html += '<div class="row cad-closer' + (cadAberto[r.id] ? ' aberto' : '') + '" data-linha="' + esc(r.id) + '">' +
         '<div class="c-name"><span class="cad-av">' + esc(ini2) + '</span><div class="cad-nome"><div class="name"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome) + '</button>' + aviso + '</div>' +
-          '<div class="addr">' + esc(quando || '') + '</div></div></div>' +
+          '<div class="addr cad-origem">' + (par ? '<span class="cad-bnd">' + (regiaoDe(par) ? bandeiraCidade(regiaoDe(par), par.regiao) : '') + '</span><b>' + esc(parNome) + '</b>' + (par.regiao ? ' · ' + esc(par.regiao) : '') + (quando ? ' · ' + esc(quando) : '') : esc(r.origem === 'organico' ? 'Orgânico' : 'Sem parceiro') + (quando ? ' · ' + esc(quando) : '')) + '</div></div></div>' +
         '<div class="cad-contato">' + contatoCloser(r) + '</div>' +
         '<div class="cad-atend">' + leadSelect(r) + '</div>' +
         '<div class="cad-fechar"><button type="button" class="btn primary inss-acao" data-act="fechar" data-id="' + esc(r.id) + '" title="O contrato foi assinado: a cliente vai para Contratos fechados">Fechar contrato</button></div>' +
