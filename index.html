@@ -5267,7 +5267,7 @@ td,.row{font-size:13px}
       var url = await urlDoScript();
       var ses = await SB.auth.getSession(), jwt = ses && ses.data && ses.data.session ? ses.data.session.access_token : '';
       var r0 = state.rows.filter(function(x){ return x.id === id; })[0] || {};
-      var etapa = r0.arquivado ? 'arquivado' : String(r0.processo || '').trim() ? 'justica' : requerido(r0) ? 'inss' : 'pendente';
+      var etapa = r0.arquivado ? 'arquivado' : String(r0.processo || '').trim() ? 'justica' : noInss(r0) ? 'inss' : aguardaNasc(r0) ? 'aguardando' : r0.contratoEm ? 'contrato' : 'cadastro';
       var d = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ acao: 'pasta', jwt: jwt, nome: nome, etapa: etapa, pastaId: r0.pastaId || '', soAchar: !!soAchar }) }).then(function(x){ return x.json(); });
       if (!d || !d.ok) throw { code: 'tool_error', message: d && d.erro };
       if (d.achou === false) return null;
