@@ -2004,6 +2004,21 @@ td,.row{font-size:13px}
 #cad-list .btn.tent{height:34px;padding:0 12px;border-radius:999px;font-size:12px;white-space:nowrap;background:var(--soft,#faf6ee)}
 #cad-list .cad-origem{flex-wrap:wrap;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;row-gap:2px}
 #cad-list .cad-origem .cad-atraso{white-space:nowrap}
+
+/* situação da ligação: pílula colorida; "não atendeu" como ação discreta */
+#cad-list .row.cad-closer .cad-atend{gap:10px!important}
+#cad-list .row.cad-closer .cad-atend select.lead-sel{width:auto;min-width:126px;height:30px;border-radius:999px;padding:0 28px 0 12px;font-size:12.5px;font-weight:700;border:0;background-color:#f3e8d2;color:#7a5a2b;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%237a5a2b%27 stroke-width=%272.5%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M6 9l6 6 6-6%27/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;background-size:12px;cursor:pointer}
+#cad-list select.lead-contato{background-color:#e3eefc!important;color:#1f4f8f!important}
+#cad-list select.lead-retornar{background-color:#fdf0d5!important;color:#8a5a00!important}
+#cad-list select.lead-sem_resposta{background-color:#ececec!important;color:#555!important}
+#cad-list select.lead-perdido{background-color:#fbe3e1!important;color:#a02e24!important}
+#cad-list .btn.tent{height:auto;padding:2px 4px;border:0!important;background:none!important;box-shadow:none!important;color:var(--ink-3);font-size:12px;font-weight:600;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px}
+#cad-list .btn.tent:hover{color:var(--ink);text-decoration-color:currentColor}
+:root[data-theme="dark"] #cad-list select.lead-sel{background-color:rgba(212,180,131,.16);color:#e8c98f}
+:root[data-theme="dark"] #cad-list select.lead-contato{background-color:rgba(80,140,230,.2)!important;color:#9cc2ff!important}
+:root[data-theme="dark"] #cad-list select.lead-retornar{background-color:rgba(230,170,60,.2)!important;color:#f0c46b!important}
+:root[data-theme="dark"] #cad-list select.lead-sem_resposta{background-color:rgba(255,255,255,.1)!important;color:#c9c9c9!important}
+:root[data-theme="dark"] #cad-list select.lead-perdido{background-color:rgba(230,90,80,.2)!important;color:#ff9b93!important}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -3865,7 +3880,7 @@ td,.row{font-size:13px}
   var LEAD_ORDEM = { novo: 0, retornar: 1, contato: 2, sem_resposta: 3, perdido: 4 };
   function leadSelect(r){
     var k = leadDe(r);
-    return '<select class="inss-sel" data-lead="' + esc(r.id) + '" aria-label="Situação do contato com ' + esc(r.nome) + '">' +
+    return '<select class="inss-sel lead-sel lead-' + k + '" data-lead="' + esc(r.id) + '" aria-label="Situação do contato com ' + esc(r.nome) + '">' +
       Object.keys(LEAD).map(function(x){ return '<option value="' + x + '"' + (x === k ? ' selected' : '') + '>' + LEAD[x] + '</option>'; }).join('') + '</select>';
   }
   var CTR_ETAPAS = { regularizar: ['Regularizar documentos', 'crit'] };
