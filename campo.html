@@ -720,7 +720,7 @@ html,body{overflow-x:hidden}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 9;
+  var APP_VERSAO = 10;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -731,13 +731,14 @@ html,body{overflow-x:hidden}
     { k: 'rg_frente', arq: 'RG - frente', t: 'RG', s: 'da mãe, frente e verso', lado: 'Frente', ic: 'i-id', req: true, fala: 'Tire a foto da frente do RG, o lado com a foto.' },
     { k: 'rg_verso', arq: 'RG - verso', t: 'RG', s: 'verso', lado: 'Verso', oculto: true, ic: 'i-idv', fala: 'Agora o verso do RG.' },
     { k: 'cpf', arq: 'CPF', t: 'CPF', s: 'da mãe', ic: 'i-id', req: true, fala: 'Tire a foto do CPF da cliente.' },
-    { k: 'titulo', arq: 'Título de eleitor', t: 'Título de eleitor', s: 'frente e, se tiver, o verso', ic: 'i-id', req: true, multi: true, fala: 'Tire a foto do título de eleitor. Se tiver verso, toque de novo para a próxima foto.' },
+    { k: 'titulo', arq: 'Título de eleitor - frente', t: 'Título de eleitor', s: 'frente', ic: 'i-id', req: true, fala: 'Tire a foto da frente do título de eleitor.' },
+    { k: 'titulo_verso', arq: 'Título de eleitor - verso', t: 'Título · verso', s: 'verso, se tiver', ic: 'i-idv', opcional: true, fala: 'Agora o verso do título de eleitor, se tiver.' },
     { k: 'residencia', arq: 'Comprovante de residência', t: 'Comprovante de residência', s: 'da mãe', ic: 'i-casa', req: true, fala: 'Tire a foto do comprovante de residência.' },
     { k: 'video', arq: 'Vídeo de concordância', t: 'Vídeo de concordância', s: 'a cliente aceitando os termos do contrato', ic: 'i-video', opcional: true, video: true, fala: 'Grave um vídeo curto com a cliente concordando com os termos do contrato.' },
     { k: 'procuracao', arq: 'Contrato e procuração', t: 'Contrato e procuração', s: 'fotografe os dois, um em seguida do outro', ic: 'i-pena', opcional: true, multi: true, fala: 'Tire a foto do contrato e, em seguida, da procuração. Toque de novo para cada folha.' }
   ];
   // formato do enquadramento: cartão (RG/CPF, deitado), folha (A4, em pé) ou rosto (oval)
-  var MOLDURA = { procuracao: 'folha', rg_frente: 'cartao', rg_verso: 'cartao', cpf: 'cartao', titulo: 'cartao', residencia: 'folha' };
+  var MOLDURA = { procuracao: 'folha', rg_frente: 'cartao', rg_verso: 'cartao', cpf: 'cartao', titulo: 'cartao', titulo_verso: 'cartao', residencia: 'folha' };
   var DICA = { cartao: 'Coloque o documento dentro do quadro e segure firme', folha: 'Coloque a folha inteira dentro do quadro e segure firme', livre: 'Rosto da cliente dentro do círculo' };
   // dados do cadastro em andamento (ficam no celular até o envio)
   // cadastro antigo, sem o tipo guardado: conta como segurada especial
@@ -753,6 +754,12 @@ html,body{overflow-x:hidden}
   function gestante(){ return true; }   // o sistema atende só gestantes: o que importa é a data prevista do parto
   // telefone no padrão (DDD) 00000-0000
   function maskFone(v){ var d = String(v || '').replace(/\D/g, '').slice(0, 11); if (!d) return ''; if (d.length <= 2) return '(' + d; if (d.length <= 6) return '(' + d.slice(0, 2) + ') ' + d.slice(2); if (d.length <= 10) return '(' + d.slice(0, 2) + ') ' + d.slice(2, 6) + '-' + d.slice(6); return '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7); }
+  function maskCpf(v){ var d = String(v || '').replace(/\D/g, '').slice(0, 11); if (d.length <= 3) return d; if (d.length <= 6) return d.slice(0, 3) + '.' + d.slice(3); if (d.length <= 9) return d.slice(0, 3) + '.' + d.slice(3, 6) + '.' + d.slice(6); return d.slice(0, 3) + '.' + d.slice(3, 6) + '.' + d.slice(6, 9) + '-' + d.slice(9); }
+  function cpfOk(v){
+    var d = String(v || '').replace(/\D/g, ''); if (d.length !== 11 || /^(\d)\1+$/.test(d)) return false;
+    for (var t = 9; t < 11; t++){ var s = 0; for (var i = 0; i < t; i++) s += +d[i] * (t + 1 - i); var r = (s * 10) % 11; if (r === 10) r = 0; if (r !== +d[t]) return false; }
+    return true;
+  }
   function foneOk(v){ var n = String(v || '').replace(/\D/g, '').length; return n === 10 || n === 11; }
   // o documento é obrigatório neste cadastro? (certidão: a gestante pode mandar depois do parto)
   function obrig(d){
@@ -911,7 +918,7 @@ html,body{overflow-x:hidden}
   /* ---------- telas ---------- */
   /* ---------- casca do aplicativo: barra de cima, três abas e as vistas ---------- */
   var aba = lsGet('campo_aba') || 'painel', painel = null, filtroCli = 'todos', buscaCli = '';
-  var NOME_DOC = { procuracao: 'Contrato e procuração', rg_frente: 'RG', cpf: 'CPF', titulo: 'Título de eleitor', video: 'Vídeo de concordância', certidao: 'Certidão de nascimento', residencia: 'Comprovante de residência', cliente: 'Foto da cliente', autodeclaracao: 'Autodeclaração rural', rural: 'Provas rurais', ctps: 'CTPS / CNIS', arogo: 'Documentos a rogo', outro: 'Outro documento' };
+  var NOME_DOC = { procuracao: 'Contrato e procuração', rg_frente: 'RG', cpf: 'CPF', titulo: 'Título de eleitor', titulo_verso: 'Título de eleitor - verso', video: 'Vídeo de concordância', certidao: 'Certidão de nascimento', residencia: 'Comprovante de residência', cliente: 'Foto da cliente', autodeclaracao: 'Autodeclaração rural', rural: 'Provas rurais', ctps: 'CTPS / CNIS', arogo: 'Documentos a rogo', outro: 'Outro documento' };
   function faltas(c){ return (c && Array.isArray(c.faltaDocs) ? c.faltaDocs : []).filter(function(k){ return NOME_DOC[k]; }); }
   function nomesFaltas(l){ return l.map(function(k){ return NOME_DOC[k]; }).join(', '); }
   // completando: cliente já cadastrado que o prospectador está completando ({ id, nome, faltaDocs })
@@ -1270,6 +1277,7 @@ html,body{overflow-x:hidden}
       '<div class="rot" style="margin-top:0">Dados da cliente</div><div class="dados">' +
         '<label class="fone' + (lsGet('campo_nome').trim() ? '' : ' falta') + '" id="l-nome"><svg viewBox="0 0 24 24"><use href="#i-pessoa"/></svg><input id="nome" autocomplete="off" autocapitalize="words" placeholder="Nome completo da cliente" value="' + esc(lsGet('campo_nome')) + '"></label>' +
         '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-fone"/></svg><input id="fone" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="(92) 99999-9999" value="' + esc(maskFone(lsGet('campo_fone'))) + '"></label>' +
+        '<label class="fone' + (cpfOk(lsGet('campo_cpf')) ? '' : ' falta') + '" id="l-cpf"><svg viewBox="0 0 24 24"><use href="#i-id"/></svg><input id="cpf" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="CPF da cliente" value="' + esc(maskCpf(lsGet('campo_cpf'))) + '"></label>' +
       '</div>' +
       '<div class="rot">Gestação</div><div class="dados">' +
         '<label class="fone' + (lsGet('campo_dpp') ? '' : ' falta') + '" id="l-dpp"><svg viewBox="0 0 24 24"><use href="#i-cal"/></svg><span class="rc">Data prevista do parto</span><input id="dpp" type="text" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="dd/mm/aaaa" value="' + esc(isoParaBr(lsGet('campo_dpp'))) + '"></label>' +
@@ -1296,6 +1304,7 @@ html,body{overflow-x:hidden}
     if (completando){ $('cancelar-comp').onclick = cancelarComplemento; if ($('enviar')) $('enviar').lastChild.textContent = 'Enviar documentos'; }
     else {
     $('fone').addEventListener('input', function(){ this.value = maskFone(this.value); lsSet('campo_fone', this.value); });
+    if ($('cpf')) $('cpf').addEventListener('input', function(){ this.value = maskCpf(this.value); lsSet('campo_cpf', this.value); var l = $('l-cpf'); if (l) l.classList.toggle('falta', !cpfOk(this.value)); });
     $('nome').addEventListener('input', function(){ lsSet('campo_nome', this.value); $('l-nome').classList.toggle('falta', !this.value.trim()); });
     $('nome').addEventListener('blur', function(){ this.value = bonito(this.value); lsSet('campo_nome', this.value); });
     if ($('dpp')) $('dpp').addEventListener('input', function(){
@@ -1493,7 +1502,7 @@ html,body{overflow-x:hidden}
       if (Object.keys(fotos).length && !confirm('Há fotos de um cadastro em andamento. Sair mesmo assim? As fotos serão apagadas.')) return;
       if (!confirm('Sair desta conta? Para entrar de novo você vai precisar do usuário e da senha.')) return;
       fotos = {}; guardarRascunho();
-      ['campo_token', 'campo_quem', 'campo_painel', 'campo_nome', 'campo_fone', 'campo_aba', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp'].forEach(function(k){ lsSet(k, ''); });
+      ['campo_token', 'campo_quem', 'campo_painel', 'campo_nome', 'campo_fone', 'campo_cpf', 'campo_aba', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp'].forEach(function(k){ lsSet(k, ''); });
       token = ''; quem = null; painel = null; aba = 'painel';
       pedirLink();
     });
@@ -2011,6 +2020,7 @@ html,body{overflow-x:hidden}
     var nm = ($('nome') || {}).value || '';
     if (!nm.trim()){ falar('Digite o nome completo da cliente.'); alert('Digite o nome completo da cliente.'); $('nome').focus(); return; }
     if (!foneOk(($('fone') || {}).value)){ alert('Informe o telefone com DDD, por exemplo (92) 99999-9999.'); if ($('fone')) $('fone').focus(); return; }
+    if (!cpfOk(($('cpf') || {}).value)){ alert('Informe o CPF da cliente (11 números).'); if ($('cpf')) $('cpf').focus(); return; }
     if (!lsGet('campo_dpp')){ alert('Informe a data prevista do parto, por exemplo 15/03/2027.'); if ($('dpp')) $('dpp').focus(); return; }
     var falta = DOCS.filter(function(d){ return obrig(d) && !fotos[d.k]; });
     if (falta.length){
@@ -2027,7 +2037,7 @@ html,body{overflow-x:hidden}
     // arquivos que vão para a pasta (ESPECIFICACAO §5): procuração separada; RG + CPF + comprovante de residência juntos em DOCUMENTOS PESSOAIS
     var GRUPOS_ARQ = [
       { nome: 'CONTRATO E PROCURAÇÃO', ks: ['procuracao'] },
-      { nome: 'DOCUMENTOS PESSOAIS', ks: ['rg_frente', 'rg_verso', 'cpf', 'titulo', 'residencia'] }
+      { nome: 'DOCUMENTOS PESSOAIS', ks: ['rg_frente', 'rg_verso', 'cpf', 'titulo', 'titulo_verso', 'residencia'] }
     ];
     var nDocs = GRUPOS_ARQ.filter(function(g){ return g.ks.some(function(k){ return fotos[k]; }); }).length, nFeito = 0;
     var id = Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
@@ -2055,7 +2065,7 @@ html,body{overflow-x:hidden}
       cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height); fotoMini = cv.toDataURL('image/jpeg', 0.72);
     }).catch(function(){}); });
     p     .then(function(){
-       var envio = { id: id, token: token, criado: new Date().toISOString(), completar: comp ? comp.id : '', foto: fotoMini, contato: maskFone(($('fone') || {}).value || ''), cliente: comp ? comp.nome : bonito(($('nome') || {}).value || ''), local: local, faltam: falta.map(function(d){ return d.k; }),
+       var envio = { id: id, token: token, criado: new Date().toISOString(), completar: comp ? comp.id : '', foto: fotoMini, contato: maskFone(($('fone') || {}).value || ''), cpf: comp ? '' : maskCpf(($('cpf') || {}).value || ''), cliente: comp ? comp.nome : bonito(($('nome') || {}).value || ''), local: local, faltam: falta.map(function(d){ return d.k; }),
          tipoSegurada: tipoAtual(), crianca: '', criancaNasc: comp || gestante() ? '' : lsGet('campo_crianca_nasc'),
          fatoGerador: 'gestante', dpp: !comp && gestante() ? lsGet('campo_dpp') : '',
          docs: DOCS.filter(function(d){ return fotos[d.k]; }).map(function(d){ return d.k; }), arquivos: [] };
@@ -2065,7 +2075,7 @@ html,body{overflow-x:hidden}
      .then(function(envio){
        fotos = {}; local = null;
        if (comp){ completando = null; lsSet('campo_completando', ''); if (painel) painel.clientes.forEach(function(c){ if (c.id === comp.id) c.faltaDocs = comp.faltaDocs.filter(function(k){ return envio.docs.indexOf(k) < 0; }); }); }
-       else { ['campo_fone', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp'].forEach(function(k){ lsSet(k, ''); }); }
+       else { ['campo_fone', 'campo_cpf', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp'].forEach(function(k){ lsSet(k, ''); }); }
        t.remove(); aba = comp ? 'painel' : 'novo'; telaInicial(); window.scrollTo(0, 0);
        var ok = tela('<svg viewBox="0 0 24 24" style="stroke:var(--ok)"><use href="#i-ok"/></svg><b>' + (comp ? 'Documentos guardados' : 'Cadastro guardado') + '</b><p>' + esc(envio.cliente || '') + '<br>' + (comp ? 'Vão para a pasta da cliente sozinhos quando tiver internet.' : 'Está sendo enviado agora: acompanhe na barra embaixo. Pode cadastrar a próxima cliente.') + '</p><button id="t-ok">' + (comp ? 'Entendi' : 'Cadastrar a próxima') + '</button>');
        ok.querySelector('#t-ok').onclick = function(){ ok.remove(); };
@@ -2199,10 +2209,17 @@ html,body{overflow-x:hidden}
       // cadastros antigos que estão na fila mas não no histórico (feitos antes desta versão)
       fila.forEach(function(e){ if (!h.some(function(x){ return x.id === e.id; })) h.push({ id: e.id, cliente: e.cliente, criado: e.criado, enviado: null }); });
       h.sort(function(a, b){ return String(b.criado).localeCompare(String(a.criado)); });
+      // quem já aparece na lista de clientes acima não se repete aqui: só o que ainda não chegou ao sistema
+      var listaP = painel && painel.clientes;
+      h = h.filter(function(x){
+        if (naFila[x.id]) return true;
+        if (/ · documentos$/.test(x.cliente || '')) return !x.enviado;
+        return !(listaP && listaP.some(function(c){ return c.id === 'campo-' + x.id; }));
+      });
       if (!$('fila')) return;
       var pend = h.filter(function(x){ return !x.enviado; }).length, hoje = new Date().toDateString();
       var dt = function(t){ var d = new Date(t); return d.toDateString() === hoje ? 'hoje ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }); };
-      $('fila').innerHTML = h.length ? '<div class="sec">Cadastros neste celular · ' + h.length + (pend ? ' · ' + pend + ' na fila' : '') + '</div><div class="lista">' + h.slice(0, 100).map(function(x){
+      $('fila').innerHTML = h.length ? '<div class="sec">Ainda não chegaram ao sistema · ' + h.length + (pend ? ' · ' + pend + ' na fila' : '') + '</div><div class="lista">' + h.slice(0, 100).map(function(x){
         var e = naFila[x.id], comp = / · documentos$/.test(x.cliente || ''), lista = painel && painel.clientes;
         var noSis = lista && lista.some(function(c){ return c.id === 'campo-' + x.id; });
         var st = e ? (e.erro ? ['red', 'Não enviou: ' + e.erro] : ['warn', 'Na fila para enviar'])

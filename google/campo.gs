@@ -34,7 +34,7 @@ var MODELO_GPT = 'gpt-4o';   // ChatGPT: lê fotos e PDFs
 
 var NOMES = {
   procuracao: 'Procuração', rg_frente: 'RG - frente', rg_verso: 'RG - verso', cpf: 'CPF',
-  titulo: 'Título de eleitor', video: 'Vídeo de concordância',
+  titulo: 'Título de eleitor - frente', titulo_verso: 'Título de eleitor - verso', video: 'Vídeo de concordância',
   certidao: 'Certidão de nascimento', residencia: 'Comprovante de residência',
   autodeclaracao: 'Autodeclaração rural', rural: 'Provas de atividade rural', ctps: 'CTPS e contribuições',
   arogo: 'Documentos de quem assina a rogo', outro: 'Outro documento', cliente: 'Foto da cliente'
@@ -146,7 +146,8 @@ function fechar(p, quem){
   var digitado = nomeDigitado(p);
   var pasta = pastaDoEnvio(p.envio, quem, digitado);
   // o envio só registra o cliente (rápido); a IA lê os documentos depois, na leitura automática (a cada 10 minutos)
-  var dados = { nome: '', cpf: '', rg: '', nascimento: '', endereco: '' }, nota = [];
+  var cpfDigitado = String(p.cpf || '').replace(/\D/g, '');
+  var dados = { nome: '', cpf: cpfDigitado.length === 11 ? cpfDigitado.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') : '', rg: '', nascimento: '', endereco: '' }, nota = [];
   if (dados.cpf && !cpfValido(dados.cpf)){ nota.push('CPF lido (' + dados.cpf + ') não confere: verifique no documento.'); }
   if (dados.observacao) nota.push(dados.observacao);
   if (p.local && p.local.lat) nota.push('Localização da casa: https://maps.google.com/?q=' + p.local.lat + ',' + p.local.lng);
@@ -175,7 +176,7 @@ function fechar(p, quem){
 function lerDocumentos(pasta){
   var chave = chaveClaude();
   if (!chave) return null;
-  var ordem = ['procuracao', 'rg_frente', 'rg_verso', 'cpf', 'titulo', 'certidao', 'residencia'], imgs = [];   // os documentos a rogo são de outra pessoa: não entram na leitura
+  var ordem = ['procuracao', 'rg_frente', 'rg_verso', 'cpf', 'titulo', 'titulo_verso', 'certidao', 'residencia'], imgs = [];   // os documentos a rogo são de outra pessoa: não entram na leitura
   var it = subpasta(pasta, 'Imagens escaneadas').getFiles(), todos = [];
   while (it.hasNext()) todos.push(it.next());
   ordem.forEach(function(k){
