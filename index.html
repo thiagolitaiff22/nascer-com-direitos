@@ -2027,6 +2027,9 @@ td,.row{font-size:13px}
 .eq-ped-info{display:flex;flex-direction:column;gap:2px;min-width:0}
 .eq-ped-acoes{display:flex;gap:8px}
 :root[data-theme="dark"] .eq-pedidos{background:rgba(212,180,131,.1);border-color:#2e2820}
+
+.eq-ped-sel{height:36px;border-radius:999px;border:1px solid var(--gline,var(--line));background:var(--panel,#fff);color:inherit;padding:0 12px;font:inherit;font-size:13px;font-weight:600}
+.eq-ped-acoes{align-items:center;flex-wrap:wrap}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -7024,10 +7027,17 @@ td,.row{font-size:13px}
     if (box.hidden){ box.innerHTML = ''; return; }
     var FN = { gestor: 'Gestor', closer: 'Closer', prospectador: 'Prospectador', parceiro: 'Parceiro', operacional: 'Agente Operacional', judicial: 'Agente Judicial' };
     box.innerHTML = '<div class="sec-rot">Pedidos de acesso · ' + ps.length + '</div>' + ps.map(function(p){
-      return '<div class="eq-ped"><div class="eq-ped-info"><b>' + esc(p.nome) + '</b><span class="mini">' + esc(p.telefone || 'sem telefone') + ' · ' + esc(FN[p.funcao] || p.funcao) + '</span></div>' +
-        '<div class="eq-ped-acoes"><button type="button" class="btn primary" data-ped-aprovar="' + esc(p.id) + '">Aprovar</button><button type="button" class="btn" data-ped-descartar="' + esc(p.id) + '">Descartar</button></div></div>';
+      return '<div class="eq-ped"><div class="eq-ped-info"><b>' + esc(p.nome) + '</b><span class="mini">' + esc(p.telefone || 'sem telefone') + ' · pediu: ' + esc(FN[p.funcao] || p.funcao) + '</span></div>' +
+        '<div class="eq-ped-acoes"><select class="eq-ped-sel" data-ped-funcao="' + esc(p.id) + '" aria-label="Função de ' + esc(p.nome) + '">' +
+          Object.keys(FN).map(function(k){ return '<option value="' + k + '"' + (k === p.funcao ? ' selected' : '') + '>' + FN[k] + '</option>'; }).join('') + '</select>' +
+          '<button type="button" class="btn primary" data-ped-aprovar="' + esc(p.id) + '">Aprovar</button><button type="button" class="btn" data-ped-descartar="' + esc(p.id) + '">Descartar</button></div></div>';
     }).join('');
   }
+  $('eq-pedidos').addEventListener('change', async function(e){
+    var s = e.target.closest && e.target.closest('[data-ped-funcao]'); if (!s) return;
+    try { var r = await SB.from('equipe_pedidos').update({ funcao: s.value }).eq('id', s.dataset.pedFuncao); if (r.error) throw r.error; }
+    catch(err){ toast(errMsg(err)); }
+  });
   $('eq-pedidos').addEventListener('click', async function(e){
     var ap = e.target.closest('[data-ped-aprovar]'), ds = e.target.closest('[data-ped-descartar]');
     if (ds){
@@ -7036,7 +7046,9 @@ td,.row{font-size:13px}
       return;
     }
     if (!ap) return;
-    var p = (state.pedidos || []).filter(function(x){ return x.id === ap.dataset.pedAprovar; })[0]; if (!p) return;
+    var p0 = (state.pedidos || []).filter(function(x){ return x.id === ap.dataset.pedAprovar; })[0]; if (!p0) return;
+    var selF = $('eq-pedidos').querySelector('[data-ped-funcao="' + ap.dataset.pedAprovar + '"]');
+    var p = Object.assign({}, p0, { funcao: selF ? selF.value : p0.funcao });
     // prospectador e parceiro não são da equipe interna: abre o cadastro de parceiros com os dados já preenchidos
     if (p.funcao === 'prospectador' || p.funcao === 'parceiro'){
       pedidoEq = p.id;
