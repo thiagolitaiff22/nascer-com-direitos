@@ -2028,6 +2028,9 @@ td,.row{font-size:13px}
 .eq-ped-acoes{display:flex;gap:8px}
 :root[data-theme="dark"] .eq-pedidos{background:rgba(212,180,131,.1);border-color:#2e2820}
 
+.eq-ped.editando{align-items:flex-start}
+.eq-ped-form{display:flex;gap:8px;flex-wrap:wrap;flex:1 1 320px}
+.eq-ped-in{height:36px;border-radius:12px;border:1px solid var(--gline,var(--line));background:var(--panel,#fff);color:inherit;padding:0 12px;font:inherit;font-size:13px;flex:1 1 160px;min-width:0}
 .eq-ped-sel{height:36px;border-radius:999px;border:1px solid var(--gline,var(--line));background:var(--panel,#fff);color:inherit;padding:0 12px;font:inherit;font-size:13px;font-weight:600}
 .eq-ped-acoes{align-items:center;flex-wrap:wrap}
 </style>
@@ -7014,7 +7017,7 @@ td,.row{font-size:13px}
   $('btn-eq-novo').addEventListener('click', function(){ pedidoEq = null; openEq(null); });
 
   /* ---------- pedidos de acesso (formulário enviado no grupo) ---------- */
-  var pedidoEq = null;
+  var pedidoEq = null, pedEdit = null;
   function linkFormEquipe(){ return location.origin + location.pathname.replace(/[^/]*$/, '') + 'equipe-cadastro.html'; }
   $('btn-eq-link').addEventListener('click', async function(){
     var u = linkFormEquipe();
@@ -7026,11 +7029,19 @@ td,.row{font-size:13px}
     box.hidden = !ps.length || !isAdmin();
     if (box.hidden){ box.innerHTML = ''; return; }
     var FN = { gestor: 'Gestor', closer: 'Closer', prospectador: 'Prospectador', parceiro: 'Parceiro', operacional: 'Agente Operacional', judicial: 'Agente Judicial' };
+    var opcoes = function(sel){ return Object.keys(FN).map(function(k){ return '<option value="' + k + '"' + (k === sel ? ' selected' : '') + '>' + FN[k] + '</option>'; }).join(''); };
     box.innerHTML = '<div class="sec-rot">Pedidos de acesso · ' + ps.length + '</div>' + ps.map(function(p){
+      if (p.id === pedEdit){
+        return '<div class="eq-ped editando"><div class="eq-ped-form">' +
+          '<input class="eq-ped-in" data-ped-nome placeholder="Nome completo" value="' + esc(p.nome) + '">' +
+          '<input class="eq-ped-in" data-ped-tel inputmode="tel" placeholder="Telefone" value="' + esc(p.telefone || '') + '">' +
+          '<select class="eq-ped-sel" data-ped-func-ed>' + opcoes(p.funcao) + '</select></div>' +
+          '<div class="eq-ped-acoes"><button type="button" class="btn primary" data-ped-salvar="' + esc(p.id) + '">Salvar</button><button type="button" class="btn" data-ped-cancelar="1">Cancelar</button></div></div>';
+      }
       return '<div class="eq-ped"><div class="eq-ped-info"><b>' + esc(p.nome) + '</b><span class="mini">' + esc(p.telefone || 'sem telefone') + ' · pediu: ' + esc(FN[p.funcao] || p.funcao) + '</span></div>' +
         '<div class="eq-ped-acoes"><select class="eq-ped-sel" data-ped-funcao="' + esc(p.id) + '" aria-label="Função de ' + esc(p.nome) + '">' +
           Object.keys(FN).map(function(k){ return '<option value="' + k + '"' + (k === p.funcao ? ' selected' : '') + '>' + FN[k] + '</option>'; }).join('') + '</select>' +
-          '<button type="button" class="btn primary" data-ped-aprovar="' + esc(p.id) + '">Aprovar</button><button type="button" class="btn" data-ped-descartar="' + esc(p.id) + '">Descartar</button></div></div>';
+          '<button type="button" class="btn" data-ped-editar="' + esc(p.id) + '">Editar</button><button type="button" class="btn primary" data-ped-aprovar="' + esc(p.id) + '">Aprovar</button><button type="button" class="btn" data-ped-descartar="' + esc(p.id) + '">Descartar</button></div></div>';
     }).join('');
   }
   $('eq-pedidos').addEventListener('change', async function(e){
@@ -7039,6 +7050,21 @@ td,.row{font-size:13px}
     catch(err){ toast(errMsg(err)); }
   });
   $('eq-pedidos').addEventListener('click', async function(e){
+    var ed = e.target.closest('[data-ped-editar]'), sv = e.target.closest('[data-ped-salvar]');
+    if (ed){ pedEdit = ed.dataset.pedEditar; renderPedidos(); return; }
+    if (e.target.closest('[data-ped-cancelar]')){ pedEdit = null; renderPedidos(); return; }
+    if (sv){
+      var linha = sv.closest('.eq-ped');
+      var nm = nomeProprio(linha.querySelector('[data-ped-nome]').value.trim()), tl = maskTel(linha.querySelector('[data-ped-tel]').value), fn = linha.querySelector('[data-ped-func-ed]').value;
+      if (nm.length < 3){ toast('Informe o nome completo'); return; }
+      try {
+        var rs = await SB.from('equipe_pedidos').update({ nome: nm, telefone: tl, funcao: fn }).eq('id', sv.dataset.pedSalvar); if (rs.error) throw rs.error;
+        pedEdit = null; toast('Pedido atualizado');
+        (state.pedidos || []).forEach(function(x){ if (x.id === sv.dataset.pedSalvar){ x.nome = nm; x.telefone = tl; x.funcao = fn; } });
+        renderPedidos();
+      } catch(err){ toast(errMsg(err)); }
+      return;
+    }
     var ap = e.target.closest('[data-ped-aprovar]'), ds = e.target.closest('[data-ped-descartar]');
     if (ds){
       try { var r = await SB.from('equipe_pedidos').update({ status: 'descartado' }).eq('id', ds.dataset.pedDescartar); if (r.error) throw r.error; toast('Pedido descartado'); }
