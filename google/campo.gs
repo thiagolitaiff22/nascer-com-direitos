@@ -27,6 +27,7 @@ var MODELO_GPT = 'gpt-4o';   // ChatGPT: lê fotos e PDFs
 
 var NOMES = {
   procuracao: 'Procuração', rg_frente: 'RG - frente', rg_verso: 'RG - verso', cpf: 'CPF',
+  titulo: 'Título de eleitor', video: 'Vídeo de concordância',
   certidao: 'Certidão de nascimento', residencia: 'Comprovante de residência',
   autodeclaracao: 'Autodeclaração rural', rural: 'Provas de atividade rural', ctps: 'CTPS e contribuições',
   arogo: 'Documentos de quem assina a rogo', outro: 'Outro documento', cliente: 'Foto da cliente'
@@ -167,7 +168,7 @@ function fechar(p, quem){
 function lerDocumentos(pasta){
   var chave = chaveClaude();
   if (!chave) return null;
-  var ordem = ['procuracao', 'rg_frente', 'rg_verso', 'cpf', 'certidao', 'residencia'], imgs = [];   // os documentos a rogo são de outra pessoa: não entram na leitura
+  var ordem = ['procuracao', 'rg_frente', 'rg_verso', 'cpf', 'titulo', 'certidao', 'residencia'], imgs = [];   // os documentos a rogo são de outra pessoa: não entram na leitura
   var it = subpasta(pasta, 'Imagens escaneadas').getFiles(), todos = [];
   while (it.hasNext()) todos.push(it.next());
   ordem.forEach(function(k){
