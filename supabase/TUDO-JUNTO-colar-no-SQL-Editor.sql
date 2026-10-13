@@ -1205,24 +1205,21 @@ revoke all on function public.equipe_definir_senha(text, text) from public, anon
 grant execute on function public.equipe_definir_senha(text, text) to authenticated;
 
 select 'ok' as acesso_usuario;
--- Pastas do Drive no mesmo fluxo do sistema:
---   1 CADASTRO · 2 CONTRATOS FECHADOS · 3 AGUARDANDO NASCIMENTO · 4 NO INSS · 5 NA JUSTIÇA · 6 ARQUIVADOS
--- O script do Google pergunta aqui em que etapa está a cliente de cada pasta e move a pasta. Pode rodar de novo.
+-- Pastas do Drive no fluxo: DOCUMENTOS PENDENTES › DOCUMENTOS OK › PROTOCOLADOS.
+-- O script do Google pergunta aqui em que pasta deve estar a cliente de cada pasta e move a pasta. Pode rodar de novo.
+--   protocolado = arquivada, com processo, ou com requerimento no INSS (DER/protocolo)
+--   ok          = documentação completa (conferida no sistema ou enviada completa pelo aplicativo)
+--   pendente    = o resto
 
 create or replace function public.etapa_da_cliente(d jsonb)
 returns text language sql immutable as $$
   select case
-    when coalesce(d ->> 'arquivado', 'false') = 'true' then 'arquivado'
-    when coalesce(trim(d ->> 'processo'), '') <> '' then 'justica'
-    when coalesce(trim(d ->> 'der'), '') <> '' or coalesce(trim(d ->> 'protocoloInss'), '') <> '' then 'inss'
-    when coalesce(d ->> 'contratoEm', '') <> '' and d ->> 'fatoGerador' = 'gestante' and coalesce(d ->> 'criancaNasc', '') = '' then 'aguardando'
-    when coalesce(d ->> 'contratoEm', '') <> ''
-         and (d ->> 'docsCompletos' = 'true' or (d ->> 'origem' = 'campo' and jsonb_typeof(d -> 'faltaDocs') = 'array'))
-         and (case when jsonb_typeof(d -> 'faltaDocs') = 'array' then jsonb_array_length(d -> 'faltaDocs') else 0 end) = 0
-         and coalesce(trim(d ->> 'cpf'), '') <> '' and coalesce(trim(d ->> 'endereco'), '') <> ''
-         and coalesce(d ->> 'tipoSegurada', '') <> '' and coalesce(d ->> 'dpp', '') <> '' then 'inss'
-    when coalesce(d ->> 'contratoEm', '') <> '' then 'contrato'
-    else 'cadastro' end
+    when coalesce(d ->> 'arquivado', 'false') = 'true' then 'protocolado'
+    when coalesce(trim(d ->> 'processo'), '') <> '' then 'protocolado'
+    when coalesce(trim(d ->> 'der'), '') <> '' or coalesce(trim(d ->> 'protocoloInss'), '') <> '' then 'protocolado'
+    when (d ->> 'docsCompletos' = 'true' or (d ->> 'origem' = 'campo' and jsonb_typeof(d -> 'faltaDocs') = 'array'))
+         and (case when jsonb_typeof(d -> 'faltaDocs') = 'array' then jsonb_array_length(d -> 'faltaDocs') else 0 end) = 0 then 'ok'
+    else 'pendente' end
 $$;
 
 create or replace function public.campo_pastas_etapas(p_ids text[])

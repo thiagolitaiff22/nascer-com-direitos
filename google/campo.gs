@@ -10,21 +10,25 @@
  *  3. Implantar › Nova implantação › Tipo: App da Web · Executar como: Eu · Quem pode acessar: Qualquer pessoa.
  *  4. Copie o endereço que termina em /exec e cole no sistema: Configurações › Cadastro pelo celular.
  *
- * Pastas (CLIENTES): 1 CADASTRO › 2 CONTRATOS FECHADOS › 3 AGUARDANDO NASCIMENTO › 4 NO INSS › 5 NA JUSTIÇA › 6 ARQUIVADOS,
- * o mesmo fluxo do sistema. A cliente nova entra em 1 CADASTRO, pelo celular ou pelo BI. De hora em hora o script
- * confere no sistema a etapa de cada cliente e move a pasta.
+ * Pastas (CLIENTES): DOCUMENTOS PENDENTES › DOCUMENTOS OK › PROTOCOLADOS. A cliente nova entra em DOCUMENTOS PENDENTES,
+ * pelo celular ou pelo BI. De hora em hora o script confere no sistema: documentação completa vai para DOCUMENTOS OK;
+ * requerimento feito no INSS (ou processo, ou arquivada) vai para PROTOCOLADOS, que não volta sozinha.
  * Uma pasta em ARQUIVADOS nunca sai de lá automaticamente.
  */
 var SUPABASE_URL = 'https://rqgaliouhuulycbxxmjd.supabase.co';
 var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM'; // chave pública do site
 var PASTA_CLIENTES = 'COLE_AQUI_O_ID_DA_PASTA_CLIENTES'; // NASCER COM DIREITOS › CLIENTES
-// pastas no mesmo fluxo do sistema (os números mantêm a ordem do fluxo no Drive)
-var CADASTRO = '1 CADASTRO', CONTRATOS = '2 CONTRATOS FECHADOS', AGUARDANDO = '3 AGUARDANDO NASCIMENTO',
-    NO_INSS = '4 NO INSS', NA_JUSTICA = '5 NA JUSTIÇA', ARQUIVADOS = '6 ARQUIVADOS';
-var PENDENTES = CADASTRO;   // nome antigo
-var ETAPAS = { cadastro: CADASTRO, contrato: CONTRATOS, aguardando: AGUARDANDO, inss: NO_INSS, justica: NA_JUSTICA, arquivado: ARQUIVADOS };
+// fluxo das pastas: DOCUMENTOS PENDENTES › DOCUMENTOS OK › PROTOCOLADOS
+var PENDENTES = 'DOCUMENTOS PENDENTES', DOCS_OK = 'DOCUMENTOS OK', PROTOCOLADOS = 'PROTOCOLADOS';
+var ETAPAS = { pendente: PENDENTES, ok: DOCS_OK, protocolado: PROTOCOLADOS };
 // etapa enviada pelo site (ou devolvida pelo banco) → chave de ETAPAS; "protocolado" é o nome antigo de "justica"
-function etapaPasta(e){ e = String(e || '').toLowerCase(); if (e === 'protocolado') e = 'justica'; if (e === 'pendente') e = 'cadastro'; return ETAPAS[e] ? e : ''; }
+function etapaPasta(e){
+  e = String(e || '').toLowerCase();
+  // nomes das etapas do sistema e nomes antigos
+  if (e === 'cadastro' || e === 'contrato' || e === 'aguardando') e = 'pendente';
+  if (e === 'inss' || e === 'justica' || e === 'arquivado') e = 'protocolado';
+  return ETAPAS[e] ? e : '';
+}
 var MODELO = 'claude-sonnet-5-5';
 var MODELO_GPT = 'gpt-4o';   // ChatGPT: lê fotos e PDFs
 
@@ -247,20 +251,19 @@ function gatilho(){
   // a IA só lê quando o escritório clica em "Ler documentos da pasta" no BI: desliga a leitura automática antiga
   // e troca o acionador antigo (moverProtocolados) pelo novo (moverPastas)
   ScriptApp.getProjectTriggers().forEach(function(t){ var h = t.getHandlerFunction(); if (h === 'lerPendentes' || h === 'moverProtocolados') ScriptApp.deleteTrigger(t); });
-  if (props.getProperty('gatilho_ok') === '3') return;
+  if (props.getProperty('gatilho_ok') === '4') return;
   if (!ScriptApp.getProjectTriggers().some(function(t){ return t.getHandlerFunction() === 'moverPastas'; }))
     ScriptApp.newTrigger('moverPastas').timeBased().everyHours(1).create();
-  // cria as seis pastas do fluxo, na ordem
+  // cria as três pastas do fluxo
   var raizF = DriveApp.getFolderById(PASTA_CLIENTES);
   Object.keys(ETAPAS).forEach(function(k){ subpasta(raizF, ETAPAS[k]); });
-  props.setProperty('gatilho_ok', '3');
+  props.setProperty('gatilho_ok', '4');
 }
 function moverPastas(){
   var raiz = DriveApp.getFolderById(PASTA_CLIENTES), destino = {};
   Object.keys(ETAPAS).forEach(function(k){ destino[k] = subpasta(raiz, ETAPAS[k]); });
   var porId = {}, onde = {};
-  // ARQUIVADOS fica de fora: uma pasta arquivada nunca volta sozinha
-  ['cadastro', 'contrato', 'aguardando', 'inss', 'justica'].forEach(function(k){
+  ['pendente', 'ok'].forEach(function(k){   // PROTOCOLADOS não volta sozinha
     var it = destino[k].getFolders();
     while (it.hasNext()){ var f = it.next(); porId[f.getId()] = f; onde[f.getId()] = k; }
   });
@@ -288,7 +291,7 @@ function pastaDoCadastro(p){
   if (!nome) throw new Error('Informe o nome da cliente.');
   var raiz = DriveApp.getFolderById(PASTA_CLIENTES);
   // etapa: pendente | inss | justica | arquivado ("protocolado", nome antigo, vale como justica)
-  var etapa = ETAPAS[etapaPasta(p.etapa) || 'cadastro'];
+  var etapa = ETAPAS[etapaPasta(p.etapa) || 'pendente'];
   var todas = Object.keys(ETAPAS).map(function(k){ return ETAPAS[k]; });
   // evita pasta repetida: procura o mesmo nome nas quatro etapas antes de criar
   var achou = null;
@@ -536,7 +539,7 @@ function organizarPasta_(pasta){
 }
 function organizarExistentes(){
   var raiz = DriveApp.getFolderById(PASTA_CLIENTES), log = [];
-  [CADASTRO, CONTRATOS, AGUARDANDO, NO_INSS, NA_JUSTICA].forEach(function(n){
+  [PENDENTES, DOCS_OK, PROTOCOLADOS].forEach(function(n){
     var it = subpasta(raiz, n).getFolders();
     while (it.hasNext()){
       var f = it.next();
