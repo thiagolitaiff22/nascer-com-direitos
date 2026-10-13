@@ -2450,6 +2450,7 @@ td,.row{font-size:13px}
       <div class="field"><label for="f-rg">RG</label><input id="f-rg" class="tnum" inputmode="numeric" placeholder="2960881-3"><span class="hint">Sem RG? Deixe em branco: nos documentos vale o número do CPF.</span></div>
       <div class="field"><label for="f-nasc">Data de nascimento da mãe</label><input id="f-nasc" type="date"></div>
       <div class="field"><label for="f-nit">NIT / PIS / NIS</label><input id="f-nit" class="tnum" inputmode="numeric" placeholder="000.00000.00-0"></div>
+      <div class="field"><label for="f-cidade">Cidade</label><input id="f-cidade" autocomplete="off" placeholder="Ex.: Manaus"></div>
       <div class="field full"><label for="f-end">Endereço</label><input id="f-end" placeholder="Rua ou comunidade, número, bairro, cidade/UF"></div>
       <div class="field full"><label for="f-contato">Contato (telefone / WhatsApp)</label><input id="f-contato" inputmode="tel" placeholder="(97) 00000-0000" class="tnum"></div>
       <div class="field"><label for="f-tipo">Tipo de segurada</label><select id="f-tipo"><option value="">Não informado</option><option value="especial">Segurada especial (rural / pescadora)</option><option value="urbana">Empregada / urbana</option><option value="individual">Contribuinte individual / MEI / facultativa</option><option value="desempregada">Desempregada (período de graça)</option></select></div>
@@ -2966,7 +2967,17 @@ td,.row{font-size:13px}
     var u = zapUrl(t), num = fmtTel(t), copia = String(t).split(/[\/,;]|\be\b/)[0].trim();
     return '<span class="tel-grande tnum">' + esc(num) + '</span>' +
       '<button type="button" class="tel-ic" data-copiar-tel="' + esc(copia) + '" title="Copiar o telefone" aria-label="Copiar o telefone"><svg class="i"><use href="#i-copy"/></svg></button>' +
-      (u ? '<a class="tel-zap" href="' + u + '" target="_blank" rel="noopener" title="Abrir a conversa no WhatsApp">WhatsApp</a>' : '');
+      '';
+  }
+  // de onde é o lead: bandeira e nome da cidade da cliente, e o parceiro que indicou
+  function origemLead(r, par, parNome, quando){
+    var g = (r.cidadeUf && regiaoPorId(r.cidadeUf)) || regiaoDe(par);
+    var cidade = r.cidade || (par && par.regiao) || '';
+    var partes = [];
+    if (cidade) partes.push('<span class="cad-bnd">' + (g ? bandeiraCidade(g, cidade) : '') + '</span><b>' + esc(cidade) + '</b>');
+    partes.push(par ? 'indicação de <b>' + esc(parNome) + '</b>' : esc(r.origem === 'organico' ? 'Orgânico' : 'Sem parceiro'));
+    if (quando) partes.push(esc(quando));
+    return partes.join(' · ');
   }
   function partoCell(r){
     var d = r.dpp; if (!d) return '<span class="mini">sem data</span>';
@@ -3634,7 +3645,7 @@ td,.row{font-size:13px}
       var ini2 = String(r.nome || '?').trim().charAt(0).toUpperCase();
       html += '<div class="row cad-closer' + (cadAberto[r.id] ? ' aberto' : '') + '" data-linha="' + esc(r.id) + '">' +
         '<div class="c-name"><span class="cad-av">' + esc(ini2) + '</span><div class="cad-nome"><div class="name"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome) + '</button>' + aviso + '</div>' +
-          '<div class="addr cad-origem">' + (par ? '<span class="cad-bnd">' + (regiaoDe(par) ? bandeiraCidade(regiaoDe(par), par.regiao) : '') + '</span><b>' + esc(parNome) + '</b>' + (par.regiao ? ' · ' + esc(par.regiao) : '') + (quando ? ' · ' + esc(quando) : '') : esc(r.origem === 'organico' ? 'Orgânico' : 'Sem parceiro') + (quando ? ' · ' + esc(quando) : '')) + '</div></div></div>' +
+          '<div class="addr cad-origem">' + origemLead(r, par, parNome, quando) + '</div></div></div>' +
         '<div class="cad-contato">' + contatoCloser(r) + '</div>' +
         '<div class="cad-atend">' + leadSelect(r) + '</div>' +
         '<div class="cad-fechar"><button type="button" class="btn primary inss-acao" data-act="fechar" data-id="' + esc(r.id) + '" title="O contrato foi assinado: a cliente vai para Contratos fechados">Fechar contrato</button></div>' +
@@ -5506,6 +5517,7 @@ td,.row{font-size:13px}
     $('f-cpf').value = r ? r.cpf || '' : '';
     $('f-rg').value = r ? r.rg || '' : '';
     $('f-end').value = r ? r.endereco || '' : '';
+    $('f-cidade').value = r ? r.cidade || '' : '';
     $('f-contato').value = r ? r.contato || '' : '';
     // clients still without a phone start unchecked: a number filled in now stays out of the régua until released
     $('f-regua').checked = r ? (temContato(r) && !r.foraDaRegua) : true;
@@ -5619,7 +5631,7 @@ td,.row{font-size:13px}
     var situacao = $('f-situacao').value, avisado = situacao === 'avisado';
     var avisoEm = $('f-avisoem').value || (avisado ? iso(new Date()) : '');
     var data = Object.assign({}, prev, {
-      nome: nome, cpf: $('f-cpf').value.trim(), rg: formatarRG($('f-rg').value), endereco: $('f-end').value.trim(),
+      nome: nome, cpf: $('f-cpf').value.trim(), rg: formatarRG($('f-rg').value), endereco: $('f-end').value.trim(), cidade: nomeProprio($('f-cidade').value.trim()),
       contato: $('f-contato').value.trim(), foraDaRegua: !$('f-regua').checked,
       contatoVia: $('f-via-box').dataset.tirar ? null : (prev.contatoVia || null),
       telefoneAdicionadoEm: !prev.contato && $('f-contato').value.trim() ? new Date().toISOString() : (prev.telefoneAdicionadoEm || ''),

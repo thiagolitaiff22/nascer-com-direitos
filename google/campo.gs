@@ -166,7 +166,7 @@ function fechar(p, quem){
       // salário-maternidade: tipo de segurada, criança e fato gerador informados no aplicativo
       tipoSegurada: limpa(p.tipoSegurada), crianca: limpa(p.crianca), criancaNasc: dataISO(p.criancaNasc),
       fatoGerador: limpa(p.fatoGerador), dpp: dataISO(p.dpp),
-      contato: p.contato || '', pastaUrl: pasta.getUrl(), pastaId: pasta.getId(), docs: p.docs || [], faltam: p.faltam || [], local: p.local || null, foto: /^data:image\/jpeg;base64,/.test(p.foto || '') ? p.foto : '', leitura: nota.join('\n') }
+      contato: p.contato || '', cidade: limpa(p.cidade), cidadeUf: limpa(p.cidadeUf), pastaUrl: pasta.getUrl(), pastaId: pasta.getId(), docs: p.docs || [], faltam: p.faltam || [], local: p.local || null, foto: /^data:image\/jpeg;base64,/.test(p.foto || '') ? p.foto : '', leitura: nota.join('\n') }
   });
   PropertiesService.getScriptProperties().deleteProperty('pasta_' + p.envio);
   return { ok: true, id: id, nome: dados.nome || '' };

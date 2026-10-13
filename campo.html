@@ -720,7 +720,7 @@ html,body{overflow-x:hidden}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 12;
+  var APP_VERSAO = 13;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -757,6 +757,7 @@ html,body{overflow-x:hidden}
   function gestante(){ return true; }   // o sistema atende só gestantes: o que importa é a data prevista do parto
   // telefone no padrão (DDD) 00000-0000
   function maskFone(v){ var d = String(v || '').replace(/\D/g, '').slice(0, 11); if (!d) return ''; if (d.length <= 2) return '(' + d; if (d.length <= 6) return '(' + d.slice(0, 2) + ') ' + d.slice(2); if (d.length <= 10) return '(' + d.slice(0, 2) + ') ' + d.slice(2, 6) + '-' + d.slice(6); return '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7); }
+  function ufDoApp(){ return String((quem && quem.regiaoId) || '').slice(0, 2).toUpperCase(); }
   function maskCpf(v){ var d = String(v || '').replace(/\D/g, '').slice(0, 11); if (d.length <= 3) return d; if (d.length <= 6) return d.slice(0, 3) + '.' + d.slice(3); if (d.length <= 9) return d.slice(0, 3) + '.' + d.slice(3, 6) + '.' + d.slice(6); return d.slice(0, 3) + '.' + d.slice(3, 6) + '.' + d.slice(6, 9) + '-' + d.slice(9); }
   function cpfOk(v){
     var d = String(v || '').replace(/\D/g, ''); if (d.length !== 11 || /^(\d)\1+$/.test(d)) return false;
@@ -1280,6 +1281,7 @@ html,body{overflow-x:hidden}
       '<div class="rot" style="margin-top:0">Dados da cliente</div><div class="dados">' +
         '<label class="fone' + (lsGet('campo_nome').trim() ? '' : ' falta') + '" id="l-nome"><svg viewBox="0 0 24 24"><use href="#i-pessoa"/></svg><input id="nome" autocomplete="off" autocapitalize="words" placeholder="Nome completo da cliente" value="' + esc(lsGet('campo_nome')) + '"></label>' +
         '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-fone"/></svg><input id="fone" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="(92) 99999-9999" value="' + esc(maskFone(lsGet('campo_fone'))) + '"></label>' +
+        '<label class="fone cid-campo' + (lsGet('campo_cidade') ? '' : ' falta') + '" id="l-cidade"><svg viewBox="0 0 24 24"><use href="#i-casa"/></svg><img class="cid-flag" id="cidade-flag" alt="" hidden><input id="cidade" autocomplete="off" autocapitalize="words" placeholder="Cidade da cliente" value="' + esc(lsGet('campo_cidade')) + '"' + (ufDoApp() ? ' readonly' : '') + '>' + (ufDoApp() ? '<svg class="cid-seta" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '') + '</label>' +
         '<label class="fone' + (cpfOk(lsGet('campo_cpf')) ? '' : ' falta') + '" id="l-cpf"><svg viewBox="0 0 24 24"><use href="#i-id"/></svg><input id="cpf" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="CPF da cliente" value="' + esc(maskCpf(lsGet('campo_cpf'))) + '"></label>' +
       '</div>' +
       '<div class="rot">Gestação</div><div class="dados">' +
@@ -1307,6 +1309,21 @@ html,body{overflow-x:hidden}
     if (completando){ $('cancelar-comp').onclick = cancelarComplemento; if ($('enviar')) $('enviar').lastChild.textContent = 'Enviar documentos'; }
     else {
     $('fone').addEventListener('input', function(){ this.value = maskFone(this.value); lsSet('campo_fone', this.value); });
+    if ($('cidade')){
+      var uf0 = ufDoApp();
+      var pintaB = function(){ var im = $('cidade-flag'), n = $('cidade').value; if (!im) return; if (!n || !uf0){ im.hidden = true; return; } bandeiraDe(uf0, n, function(u){ if (u){ im.src = u; im.hidden = false; } else im.hidden = true; }); };
+      var guarda = function(v){ lsSet('campo_cidade', v); $('cidade').value = v; var l = $('l-cidade'); if (l) l.classList.toggle('falta', !v); pintaB(); };
+      if (uf0){
+        var abrirC = function(e){ if (e) e.preventDefault(); escolherCidade(uf0, $('cidade').value, guarda); };
+        $('cidade').addEventListener('click', abrirC);
+        $('cidade').addEventListener('focus', function(){ this.blur(); });
+        var sc = $('l-cidade').querySelector('.cid-seta'); if (sc) sc.addEventListener('click', abrirC);
+      } else {
+        $('cidade').addEventListener('input', function(){ lsSet('campo_cidade', this.value); var l = $('l-cidade'); if (l) l.classList.toggle('falta', !this.value.trim()); });
+        $('cidade').addEventListener('blur', function(){ this.value = bonito(this.value); lsSet('campo_cidade', this.value); });
+      }
+      pintaB();
+    }
     if ($('cpf')) $('cpf').addEventListener('input', function(){ this.value = maskCpf(this.value); lsSet('campo_cpf', this.value); var l = $('l-cpf'); if (l) l.classList.toggle('falta', !cpfOk(this.value)); });
     $('nome').addEventListener('input', function(){ lsSet('campo_nome', this.value); $('l-nome').classList.toggle('falta', !this.value.trim()); });
     $('nome').addEventListener('blur', function(){ this.value = bonito(this.value); lsSet('campo_nome', this.value); });
@@ -1505,7 +1522,7 @@ html,body{overflow-x:hidden}
       if (Object.keys(fotos).length && !confirm('Há fotos de um cadastro em andamento. Sair mesmo assim? As fotos serão apagadas.')) return;
       if (!confirm('Sair desta conta? Para entrar de novo você vai precisar do usuário e da senha.')) return;
       fotos = {}; guardarRascunho();
-      ['campo_token', 'campo_quem', 'campo_painel', 'campo_nome', 'campo_fone', 'campo_cpf', 'campo_aba', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp'].forEach(function(k){ lsSet(k, ''); });
+      ['campo_token', 'campo_quem', 'campo_painel', 'campo_nome', 'campo_fone', 'campo_cpf', 'campo_cidade', 'campo_aba', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp'].forEach(function(k){ lsSet(k, ''); });
       token = ''; quem = null; painel = null; aba = 'painel';
       pedirLink();
     });
@@ -2025,6 +2042,7 @@ html,body{overflow-x:hidden}
     var nm = ($('nome') || {}).value || '';
     if (!nm.trim()){ falar('Digite o nome completo da cliente.'); alert('Digite o nome completo da cliente.'); $('nome').focus(); return; }
     if (!foneOk(($('fone') || {}).value)){ alert('Informe o telefone com DDD, por exemplo (92) 99999-9999.'); if ($('fone')) $('fone').focus(); return; }
+    if (!String(lsGet('campo_cidade') || '').trim()){ alert('Escolha a cidade da cliente.'); if ($('cidade')) $('cidade').focus(); return; }
     if (!cpfOk(($('cpf') || {}).value)){ alert('Informe o CPF da cliente (11 números).'); if ($('cpf')) $('cpf').focus(); return; }
     if (!lsGet('campo_dpp')){ alert('Informe a data prevista do parto, por exemplo 15/03/2027.'); if ($('dpp')) $('dpp').focus(); return; }
     var falta = DOCS.filter(function(d){ return obrig(d) && !fotos[d.k]; });
@@ -2070,7 +2088,7 @@ html,body{overflow-x:hidden}
       cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height); fotoMini = cv.toDataURL('image/jpeg', 0.72);
     }).catch(function(){}); });
     p     .then(function(){
-       var envio = { id: id, token: token, criado: new Date().toISOString(), completar: comp ? comp.id : '', foto: fotoMini, contato: maskFone(($('fone') || {}).value || ''), cpf: comp ? '' : maskCpf(($('cpf') || {}).value || ''), cliente: comp ? comp.nome : bonito(($('nome') || {}).value || ''), local: local, faltam: falta.map(function(d){ return d.k; }),
+       var envio = { id: id, token: token, criado: new Date().toISOString(), completar: comp ? comp.id : '', foto: fotoMini, contato: maskFone(($('fone') || {}).value || ''), cpf: comp ? '' : maskCpf(($('cpf') || {}).value || ''), cidade: comp ? '' : lsGet('campo_cidade'), cidadeUf: ufDoApp(), cliente: comp ? comp.nome : bonito(($('nome') || {}).value || ''), local: local, faltam: falta.map(function(d){ return d.k; }),
          tipoSegurada: tipoAtual(), crianca: '', criancaNasc: comp || gestante() ? '' : lsGet('campo_crianca_nasc'),
          fatoGerador: 'gestante', dpp: !comp && gestante() ? lsGet('campo_dpp') : '',
          docs: DOCS.filter(function(d){ return fotos[d.k]; }).map(function(d){ return d.k; }), arquivos: [] };
@@ -2080,7 +2098,7 @@ html,body{overflow-x:hidden}
      .then(function(envio){
        fotos = {}; local = null;
        if (comp){ completando = null; lsSet('campo_completando', ''); if (painel) painel.clientes.forEach(function(c){ if (c.id === comp.id) c.faltaDocs = comp.faltaDocs.filter(function(k){ return envio.docs.indexOf(k) < 0; }); }); }
-       else { ['campo_fone', 'campo_cpf', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp'].forEach(function(k){ lsSet(k, ''); }); }
+       else { ['campo_fone', 'campo_cpf', 'campo_cidade', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp'].forEach(function(k){ lsSet(k, ''); }); }
        t.remove(); aba = comp ? 'painel' : 'novo'; telaInicial(); window.scrollTo(0, 0);
        var ok = tela('<svg viewBox="0 0 24 24" style="stroke:var(--ok)"><use href="#i-ok"/></svg><b>' + (comp ? 'Documentos guardados' : 'Cadastro guardado') + '</b><p>' + esc(envio.cliente || '') + '<br>' + (comp ? 'Vão para a pasta da cliente sozinhos quando tiver internet.' : 'Está sendo enviado agora: acompanhe na barra embaixo. Pode cadastrar a próxima cliente.') + '</p><button id="t-ok">' + (comp ? 'Entendi' : 'Cadastrar a próxima') + '</button>');
        ok.querySelector('#t-ok').onclick = function(){ ok.remove(); };
