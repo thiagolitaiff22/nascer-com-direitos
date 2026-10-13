@@ -41,14 +41,13 @@ button:disabled{opacity:.6}
       <label for="funcao">Sua função</label>
       <select id="funcao">
         <option value="">Escolha…</option>
-        <option value="closer">Closer — liga e fecha contratos</option>
-        <option value="operacional">Operacional — documentos e requerimentos</option>
-        <option value="outra">Outra função</option>
+        <option value="gestor">Gestor</option>
+        <option value="closer">Closer</option>
+        <option value="prospectador">Prospectador</option>
+        <option value="parceiro">Parceiro</option>
+        <option value="operacional">Agente Operacional</option>
+        <option value="judicial">Agente Judicial</option>
       </select>
-      <div id="outra-box" style="display:none">
-        <label for="outra">Qual função?</label>
-        <input id="outra" placeholder="Ex.: financeiro, secretária…">
-      </div>
       <div class="hp"><label for="site">Não preencher</label><input id="site" tabindex="-1" autocomplete="off"></div>
       <button type="submit" id="go">Enviar cadastro</button>
       <div class="msg" id="msg" role="status"></div>
@@ -65,19 +64,17 @@ button:disabled{opacity:.6}
   function mask(v){ var d = String(v || '').replace(/\D/g, '').slice(0, 11); if (!d) return ''; if (d.length <= 2) return '(' + d; if (d.length <= 6) return '(' + d.slice(0, 2) + ') ' + d.slice(2); if (d.length <= 10) return '(' + d.slice(0, 2) + ') ' + d.slice(2, 6) + '-' + d.slice(6); return '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7); }
   $('fone').addEventListener('input', function(){ this.value = mask(this.value); });
   $('nome').addEventListener('blur', function(){ this.value = bonito(this.value); });
-  $('funcao').addEventListener('change', function(){ $('outra-box').style.display = this.value === 'outra' ? 'block' : 'none'; });
   function msg(t, err){ $('msg').textContent = t || ''; $('msg').className = 'msg' + (err ? ' err' : ''); }
   $('f').addEventListener('submit', function(e){
     e.preventDefault();
     if ($('site').value) return;                                   // robô
-    var nome = bonito($('nome').value), fone = $('fone').value, fn = $('funcao').value, outra = $('outra').value.trim();
+    var nome = bonito($('nome').value), fone = $('fone').value, fn = $('funcao').value;
     if (nome.length < 3 || nome.indexOf(' ') < 0){ msg('Escreva o nome completo.', true); $('nome').focus(); return; }
     var d = fone.replace(/\D/g, ''); if (d.length < 10){ msg('Informe o telefone com DDD.', true); $('fone').focus(); return; }
     if (!fn){ msg('Escolha a sua função.', true); $('funcao').focus(); return; }
-    if (fn === 'outra' && outra.length < 2){ msg('Diga qual é a função.', true); $('outra').focus(); return; }
     $('go').disabled = true; msg('Enviando…');
     fetch(CFG.url + '/rest/v1/rpc/equipe_solicitar', { method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ p_nome: nome, p_telefone: fone, p_funcao: fn, p_outra: fn === 'outra' ? outra : '' }) })
+      body: JSON.stringify({ p_nome: nome, p_telefone: fone, p_funcao: fn, p_outra: '' }) })
       .then(function(r){ return r.json(); })
       .then(function(d2){
         if (d2 && d2.ok){ $('form-box').style.display = 'none'; $('ok').style.display = 'block'; window.scrollTo(0, 0); }

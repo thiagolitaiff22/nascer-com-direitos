@@ -2747,7 +2747,7 @@ td,.row{font-size:13px}
       <div class="field full"><label for="fe-nome">Nome</label><input id="fe-nome" autocomplete="off"></div>
       <div class="field full"><label for="fe-email">Usuário de acesso</label><input id="fe-email" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="ex.: thiago ou nome.sobrenome"><span class="hint">É com este usuário e a senha abaixo que o funcionário entra no sistema. Pode usar um e-mail, se preferir.</span></div>
       <div class="field full" id="fe-senha-wrap"><label for="fe-senha">Senha de acesso</label><input id="fe-senha" type="password" inputmode="numeric" autocomplete="new-password" placeholder="Só números, mínimo de 6"><span class="hint" id="fe-senha-dica">Só números (mínimo de 6). O próprio funcionário pode trocar depois, em Alterar senha.</span></div>
-      <div class="field"><label for="fe-funcao">Cargo</label><select id="fe-funcao"><option value="closer">Closer · liga e fecha contratos</option><option value="operacional">Operacional · documentos e requerimentos</option><option value="admin">Administrador · acesso total</option></select></div>
+      <div class="field"><label for="fe-funcao">Cargo</label><select id="fe-funcao"><option value="closer">Closer · liga e fecha contratos</option><option value="operacional">Agente Operacional · documentos e requerimentos</option><option value="judicial">Agente Judicial · ações e processos</option><option value="admin">Gestor · acesso total</option></select></div>
       <div class="field"><label for="fe-ativo">Acesso</label><select id="fe-ativo"><option value="sim">Ativo</option><option value="nao">Bloqueado</option></select></div>
     </div>
     <div class="f-foot">
@@ -4384,7 +4384,7 @@ td,.row{font-size:13px}
   function isAdmin(){ return !!(state.me && state.me.funcao === 'admin'); }
 
   /* ---------- equipe ---------- */
-  var FUNCAO = { admin: 'Administrador', assistente: 'Assistente' };
+  var FUNCAO = { admin: 'Gestor', assistente: 'Equipe' };
   /* ---------- análise de contestação (teses da defesa) ---------- */
   var TESES = [
     ['provamaterial', 'Ausência de início de prova material', /PROVA MATERIAL|IN[IÍ]CIO DE PROVA/],
@@ -5402,19 +5402,20 @@ td,.row{font-size:13px}
     renderContest();
   });
 
-  var CARGOS = { closer: ['Closers', 'Comercial: ligam para as mães e fecham os contratos'], operacional: ['Operacional', 'Documentos, requerimentos e acompanhamento dos processos'], admin: ['Administração', 'Acesso total ao sistema'] };
+  var CARGOS = { closer: ['Closers', 'Comercial: ligam para as mães e fecham os contratos'], operacional: ['Agentes operacionais', 'Documentos, requerimentos e acompanhamento no INSS'], judicial: ['Agentes judiciais', 'Ações na Justiça, audiências e acompanhamento dos processos'], admin: ['Gestores', 'Acesso total ao sistema'] };
+  var CARGOS_ORDEM = ['closer', 'operacional', 'judicial', 'admin'];
   function cargoDe(u){ return u && CARGOS[u.cargo] ? u.cargo : (u && u.funcao === 'admin' ? 'admin' : 'operacional'); }
   function renderEquipe(){
     var box = $('eq-list'); if (!box) return;
     var eq = (state.equipe || []).slice().sort(function(a, b){ return (a.nome || '').localeCompare(b.nome || '', 'pt-BR'); });
     var meu = state.me ? state.me.email : '';
-    var cont = { closer: 0, operacional: 0, admin: 0 }, bloq = 0;
+    var cont = { closer: 0, operacional: 0, judicial: 0, admin: 0 }, bloq = 0;
     eq.forEach(function(u){ cont[cargoDe(u)]++; if (!u.ativo) bloq++; });
     var res = $('eq-resumo');
-    if (res) res.innerHTML = ['closer', 'operacional', 'admin'].map(function(k){ return '<div class="eq-chip"><b>' + cont[k] + '</b><span>' + CARGOS[k][0] + '</span></div>'; }).join('') +
+    if (res) res.innerHTML = CARGOS_ORDEM.map(function(k){ return '<div class="eq-chip"><b>' + cont[k] + '</b><span>' + CARGOS[k][0] + '</span></div>'; }).join('') +
       '<div class="eq-chip' + (bloq ? ' alerta' : '') + '"><b>' + bloq + '</b><span>Bloqueados</span></div>';
     if (!eq.length){ box.innerHTML = '<div class="card empty">Ninguém cadastrado ainda. Clique em <b>Novo funcionário</b>.</div>'; return; }
-    box.innerHTML = ['closer', 'operacional', 'admin'].map(function(k){
+    box.innerHTML = CARGOS_ORDEM.map(function(k){
       var lista = eq.filter(function(u){ return cargoDe(u) === k; });
       return '<div class="eq-grupo"><div class="eq-grupo-h"><b>' + CARGOS[k][0] + '</b><span class="mini">' + lista.length + '</span><span class="eq-grupo-d">' + CARGOS[k][1] + '</span></div>' +
         (lista.length ? '<div class="eq-cards">' + lista.map(function(u){
@@ -7021,9 +7022,9 @@ td,.row{font-size:13px}
     var ps = (state.pedidos || []).filter(function(p){ return p.status === 'pendente'; }).sort(function(a, b){ return String(a.criado_em).localeCompare(String(b.criado_em)); });
     box.hidden = !ps.length || !isAdmin();
     if (box.hidden){ box.innerHTML = ''; return; }
-    var FN = { closer: 'Closer', operacional: 'Operacional', outra: 'Outra função' };
+    var FN = { gestor: 'Gestor', closer: 'Closer', prospectador: 'Prospectador', parceiro: 'Parceiro', operacional: 'Agente Operacional', judicial: 'Agente Judicial' };
     box.innerHTML = '<div class="sec-rot">Pedidos de acesso · ' + ps.length + '</div>' + ps.map(function(p){
-      return '<div class="eq-ped"><div class="eq-ped-info"><b>' + esc(p.nome) + '</b><span class="mini">' + esc(p.telefone || 'sem telefone') + ' · ' + esc(FN[p.funcao] || p.funcao) + (p.funcao === 'outra' && p.outra ? ': ' + esc(p.outra) : '') + '</span></div>' +
+      return '<div class="eq-ped"><div class="eq-ped-info"><b>' + esc(p.nome) + '</b><span class="mini">' + esc(p.telefone || 'sem telefone') + ' · ' + esc(FN[p.funcao] || p.funcao) + '</span></div>' +
         '<div class="eq-ped-acoes"><button type="button" class="btn primary" data-ped-aprovar="' + esc(p.id) + '">Aprovar</button><button type="button" class="btn" data-ped-descartar="' + esc(p.id) + '">Descartar</button></div></div>';
     }).join('');
   }
@@ -7036,12 +7037,20 @@ td,.row{font-size:13px}
     }
     if (!ap) return;
     var p = (state.pedidos || []).filter(function(x){ return x.id === ap.dataset.pedAprovar; })[0]; if (!p) return;
+    // prospectador e parceiro não são da equipe interna: abre o cadastro de parceiros com os dados já preenchidos
+    if (p.funcao === 'prospectador' || p.funcao === 'parceiro'){
+      pedidoEq = p.id;
+      openProsp(null, '', p.funcao === 'prospectador' ? 'prospectador' : 'parceiro');
+      $('fp-nome').value = nomeProprio(p.nome); $('fp-tel').value = maskTel(p.telefone || '');
+      toast('Complete a região e salve. Depois crie o acesso do aplicativo em "Aplicativo".');
+      return;
+    }
     pedidoEq = p.id;
     openEq(null);
     $('fe-nome').value = nomeProprio(p.nome);
     // usuário sugerido: primeiro nome, sem acento e em minúsculas
     $('fe-email').value = String(p.nome || '').trim().split(/\s+/)[0].normalize('NFD').replace(new RegExp('[\\u0300-\\u036f]', 'g'), '').toLowerCase().replace(/[^a-z0-9]/g, '');
-    $('fe-funcao').value = p.funcao === 'closer' ? 'closer' : 'operacional';
+    $('fe-funcao').value = { gestor: 'admin', closer: 'closer', judicial: 'judicial' }[p.funcao] || 'operacional';
     setTimeout(function(){ $('fe-senha').focus(); }, 60);
   });
   $('btn-senha').addEventListener('click', function(){ $('sn-nova').value = ''; $('sn-rep').value = ''; $('sn-msg').textContent = ''; $('dlg-senha').showModal(); setTimeout(function(){ $('sn-nova').focus(); }, 30); });
