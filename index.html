@@ -1958,6 +1958,19 @@ td,.row{font-size:13px}
 #cad-list .row{grid-template-columns:minmax(0,1.5fr) minmax(240px,1.3fr) minmax(150px,.9fr) minmax(230px,1.5fr) minmax(0,1fr) 30px!important}
 #cad-list .cad-parto{padding-left:4px}
 #cad-list .tel-zap{margin-left:2px}
+
+/* Cadastro limpo: nome, telefone, atendimento e um botão */
+#cad-list .row{grid-template-columns:minmax(0,1.6fr) minmax(190px,1fr) minmax(150px,.8fr) 150px 30px!important;gap:14px!important;min-height:58px!important;padding:8px 16px!important;border-top:1px solid var(--line)}
+#cad-list .row.head{min-height:0!important;padding:8px 16px!important;border-top:0}
+#cad-list .c-name{display:flex;align-items:center;gap:12px;min-width:0}
+#cad-list .cad-av{width:34px;height:34px;border-radius:50%;flex:none;display:grid;place-items:center;background:var(--gsoft,#f3e8d2);color:var(--gold-d,#8a6a3d);font-weight:700;font-size:14px}
+#cad-list .cad-nome{min-width:0}
+#cad-list .cad-nome .name{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
+#cad-list .cad-nome .addr{font-size:11.5px;color:var(--ink-3)}
+#cad-list .cad-ponto{width:8px;height:8px;border-radius:50%;background:#d9534f;flex:none;display:inline-block}
+#cad-list .cad-fechar .btn{width:100%;justify-content:center;white-space:nowrap}
+#cad-list .cad-atend{display:block}
+#cad-list .cad-atend select{width:100%}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -3581,7 +3594,7 @@ td,.row{font-size:13px}
       // mais recente primeiro (pelo dia do cadastro); no mesmo dia, em ordem alfabética
       .sort(function(a, b){ var da = String(a.dataCadastro || a.criadoEm || '').slice(0, 10), db = String(b.dataCadastro || b.criadoEm || '').slice(0, 10); return (LEAD_ORDEM[leadDe(a)] - LEAD_ORDEM[leadDe(b)]) || db.localeCompare(da) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); });
     $('cad-count').textContent = lista.length + (lista.length === 1 ? ' cliente' : ' clientes');
-    var html = '<div class="row head"><div>Cliente</div><div>Contato · ligar</div><div>Parto previsto</div><div>Atendimento</div><div>Documentos</div><div></div></div>';
+    var html = '<div class="row head"><div>Cliente</div><div>Telefone</div><div>Atendimento</div><div></div><div></div></div>';
     if (!lista.length) html += '<div class="empty">' + (todos.length ? 'Nenhum cliente neste filtro.' : 'Nenhum cliente em cadastro. Clique em <b>Novo cadastro</b> para começar.') + '</div>';
     lista.slice(0, 300).forEach(function(r){
       var st = situacaoCad(r);
@@ -3590,15 +3603,15 @@ td,.row{font-size:13px}
       var onde = [parNome ? 'Indicação de ' + parNome : '', par && par.regiao ? par.regiao : ''].filter(Boolean).join(' · ');
       var dc = String(r.dataCadastro || r.criadoEm || '').slice(0, 10), nd = dc ? -daysUntil(dc) : null;
       var quando = nd == null ? '' : nd <= 0 ? 'cadastrada hoje' : nd === 1 ? 'cadastrada ontem' : 'cadastrada há ' + nd + ' dias';
+      var docsOk = !docsPendentes(r), incompleto = st[0] === 'incompleto';
+      var aviso = !docsOk || incompleto ? '<span class="cad-ponto" title="' + esc((!docsOk ? 'Documentos pendentes' : '') + (!docsOk && incompleto ? ' · ' : '') + (incompleto ? 'Dados incompletos' : '')) + '"></span>' : '';
+      var ini2 = String(r.nome || '?').trim().charAt(0).toUpperCase();
       html += '<div class="row cad-closer' + (cadAberto[r.id] ? ' aberto' : '') + '" data-linha="' + esc(r.id) + '">' +
-        '<div class="c-name"><div class="name">' + ufFlag(r) + foto + '<button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome) + '</button>' +
-          '<button type="button" class="nome-copia" data-copiar-nome="' + esc(r.nome) + '" title="Copiar o nome" aria-label="Copiar o nome de ' + esc(r.nome) + '"><svg class="i"><use href="#i-copy"/></svg></button>' +
-          (r.pastaUrl ? pastaIco(r) : '<button type="button" class="pasta-falta" data-pasta-cad="' + esc(r.id) + '" title="Pasta não ligada ao cadastro: clique para procurar a pasta dela no Drive" aria-label="Ligar pasta de ' + esc(r.nome) + '"><svg class="i"><use href="#i-folder"/></svg></button>') + '</div>' +
-          '<div class="addr">' + esc(onde || 'Sem parceiro') + (quando ? ' · ' + quando : '') + '</div></div>' +
+        '<div class="c-name"><span class="cad-av">' + esc(ini2) + '</span><div class="cad-nome"><div class="name"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome) + '</button>' + aviso + '</div>' +
+          '<div class="addr">' + esc(quando || '') + '</div></div></div>' +
         '<div class="cad-contato">' + contatoCloser(r) + '</div>' +
-        '<div class="cad-parto">' + partoCell(r) + '</div>' +
-        '<div class="cad-atend">' + leadSelect(r) + '<button type="button" class="btn inss-acao" data-act="fechar" data-id="' + esc(r.id) + '" title="O contrato foi assinado: a cliente vai para Contratos fechados">Fechar contrato</button></div>' +
-        '<div class="cad-docs" title="' + esc(st[1]) + '">' + docsCell(r) + '</div>' +
+        '<div class="cad-atend">' + leadSelect(r) + '</div>' +
+        '<div class="cad-fechar"><button type="button" class="btn primary inss-acao" data-act="fechar" data-id="' + esc(r.id) + '" title="O contrato foi assinado: a cliente vai para Contratos fechados">Fechar contrato</button></div>' +
         '<div class="c-act"><button type="button" class="ico-btn" data-act="edit" data-id="' + esc(r.id) + '" title="Editar cadastro" aria-label="Editar ' + esc(r.nome) + '"><svg class="i"><use href="#i-pencil"/></svg></button></div>' +
       '</div>' + (cadAberto[r.id] ? fichaCliente(r, true) : '');
     });
