@@ -2747,9 +2747,9 @@ td,.row{font-size:13px}
   <form class="f" id="form-novasenha" novalidate>
     <div class="f-head"><h2>Crie a sua senha</h2></div>
     <div class="f-body">
-      <div class="field full"><span class="hint">Para a sua segurança, escolha agora uma senha só sua. Use só números, no mínimo 6, e diferente de 123456.</span></div>
-      <div class="field full"><label for="ns-a">Nova senha</label><input id="ns-a" type="password" inputmode="numeric" autocomplete="new-password"></div>
-      <div class="field full"><label for="ns-b">Repita a nova senha</label><input id="ns-b" type="password" inputmode="numeric" autocomplete="new-password"></div>
+      <div class="field full"><span class="hint">Para a sua segurança, escolha agora uma senha só sua. Use no mínimo 6 caracteres, com letra maiúscula, letra minúscula, número e símbolo (por exemplo ! @ # $ %). Não pode ser 123456.</span></div>
+      <div class="field full"><label for="ns-a">Nova senha</label><input id="ns-a" type="password" autocomplete="new-password"></div>
+      <div class="field full"><label for="ns-b">Repita a nova senha</label><input id="ns-b" type="password" autocomplete="new-password"></div>
       <div class="field full"><span class="hint" id="ns-msg" role="status"></span></div>
     </div>
     <div class="f-foot"><div class="right"><button class="btn primary" type="submit" id="ns-go">Salvar e entrar</button></div></div>
@@ -2760,7 +2760,7 @@ td,.row{font-size:13px}
   <form class="f" id="form-reset" novalidate>
     <div class="f-head"><h2>Redefinir senhas</h2></div>
     <div class="f-body">
-      <div class="field full"><label for="rs-senha">Nova senha (só números, mínimo de 6)</label><input id="rs-senha" name="rs-nova" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" data-lpignore="true" data-1p-ignore placeholder="Ex.: 123456"><span class="hint">Aparece o que você digita. Cada pessoa pode trocar depois, em Alterar senha.</span></div>
+      <div class="field full"><label for="rs-senha">Senha provisória (mínimo de 6)</label><input id="rs-senha" name="rs-nova" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" data-lpignore="true" data-1p-ignore placeholder="Ex.: 123456"><span class="hint">Cada pessoa é obrigada a criar a própria senha no primeiro acesso, com maiúscula, minúscula, número e símbolo.</span></div>
       <div class="field full"><label>Quem recebe esta senha</label><div id="rs-lista" class="rs-lista"></div></div>
       <div class="field full"><span class="hint" id="rs-msg" role="status"></span></div>
     </div>
@@ -2772,8 +2772,8 @@ td,.row{font-size:13px}
   <form class="f" id="form-senha" novalidate>
     <div class="f-head"><h2>Alterar minha senha</h2></div>
     <div class="f-body">
-      <div class="field full"><label for="sn-nova">Nova senha</label><input id="sn-nova" type="password" inputmode="numeric" autocomplete="new-password" placeholder="Só números, mínimo de 6"></div>
-      <div class="field full"><label for="sn-rep">Repita a nova senha</label><input id="sn-rep" type="password" inputmode="numeric" autocomplete="new-password"></div>
+      <div class="field full"><label for="sn-nova">Nova senha</label><input id="sn-nova" type="password" autocomplete="new-password" placeholder="Mín. 6 · Maiúscula, minúscula, número e símbolo"></div>
+      <div class="field full"><label for="sn-rep">Repita a nova senha</label><input id="sn-rep" type="password" autocomplete="new-password"></div>
       <div class="field full"><span class="hint" id="sn-msg"></span></div>
     </div>
     <div class="f-foot"><div class="right"><button class="btn" type="button" id="sn-cancel">Cancelar</button><button class="btn primary" type="submit" id="sn-go">Salvar senha</button></div></div>
@@ -2786,7 +2786,7 @@ td,.row{font-size:13px}
     <div class="f-body">
       <div class="field full"><label for="fe-nome">Nome</label><input id="fe-nome" autocomplete="off"></div>
       <div class="field full"><label for="fe-email">Usuário de acesso</label><input id="fe-email" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="ex.: thiago ou nome.sobrenome"><span class="hint">É com este usuário e a senha abaixo que o funcionário entra no sistema. Pode usar um e-mail, se preferir.</span></div>
-      <div class="field full" id="fe-senha-wrap"><label for="fe-senha">Senha de acesso</label><input id="fe-senha" name="nova-senha-equipe" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocapitalize="none" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Deixe em branco para usar a senha padrão 123456"><span class="hint" id="fe-senha-dica">Só números (mínimo de 6). O próprio funcionário pode trocar depois, em Alterar senha.</span></div>
+      <div class="field full" id="fe-senha-wrap"><label for="fe-senha">Senha de acesso</label><input id="fe-senha" name="nova-senha-equipe" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocapitalize="none" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Em branco = senha padrão 123456 (a pessoa troca no 1º acesso)"><span class="hint" id="fe-senha-dica">Só números (mínimo de 6). O próprio funcionário pode trocar depois, em Alterar senha.</span></div>
       <div class="field"><label for="fe-funcao">Cargo</label><select id="fe-funcao"><option value="closer">Closer · liga e fecha contratos</option><option value="operacional">Agente Operacional · documentos e requerimentos</option><option value="judicial">Agente Judicial · ações e processos</option><option value="admin">Gestor · acesso total</option></select></div>
       <div class="field"><label for="fe-ativo">Acesso</label><select id="fe-ativo"><option value="sim">Ativo</option><option value="nao">Bloqueado</option></select></div>
     </div>
@@ -6790,6 +6790,15 @@ td,.row{font-size:13px}
   /* ---------- entering the app ---------- */
   var iniciado = false, recuperando = false;
   // senha padrão: a pessoa é obrigada a criar a senha dela no primeiro acesso
+  function senhaForte(s){
+    s = String(s || '');
+    if (s.length < 6) return 'A senha precisa ter no mínimo 6 caracteres.';
+    if (!/[A-Z]/.test(s)) return 'Falta pelo menos uma letra maiúscula.';
+    if (!/[a-z]/.test(s)) return 'Falta pelo menos uma letra minúscula.';
+    if (!/[0-9]/.test(s)) return 'Falta pelo menos um número.';
+    if (!/[^A-Za-z0-9]/.test(s)) return 'Falta pelo menos um símbolo (por exemplo ! @ # $ %).';
+    return '';
+  }
   function novaSenhaObrigatoria(){
     return new Promise(function(ok){
       var d = $('dlg-novasenha'); $('ns-a').value = ''; $('ns-b').value = ''; $('ns-msg').textContent = '';
@@ -6797,7 +6806,7 @@ td,.row{font-size:13px}
       $('form-novasenha').onsubmit = async function(e){
         e.preventDefault();
         var a = $('ns-a').value, b = $('ns-b').value;
-        if (!/^[0-9]{6,}$/.test(a)){ $('ns-msg').textContent = 'Use só números, com pelo menos 6.'; return; }
+        var pe = senhaForte(a); if (pe){ $('ns-msg').textContent = pe; return; }
         if (a === '123456'){ $('ns-msg').textContent = 'Escolha uma senha diferente da padrão.'; return; }
         if (a !== b){ $('ns-msg').textContent = 'As duas senhas não são iguais.'; return; }
         $('ns-go').disabled = true; $('ns-msg').textContent = 'Salvando…';
@@ -7101,12 +7110,11 @@ td,.row{font-size:13px}
     });
   });
   $('rs-cancel').addEventListener('click', function(){ $('dlg-reset').close(); });
-  $('rs-senha').addEventListener('input', function(){ this.value = this.value.replace(/\D/g, ''); });
   $('form-reset').addEventListener('submit', async function(e){
     e.preventDefault();
     var s = $('rs-senha').value, marcados = [].slice.call($('rs-lista').querySelectorAll('input[data-rs]:checked')).map(function(c){ return c.dataset.rs; });
     var marcadosP = [].slice.call($('rs-lista').querySelectorAll('input[data-rsp]:checked')).map(function(c){ return { id: c.dataset.rsp, u: c.dataset.rsu }; });
-    if (!/^[0-9]{6,}$/.test(s)){ $('rs-msg').textContent = 'A senha deve ter só números, no mínimo 6.'; return; }
+    if (s.length < 6){ $('rs-msg').textContent = 'A senha provisória deve ter no mínimo 6 caracteres.'; return; }
     if (!marcados.length && !marcadosP.length){ $('rs-msg').textContent = 'Marque pelo menos uma pessoa.'; return; }
     $('rs-go').disabled = true; $('rs-msg').textContent = 'Aplicando…';
     var ok = 0, falhas = [];
@@ -7206,8 +7214,7 @@ td,.row{font-size:13px}
   $('form-senha').addEventListener('submit', async function(e){
     e.preventDefault();
     var a = $('sn-nova').value, b = $('sn-rep').value;
-    var soNum = state.me && ehAcessoInterno(state.me.email);   // acesso por usuário: senha só com números
-    if (soNum ? !/^[0-9]{6,}$/.test(a) : a.length < 6){ $('sn-msg').textContent = soNum ? 'Use só números, com pelo menos 6.' : 'A senha precisa ter pelo menos 6 caracteres.'; return; }
+    var pe2 = senhaForte(a); if (pe2){ $('sn-msg').textContent = pe2; return; }
     if (a === '123456'){ $('sn-msg').textContent = 'Escolha uma senha diferente da padrão.'; return; }
     if (a !== b){ $('sn-msg').textContent = 'As duas senhas não são iguais.'; return; }
     $('sn-go').disabled = true; $('sn-msg').textContent = 'Salvando…';
@@ -7230,7 +7237,7 @@ td,.row{font-size:13px}
     var interno = ehAcessoInterno(email);
     var usouPadrao = false;
     if (interno && !eEditing && !senhaNova){ senhaNova = '123456'; usouPadrao = true; }   // senha padrão: a pessoa troca no primeiro acesso
-    if (interno && senhaNova && !/^[0-9]{6,}$/.test(senhaNova)){ $('fe-senha').focus(); toast('A senha deve ter só números, no mínimo 6'); return; }
+    if (interno && senhaNova && senhaNova.length < 6){ $('fe-senha').focus(); toast('A senha provisória deve ter no mínimo 6 caracteres'); return; }
     var cargoSel = $('fe-funcao').value;
     var row = { nome: nome, funcao: cargoSel === 'admin' ? 'admin' : 'assistente', cargo: cargoSel, ativo: $('fe-ativo').value === 'sim' };
     $('fe-save').disabled = true;

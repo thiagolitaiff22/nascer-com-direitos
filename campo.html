@@ -720,7 +720,7 @@ html,body{overflow-x:hidden}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 17;
+  var APP_VERSAO = 18;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -2291,15 +2291,24 @@ html,body{overflow-x:hidden}
   var APP = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
   // entrada: usuário e senha que o escritório cadastrou (ou o link antigo, se a pessoa tiver)
   // primeiro acesso com a senha padrão: o aplicativo só segue depois de a pessoa criar a senha dela
+  function senhaForte(s){
+    s = String(s || '');
+    if (s.length < 6) return 'A senha precisa ter no mínimo 6 caracteres.';
+    if (!/[A-Z]/.test(s)) return 'Falta pelo menos uma letra maiúscula.';
+    if (!/[a-z]/.test(s)) return 'Falta pelo menos uma letra minúscula.';
+    if (!/[0-9]/.test(s)) return 'Falta pelo menos um número.';
+    if (!/[^A-Za-z0-9]/.test(s)) return 'Falta pelo menos um símbolo (por exemplo ! @ # $ %).';
+    return '';
+  }
   function telaNovaSenha(tk){
     $('app').innerHTML = '<div class="login"><div class="entrar"><img class="login-logo" src="img/logo-nascer-t.png" alt="Nascer com Direitos">' +
-      '<b class="login-t">Crie a sua senha</b><p class="login-s">Para a sua segurança, escolha agora uma senha só sua.<br>No mínimo 6 caracteres, diferente de 123456.</p>' +
+      '<b class="login-t">Crie a sua senha</b><p class="login-s">Para a sua segurança, escolha agora uma senha só sua.<br>Mínimo de 6 caracteres, com letra maiúscula, minúscula, número e símbolo (! @ # $ %). Não pode ser 123456.</p>' +
       '<label class="login-rot" for="ns1">Nova senha</label><label class="fone" style="margin:0 0 14px"><input id="ns1" type="password" placeholder="nova senha" autocomplete="new-password"></label>' +
       '<label class="login-rot" for="ns2">Repita a nova senha</label><label class="fone" style="margin:0"><input id="ns2" type="password" placeholder="repita a senha" autocomplete="new-password"></label>' +
       '<button class="enviar" id="ns-ok">Salvar e entrar</button></div></div>';
     $('ns-ok').onclick = function(){
       var a = $('ns1').value, b = $('ns2').value, bt = this;
-      if (a.length < 6) return alert('A senha precisa ter pelo menos 6 caracteres.');
+      var pe = senhaForte(a); if (pe) return alert(pe);
       if (a === '123456') return alert('Escolha uma senha diferente da padrão.');
       if (a !== b) return alert('As duas senhas não são iguais.');
       bt.disabled = true; bt.textContent = 'Salvando…';

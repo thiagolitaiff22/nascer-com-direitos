@@ -204,16 +204,25 @@ main{max-width:1180px}
       entrar(r.data.session);
     }, function(){ msgLogin('Sem internet. Tente de novo.'); $('lg-go').disabled = false; });
   });
+  function senhaForte(s){
+    s = String(s || '');
+    if (s.length < 6) return 'A senha precisa ter no mínimo 6 caracteres.';
+    if (!/[A-Z]/.test(s)) return 'Falta pelo menos uma letra maiúscula.';
+    if (!/[a-z]/.test(s)) return 'Falta pelo menos uma letra minúscula.';
+    if (!/[0-9]/.test(s)) return 'Falta pelo menos um número.';
+    if (!/[^A-Za-z0-9]/.test(s)) return 'Falta pelo menos um símbolo (por exemplo ! @ # $ %).';
+    return '';
+  }
   function novaSenhaObrigatoria(){
     return new Promise(function(ok){
-      var f = abrirFolha('<h2>Crie a sua senha</h2><p class="sub">Para a sua segurança, escolha agora uma senha só sua: só números, no mínimo 6, e diferente de 123456.</p>' +
-        '<label class="campo"><span>Nova senha</span><input id="ob-a" type="password" inputmode="numeric" autocomplete="new-password"></label>' +
-        '<label class="campo"><span>Repita a nova senha</span><input id="ob-b" type="password" inputmode="numeric" autocomplete="new-password"></label>' +
+      var f = abrirFolha('<h2>Crie a sua senha</h2><p class="sub">Para a sua segurança, escolha agora uma senha só sua. Use no mínimo 6 caracteres, com letra maiúscula, letra minúscula, número e símbolo (por exemplo ! @ # $ %). Não pode ser 123456.</p>' +
+        '<label class="campo"><span>Nova senha</span><input id="ob-a" type="password" autocomplete="new-password"></label>' +
+        '<label class="campo"><span>Repita a nova senha</span><input id="ob-b" type="password" autocomplete="new-password"></label>' +
         '<div class="msg" id="ob-msg"></div><button class="btn p full" id="ob-ok">Salvar e entrar</button>');
       S.obrig = true;   // não fecha clicando fora
       f.querySelector('#ob-ok').onclick = async function(){
         var a = f.querySelector('#ob-a').value, b = f.querySelector('#ob-b').value, m = f.querySelector('#ob-msg');
-        if (!/^[0-9]{6,}$/.test(a)){ m.textContent = 'Use só números, com pelo menos 6.'; return; }
+        var pe = senhaForte(a); if (pe){ m.textContent = pe; return; }
         if (a === '123456'){ m.textContent = 'Escolha uma senha diferente da padrão.'; return; }
         if (a !== b){ m.textContent = 'As duas senhas não são iguais.'; return; }
         this.disabled = true; m.textContent = 'Salvando…';
@@ -239,14 +248,14 @@ main{max-width:1180px}
     });
   }
   $('b-senha').addEventListener('click', function(){
-    var f = abrirFolha('<h2>Alterar minha senha</h2><p class="sub">Escolha uma nova senha, só com números (mínimo de 6).</p>' +
-      '<label class="campo"><span>Nova senha</span><input id="sn-a" type="password" inputmode="numeric" autocomplete="new-password"></label>' +
-      '<label class="campo"><span>Repita a nova senha</span><input id="sn-b" type="password" inputmode="numeric" autocomplete="new-password"></label>' +
+    var f = abrirFolha('<h2>Alterar minha senha</h2><p class="sub">Use no mínimo 6 caracteres, com letra maiúscula, letra minúscula, número e símbolo (por exemplo ! @ # $ %). Não pode ser 123456.</p>' +
+      '<label class="campo"><span>Nova senha</span><input id="sn-a" type="password" autocomplete="new-password"></label>' +
+      '<label class="campo"><span>Repita a nova senha</span><input id="sn-b" type="password" autocomplete="new-password"></label>' +
       '<div class="msg" id="sn-msg"></div><div class="fx"><button class="btn p" id="sn-ok">Salvar senha</button><button class="btn" id="sn-x">Cancelar</button></div>');
     f.querySelector('#sn-x').onclick = fecharFolha;
     f.querySelector('#sn-ok').onclick = async function(){
       var a = f.querySelector('#sn-a').value, b = f.querySelector('#sn-b').value, m = f.querySelector('#sn-msg');
-      if (!/^[0-9]{6,}$/.test(a)){ m.textContent = 'Use só números, com pelo menos 6.'; return; }
+      var pe2 = senhaForte(a); if (pe2){ m.textContent = pe2; return; }
       if (a === '123456'){ m.textContent = 'Escolha uma senha diferente da padrão.'; return; }
       if (a !== b){ m.textContent = 'As duas senhas não são iguais.'; return; }
       this.disabled = true; m.textContent = 'Salvando…';
