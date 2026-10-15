@@ -1435,7 +1435,7 @@ td,.row{font-size:13px}
 }
 .app th,.app .thead > *{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-/* ---------- Contratos fechados / Aguardando nascimento ---------- */
+/* ---------- Contratos fechados / Pagamento de guia ---------- */
 #ctr-list .row,#nasc-list .row{grid-template-columns:minmax(0,2.2fr) minmax(0,1.2fr) minmax(0,1.1fr) minmax(0,1.5fr) minmax(190px,1.4fr) 36px!important;align-items:center;gap:16px!important;min-height:46px;padding-top:6px!important;padding-bottom:6px!important}
 #nasc-list .row{grid-template-columns:minmax(0,2.2fr) minmax(0,1.2fr) minmax(0,1.1fr) minmax(0,1.2fr) minmax(0,1.4fr) minmax(150px,1fr)!important}
 #ctr-list .row[data-linha],#nasc-list .row[data-linha]{cursor:pointer}
@@ -2119,8 +2119,8 @@ td,.row{font-size:13px}
     <nav class="nav" role="tablist" aria-orientation="horizontal">
       <div class="nav-lbl" aria-hidden="true">Comercial</div><button class="tab" role="tab" id="tab-cad" aria-selected="false" type="button" title="Cadastro"><svg class="i"><use href="#i-phone"/></svg><span>Cadastro</span></button>
       <button class="tab" role="tab" id="tab-ctr" aria-selected="false" type="button" title="Contratos fechados"><svg class="i"><use href="#i-check"/></svg><span>Contratos fechados</span></button>
-      <button class="tab" role="tab" id="tab-nasc" aria-selected="false" type="button" title="Aguardando nascimento"><svg class="i"><use href="#i-clock"/></svg><span>Aguardando nascimento</span></button>
-      <div class="nav-lbl" aria-hidden="true">Processos</div><button class="tab" role="tab" id="tab-inss" aria-selected="false" type="button" title="INSS"><svg class="i"><use href="#i-inss"/></svg><span>INSS</span></button>
+      <div class="nav-lbl" aria-hidden="true">Operacional</div><button class="tab" role="tab" id="tab-nasc" aria-selected="false" type="button" title="Pagamento de guia"><svg class="i"><use href="#i-clock"/></svg><span>Pagamento de guia</span></button>
+      <button class="tab" role="tab" id="tab-inss" aria-selected="false" type="button" title="INSS"><svg class="i"><use href="#i-inss"/></svg><span>INSS</span></button>
       <button class="tab" role="tab" id="tab-clientes" aria-selected="true" type="button" title="Judicial"><svg class="i"><use href="#i-gavel"/></svg><span>Judicial</span></button>
       <div class="nav-lbl" aria-hidden="true">Gestão</div><button class="tab admin-only" role="tab" id="tab-fin" aria-selected="false" type="button" title="Financeiro"><svg class="i"><use href="#i-cash"/></svg><span>Financeiro</span></button>
       <button class="tab" role="tab" id="tab-ret" aria-selected="false" type="button" title="Arquivados"><svg class="i"><use href="#i-file"/></svg><span>Arquivados</span></button>
@@ -3918,7 +3918,7 @@ td,.row{font-size:13px}
     renderCad();
   });
 
-  /* ---------- Cadastro como lead, Contratos fechados e Aguardando nascimento ---------- */
+  /* ---------- Cadastro como lead, Contratos fechados e Pagamento de guia ---------- */
   var LEAD = { novo: 'Novo lead', contato: 'Em contato', sem_resposta: 'Sem resposta', retornar: 'Retornar depois', perdido: 'Perdido (não fechou)' };
   // regras automáticas: 3 tentativas sem atender = sem resposta; em contato há mais de 3 dias = sem resposta;
   // sem resposta há mais de 15 dias = perdido; "retornar depois" volta para "novo lead" na data marcada
@@ -4000,7 +4000,7 @@ td,.row{font-size:13px}
     var atras = todos.filter(function(r){ var n = daysUntil(r.dpp); return n != null && n < 0; });
     var pend = todos.filter(docsPendentes);
     $('nasc-stats').innerHTML =
-      cardLista('data-nasc-filtro', 'i-clock', 'Aguardando nascimento', todos.length, 'contratos fechados de gestantes', '', nascSit) +
+      cardLista('data-nasc-filtro', 'i-clock', 'Pagamento de guia', todos.length, 'contratos fechados de gestantes', '', nascSit) +
       cardLista('data-nasc-filtro', 'i-check', 'Já podem requerer', pode.length, 'a partir de 28 dias antes do parto', 'pode', nascSit) +
       cardLista('data-nasc-filtro', 'i-bellx', 'Passou da data prevista', atras.length, 'confirmar se o bebê nasceu', 'atrasou', nascSit) +
       cardLista('data-nasc-filtro', 'i-bellx', 'Documentos pendentes', pend.length, 'falta documento ou dado', 'docs', nascSit);
@@ -6085,7 +6085,7 @@ td,.row{font-size:13px}
     i: ['INSS', 'Requerimentos administrativos: análise, exigências, concessões e indeferimentos'],
     c: ['Judicial', 'Ações judiciais: acompanhamento do processo até a sentença e o pagamento'],
     k: ['Contratos fechados', 'Clientes com contrato assinado: regularizar documentos e requerer no INSS'],
-    n: ['Aguardando nascimento', 'Contratos fechados de gestantes: esperando o bebê nascer para requerer'],
+    n: ['Pagamento de guia', 'Contratos fechados de gestantes: pagamento da guia enquanto o bebê não nasce'],
     a: ['Audiências', 'Pauta por dia, avisos e convites'],
     l: ['Clientes', 'Todas as clientes e a etapa de cada caso'],
     p: ['Pós-audiência', 'Resultados, conclusos, recursos e pagamentos'],

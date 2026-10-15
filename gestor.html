@@ -342,7 +342,7 @@ function tentarParceiro(cpf, senha){
     if (c.arquivado) return ['Arquivada', ''];
     if (String(c.processo || '').trim()) return ['Na Justiça', 'warn'];
     if (c.der || String(c.protocoloInss || '').trim()) return ['No INSS', 'ok'];
-    if (c.contratoEm) return c.fatoGerador === 'gestante' && !c.criancaNasc ? ['Aguardando nascimento', ''] : ['Contrato fechado', 'ok'];
+    if (c.contratoEm) return c.fatoGerador === 'gestante' && !c.criancaNasc ? ['Pagamento de guia', ''] : ['Contrato fechado', 'ok'];
     return ['Em cadastro', ''];
   }
   function docsFalta(c){ return Array.isArray(c.faltaDocs) ? c.faltaDocs : []; }
