@@ -720,7 +720,7 @@ html,body{overflow-x:hidden}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 13;
+  var APP_VERSAO = 14;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -2297,6 +2297,7 @@ html,body{overflow-x:hidden}
       '<label class="login-rot" for="senha">Senha</label><label class="fone" style="margin:0"><svg viewBox="0 0 24 24"><use href="#i-cadeado"/></svg><input id="senha" type="password" placeholder="sua senha" autocomplete="current-password"><button type="button" id="ver-senha" style="border:0;background:none;color:var(--ink2);font:inherit;font-size:14px">mostrar</button></label>' +
       '<button class="enviar" id="entrar">Entrar</button>' +
       '<p class="login-nota">Precisa de internet só para entrar. Depois o aplicativo funciona sem sinal.</p>' +
+      (APP ? '' : '<p class="login-nota"><a href="gestor.html" style="color:inherit;font-weight:700">Sou gestor do escritório</a></p>') +
       '</div></div>';
     $('ver-senha').onclick = function(){ var e = $('senha'); e.type = e.type === 'password' ? 'text' : 'password'; this.textContent = e.type === 'password' ? 'mostrar' : 'esconder'; };
     $('senha').addEventListener('keydown', function(e){ if (e.key === 'Enter') $('entrar').click(); });
