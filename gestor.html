@@ -143,7 +143,6 @@ button,a,label,[role=button]{touch-action:manipulation}
     <div class="msg" id="lg-msg" role="status"></div>
   </form>
   <p style="margin-top:14px"><a href="#" id="lg-modo" style="color:var(--gold2);font-weight:700">Entrar com e-mail (administração)</a></p>
-  <p style="margin-top:18px"><a href="campo.html" style="color:var(--gold2);font-weight:700">Sou parceiro ou prospectador</a></p>
 </section>
 
 <!-- aplicativo -->
@@ -211,6 +210,14 @@ button,a,label,[role=button]{touch-action:manipulation}
     el.parentNode.querySelector('span').textContent = lgEmail ? 'E-mail' : 'CPF';
     this.textContent = lgEmail ? 'Entrar com CPF' : 'Entrar com e-mail (administração)'; el.focus();
   });
+function tentarParceiro(cpf, senha){
+    if (!cpf || cpf.length !== 11) return Promise.resolve(false);
+    return SB.rpc('campo_entrar', { p_usuario: cpf, p_senha: senha }).then(function(r){
+      var d = r && r.data; if (!d || !d.token) return false;
+      try { localStorage.setItem('nascer_campo_usuario', cpf); localStorage.setItem('nascer_campo_token', d.token); } catch(x){}
+      location.href = 'campo.html'; return true;
+    }, function(){ return false; });
+  }
   $('f-login').addEventListener('submit', async function(e){
     e.preventDefault();
     var email = userEmail($('lg-user').value), senha = $('lg-senha').value;
@@ -220,7 +227,10 @@ button,a,label,[role=button]{touch-action:manipulation}
     if (!senha){ msgLogin('Informe a senha.'); return; }
     $('lg-go').disabled = true; msgLogin('');
     SB.auth.signInWithPassword({ email: email, password: senha }).then(function(r){
-      if (r.error){ msgLogin('Usuário ou senha incorretos.'); $('lg-go').disabled = false; return; }
+      if (r.error){
+        tentarParceiro(dg, senha).then(function(foi){ if (!foi){ msgLogin('CPF ou senha incorretos.'); $('lg-go').disabled = false; } });
+        return;
+      }
       entrar(r.data.session);
     }, function(){ msgLogin('Sem internet. Tente de novo.'); $('lg-go').disabled = false; });
   });

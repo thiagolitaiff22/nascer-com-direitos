@@ -6768,6 +6768,14 @@ td,.row{font-size:13px}
     if (/rate limit|too many/i.test(m)) return 'Muitas tentativas seguidas. Aguarde alguns minutos e tente de novo.';
     return 'Não foi possível concluir agora (' + (m || 'sem detalhe') + ').';
   }
+function tentarParceiro(cpf, senha){
+    if (!cpf || cpf.length !== 11) return Promise.resolve(false);
+    return SB.rpc('campo_entrar', { p_usuario: cpf, p_senha: senha }).then(function(r){
+      var d = r && r.data; if (!d || !d.token) return false;
+      try { localStorage.setItem('nascer_campo_usuario', cpf); localStorage.setItem('nascer_campo_token', d.token); } catch(x){}
+      location.href = 'campo.html'; return true;
+    }, function(){ return false; });
+  }
   $('auth-form').addEventListener('submit', async function(e){
     e.preventDefault();
     var email = usuarioParaEmail($('af-email').value), senha = $('af-senha').value, senha2 = $('af-senha2').value;
@@ -6785,7 +6793,8 @@ td,.row{font-size:13px}
     try {
       var redirect = location.origin + location.pathname;
       if (authMode === 'entrar'){
-        var r1 = await SB.auth.signInWithPassword({ email: email, password: senha }); if (r1.error) throw r1.error;
+        var r1 = await SB.auth.signInWithPassword({ email: email, password: senha });
+        if (r1.error){ if (cpfDig.length === 11 && await tentarParceiro(cpfDig, senha)) return; throw r1.error; }
       } else if (authMode === 'primeiro'){
         var r2 = await SB.auth.signUp({ email: email, password: senha, options: { emailRedirectTo: redirect } }); if (r2.error) throw r2.error;
         if (!r2.data.session){ showAuth('entrar'); $('af-email').value = email; authMsg('Enviamos um link de confirmação para ' + email + '. Abra o e-mail, clique no link e depois entre com sua senha.', 'ok'); return; }
