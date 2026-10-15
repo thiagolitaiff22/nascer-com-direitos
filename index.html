@@ -6085,7 +6085,7 @@ td,.row{font-size:13px}
     dlgP.showModal(); $('fp-nome').focus();
   }
   $('btn-prosp-novo').addEventListener('click', function(){ openProsp(null); });
-  $('fp-cancel').addEventListener('click', function(){ dlgP.close(); });
+  $('fp-cancel').addEventListener('click', function(){ pedidoEq = null; dlgP.close(); });
   // cidades do estado escolhido (lista do IBGE, guardada depois da primeira consulta)
   var cidadesCache = {};
   // bandeira da cidade ao lado do campo Cidade (parceiro)
@@ -6130,6 +6130,8 @@ td,.row{font-size:13px}
       if (state.db){ await (pEditing ? pcol().doc(pEditing) : pcol().doc()).set(data); }
       else { var pid = pEditing || 'mp' + (++memId); state.prosp = state.prosp.filter(function(x){ return x.id !== pid; }).concat([Object.assign({ id: pid }, data)]); render(); }
       dlgP.close(); toast(pEditing ? 'Parceiro atualizado' : 'Parceiro cadastrado');
+      // veio de um pedido de acesso: marca o pedido como aprovado (ele sai da lista)
+      if (pedidoEq){ var pid2 = pedidoEq; pedidoEq = null; SB.from('equipe_pedidos').update({ status: 'aprovado' }).eq('id', pid2).then(function(){}, function(){}); }
     } catch(err){ toast(errMsg(err)); } finally { $('fp-save').disabled = false; }
   });
   $('fp-del').addEventListener('click', async function(){
