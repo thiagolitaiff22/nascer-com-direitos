@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Gestor">
+<meta name="theme-color" content="#faf7f2">
+<link rel="apple-touch-icon" href="img/icone-180.png">
+<title>Gestor · Nascer com Direitos</title>
+<style>
+:root{--bg:#faf7f2;--card:#fff;--ink:#2b2418;--ink2:#6b5d47;--ink3:#9a8a70;--line:#ebe2cf;--gold:#a07a45;--gold2:#8a6a3d;--soft:#f6efe0;--ok:#2e8b57;--warn:#c0861b;--bad:#c0392b;--sh:0 2px 10px rgba(80,60,20,.07);--gx:max(18px,env(safe-area-inset-left))}
+@media (prefers-color-scheme:dark){:root{--bg:#14110d;--card:#1d1812;--ink:#f3ead8;--ink2:#b9a98c;--ink3:#8d7f66;--line:#322a1f;--soft:#271f15;--sh:none}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 -apple-system,"Segoe UI",system-ui,Roboto,sans-serif}
+button,input,select{font:inherit;color:inherit}
+.hidden{display:none!important}
+/* entrada */
+.login{min-height:100dvh;display:flex;flex-direction:column;justify-content:center;max-width:380px;margin:0 auto;padding:26px 22px}
+.login img{display:block;width:70%;max-width:220px;margin:0 auto 22px}
+.login h1{font-size:20px;text-align:center;margin:0 0 4px}
+.login p{text-align:center;color:var(--ink2);margin:0 0 20px;font-size:14px}
+.campo{display:block;margin:12px 0 0}
+.campo span{display:block;font-weight:600;font-size:13px;margin-bottom:5px}
+.campo input,.campo select{width:100%;height:48px;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:0 14px}
+.btn{height:46px;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:0 16px;font-weight:600;cursor:pointer}
+.btn.p{background:linear-gradient(135deg,#b08a52,#8a6a3d);border:0;color:#fff}
+.btn.full{width:100%;margin-top:18px;height:50px}
+.btn:disabled{opacity:.55}
+.msg{min-height:20px;margin-top:12px;text-align:center;font-size:13.5px;color:var(--bad)}
+/* app */
+.topo{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top)) var(--gx) 10px;border-bottom:1px solid var(--line)}
+.topo img{height:34px}
+.topo .quem{flex:1;min-width:0}
+.topo .quem b{display:block;font-size:14.5px}
+.topo .quem span{font-size:12px;color:var(--ink2)}
+.ic{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:var(--card);display:grid;place-items:center;cursor:pointer;padding:0}
+.ic svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+main{max-width:760px;margin:0 auto;padding:14px var(--gx) calc(96px + env(safe-area-inset-bottom))}
+.abas{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;gap:6px;justify-content:center;padding:8px var(--gx) calc(8px + env(safe-area-inset-bottom));background:var(--card);border-top:1px solid var(--line)}
+.abas button{flex:1;max-width:240px;height:48px;border:0;border-radius:14px;background:none;font-weight:700;font-size:13px;color:var(--ink2);cursor:pointer}
+.abas button[aria-selected=true]{background:var(--soft);color:var(--gold2)}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;box-shadow:var(--sh)}
+.kpi small{display:block;color:var(--ink2);font-size:12px;font-weight:600}
+.kpi b{display:block;font-size:26px;line-height:1.15;margin-top:2px;font-variant-numeric:tabular-nums}
+.busca{width:100%;height:46px;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:0 14px;margin-bottom:10px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px}
+.chips button{flex:none;height:34px;border:1px solid var(--line);border-radius:999px;background:var(--card);padding:0 14px;font-size:13px;font-weight:600;cursor:pointer}
+.chips button[aria-pressed=true]{background:var(--gold);border-color:var(--gold);color:#fff}
+.sec{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink3);margin:18px 2px 8px}
+.estado{background:var(--card);border:1px solid var(--line);border-radius:18px;margin-bottom:12px;box-shadow:var(--sh);overflow:hidden}
+.estado>header{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer}
+.estado>header img{width:30px;height:21px;border-radius:3px;object-fit:cover;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+.estado>header b{flex:1;font-size:15.5px}
+.estado>header small{color:var(--ink2);font-size:12.5px}
+.estado .corpo{border-top:1px solid var(--line)}
+.grupo{padding:10px 14px 4px;font-size:12.5px;color:var(--ink2);background:var(--soft);font-weight:700}
+.lin{display:flex;align-items:center;gap:10px;padding:11px 14px;border-top:1px solid var(--line);cursor:pointer}
+.lin:first-child{border-top:0}
+.lin .nm{flex:1;min-width:0}
+.lin .nm b{display:block;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lin .nm span{display:block;font-size:12px;color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lin.filho{padding-left:30px}
+.num{display:flex;gap:10px;font-variant-numeric:tabular-nums;text-align:center}
+.num div{min-width:34px}
+.num b{display:block;font-size:15px}
+.num small{display:block;font-size:10.5px;color:var(--ink3)}
+.tag{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--soft);color:var(--gold2)}
+.tag.ok{background:#e4f4ea;color:#1f6b3d}.tag.warn{background:#fdf0d5;color:#8a5a00}.tag.bad{background:#fbe3e1;color:#a02e24}
+.vazio{text-align:center;color:var(--ink2);padding:30px 10px}
+.fab{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:calc(84px + env(safe-area-inset-bottom));z-index:7;height:52px;border:0;border-radius:26px;padding:0 20px;background:linear-gradient(135deg,#b08a52,#8a6a3d);color:#fff;font-weight:700;box-shadow:0 8px 20px rgba(80,60,20,.3);cursor:pointer}
+/* folha */
+.fundo{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center}
+.folha{width:100%;max-width:560px;max-height:92dvh;overflow:auto;background:var(--bg);border-radius:24px 24px 0 0;padding:16px var(--gx) calc(20px + env(safe-area-inset-bottom))}
+.folha h2{margin:2px 0 4px;font-size:18px}
+.folha .sub{color:var(--ink2);font-size:13.5px;margin:0 0 10px}
+.fx{display:flex;gap:10px}.fx>*{flex:1}
+.seg{display:flex;background:var(--soft);border-radius:14px;padding:4px;margin-top:12px}
+.seg button{flex:1;height:40px;border:0;border-radius:11px;background:none;font-weight:700;color:var(--ink2);cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--card);color:var(--gold2);box-shadow:var(--sh)}
+.cred{background:var(--soft);border-radius:16px;padding:14px;margin:12px 0}
+.cred div{display:flex;justify-content:space-between;gap:10px;padding:4px 0}
+.cred b{font-variant-numeric:tabular-nums}
+.cli{padding:10px 0;border-top:1px solid var(--line)}
+.cli:first-child{border-top:0}
+.cli b{display:block}
+.cli .acoes{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.cli .acoes .btn{height:36px;font-size:13px;padding:0 12px;display:inline-flex;align-items:center;text-decoration:none}
+#toast{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:30;background:#2b2418;color:#fff;padding:10px 16px;border-radius:12px;font-size:13.5px;max-width:86vw}
+</style>
+</head>
+<body>
+
+<!-- entrada -->
+<section class="login" id="login">
+  <img src="img/logo-nascer-t.png" alt="Nascer com Direitos">
+  <h1>Painel do gestor</h1>
+  <p>Entre com o seu usuário e a senha do sistema.</p>
+  <form id="f-login" novalidate>
+    <label class="campo"><span>Usuário</span><input id="lg-user" autocomplete="username" autocapitalize="none" spellcheck="false"></label>
+    <label class="campo"><span>Senha</span><input id="lg-senha" type="password" inputmode="text" autocomplete="current-password"></label>
+    <button class="btn p full" id="lg-go" type="submit">Entrar</button>
+    <div class="msg" id="lg-msg" role="status"></div>
+  </form>
+</section>
+
+<!-- aplicativo -->
+<div id="app" class="hidden">
+  <header class="topo">
+    <img src="img/logo-nascer-t.png" alt="">
+    <div class="quem"><b id="q-nome">Gestor</b><span id="q-sub">Rede de indicação</span></div>
+    <button class="ic" id="b-atualizar" aria-label="Atualizar" title="Atualizar"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7M21 4v5h-5"/></svg></button>
+    <button class="ic" id="b-sair" aria-label="Sair" title="Sair"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
+  </header>
+  <main id="main"></main>
+  <button class="fab hidden" id="fab">+ Novo parceiro</button>
+  <nav class="abas" id="abas">
+    <button data-aba="rede" aria-selected="true">Rede</button>
+    <button data-aba="parceiros" aria-selected="false">Parceiros</button>
+    <button data-aba="docs" aria-selected="false">Documentos</button>
+  </nav>
+</div>
+<div id="toast" class="hidden"></div>
+
+<script src="vendor/supabase.min.js"></script>
+<script src="config.js"></script>
+<script>
+(function(){
+  var $ = function(i){ return document.getElementById(i); };
+  var CFG = window.QE_CONFIG || {};
+  var SB = window.supabase.createClient(CFG.url, CFG.key, { auth: { persistSession: true, autoRefreshToken: true } });
+  var DOM = 'acesso.rodrigueslitaiffadv.com.br';
+  var SITE = location.origin + location.pathname.replace(/[^/]*$/, '');
+  var S = { prosp: [], cli: [], regioes: [], aba: 'rede', busca: '', filtro: 'todos', abertos: {}, eu: null };
+  var NOMES = { procuracao: 'Procuração', rg_frente: 'RG', rg_verso: 'RG (verso)', cpf: 'CPF', titulo: 'Título de eleitor', titulo_verso: 'Título (verso)', video: 'Vídeo', residencia: 'Comprovante de residência', certidao: 'Certidão', cliente: 'Foto da cliente', autodeclaracao: 'Autodeclaração', rural: 'Provas rurais', ctps: 'CTPS' };
+  var ESTADOS_PADRAO = [{ id: 'AM', nome: 'Amazonas', uf: 'AM' }, { id: 'PA', nome: 'Pará', uf: 'PA' }, { id: 'AP', nome: 'Amapá', uf: 'AP' }];
+
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function sem(s){ return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+  function bonito(n){ return String(n || '').replace(/\s+/g, ' ').trim().toLowerCase().replace(/(^|[\s'-])([a-zà-ÿ])/g, function(m, a, b){ return a + b.toUpperCase(); }).replace(/\s(De|Da|Do|Das|Dos|E)(?=\s)/g, function(m){ return m.toLowerCase(); }); }
+  function mask(v){ var d = String(v || '').replace(/\D/g, '').slice(0, 11); if (!d) return ''; if (d.length <= 2) return '(' + d; if (d.length <= 6) return '(' + d.slice(0, 2) + ') ' + d.slice(2); if (d.length <= 10) return '(' + d.slice(0, 2) + ') ' + d.slice(2, 6) + '-' + d.slice(6); return '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7); }
+  function toast(t){ var e = $('toast'); e.textContent = t; e.classList.remove('hidden'); clearTimeout(toast.t); toast.t = setTimeout(function(){ e.classList.add('hidden'); }, 2600); }
+  function copiar(t){
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(t);
+    return new Promise(function(ok, no){ var a = document.createElement('textarea'); a.value = t; a.style.position = 'fixed'; a.style.opacity = '0'; document.body.appendChild(a); a.select(); try { document.execCommand('copy') ? ok() : no(); } catch(e){ no(e); } a.remove(); });
+  }
+  function genId(){ var a = new Uint8Array(16); crypto.getRandomValues(a); return Array.prototype.map.call(a, function(x){ return ('0' + x.toString(16)).slice(-2); }).join(''); }
+  function senhaNum(){ var a = new Uint32Array(6); crypto.getRandomValues(a); return Array.prototype.map.call(a, function(x){ return x % 10; }).join(''); }
+  function userEmail(v){
+    v = String(v || '').trim().toLowerCase(); if (!v) return '';
+    if (v.indexOf('@') >= 0) return v;
+    var u = sem(v).replace(/\s+/g, '.').replace(/[^a-z0-9._-]/g, '');
+    return u.length >= 2 ? u + '@' + DOM : '';
+  }
+
+  /* ---------- entrada ---------- */
+  function msgLogin(t){ $('lg-msg').textContent = t || ''; }
+  $('f-login').addEventListener('submit', function(e){
+    e.preventDefault();
+    var email = userEmail($('lg-user').value), senha = $('lg-senha').value;
+    if (!email){ msgLogin('Informe o usuário.'); return; }
+    if (!senha){ msgLogin('Informe a senha.'); return; }
+    $('lg-go').disabled = true; msgLogin('');
+    SB.auth.signInWithPassword({ email: email, password: senha }).then(function(r){
+      if (r.error){ msgLogin('Usuário ou senha incorretos.'); $('lg-go').disabled = false; return; }
+      entrar(r.data.session);
+    }, function(){ msgLogin('Sem internet. Tente de novo.'); $('lg-go').disabled = false; });
+  });
+  function entrar(session){
+    SB.rpc('minha_funcao').then(function(f){
+      if (f.error || f.data !== 'admin'){
+        $('lg-go').disabled = false;
+        msgLogin(f.error ? 'Não foi possível verificar o acesso.' : 'Este painel é só para gestores.');
+        SB.auth.signOut(); return;
+      }
+      S.eu = session.user.email;
+      $('login').classList.add('hidden'); $('app').classList.remove('hidden');
+      SB.from('equipe').select('nome').eq('email', String(session.user.email).toLowerCase()).maybeSingle().then(function(r){ if (r.data && r.data.nome) $('q-nome').textContent = r.data.nome; });
+      carregar();
+    });
+  }
+  $('b-sair').addEventListener('click', function(){ SB.auth.signOut().then(function(){ location.reload(); }); });
+  SB.auth.getSession().then(function(r){ if (r.data && r.data.session) entrar(r.data.session); });
+
+  /* ---------- dados ---------- */
+  async function todos(tabela){
+    var all = [], from = 0;
+    for (;;){
+      var r = await SB.from(tabela).select('*').order('id').range(from, from + 999);
+      if (r.error) throw r.error;
+      all = all.concat(r.data); if (r.data.length < 1000) break; from += 1000;
+    }
+    return all.map(function(x){ return Object.assign({ id: x.id }, x.data || {}); });
+  }
+  async function carregar(){
+    $('b-atualizar').disabled = true;
+    try {
+      var r = await Promise.all([todos('prospectadores'), todos('clientes'), SB.from('config').select('data').eq('id', 'regioes').maybeSingle()]);
+      S.prosp = r[0]; S.cli = r[1];
+      var l = r[2] && r[2].data && r[2].data.data && r[2].data.data.lista;
+      S.regioes = Array.isArray(l) && l.length ? l : ESTADOS_PADRAO;
+      desenhar();
+    } catch(e){ toast('Não foi possível carregar agora.'); }
+    $('b-atualizar').disabled = false;
+  }
+  $('b-atualizar').addEventListener('click', carregar);
+  document.addEventListener('visibilitychange', function(){ if (!document.hidden && S.eu) carregar(); });
+
+  /* ---------- regras ---------- */
+  function ehProsp(p){ return p.perfil === 'prospectador'; }
+  function conc(c){ return c.inssStatus === 'concedido' || ['procedente', 'parcial', 'acordo'].indexOf(c.resultado) >= 0; }
+  function numeros(clis){ return { ind: clis.length, con: clis.filter(function(c){ return !!c.contratoEm; }).length, cnc: clis.filter(conc).length }; }
+  function clientesDe(ids){ return S.cli.filter(function(c){ return ids.indexOf(c.responsavelId) >= 0; }); }
+  function parceiros(){ return S.prosp.filter(function(p){ return !ehProsp(p); }); }
+  function prospectadores(){ return S.prosp.filter(ehProsp); }
+  function nomeParc(p){ return p && p.tipo === 'clinica' && p.clinica ? p.clinica : (p && p.nome) || ''; }
+  function regiao(id){ return S.regioes.filter(function(g){ return g.id === id; })[0] || null; }
+  function etapa(c){
+    if (c.arquivado) return ['Arquivada', ''];
+    if (String(c.processo || '').trim()) return ['Na Justiça', 'warn'];
+    if (c.der || String(c.protocoloInss || '').trim()) return ['No INSS', 'ok'];
+    if (c.contratoEm) return c.fatoGerador === 'gestante' && !c.criancaNasc ? ['Aguardando nascimento', ''] : ['Contrato fechado', 'ok'];
+    return ['Em cadastro', ''];
+  }
+  function docsFalta(c){ return Array.isArray(c.faltaDocs) ? c.faltaDocs : []; }
+  function docsOk(c){ return !docsFalta(c).length && (c.docsCompletos === true || (c.origem === 'campo' && Array.isArray(c.faltaDocs))); }
+
+  /* ---------- desenho ---------- */
+  function desenhar(){
+    Array.prototype.forEach.call($('abas').children, function(b){ b.setAttribute('aria-selected', b.dataset.aba === S.aba ? 'true' : 'false'); });
+    $('fab').classList.toggle('hidden', S.aba === 'docs');
+    $('q-sub').textContent = S.aba === 'rede' ? 'Rede de indicação' : S.aba === 'parceiros' ? 'Parceiros e prospectadores' : 'Documentação dos clientes';
+    if (S.aba === 'rede') return telaRede();
+    if (S.aba === 'parceiros') return telaParceiros();
+    telaDocs();
+  }
+  $('abas').addEventListener('click', function(e){ var b = e.target.closest('[data-aba]'); if (!b) return; S.aba = b.dataset.aba; S.busca = ''; S.filtro = 'todos'; desenhar(); window.scrollTo(0, 0); });
+
+  function linhaParc(p, filho){
+    var n = numeros(clientesDe(ehProsp(p) ? parceiros().filter(function(x){ return x.prospectadorId === p.id; }).map(function(x){ return x.id; }) : [p.id]));
+    return '<div class="lin' + (filho ? ' filho' : '') + '" data-parc="' + esc(p.id) + '"><div class="nm"><b>' + esc(nomeParc(p) || 'Sem nome') + '</b><span>' + esc(p.tipo === 'clinica' ? 'Clínica · ' + p.nome : ehProsp(p) ? 'Prospectador' : 'Parceiro') + (p.regiao ? ' · ' + esc(p.regiao) : '') + (p.ativo === false ? ' · bloqueado' : '') + '</span></div>' +
+      '<div class="num"><div><b>' + n.ind + '</b><small>indic.</small></div><div><b>' + n.con + '</b><small>contr.</small></div><div><b>' + n.cnc + '</b><small>conc.</small></div></div></div>';
+  }
+  function telaRede(){
+    var ps = parceiros(), tot = numeros(clientesDe(ps.map(function(p){ return p.id; })));
+    var html = '<div class="kpis"><div class="kpi"><small>Parceiros</small><b>' + ps.length + '</b></div><div class="kpi"><small>Indicações</small><b>' + tot.ind + '</b></div>' +
+      '<div class="kpi"><small>Contratos fechados</small><b>' + tot.con + '</b></div><div class="kpi"><small>Concedidos</small><b>' + tot.cnc + '</b></div></div>';
+    var ids = {}; S.regioes.forEach(function(g){ ids[g.id] = 1; });
+    var estados = S.regioes.slice();
+    if (S.prosp.some(function(p){ return !p.regiaoId || !ids[p.regiaoId]; })) estados.push({ id: '', nome: 'Sem estado', uf: '' });
+    estados.forEach(function(g){
+      var dentro = S.prosp.filter(function(p){ return g.id ? p.regiaoId === g.id : (!p.regiaoId || !ids[p.regiaoId]); });
+      if (!dentro.length && g.id) return;
+      var pros = dentro.filter(ehProsp), par = dentro.filter(function(p){ return !ehProsp(p); });
+      var n = numeros(clientesDe(par.map(function(p){ return p.id; })));
+      var aberto = S.abertos[g.id || '_'] !== false;
+      html += '<section class="estado"><header data-estado="' + esc(g.id || '_') + '">' + (g.uf ? '<img src="img/flags/' + esc(g.uf) + '.svg" alt="" onerror="this.style.display=\'none\'">' : '') +
+        '<b>' + esc(g.nome) + '</b><small>' + par.length + ' parc. · ' + n.ind + ' indic. · ' + n.con + ' contr.</small></header>';
+      if (aberto){
+        html += '<div class="corpo">';
+        if (g.responsavel) html += '<div class="grupo">Responsável: ' + esc(g.responsavel) + '</div>';
+        pros.forEach(function(pr){
+          var seus = par.filter(function(x){ return x.prospectadorId === pr.id; });
+          html += linhaParc(pr, false) + seus.map(function(x){ return linhaParc(x, true); }).join('');
+        });
+        var soltos = par.filter(function(x){ return !x.prospectadorId || !pros.some(function(pr){ return pr.id === x.prospectadorId; }); });
+        if (soltos.length){ html += (pros.length ? '<div class="grupo">Parceiros sem prospectador</div>' : '') + soltos.map(function(x){ return linhaParc(x, false); }).join(''); }
+        html += '</div>';
+      }
+      html += '</section>';
+    });
+    if (!S.prosp.length) html += '<div class="vazio">Nenhum parceiro cadastrado ainda. Toque em <b>+ Novo parceiro</b>.</div>';
+    $('main').innerHTML = html;
+  }
+  function telaParceiros(){
+    var q = sem(S.busca);
+    var l = S.prosp.filter(function(p){ return !q || sem(nomeParc(p) + ' ' + p.nome + ' ' + (p.regiao || '')).indexOf(q) >= 0; })
+      .sort(function(a, b){ return nomeParc(a).localeCompare(nomeParc(b), 'pt-BR'); });
+    $('main').innerHTML = '<input class="busca" id="busca" placeholder="Buscar parceiro ou prospectador" value="' + esc(S.busca) + '">' +
+      '<div class="sec">' + l.length + (l.length === 1 ? ' cadastro' : ' cadastros') + '</div><section class="estado"><div class="corpo">' +
+      (l.length ? l.map(function(p){ return linhaParc(p, false); }).join('') : '<div class="vazio">Nenhum resultado.</div>') + '</div></section>';
+    var b = $('busca'); b.addEventListener('input', function(){ S.busca = this.value; var pos = this.selectionStart; telaParceiros(); var n = $('busca'); n.focus(); try { n.setSelectionRange(pos, pos); } catch(x){} });
+  }
+  function telaDocs(){
+    var q = sem(S.busca), dq = q.replace(/\D/g, '');
+    var l = S.cli.filter(function(c){
+      if (S.filtro === 'faltam' && docsOk(c)) return false;
+      if (S.filtro === 'ok' && !docsOk(c)) return false;
+      if (!q) return true;
+      return sem(c.nome).indexOf(q) >= 0 || (dq && String(c.cpf || '').replace(/\D/g, '').indexOf(dq) >= 0);
+    }).sort(function(a, b){ return String(b.criadoEm || b.dataCadastro || '').localeCompare(String(a.criadoEm || a.dataCadastro || '')); });
+    var nFalta = S.cli.filter(function(c){ return !docsOk(c); }).length;
+    $('main').innerHTML = '<input class="busca" id="busca" placeholder="Buscar cliente por nome ou CPF" value="' + esc(S.busca) + '">' +
+      '<div class="chips" id="chips">' + [['todos', 'Todos · ' + S.cli.length], ['faltam', 'Faltam documentos · ' + nFalta], ['ok', 'Completos · ' + (S.cli.length - nFalta)]].map(function(x){ return '<button data-f="' + x[0] + '" aria-pressed="' + (S.filtro === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</div>' +
+      '<section class="estado"><div class="corpo" style="padding:4px 14px">' + (l.length ? l.slice(0, 200).map(function(c){
+        var p = S.prosp.filter(function(x){ return x.id === c.responsavelId; })[0], e = etapa(c), fl = docsFalta(c);
+        return '<div class="cli"><b>' + esc(bonito(c.nome) || 'Sem nome') + '</b><span class="tag ' + e[1] + '">' + e[0] + '</span> ' +
+          (docsOk(c) ? '<span class="tag ok">Documentação completa</span>' : '<span class="tag bad">' + (fl.length ? 'Faltam: ' + esc(fl.map(function(k){ return NOMES[k] || k; }).join(', ')) : 'Documentos não conferidos') + '</span>') +
+          '<div style="font-size:12.5px;color:var(--ink2);margin-top:4px">' + esc(p ? nomeParc(p) : 'Sem parceiro') + (c.cidade ? ' · ' + esc(c.cidade) : '') + (c.contato ? ' · ' + esc(c.contato) : '') + '</div>' +
+          '<div class="acoes">' + (c.pastaUrl ? '<a class="btn p" href="' + esc(c.pastaUrl) + '" target="_blank" rel="noopener">Abrir pasta no Drive</a>' : '<span class="tag">Sem pasta no Drive</span>') +
+          (c.cpf ? '<button class="btn" data-cpf="' + esc(c.cpf) + '">Copiar CPF</button>' : '') + '</div></div>';
+      }).join('') : '<div class="vazio">Nenhum cliente neste filtro.</div>') + '</div></section>';
+    var b = $('busca'); b.addEventListener('input', function(){ S.busca = this.value; var pos = this.selectionStart; telaDocs(); var n = $('busca'); n.focus(); try { n.setSelectionRange(pos, pos); } catch(x){} });
+  }
+
+  /* ---------- cliques ---------- */
+  $('main').addEventListener('click', function(e){
+    var h = e.target.closest('[data-estado]');
+    if (h){ var k = h.dataset.estado; S.abertos[k] = S.abertos[k] === false; desenhar(); return; }
+    var p = e.target.closest('[data-parc]'); if (p){ return fichaParc(p.dataset.parc); }
+    var f = e.target.closest('[data-f]'); if (f){ S.filtro = f.dataset.f; telaDocs(); return; }
+    var c = e.target.closest('[data-cpf]'); if (c){ copiar(c.dataset.cpf).then(function(){ toast('CPF copiado'); }, function(){ toast('Não foi possível copiar'); }); }
+  });
+
+  /* ---------- folhas ---------- */
+  function abrirFolha(html){
+    fecharFolha();
+    var f = document.createElement('div'); f.className = 'fundo'; f.id = 'fundo';
+    f.innerHTML = '<div class="folha">' + html + '</div>';
+    f.addEventListener('click', function(e){ if (e.target === f) fecharFolha(); });
+    document.body.appendChild(f); return f;
+  }
+  function fecharFolha(){ var f = $('fundo'); if (f) f.remove(); }
+
+  function fichaParc(id){
+    var p = S.prosp.filter(function(x){ return x.id === id; })[0]; if (!p) return;
+    var clis = ehProsp(p)
+      ? clientesDe(parceiros().filter(function(x){ return x.prospectadorId === p.id; }).map(function(x){ return x.id; }))
+      : clientesDe([p.id]);
+    var n = numeros(clis), pr = p.prospectadorId ? S.prosp.filter(function(x){ return x.id === p.prospectadorId; })[0] : null;
+    var g = regiao(p.regiaoId);
+    var f = abrirFolha('<h2>' + esc(nomeParc(p)) + '</h2><p class="sub">' + esc(ehProsp(p) ? 'Prospectador' : (p.tipo === 'clinica' ? 'Clínica · ' + p.nome : 'Parceiro')) + (g ? ' · ' + esc(g.nome) : '') + (p.regiao ? ' · ' + esc(p.regiao) : '') + '</p>' +
+      '<div class="kpis"><div class="kpi"><small>Indicações</small><b>' + n.ind + '</b></div><div class="kpi"><small>Contratos</small><b>' + n.con + '</b></div><div class="kpi"><small>Concedidos</small><b>' + n.cnc + '</b></div>' +
+      '<div class="kpi"><small>Telefone</small><b style="font-size:15px">' + esc(p.telefone || '—') + '</b></div></div>' +
+      (pr ? '<p class="sub">Prospectador: <b>' + esc(pr.nome) + '</b></p>' : '') +
+      '<div class="sec" style="margin-top:6px">Clientes indicados · ' + clis.length + '</div>' +
+      (clis.length ? clis.slice(0, 100).map(function(c){ var e = etapa(c); return '<div class="cli"><b>' + esc(bonito(c.nome) || 'Sem nome') + '</b><span class="tag ' + e[1] + '">' + e[0] + '</span> ' + (docsOk(c) ? '<span class="tag ok">Docs ok</span>' : '<span class="tag bad">Docs pendentes</span>') + (c.pastaUrl ? ' <a href="' + esc(c.pastaUrl) + '" target="_blank" rel="noopener" style="color:var(--gold2);font-weight:700;font-size:13px">Abrir pasta</a>' : '') + '</div>'; }).join('') : '<div class="vazio">Nenhuma indicação ainda.</div>') +
+      '<div class="fx" style="margin-top:14px"><button class="btn" id="fc-acesso">Gerar novo acesso</button><button class="btn" id="fc-fechar">Fechar</button></div>');
+    f.querySelector('#fc-fechar').onclick = fecharFolha;
+    f.querySelector('#fc-acesso').onclick = function(){ novoAcesso(p); };
+  }
+
+  /* acesso do aplicativo: usuário e senha (só gestor) */
+  function sugerirUser(nome){ var w = sem(nome).replace(/^(dona|seu|sr|sra)\.?\s+/, '').split(/\s+/).filter(Boolean); return (w[0] || 'parceiro').replace(/[^a-z0-9]/g, '').slice(0, 20); }
+  function novoAcesso(p){
+    var f = abrirFolha('<h2>Acesso de ' + esc(p.nome) + '</h2><p class="sub">Defina o usuário e a senha para entrar no aplicativo.</p>' +
+      '<label class="campo"><span>Usuário</span><input id="ac-user" autocapitalize="none" spellcheck="false" value="' + esc(sugerirUser(p.nome)) + '"></label>' +
+      '<label class="campo"><span>Senha (só números)</span><input id="ac-senha" inputmode="numeric" value="' + senhaNum() + '"></label>' +
+      '<div class="msg" id="ac-msg"></div><div class="fx"><button class="btn p" id="ac-ok">Salvar acesso</button><button class="btn" id="ac-x">Cancelar</button></div>');
+    f.querySelector('#ac-x').onclick = fecharFolha;
+    f.querySelector('#ac-ok').onclick = async function(){
+      var u = f.querySelector('#ac-user').value.trim().toLowerCase(), s = f.querySelector('#ac-senha').value.trim(), m = f.querySelector('#ac-msg');
+      if (!/^[a-z0-9._-]{3,30}$/.test(u)){ m.textContent = 'Usuário: de 3 a 30 letras ou números, sem espaço nem acento.'; return; }
+      if (s.length < 6){ m.textContent = 'A senha precisa ter pelo menos 6 caracteres.'; return; }
+      this.disabled = true; m.textContent = '';
+      var r = await SB.rpc('campo_definir_login', { p_prosp: p.id, p_usuario: u, p_senha: s });
+      if (r.error){ m.textContent = 'Não foi possível salvar: ' + (r.error.message || 'tente de novo'); this.disabled = false; return; }
+      mostrarAcesso(p, u, s);
+    };
+  }
+  function mostrarAcesso(p, u, s){
+    var txt = 'Olá, ' + String(p.nome || '').split(' ')[0] + '! Este é o aplicativo Nascer com Direitos' + (ehProsp(p) ? ', para cadastrar os parceiros e acompanhar os contratos deles.' : ', para cadastrar as clientes.') +
+      '\n\nAbra no Safari (iPhone) e toque em Compartilhar › Adicionar à Tela de Início:\n' + SITE + 'campo.html\n\nUsuário: ' + u + '\nSenha: ' + s;
+    var f = abrirFolha('<h2>Acesso criado ✔</h2><p class="sub">Mande para ' + esc(nomeParc(p)) + '.</p><div class="cred"><div><span>Usuário</span><b>' + esc(u) + '</b></div><div><span>Senha</span><b>' + esc(s) + '</b></div></div>' +
+      '<div class="fx"><button class="btn p" id="ca-copiar">Copiar mensagem</button><a class="btn" id="ca-zap" target="_blank" rel="noopener" style="display:grid;place-items:center;text-decoration:none">WhatsApp</a></div>' +
+      '<button class="btn full" id="ca-fechar" style="margin-top:12px">Concluir</button>');
+    var dig = String(p.telefone || '').replace(/\D/g, '');
+    f.querySelector('#ca-zap').href = 'https://wa.me/' + (dig.length >= 10 ? '55' + dig.replace(/^55/, '') : '') + '?text=' + encodeURIComponent(txt);
+    f.querySelector('#ca-copiar').onclick = function(){ copiar(txt).then(function(){ toast('Mensagem copiada'); }, function(){ toast('Não foi possível copiar'); }); };
+    f.querySelector('#ca-fechar').onclick = function(){ fecharFolha(); carregar(); };
+  }
+
+  /* cadastrar parceiro ou prospectador */
+  $('fab').addEventListener('click', function(){ novoCadastro(S.aba === 'parceiros' ? '' : ''); });
+  function cidadesUF(uf, cb){
+    var c; try { c = JSON.parse(localStorage.getItem('nascer-cid-' + uf) || 'null'); } catch(e){}
+    if (c && c.length) return cb(c);
+    fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados/' + uf + '/municipios?orderBy=nome').then(function(r){ return r.json(); }).then(function(l){
+      var n = (l || []).map(function(m){ return m.nome; }); try { localStorage.setItem('nascer-cid-' + uf, JSON.stringify(n)); } catch(e){} cb(n);
+    }).catch(function(){ cb([]); });
+  }
+  function novoCadastro(){
+    var perfil = 'parceiro', tipo = 'pessoa';
+    var opts = S.regioes.map(function(g){ return '<option value="' + esc(g.id) + '">' + esc(g.nome) + '</option>'; }).join('');
+    var f = abrirFolha('<h2>Novo cadastro</h2><p class="sub">Cadastre um parceiro ou um prospectador e já crie o acesso dele ao aplicativo.</p>' +
+      '<div class="seg" id="nc-perfil"><button type="button" data-v="parceiro" aria-pressed="true">Parceiro</button><button type="button" data-v="prospectador" aria-pressed="false">Prospectador</button></div>' +
+      '<div class="seg" id="nc-tipo"><button type="button" data-v="pessoa" aria-pressed="true">Pessoa</button><button type="button" data-v="clinica" aria-pressed="false">Clínica</button></div>' +
+      '<label class="campo"><span id="nc-lnome">Nome completo</span><input id="nc-nome" autocomplete="off" autocapitalize="words"></label>' +
+      '<label class="campo hidden" id="nc-cbox"><span>Nome da clínica</span><input id="nc-clinica" autocomplete="off" autocapitalize="words"></label>' +
+      '<label class="campo"><span>Telefone / WhatsApp</span><input id="nc-tel" inputmode="tel" maxlength="15" placeholder="(92) 99999-9999"></label>' +
+      '<label class="campo"><span>Estado</span><select id="nc-estado">' + opts + '</select></label>' +
+      '<label class="campo" id="nc-cidbox"><span>Cidade</span><input id="nc-cidade" list="nc-cidades" autocomplete="off" autocapitalize="words" placeholder="Escolha ou digite"><datalist id="nc-cidades"></datalist></label>' +
+      '<label class="campo" id="nc-prbox"><span>Prospectador responsável</span><select id="nc-pros"></select></label>' +
+      '<div class="sec">Acesso ao aplicativo</div>' +
+      '<div class="fx"><label class="campo" style="margin:0"><span>Usuário</span><input id="nc-user" autocapitalize="none" spellcheck="false"></label>' +
+      '<label class="campo" style="margin:0"><span>Senha (só números)</span><input id="nc-senha" inputmode="numeric" value="' + senhaNum() + '"></label></div>' +
+      '<div class="msg" id="nc-msg"></div><div class="fx"><button class="btn p" id="nc-ok">Cadastrar</button><button class="btn" id="nc-x">Cancelar</button></div>');
+    var userEditado = false;
+    function seg(id, cb){ f.querySelector(id).addEventListener('click', function(e){ var b = e.target.closest('[data-v]'); if (!b) return; Array.prototype.forEach.call(this.children, function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); cb(b.dataset.v); }); }
+    function pintaPros(){
+      var uf = f.querySelector('#nc-estado').value;
+      f.querySelector('#nc-pros').innerHTML = '<option value="">Sem prospectador</option>' + prospectadores().filter(function(x){ return x.regiaoId === uf; }).map(function(x){ return '<option value="' + esc(x.id) + '">' + esc(x.nome) + '</option>'; }).join('');
+      var u = String(uf || '').slice(0, 2).toUpperCase(), dl = f.querySelector('#nc-cidades');
+      dl.innerHTML = ''; if (u) cidadesUF(u, function(l){ dl.innerHTML = l.map(function(n){ return '<option value="' + esc(n) + '">'; }).join(''); });
+    }
+    function ajusta(){
+      f.querySelector('#nc-tipo').classList.toggle('hidden', perfil === 'prospectador');
+      f.querySelector('#nc-cbox').classList.toggle('hidden', !(perfil === 'parceiro' && tipo === 'clinica'));
+      f.querySelector('#nc-cidbox').classList.toggle('hidden', perfil === 'prospectador');
+      f.querySelector('#nc-prbox').classList.toggle('hidden', perfil === 'prospectador');
+      f.querySelector('#nc-lnome').textContent = perfil === 'parceiro' && tipo === 'clinica' ? 'Nome do responsável pela clínica' : 'Nome completo';
+    }
+    function sugere(){ if (userEditado) return; var base = perfil === 'parceiro' && tipo === 'clinica' && f.querySelector('#nc-clinica').value.trim() ? f.querySelector('#nc-clinica').value : f.querySelector('#nc-nome').value; f.querySelector('#nc-user').value = base.trim() ? sugerirUser(base) : ''; }
+    seg('#nc-perfil', function(v){ perfil = v; ajusta(); });
+    seg('#nc-tipo', function(v){ tipo = v; ajusta(); sugere(); });
+    f.querySelector('#nc-estado').addEventListener('change', pintaPros);
+    f.querySelector('#nc-nome').addEventListener('input', sugere);
+    f.querySelector('#nc-clinica').addEventListener('input', sugere);
+    f.querySelector('#nc-nome').addEventListener('blur', function(){ this.value = bonito(this.value); sugere(); });
+    f.querySelector('#nc-tel').addEventListener('input', function(){ this.value = mask(this.value); });
+    f.querySelector('#nc-user').addEventListener('input', function(){ userEditado = true; this.value = this.value.toLowerCase().replace(/[^a-z0-9._-]/g, ''); });
+    f.querySelector('#nc-x').onclick = fecharFolha;
+    pintaPros(); ajusta();
+    f.querySelector('#nc-ok').onclick = async function(){
+      var m = f.querySelector('#nc-msg'), btn = this;
+      var nome = bonito(f.querySelector('#nc-nome').value), clinica = bonito(f.querySelector('#nc-clinica').value), tel = f.querySelector('#nc-tel').value;
+      var u = f.querySelector('#nc-user').value.trim(), s = f.querySelector('#nc-senha').value.trim();
+      if (nome.length < 3){ m.textContent = 'Informe o nome.'; return; }
+      if (perfil === 'parceiro' && tipo === 'clinica' && clinica.length < 2){ m.textContent = 'Informe o nome da clínica.'; return; }
+      if (tel.replace(/\D/g, '').length < 10){ m.textContent = 'Informe o telefone com DDD.'; return; }
+      if (!/^[a-z0-9._-]{3,30}$/.test(u)){ m.textContent = 'Usuário: de 3 a 30 letras ou números, sem espaço nem acento.'; return; }
+      if (s.length < 6){ m.textContent = 'A senha precisa ter pelo menos 6 caracteres.'; return; }
+      btn.disabled = true; m.textContent = '';
+      var data = { nome: nome, tipo: perfil === 'prospectador' ? 'pessoa' : tipo, clinica: perfil === 'parceiro' && tipo === 'clinica' ? clinica : '', telefone: tel,
+        regiaoId: f.querySelector('#nc-estado').value, regiao: perfil === 'prospectador' ? '' : bonito(f.querySelector('#nc-cidade').value),
+        ativo: true, palavrasEndereco: [], criadoEm: new Date().toISOString(), atualizadoEm: new Date().toISOString(), criadoPor: 'gestor:' + S.eu };
+      if (perfil === 'prospectador') data.perfil = 'prospectador';
+      else { var pr = f.querySelector('#nc-pros').value; if (pr) data.prospectadorId = pr; }
+      var id = genId();
+      var a = await SB.from('prospectadores').upsert({ id: id, data: data });
+      if (a.error){ m.textContent = 'Não foi possível cadastrar: ' + (a.error.message || 'tente de novo'); btn.disabled = false; return; }
+      var r = await SB.rpc('campo_definir_login', { p_prosp: id, p_usuario: u, p_senha: s });
+      if (r.error){
+        m.textContent = 'Cadastro criado, mas o acesso não: ' + (r.error.message || 'usuário já existe?') + ' Gere o acesso depois, na ficha.';
+        S.prosp.push(Object.assign({ id: id }, data)); btn.disabled = false; return;
+      }
+      S.prosp.push(Object.assign({ id: id }, data));
+      mostrarAcesso(Object.assign({ id: id }, data), u, s);
+    };
+  }
+})();
+</script>
+</body>
+</html>
