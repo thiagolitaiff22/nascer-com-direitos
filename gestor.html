@@ -204,7 +204,13 @@ main{max-width:1180px}
       entrar(r.data.session);
     }, function(){ msgLogin('Sem internet. Tente de novo.'); $('lg-go').disabled = false; });
   });
-  var SENHA_TROCA_OBRIGATORIA = false;   // true = obriga a criar senha própria no primeiro acesso (desligado: vale a senha padrão 123456)
+  var SENHA_TROCA_OBRIGATORIA = true;   // oferece criar a senha própria (só números) no primeiro acesso; dá para deixar para depois
+  function senhaNumerica(s){
+    s = String(s || '');
+    if (!/^[0-9]{6,}$/.test(s)) return 'Use só números, no mínimo 6.';
+    if (s === '123456') return 'Escolha uma senha diferente da padrão (123456).';
+    return '';
+  }
   function senhaForte(s){
     s = String(s || '');
     if (s.length < 6) return 'A senha precisa ter no mínimo 6 caracteres.';
@@ -216,14 +222,15 @@ main{max-width:1180px}
   }
   function novaSenhaObrigatoria(){
     return new Promise(function(ok){
-      var f = abrirFolha('<h2>Crie a sua senha</h2><p class="sub">Para a sua segurança, escolha agora uma senha só sua. Use no mínimo 6 caracteres, com letra maiúscula, letra minúscula, número e símbolo (por exemplo ! @ # $ %). Não pode ser 123456.</p>' +
-        '<label class="campo"><span>Nova senha</span><input id="ob-a" type="password" autocomplete="new-password"></label>' +
-        '<label class="campo"><span>Repita a nova senha</span><input id="ob-b" type="password" autocomplete="new-password"></label>' +
-        '<div class="msg" id="ob-msg"></div><button class="btn p full" id="ob-ok">Salvar e entrar</button>');
+      var f = abrirFolha('<h2>Crie a sua senha</h2><p class="sub">Este é o seu primeiro acesso. Se quiser, crie agora uma senha só sua: só números, no mínimo 6. Ou deixe para depois.</p>' +
+        '<label class="campo"><span>Nova senha</span><input id="ob-a" type="password" inputmode="numeric" autocomplete="new-password"></label>' +
+        '<label class="campo"><span>Repita a nova senha</span><input id="ob-b" type="password" inputmode="numeric" autocomplete="new-password"></label>' +
+        '<div class="msg" id="ob-msg"></div><button class="btn p full" id="ob-ok">Salvar e entrar</button><button class="btn full" id="ob-depois" style="margin-top:10px">Agora não</button>');
       S.obrig = true;   // não fecha clicando fora
+      f.querySelector('#ob-depois').onclick = function(){ S.obrig = false; fecharFolha(); ok(); };
       f.querySelector('#ob-ok').onclick = async function(){
         var a = f.querySelector('#ob-a').value, b = f.querySelector('#ob-b').value, m = f.querySelector('#ob-msg');
-        var pe = senhaForte(a); if (pe){ m.textContent = pe; return; }
+        var pe = senhaNumerica(a); if (pe){ m.textContent = pe; return; }
           if (a !== b){ m.textContent = 'As duas senhas não são iguais.'; return; }
         this.disabled = true; m.textContent = 'Salvando…';
         var r = await SB.auth.updateUser({ password: a });

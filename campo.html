@@ -738,7 +738,7 @@ img,video,canvas,svg{max-width:100%}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 21;
+  var APP_VERSAO = 22;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -2311,7 +2311,13 @@ img,video,canvas,svg{max-width:100%}
   var APP = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
   // entrada: usuário e senha que o escritório cadastrou (ou o link antigo, se a pessoa tiver)
   // primeiro acesso com a senha padrão: o aplicativo só segue depois de a pessoa criar a senha dela
-  var SENHA_TROCA_OBRIGATORIA = false;   // true = obriga a criar senha própria no primeiro acesso (desligado: vale a senha padrão 123456)
+  var SENHA_TROCA_OBRIGATORIA = true;   // oferece criar a senha própria (só números) no primeiro acesso; dá para deixar para depois
+  function senhaNumerica(s){
+    s = String(s || '');
+    if (!/^[0-9]{6,}$/.test(s)) return 'Use só números, no mínimo 6.';
+    if (s === '123456') return 'Escolha uma senha diferente da padrão (123456).';
+    return '';
+  }
   function senhaForte(s){
     s = String(s || '');
     if (s.length < 6) return 'A senha precisa ter no mínimo 6 caracteres.';
@@ -2323,13 +2329,14 @@ img,video,canvas,svg{max-width:100%}
   }
   function telaNovaSenha(tk){
     $('app').innerHTML = '<div class="login"><div class="entrar"><img class="login-logo" src="img/logo-nascer-t.png" alt="Nascer com Direitos">' +
-      '<b class="login-t">Crie a sua senha</b><p class="login-s">Para a sua segurança, escolha agora uma senha só sua.<br>Mínimo de 6 caracteres, com letra maiúscula, minúscula, número e símbolo (! @ # $ %). Não pode ser 123456.</p>' +
-      '<label class="login-rot" for="ns1">Nova senha</label><label class="fone" style="margin:0 0 14px"><input id="ns1" type="password" placeholder="nova senha" autocomplete="new-password"></label>' +
-      '<label class="login-rot" for="ns2">Repita a nova senha</label><label class="fone" style="margin:0"><input id="ns2" type="password" placeholder="repita a senha" autocomplete="new-password"></label>' +
-      '<button class="enviar" id="ns-ok">Salvar e entrar</button></div></div>';
+      '<b class="login-t">Crie a sua senha</b><p class="login-s">Este é o seu primeiro acesso.<br>Se quiser, crie agora uma senha só sua: só números, no mínimo 6. Ou deixe para depois.</p>' +
+      '<label class="login-rot" for="ns1">Nova senha</label><label class="fone" style="margin:0 0 14px"><input id="ns1" type="password" inputmode="numeric" placeholder="nova senha" autocomplete="new-password"></label>' +
+      '<label class="login-rot" for="ns2">Repita a nova senha</label><label class="fone" style="margin:0"><input id="ns2" type="password" inputmode="numeric" placeholder="repita a senha" autocomplete="new-password"></label>' +
+      '<button class="enviar" id="ns-ok">Salvar e entrar</button><p class="login-nota"><a href="#" id="ns-depois" style="color:inherit;font-weight:700">Agora não, deixar para depois</a></p></div></div>';
+    $('ns-depois').onclick = function(e){ e.preventDefault(); iniciar(); };
     $('ns-ok').onclick = function(){
       var a = $('ns1').value, b = $('ns2').value, bt = this;
-      var pe = senhaForte(a); if (pe) return alert(pe);
+      var pe = senhaNumerica(a); if (pe) return alert(pe);
       if (a === '123456') return alert('Escolha uma senha diferente da padrão.');
       if (a !== b) return alert('As duas senhas não são iguais.');
       bt.disabled = true; bt.textContent = 'Salvando…';
