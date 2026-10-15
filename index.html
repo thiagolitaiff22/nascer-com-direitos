@@ -2791,6 +2791,7 @@ td,.row{font-size:13px}
       <div class="field full" id="fe-senha-wrap"><label for="fe-senha">Senha de acesso</label><input id="fe-senha" name="nova-senha-equipe" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocapitalize="none" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Em branco = senha padrão 123456 (a pessoa troca no 1º acesso)"><span class="hint" id="fe-senha-dica">Só números (mínimo de 6). O próprio funcionário pode trocar depois, em Alterar senha.</span></div>
       <div class="field"><label for="fe-funcao">Cargo</label><select id="fe-funcao"><option value="closer">Closer · liga e fecha contratos</option><option value="operacional">Agente Operacional · documentos e requerimentos</option><option value="judicial">Agente Judicial · ações e processos</option><option value="admin">Gestor · acesso total</option></select></div>
       <div class="field"><label for="fe-ativo">Acesso</label><select id="fe-ativo"><option value="sim">Ativo</option><option value="nao">Bloqueado</option></select></div>
+      <div class="field full" id="fe-estados-box"><label>Estados que esta pessoa gere (painel do gestor)</label><div id="fe-estados" class="rs-lista"></div><span class="hint">Marque os estados dela. Sem nenhum marcado, ela vê todos os estados. Quem tem estado marcado vê e cadastra só aquele estado no painel do gestor; o sistema completo (BI) continua com tudo.</span></div>
     </div>
     <div class="f-foot">
       <button class="btn danger" type="button" id="fe-del" hidden>Excluir</button>
@@ -7103,6 +7104,8 @@ td,.row{font-size:13px}
       : dtSenha ? '<span class="senha-ok">✔ Senha cadastrada em ' + dtSenha.toLocaleDateString('pt-BR') + ' às ' + dtSenha.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + '.</span> Deixe em branco para manter.'
       : '<span class="senha-falta">Ainda não tem senha cadastrada.</span> Digite uma para liberar a entrada.';
     $('fe-funcao').value = u ? cargoDe(u) : 'operacional'; $('fe-ativo').value = !u || u.ativo ? 'sim' : 'nao';
+    var mEst = (u && Array.isArray(u.estados)) ? u.estados : [];
+    $('fe-estados').innerHTML = (state.regioes || []).map(function(g){ return '<label class="rs-lin"><input type="checkbox" data-est="' + esc(g.id) + '"' + (mEst.indexOf(g.id) >= 0 ? ' checked' : '') + '> <b>' + esc(g.nome) + '</b></label>'; }).join('');
     var eu = u && state.me && u.email === state.me.email;
     $('fe-funcao').disabled = !!eu; $('fe-ativo').disabled = !!eu;
     $('fe-del').hidden = !u || !!eu; eDelArmed = false; $('fe-del').classList.remove('armed'); $('fe-del').textContent = 'Excluir';
@@ -7278,7 +7281,8 @@ td,.row{font-size:13px}
     if (interno && !eEditing && !senhaNova){ senhaNova = '123456'; usouPadrao = true; }   // senha padrão: a pessoa troca no primeiro acesso
     if (interno && senhaNova && senhaNova.length < 6){ $('fe-senha').focus(); toast('A senha provisória deve ter no mínimo 6 caracteres'); return; }
     var cargoSel = $('fe-funcao').value;
-    var row = { nome: nome, funcao: cargoSel === 'admin' ? 'admin' : 'assistente', cargo: cargoSel, ativo: $('fe-ativo').value === 'sim', cpf: cpfFe || null };
+    var estSel = [].slice.call($('fe-estados').querySelectorAll('input[data-est]:checked')).map(function(c){ return c.dataset.est; });
+    var row = { nome: nome, funcao: cargoSel === 'admin' ? 'admin' : 'assistente', cargo: cargoSel, ativo: $('fe-ativo').value === 'sim', cpf: cpfFe || null, estados: estSel.length ? estSel : null };
     $('fe-save').disabled = true;
     try {
       var r = eEditing ? await SB.from('equipe').update(row).eq('email', eEditing).select('email') : await SB.from('equipe').insert(Object.assign({ email: email }, row));
