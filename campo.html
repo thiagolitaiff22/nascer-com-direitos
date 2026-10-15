@@ -744,7 +744,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 30;
+  var APP_VERSAO = 31;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -973,6 +973,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     $('app').innerHTML =
       '<div class="topo"><div class="logo"><img src="img/logo-nascer-t.png" alt="Nascer com Direitos"></div>' +
         '<div class="quem"><b id="topo-nome"></b><span id="topo-sub">Parceira</span></div><div class="sinc" id="sinc"><i></i><span></span></div>' +
+        '<button type="button" class="tema" id="modo" hidden style="width:auto;padding:0 11px;font-size:12px;font-weight:700"></button>' +
         '<button type="button" class="tema" id="tema" aria-label="Trocar entre modo claro e escuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle class="sol" cx="12" cy="12" r="4"/><path class="sol" d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/><path class="lua" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button></div>' +
       '<main class="vista" id="vista"></main>' +
       '<nav class="abas" id="abas">' +
@@ -1002,7 +1003,8 @@ button,a,label,[role=button]{touch-action:manipulation}
   /* ---------- prospectador: cria o login dos parceiros e vê os números deles ---------- */
   var SITE = 'https://thiagolitaiff22.github.io/nascer-com-direitos/';
   var pp = null;   // { parceiros: [...], atualizado }
-  function ehProspectador(){ return !!(quem && quem.perfil === 'prospectador'); }
+  // prospectador que também é parceiro (configuração no sistema) pode alternar entre os dois modos
+  function ehProspectador(){ return !!(quem && quem.perfil === 'prospectador' && !(quem.tambemParceiro && lsGet('campo_modo') === 'parceiro')); }
   function chamar(nome, corpo){
     return fetch(CFG.url + '/rest/v1/rpc/' + nome, { method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) })
       .then(function(r){ return r.json(); });
@@ -1284,7 +1286,14 @@ button,a,label,[role=button]{touch-action:manipulation}
     montarCasca();
     var clin = quem && quem.tipo === 'clinica' && quem.clinica;
     $('topo-nome').textContent = clin ? bonito(quem.clinica) : bonito((quem && quem.nome) || '') || 'Parceiro';
-    $('topo-sub').textContent = ehProspectador() ? 'Prospectador' : clin ? 'Clínica parceira' : 'Parceira';
+    $('topo-sub').textContent = ehProspectador() ? 'Prospectador' : clin ? 'Clínica parceira' : (quem && quem.perfil === 'prospectador' ? 'Parceiro' : 'Parceira');
+    var bm = $('modo');
+    if (bm){
+      var duplo = !!(quem && quem.perfil === 'prospectador' && quem.tambemParceiro);
+      bm.hidden = !duplo;
+      bm.textContent = ehProspectador() ? 'Atuar como parceiro' : 'Voltar a prospectador';
+      bm.onclick = function(){ lsSet('campo_modo', ehProspectador() ? 'parceiro' : 'prospectador'); aba = 'painel'; lsSet('campo_aba', 'painel'); $('app').dataset.perfil = ''; telaInicial(); carregarPainel(); };
+    }
     Array.prototype.forEach.call(document.querySelectorAll('#abas [data-aba]'), function(b){ b.setAttribute('aria-current', b.dataset.aba === aba ? 'true' : 'false'); });
     $('vista').className = 'vista' + (aba === 'novo' ? ' novo' : '');
     $('vista').onclick = null;   // cada aba põe o seu próprio clique

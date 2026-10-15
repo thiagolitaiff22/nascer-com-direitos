@@ -2585,6 +2585,7 @@ td,.row{font-size:13px}
       <div class="field"><label for="fp-regiao">Região de atuação</label><select id="fp-regiao"></select></div>
       <div class="field full" id="fp-pros-box"><label for="fp-prospectador">Prospectador responsável</label><select id="fp-prospectador"></select><span class="hint">Quem trouxe este parceiro (conta para a remuneração dele).</span></div>
       <div class="field"><label for="fp-reg">Cidade</label><div class="fp-reg-box"><span id="fp-reg-flag" class="fp-flag"></span><input id="fp-reg" list="fp-cidades" autocomplete="off" placeholder="Ex.: Manaus"></div><datalist id="fp-cidades"></datalist></div>
+      <div class="field full" id="fp-tambem-box" hidden><label class="chk"><input id="fp-tambem" type="checkbox"> Este prospectador também atua como parceiro</label><span class="hint">No aplicativo ele passa a poder alternar entre prospectar parceiros e cadastrar clientes dele mesmo.</span></div>
       <div class="field full" id="fp-acesso-box" hidden><label>Acesso ao aplicativo</label><button class="btn" type="button" id="fp-acesso"><svg class="i"><use href="#i-phone"/></svg>Configurar login e senha</button><span class="hint">O login é o CPF do parceiro. A senha padrão é 123456 e ele cria a própria no primeiro acesso.</span></div>
       <div class="field full"><label for="fp-pal">Palavras do endereço</label><input id="fp-pal" placeholder="Ex.: curumitá, nogueira"><span class="hint">Clientes cujo endereço tiver uma dessas palavras ficam com este parceiro. Separe por vírgula.</span></div>
     </div>
@@ -6149,6 +6150,7 @@ td,.row{font-size:13px}
     prosPreencher($('fp-regiao').value, p ? p.prospectadorId || '' : '');
     $('fp-pal').value = p ? (p.palavrasEndereco || []).join(', ') : '';
     $('fp-acesso-box').hidden = !p;
+    $('fp-tambem-box').hidden = !ehPros; $('fp-tambem').checked = !!(p && p.tambemParceiro);
     $('fp-del').hidden = !p; pDelArmed = false; $('fp-del').classList.remove('armed'); $('fp-del').textContent = 'Excluir';
     dlgP.showModal(); $('fp-nome').focus();
   }
@@ -6194,7 +6196,7 @@ td,.row{font-size:13px}
       palavrasEndereco: $('fp-pal').value.split(',').map(function(s){ return s.trim(); }).filter(Boolean),
       ativo: true, criadoEm: prev.criadoEm || new Date().toISOString(), atualizadoEm: new Date().toISOString() };
     if (prev.valorIndicacao) data.valorIndicacao = prev.valorIndicacao;
-    if (pPerfil === 'prospectador'){ data.perfil = 'prospectador'; data.tipo = 'pessoa'; data.clinica = ''; data.regiao = ''; }
+    if (pPerfil === 'prospectador'){ data.perfil = 'prospectador'; data.tipo = 'pessoa'; data.clinica = ''; data.regiao = ''; data.tambemParceiro = $('fp-tambem').checked; }
     else { var pr = $('fp-prospectador').value || ''; if (pr) data.prospectadorId = pr; }
     if (prev.criadoPor) data.criadoPor = prev.criadoPor;
     $('fp-save').disabled = true;
