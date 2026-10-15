@@ -2164,6 +2164,7 @@ td,.row{font-size:13px}
       </section>
 
       <section id="view-ctr" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
+        <div id="prio-box"></div>
         <div class="sec-rot">Resumo dos contratos fechados</div>
         <div class="stats" id="ctr-stats"></div>
         <div class="fbar">
@@ -2201,7 +2202,6 @@ td,.row{font-size:13px}
       </section>
 
       <section id="view-clientes" class="vw-dash" style="display:flex;flex-direction:column;gap:18px">
-        <div id="prio-box"></div>
         <div class="sec-rot">Resumo por status</div>
         <div class="cl-cards">
         <div class="stats">
@@ -4367,7 +4367,7 @@ td,.row{font-size:13px}
   function renderPrio(){
     var box = $('prio-box'); if (!box) return;
     var agora = Date.now();
-    var l = state.rows.filter(function(r){ return !r.arquivado; }).map(function(r){ var f = prazoFimData(r); return f ? { r: r, f: f, ms: f.getTime() - agora } : null; }).filter(Boolean)
+    var l = state.rows.filter(fechado).map(function(r){ var f = prazoFimData(r); return f ? { r: r, f: f, ms: f.getTime() - agora } : null; }).filter(Boolean)
       .sort(function(a, b){ return a.ms - b.ms; });
     var abertos = l.filter(function(x){ return x.ms > 0; }), vencidos = l.length - abertos.length;
     var cor = function(ms){ var d = ms / 86400000; return d <= 60 ? 'crit' : d <= 183 ? 'warn' : 'ok'; };
@@ -4379,7 +4379,7 @@ td,.row{font-size:13px}
     }).join('');
     if (!corpo){ box.innerHTML = ''; return; }
     box.innerHTML = '<div class="prio"><div class="sec-rot">Prioridade · prazos mais próximos de vencer' + (vencidos ? ' <small>(' + vencidos + ' já venceram)</small>' : '') + '</div>' +
-      '<p class="prio-s">O direito de pedir acaba 5 anos depois do nascimento da criança. Sai desta lista quando o INSS ou a Justiça é acionado.</p>' + corpo + '</div>';
+      '<p class="prio-s">O direito de pedir acaba 5 anos depois do nascimento da criança. Vale para os contratos fechados que ainda não deram entrada no INSS; sai daqui quando o requerimento é feito.</p>' + corpo + '</div>';
   }
   setInterval(function(){
     var els = document.querySelectorAll('.cron[data-fim]'), t = Date.now();
