@@ -720,7 +720,7 @@ html,body{overflow-x:hidden}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 14;
+  var APP_VERSAO = 15;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -2290,6 +2290,28 @@ html,body{overflow-x:hidden}
 
   var APP = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
   // entrada: usuário e senha que o escritório cadastrou (ou o link antigo, se a pessoa tiver)
+  function tentarGestor(u, p){
+    var base = String(u || '').trim().toLowerCase();
+    var em = base.indexOf('@') >= 0 ? base : base.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '.').replace(/[^a-z0-9._-]/g, '') + '@acesso.rodrigueslitaiffadv.com.br';
+    if (em.charAt(0) === '@') return Promise.resolve(false);
+    return fetch(CFG.url + '/auth/v1/token?grant_type=password', { method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ email: em, password: p }) })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(s){
+        if (!s || !s.access_token) return false;
+        return fetch(CFG.url + '/rest/v1/rpc/minha_funcao', { method: 'POST', headers: { apikey: CFG.key, Authorization: 'Bearer ' + s.access_token, 'Content-Type': 'application/json' }, body: '{}' })
+          .then(function(r){ return r.json(); })
+          .then(function(f){
+            if (f !== 'admin') return false;
+            var GESTOR = 'https://thiagolitaiff22.github.io/nascer-com-direitos/gestor.html';
+            if (!APP){
+              try { var ref = CFG.url.replace(/^https?:\/\//, '').split('.')[0]; s.expires_at = Math.floor(Date.now() / 1000) + (s.expires_in || 3600); localStorage.setItem('sb-' + ref + '-auth-token', JSON.stringify(s)); } catch(x){}
+              location.href = 'gestor.html';
+            } else { location.href = GESTOR; }
+            return true;
+          });
+      })
+      .catch(function(){ return false; });
+  }
   function pedirLink(msg){
     $('app').innerHTML = '<div class="login"><div class="entrar"><img class="login-logo" src="img/logo-nascer-t.png" alt="Nascer com Direitos">' +
       '<b class="login-t">Nascer com Direitos</b><p class="login-s">Salário-maternidade<br>' + esc(msg || 'Use o usuário e a senha que a equipe passou para você.') + '</p>' +
@@ -2310,7 +2332,10 @@ html,body{overflow-x:hidden}
         .then(function(r){ return r.json(); })
         .then(function(d){
           if (d && d.token){ lsSet('campo_usuario', u); token = d.token; return iniciar(); }
-          alert((d && (d.erro || d.message)) || 'Não foi possível entrar.');
+          // não é parceiro: pode ser um gestor do escritório (usuário e senha do sistema) → vai para o painel do gestor
+          return tentarGestor(u, p).then(function(foi){
+            if (!foi) alert((d && (d.erro || d.message)) || 'Não foi possível entrar.');
+          });
         })
         .catch(function(){ alert('Sem internet agora. Para entrar a primeira vez precisa de sinal.'); })
         .then(function(){ if (document.body.contains(b)){ b.disabled = false; b.textContent = 'Entrar'; } });
