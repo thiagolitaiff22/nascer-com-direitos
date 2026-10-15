@@ -89,6 +89,38 @@ main{max-width:760px;margin:0 auto;padding:14px var(--gx) calc(96px + env(safe-a
 .cli .acoes{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
 .cli .acoes .btn{height:36px;font-size:13px;padding:0 12px;display:inline-flex;align-items:center;text-decoration:none}
 #toast{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:30;background:#2b2418;color:#fff;padding:10px 16px;border-radius:12px;font-size:13.5px;max-width:86vw}
+
+main{max-width:1180px}
+.kpis.g4{grid-template-columns:repeat(2,1fr)}
+@media (min-width:760px){.kpis.g4{grid-template-columns:repeat(4,1fr)}.grid2{grid-template-columns:1fr 1fr!important}}
+.kpi span{display:block;font-size:11.5px;color:var(--ink3);margin-top:2px}
+.kpi em{font-style:normal;font-weight:700;font-size:12px;margin-right:4px}
+.kpi em.up{color:var(--ok)}.kpi em.down{color:var(--bad)}
+.periodo{display:flex;gap:8px;margin-bottom:12px}
+.periodo button{height:36px;border:1px solid var(--line);border-radius:999px;background:var(--card);padding:0 16px;font-weight:700;font-size:13px;cursor:pointer}
+.periodo button[aria-pressed=true]{background:var(--gold);border-color:var(--gold);color:#fff}
+.grid2{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:12px}
+.cx{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 16px;box-shadow:var(--sh);min-width:0}
+.cx h3{margin:0 0 10px;font-size:14.5px}
+.cx h3 small{font-weight:500;color:var(--ink3);font-size:12px}
+.bars{display:flex;flex-direction:column;gap:10px}
+.bar-t{display:flex;justify-content:space-between;gap:10px;font-size:13px}
+.bar-n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.bar-t b{white-space:nowrap;font-variant-numeric:tabular-nums}
+.bar-c{height:9px;border-radius:6px;background:var(--soft);margin-top:4px;overflow:hidden}
+.bar-c i{display:block;height:100%;border-radius:6px;background:var(--gold)}
+.bar-s{font-size:11.5px;color:var(--ink3);margin-top:3px}
+.grafico{width:100%;height:auto}
+.grafico .gl{stroke:var(--line);stroke-width:1}
+.grafico .tx{font-size:11px;fill:var(--ink3)}
+.grafico .tv{font-size:10.5px;font-weight:700;fill:var(--ink2)}
+.c-ind{fill:#a07a45;background:#a07a45}.c-con{fill:#2e8b57;background:#2e8b57}
+.leg{display:flex;gap:16px;font-size:12px;color:var(--ink2);margin-top:6px}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px}
+.rosca{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.rosca .tt{font-size:22px;font-weight:700;fill:var(--ink)}
+.rosca-l{display:flex;flex-direction:column;gap:6px;font-size:13px}
+.rosca-l i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:8px}
 </style>
 </head>
 <body>
@@ -117,7 +149,8 @@ main{max-width:760px;margin:0 auto;padding:14px var(--gx) calc(96px + env(safe-a
   <main id="main"></main>
   <button class="fab hidden" id="fab">+ Novo parceiro</button>
   <nav class="abas" id="abas">
-    <button data-aba="rede" aria-selected="true">Rede</button>
+    <button data-aba="painel" aria-selected="true">Painel</button>
+    <button data-aba="rede" aria-selected="false">Rede</button>
     <button data-aba="parceiros" aria-selected="false">Parceiros</button>
     <button data-aba="docs" aria-selected="false">Documentos</button>
   </nav>
@@ -133,7 +166,7 @@ main{max-width:760px;margin:0 auto;padding:14px var(--gx) calc(96px + env(safe-a
   var SB = window.supabase.createClient(CFG.url, CFG.key, { auth: { persistSession: true, autoRefreshToken: true } });
   var DOM = 'acesso.rodrigueslitaiffadv.com.br';
   var SITE = location.origin + location.pathname.replace(/[^/]*$/, '');
-  var S = { prosp: [], cli: [], regioes: [], aba: 'rede', busca: '', filtro: 'todos', abertos: {}, eu: null };
+  var S = { prosp: [], cli: [], regioes: [], aba: 'painel', dias: 30, busca: '', filtro: 'todos', abertos: {}, eu: null };
   var NOMES = { procuracao: 'Procuração', rg_frente: 'RG', rg_verso: 'RG (verso)', cpf: 'CPF', titulo: 'Título de eleitor', titulo_verso: 'Título (verso)', video: 'Vídeo', residencia: 'Comprovante de residência', certidao: 'Certidão', cliente: 'Foto da cliente', autodeclaracao: 'Autodeclaração', rural: 'Provas rurais', ctps: 'CTPS' };
   var ESTADOS_PADRAO = [{ id: 'AM', nome: 'Amazonas', uf: 'AM' }, { id: 'PA', nome: 'Pará', uf: 'PA' }, { id: 'AP', nome: 'Amapá', uf: 'AP' }];
 
@@ -230,8 +263,9 @@ main{max-width:760px;margin:0 auto;padding:14px var(--gx) calc(96px + env(safe-a
   /* ---------- desenho ---------- */
   function desenhar(){
     Array.prototype.forEach.call($('abas').children, function(b){ b.setAttribute('aria-selected', b.dataset.aba === S.aba ? 'true' : 'false'); });
-    $('fab').classList.toggle('hidden', S.aba === 'docs');
-    $('q-sub').textContent = S.aba === 'rede' ? 'Rede de indicação' : S.aba === 'parceiros' ? 'Parceiros e prospectadores' : 'Documentação dos clientes';
+    $('fab').classList.toggle('hidden', S.aba === 'docs' || S.aba === 'painel');
+    $('q-sub').textContent = S.aba === 'painel' ? 'Desempenho da rede' : S.aba === 'rede' ? 'Rede de indicação' : S.aba === 'parceiros' ? 'Parceiros e prospectadores' : 'Documentação dos clientes';
+    if (S.aba === 'painel') return telaPainel();
     if (S.aba === 'rede') return telaRede();
     if (S.aba === 'parceiros') return telaParceiros();
     telaDocs();
@@ -243,6 +277,147 @@ main{max-width:760px;margin:0 auto;padding:14px var(--gx) calc(96px + env(safe-a
     return '<div class="lin' + (filho ? ' filho' : '') + '" data-parc="' + esc(p.id) + '"><div class="nm"><b>' + esc(nomeParc(p) || 'Sem nome') + '</b><span>' + esc(p.tipo === 'clinica' ? 'Clínica · ' + p.nome : ehProsp(p) ? 'Prospectador' : 'Parceiro') + (p.regiao ? ' · ' + esc(p.regiao) : '') + (p.ativo === false ? ' · bloqueado' : '') + '</span></div>' +
       '<div class="num"><div><b>' + n.ind + '</b><small>indic.</small></div><div><b>' + n.con + '</b><small>contr.</small></div><div><b>' + n.cnc + '</b><small>conc.</small></div></div></div>';
   }
+  /* ====== PAINEL: números, gráficos e rankings da rede ====== */
+  var LEAD_NOMES = { novo: 'Novo lead', contato: 'Em contato', sem_resposta: 'Sem resposta', retornar: 'Retornar depois', perdido: 'Perdido' };
+  function dataC(c){ return String(c.dataCadastro || c.criadoEm || '').slice(0, 10); }
+  function isoDia(d){ return d.toISOString().slice(0, 10); }
+  function diaAtras(n){ var d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - n); return isoDia(d); }
+  function pct(a, b){ return b ? Math.round(a * 100 / b) : 0; }
+  function fmtN(n){ return Number(n || 0).toLocaleString('pt-BR'); }
+  function barras(itens, opt){
+    opt = opt || {}; var max = Math.max.apply(null, itens.map(function(i){ return i.v; }).concat([1]));
+    if (!itens.length) return '<div class="vazio" style="padding:14px 4px">Sem dados no período.</div>';
+    return '<div class="bars">' + itens.map(function(i){
+      return '<div class="bar-l"><div class="bar-t"><span class="bar-n">' + esc(i.n) + '</span><b>' + esc(i.txt != null ? i.txt : fmtN(i.v)) + '</b></div>' +
+        '<div class="bar-c"><i style="width:' + Math.max(2, Math.round(i.v * 100 / max)) + '%;' + (opt.cor ? 'background:' + opt.cor : '') + '"></i></div>' + (i.sub ? '<div class="bar-s">' + esc(i.sub) + '</div>' : '') + '</div>';
+    }).join('') + '</div>';
+  }
+  function colunas(rotulos, a, b){
+    var W = 640, H = 190, pad = 26, n = rotulos.length, max = Math.max.apply(null, a.concat(b).concat([1]));
+    var bw = (W - pad * 2) / n, svg = '<svg viewBox="0 0 ' + W + ' ' + (H + 26) + '" class="grafico" role="img" aria-label="Indicações e contratos por período">';
+    for (var g = 0; g <= 4; g++){ var y = pad / 2 + (H - pad) * g / 4; svg += '<line x1="' + pad + '" x2="' + (W - 4) + '" y1="' + y + '" y2="' + y + '" class="gl"/>'; }
+    for (var i = 0; i < n; i++){
+      var x = pad + bw * i, h1 = (H - pad) * a[i] / max, h2 = (H - pad) * b[i] / max, w = Math.min(26, bw * 0.34);
+      svg += '<rect x="' + (x + bw / 2 - w - 2) + '" y="' + (H - h1) + '" width="' + w + '" height="' + Math.max(h1, a[i] ? 2 : 0) + '" rx="4" class="c-ind"/>' +
+             '<rect x="' + (x + bw / 2 + 2) + '" y="' + (H - h2) + '" width="' + w + '" height="' + Math.max(h2, b[i] ? 2 : 0) + '" rx="4" class="c-con"/>';
+      if (a[i]) svg += '<text x="' + (x + bw / 2 - w / 2 - 2) + '" y="' + (H - h1 - 4) + '" class="tv" text-anchor="middle">' + a[i] + '</text>';
+      if (b[i]) svg += '<text x="' + (x + bw / 2 + w / 2 + 2) + '" y="' + (H - h2 - 4) + '" class="tv" text-anchor="middle">' + b[i] + '</text>';
+      svg += '<text x="' + (x + bw / 2) + '" y="' + (H + 16) + '" class="tx" text-anchor="middle">' + esc(rotulos[i]) + '</text>';
+    }
+    return svg + '</svg><div class="leg"><span><i class="c-ind"></i>Indicações</span><span><i class="c-con"></i>Contratos fechados</span></div>';
+  }
+  function rosca(fatias){
+    var tot = fatias.reduce(function(s, f){ return s + f.v; }, 0), R = 52, C = 2 * Math.PI * R, off = 0;
+    var cores = ['#a07a45', '#2e8b57', '#4a7fc1', '#c0861b', '#9a8a70', '#c0392b'];
+    var arcos = tot ? fatias.map(function(f, i){
+      var len = C * f.v / tot, s = '<circle r="' + R + '" cx="70" cy="70" fill="none" stroke="' + cores[i % cores.length] + '" stroke-width="22" stroke-dasharray="' + len + ' ' + (C - len) + '" stroke-dashoffset="' + (-off) + '" transform="rotate(-90 70 70)"/>';
+      off += len; return s;
+    }).join('') : '<circle r="' + R + '" cx="70" cy="70" fill="none" stroke="var(--line)" stroke-width="22"/>';
+    return '<div class="rosca"><svg viewBox="0 0 140 140" width="130" height="130">' + arcos + '<text x="70" y="75" text-anchor="middle" class="tt">' + fmtN(tot) + '</text></svg><div class="rosca-l">' +
+      fatias.map(function(f, i){ return '<div><i style="background:' + cores[i % cores.length] + '"></i>' + esc(f.n) + ' <b>' + fmtN(f.v) + '</b></div>'; }).join('') + '</div></div>';
+  }
+  function telaPainel(){
+    var ini = P_ini(), ini2 = S.dias ? diaAtras(S.dias * 2) : '', hoje = isoDia(new Date());
+    var ps = parceiros(), pids = ps.map(function(p){ return p.id; });
+    var cliRede = S.cli.filter(function(c){ return pids.indexOf(c.responsavelId) >= 0; });
+    var noPer = cliRede.filter(function(c){ var d = dataC(c); return !ini || d >= ini; });                       // indicações do período
+    var antes = S.dias ? cliRede.filter(function(c){ var d = dataC(c); return d >= ini2 && d < ini; }) : [];    // período anterior, para comparar
+    var fechou = function(c){ return !!c.contratoEm; };
+    var cCon = noPer.filter(fechou), cInss = noPer.filter(function(c){ return c.der || String(c.protocoloInss || '').trim() || String(c.processo || '').trim(); }), cCnc = noPer.filter(conc);
+    var ativosIds = {}; noPer.forEach(function(c){ ativosIds[c.responsavelId] = 1; });
+    var nAtivos = Object.keys(ativosIds).length;
+    var delta = function(a, b){ if (!S.dias) return ''; if (!b) return a ? '<em class="up">novo</em>' : ''; var d = Math.round((a - b) * 100 / b); return '<em class="' + (d >= 0 ? 'up' : 'down') + '">' + (d >= 0 ? '▲ ' : '▼ ') + Math.abs(d) + '%</em>'; };
+    var antCon = antes.filter(fechou).length;
+    var kpi = function(t, v, sub, extra){ return '<div class="kpi"><small>' + t + '</small><b>' + v + '</b><span>' + (extra || '') + (sub ? ' ' + sub : '') + '</span></div>'; };
+
+    var html = '<div class="periodo" id="periodo">' + [[7, '7 dias'], [30, '30 dias'], [90, '90 dias'], [0, 'Tudo']].map(function(x){ return '<button data-dias="' + x[0] + '" aria-pressed="' + (S.dias === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</div>';
+    html += '<div class="kpis g4">' +
+      kpi('Indicações', fmtN(noPer.length), 'no período', delta(noPer.length, antes.length)) +
+      kpi('Contratos fechados', fmtN(cCon.length), '', delta(cCon.length, antCon)) +
+      kpi('Conversão', pct(cCon.length, noPer.length) + '%', 'das indicações fecharam') +
+      kpi('Concedidos', fmtN(cCnc.length), 'benefícios') +
+      kpi('Parceiros ativos', nAtivos + '<small style="display:inline;font-size:14px;color:var(--ink3)"> / ' + ps.length + '</small>', 'indicaram no período') +
+      kpi('Prospectadores', fmtN(prospectadores().length), 'na rede') +
+      kpi('No INSS ou na Justiça', fmtN(cInss.length), 'requerimento feito') +
+      kpi('Docs pendentes', fmtN(cliRede.filter(function(c){ return c.contratoEm && !docsOk(c); }).length), 'em contratos fechados') + '</div>';
+
+    /* evolução: semanas (até 90 dias) ou meses (tudo) */
+    var rot = [], a = [], b = [], n, i;
+    if (S.dias && S.dias <= 90){
+      n = Math.ceil(S.dias / 7);
+      for (i = n - 1; i >= 0; i--){
+        var fim = diaAtras(i * 7), ini7 = diaAtras(i * 7 + 6);
+        rot.push(ini7.slice(8) + '/' + ini7.slice(5, 7));
+        a.push(cliRede.filter(function(c){ var d = dataC(c); return d >= ini7 && d <= fim; }).length);
+        b.push(cliRede.filter(function(c){ var d = String(c.contratoEm || '').slice(0, 10); return d >= ini7 && d <= fim; }).length);
+      }
+    } else {
+      var ref = new Date(); ref.setDate(1);
+      for (i = 5; i >= 0; i--){
+        var m = new Date(ref.getFullYear(), ref.getMonth() - i, 1), chave = isoDia(new Date(m.getFullYear(), m.getMonth(), 15)).slice(0, 7);
+        rot.push(['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'][m.getMonth()]);
+        a.push(cliRede.filter(function(c){ return dataC(c).slice(0, 7) === chave; }).length);
+        b.push(cliRede.filter(function(c){ return String(c.contratoEm || '').slice(0, 7) === chave; }).length);
+      }
+    }
+    html += '<div class="grid2"><section class="cx"><h3>Evolução</h3>' + colunas(rot, a, b) + '</section>';
+
+    /* funil */
+    html += '<section class="cx"><h3>Funil da rede</h3>' + barras([
+      { n: 'Indicadas', v: noPer.length, txt: fmtN(noPer.length) + ' · 100%' },
+      { n: 'Contrato fechado', v: cCon.length, txt: fmtN(cCon.length) + ' · ' + pct(cCon.length, noPer.length) + '%' },
+      { n: 'Requerimento no INSS / Justiça', v: cInss.length, txt: fmtN(cInss.length) + ' · ' + pct(cInss.length, noPer.length) + '%' },
+      { n: 'Benefício concedido', v: cCnc.length, txt: fmtN(cCnc.length) + ' · ' + pct(cCnc.length, noPer.length) + '%' }], { cor: 'var(--gold)' }) + '</section></div>';
+
+    /* ranking de parceiros */
+    var porP = ps.map(function(p){
+      var seus = noPer.filter(function(c){ return c.responsavelId === p.id; }), todos = cliRede.filter(function(c){ return c.responsavelId === p.id; });
+      var ult = todos.map(dataC).sort().pop() || '';
+      return { p: p, ind: seus.length, con: seus.filter(fechou).length, cnc: seus.filter(conc).length, total: todos.length, ult: ult };
+    });
+    var topo = function(campo, fmt){ return porP.filter(function(x){ return x[campo] > 0; }).sort(function(x, y){ return y[campo] - x[campo] || y.ind - x.ind; }).slice(0, 8).map(function(x){ return { n: nomeParc(x.p), v: x[campo], txt: fmt ? fmt(x) : fmtN(x[campo]), sub: (x.p.regiao ? x.p.regiao : '') }; }); };
+    html += '<div class="grid2"><section class="cx"><h3>Quem mais indica</h3>' + barras(topo('ind', function(x){ return fmtN(x.ind) + ' indic.'; })) + '</section>' +
+      '<section class="cx"><h3>Quem mais fecha contratos</h3>' + barras(topo('con', function(x){ return fmtN(x.con) + ' contr. · ' + pct(x.con, x.ind) + '%'; }), { cor: 'var(--ok)' }) + '</section></div>';
+
+    var conv = porP.filter(function(x){ return x.ind >= 3; }).sort(function(x, y){ return pct(y.con, y.ind) - pct(x.con, x.ind) || y.ind - x.ind; }).slice(0, 8)
+      .map(function(x){ return { n: nomeParc(x.p), v: pct(x.con, x.ind), txt: pct(x.con, x.ind) + '% · ' + x.con + '/' + x.ind, sub: x.p.regiao || '' }; });
+    html += '<div class="grid2"><section class="cx"><h3>Melhor conversão <small>(mín. 3 indicações)</small></h3>' + barras(conv, { cor: 'var(--ok)' }) + '</section>';
+
+    /* regiões */
+    var porE = S.regioes.map(function(g){
+      var pg = ps.filter(function(p){ return p.regiaoId === g.id; }), ids = pg.map(function(p){ return p.id; });
+      var cl = noPer.filter(function(c){ return ids.indexOf(c.responsavelId) >= 0; });
+      return { g: g, parc: pg.length, ind: cl.length, con: cl.filter(fechou).length };
+    }).filter(function(x){ return x.parc || x.ind; }).sort(function(x, y){ return y.con - x.con || y.ind - x.ind; });
+    html += '<section class="cx"><h3>Regiões · contratos</h3>' + barras(porE.map(function(x){ return { n: x.g.nome, v: x.con, txt: fmtN(x.con) + ' contr. · ' + fmtN(x.ind) + ' indic.', sub: x.parc + (x.parc === 1 ? ' parceiro' : ' parceiros') + ' · conversão ' + pct(x.con, x.ind) + '%' }; }), { cor: 'var(--gold)' }) + '</section></div>';
+
+    /* cidades */
+    var cid = {};
+    noPer.forEach(function(c){ var p = ps.filter(function(x){ return x.id === c.responsavelId; })[0]; var k = c.cidade || (p && p.regiao) || ''; if (!k) return; var o = cid[k] || (cid[k] = { ind: 0, con: 0 }); o.ind++; if (c.contratoEm) o.con++; });
+    var cidades = Object.keys(cid).map(function(k){ return { n: k, v: cid[k].con, txt: cid[k].con + ' contr. · ' + cid[k].ind + ' indic.', sub: 'conversão ' + pct(cid[k].con, cid[k].ind) + '%' }; }).sort(function(x, y){ return y.v - x.v; }).slice(0, 8);
+
+    /* prospectadores */
+    var pros = prospectadores().map(function(pr){
+      var seus = ps.filter(function(x){ return x.prospectadorId === pr.id; }), ids = seus.map(function(x){ return x.id; });
+      var cl = noPer.filter(function(c){ return ids.indexOf(c.responsavelId) >= 0; });
+      return { n: pr.nome, parc: seus.length, ind: cl.length, con: cl.filter(fechou).length };
+    }).sort(function(x, y){ return y.con - x.con || y.ind - x.ind || y.parc - x.parc; });
+    html += '<div class="grid2"><section class="cx"><h3>Cidades que mais fecham</h3>' + barras(cidades, { cor: 'var(--gold)' }) + '</section>' +
+      '<section class="cx"><h3>Prospectadores</h3>' + barras(pros.slice(0, 8).map(function(x){ return { n: x.n, v: x.con, txt: x.con + ' contr. · ' + x.ind + ' indic.', sub: x.parc + (x.parc === 1 ? ' parceiro trazido' : ' parceiros trazidos') }; }), { cor: 'var(--ok)' }) + '</section></div>';
+
+    /* parceiros parados + composição */
+    var parados = porP.filter(function(x){ return x.ind === 0 && x.p.ativo !== false; }).sort(function(x, y){ return String(x.ult).localeCompare(String(y.ult)); }).slice(0, 8);
+    var tipoPessoa = ps.filter(function(p){ return p.tipo !== 'clinica'; }).length, tipoClin = ps.length - tipoPessoa;
+    var leads = {}; cliRede.filter(function(c){ return !c.contratoEm && !c.arquivado; }).forEach(function(c){ var k = LEAD_NOMES[c.leadStatus] ? c.leadStatus : 'novo'; leads[k] = (leads[k] || 0) + 1; });
+    html += '<div class="grid2"><section class="cx"><h3>Parceiros parados <small>(sem indicar no período)</small></h3>' +
+      (parados.length ? '<div class="bars">' + parados.map(function(x){ var d = x.ult ? Math.floor((Date.parse(hoje) - Date.parse(x.ult)) / 864e5) : null; return '<div class="bar-l"><div class="bar-t"><span class="bar-n">' + esc(nomeParc(x.p)) + '</span><b>' + (d == null ? 'nunca indicou' : 'há ' + d + ' dias') + '</b></div><div class="bar-s">' + esc(x.p.regiao || '') + ' · ' + x.total + ' indic. no total</div></div>'; }).join('') + '</div>' : '<div class="vazio" style="padding:14px 4px">Todos os parceiros indicaram no período.</div>') + '</section>' +
+      '<section class="cx"><h3>Composição</h3>' + rosca([{ n: 'Pessoas', v: tipoPessoa }, { n: 'Clínicas', v: tipoClin }]) +
+      '<h3 style="margin-top:16px">Leads em cadastro</h3>' + rosca(Object.keys(LEAD_NOMES).filter(function(k){ return leads[k]; }).map(function(k){ return { n: LEAD_NOMES[k], v: leads[k] }; })) + '</section></div>';
+
+    $('main').innerHTML = html;
+  }
+  function P_ini(){ return S.dias ? diaAtras(S.dias) : ''; }
+
   function telaRede(){
     var ps = parceiros(), tot = numeros(clientesDe(ps.map(function(p){ return p.id; })));
     var html = '<div class="kpis"><div class="kpi"><small>Parceiros</small><b>' + ps.length + '</b></div><div class="kpi"><small>Indicações</small><b>' + tot.ind + '</b></div>' +
@@ -311,6 +486,7 @@ main{max-width:760px;margin:0 auto;padding:14px var(--gx) calc(96px + env(safe-a
     if (h){ var k = h.dataset.estado; S.abertos[k] = S.abertos[k] === false; desenhar(); return; }
     var p = e.target.closest('[data-parc]'); if (p){ return fichaParc(p.dataset.parc); }
     var f = e.target.closest('[data-f]'); if (f){ S.filtro = f.dataset.f; telaDocs(); return; }
+    var dd = e.target.closest('[data-dias]'); if (dd){ S.dias = parseInt(dd.dataset.dias, 10) || 0; telaPainel(); return; }
     var c = e.target.closest('[data-cpf]'); if (c){ copiar(c.dataset.cpf).then(function(){ toast('CPF copiado'); }, function(){ toast('Não foi possível copiar'); }); }
   });
 
