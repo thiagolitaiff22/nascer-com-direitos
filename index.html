@@ -2164,7 +2164,6 @@ td,.row{font-size:13px}
       </section>
 
       <section id="view-ctr" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
-        <div id="prio-box"></div>
         <div class="sec-rot">Resumo dos contratos fechados</div>
         <div class="stats" id="ctr-stats"></div>
         <div class="fbar">
@@ -4385,7 +4384,7 @@ td,.row{font-size:13px}
     var els = document.querySelectorAll('.cron[data-fim]'), t = Date.now();
     for (var i = 0; i < els.length; i++) els[i].textContent = cronTexto(+els[i].getAttribute('data-fim') - t);
   }, 1000);
-  function render(){ renderPrio(); renderEstadosCfg(); renderRegioes(); renderContratos(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
+  function render(){ renderEstadosCfg(); renderRegioes(); renderContratos(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
   var clQ = '';
   // stage of each process, derived from what is already recorded (no extra typing)
   var ETAPAS = [
