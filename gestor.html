@@ -192,6 +192,7 @@ main{max-width:1180px}
 
   /* ---------- entrada ---------- */
   function msgLogin(t){ $('lg-msg').textContent = t || ''; }
+  $('lg-user').addEventListener('input', function(){ var p = this.selectionStart; this.value = this.value.toLowerCase(); try { this.setSelectionRange(p, p); } catch(x){} });
   $('f-login').addEventListener('submit', function(e){
     e.preventDefault();
     var email = userEmail($('lg-user').value), senha = $('lg-senha').value;

@@ -2031,6 +2031,8 @@ td,.row{font-size:13px}
 .eq-ped.editando{align-items:flex-start}
 .eq-ped-form{display:flex;gap:8px;flex-wrap:wrap;flex:1 1 320px}
 .eq-ped-in{height:36px;border-radius:12px;border:1px solid var(--gline,var(--line));background:var(--panel,#fff);color:inherit;padding:0 12px;font:inherit;font-size:13px;flex:1 1 160px;min-width:0}
+.rs-lista{display:flex;flex-direction:column;gap:6px;max-height:240px;overflow:auto;border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.rs-lin{display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer}
 .eq-ped-sel{height:36px;border-radius:999px;border:1px solid var(--gline,var(--line));background:var(--panel,#fff);color:inherit;padding:0 12px;font:inherit;font-size:13px;font-weight:600}
 .eq-ped-acoes{align-items:center;flex-wrap:wrap}
 </style>
@@ -2385,6 +2387,7 @@ td,.row{font-size:13px}
         <div class="sec-title" data-cfg="equipe">Equipe</div>
         <div class="prosp-head" data-cfg="equipe">
           <p class="view-desc">Funcionários com acesso ao sistema. Só quem está nesta lista, e ativo, consegue ver os clientes.</p>
+          <button class="btn" id="btn-eq-reset" type="button" title="Define a mesma senha para vários acessos de uma vez"><svg class="i"><use href="#i-save"/></svg>Redefinir senhas</button>
           <button class="btn" id="btn-eq-link" type="button" title="Copia o endereço do formulário para mandar no grupo"><svg class="i"><use href="#i-copy"/></svg>Link do formulário</button>
           <button class="btn" id="btn-eq-novo" type="button"><svg class="i"><use href="#i-plus"/></svg>Novo funcionário</button>
         </div>
@@ -2731,6 +2734,18 @@ td,.row{font-size:13px}
         <button class="btn primary" type="submit" id="wa-go">Enviar</button>
       </div>
     </div>
+  </form>
+</dialog>
+
+<dialog id="dlg-reset">
+  <form class="f" id="form-reset" novalidate>
+    <div class="f-head"><h2>Redefinir senhas</h2></div>
+    <div class="f-body">
+      <div class="field full"><label for="rs-senha">Nova senha (só números, mínimo de 6)</label><input id="rs-senha" name="rs-nova" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" data-lpignore="true" data-1p-ignore placeholder="Ex.: 123456"><span class="hint">Aparece o que você digita. Cada pessoa pode trocar depois, em Alterar senha.</span></div>
+      <div class="field full"><label>Quem recebe esta senha</label><div id="rs-lista" class="rs-lista"></div></div>
+      <div class="field full"><span class="hint" id="rs-msg" role="status"></span></div>
+    </div>
+    <div class="f-foot"><div class="right"><button class="btn" type="button" id="rs-cancel">Cancelar</button><button class="btn primary" type="submit" id="rs-go">Aplicar</button></div></div>
   </form>
 </dialog>
 
@@ -7015,6 +7030,35 @@ td,.row{font-size:13px}
     return 'Não foi possível salvar agora. Tente de novo.';
   }
   $('btn-eq-novo').addEventListener('click', function(){ pedidoEq = null; openEq(null); });
+
+  /* ---------- redefinir senhas de vários acessos (usuário e senha) ---------- */
+  $('btn-eq-reset').addEventListener('click', function(){
+    var alvos = (state.equipe || []).filter(function(u){ return ehAcessoInterno(u.email) && u.ativo; }).sort(function(a, b){ return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
+    if (!alvos.length){ toast('Ninguém com acesso por usuário e senha ainda.'); return; }
+    $('rs-senha').value = ''; $('rs-msg').textContent = '';
+    $('rs-lista').innerHTML = alvos.map(function(u){ return '<label class="rs-lin"><input type="checkbox" checked data-rs="' + esc(u.email) + '"> <b>' + esc(u.nome) + '</b> <span class="mini">' + esc(emailParaExibir(u.email)) + ' · ' + esc((CARGOS[cargoDe(u)] || [''])[0]) + '</span></label>'; }).join('');
+    $('dlg-reset').showModal(); setTimeout(function(){ $('rs-senha').focus(); }, 30);
+  });
+  $('rs-cancel').addEventListener('click', function(){ $('dlg-reset').close(); });
+  $('rs-senha').addEventListener('input', function(){ this.value = this.value.replace(/\D/g, ''); });
+  $('form-reset').addEventListener('submit', async function(e){
+    e.preventDefault();
+    var s = $('rs-senha').value, marcados = [].slice.call($('rs-lista').querySelectorAll('input[data-rs]:checked')).map(function(c){ return c.dataset.rs; });
+    if (!/^[0-9]{6,}$/.test(s)){ $('rs-msg').textContent = 'A senha deve ter só números, no mínimo 6.'; return; }
+    if (!marcados.length){ $('rs-msg').textContent = 'Marque pelo menos uma pessoa.'; return; }
+    $('rs-go').disabled = true; $('rs-msg').textContent = 'Aplicando…';
+    var ok = 0, falhas = [];
+    for (var i = 0; i < marcados.length; i++){
+      var r = await SB.rpc('equipe_definir_senha', { p_email: marcados[i], p_senha: s });
+      if (r.error || !r.data || r.data.erro) falhas.push(emailParaExibir(marcados[i]) + ': ' + ((r.data && r.data.erro) || (r.error && r.error.message) || 'erro')); else ok++;
+    }
+    $('rs-go').disabled = false;
+    if (falhas.length){ $('rs-msg').textContent = ok + ' ok. Não foi possível: ' + falhas.join(' | '); return; }
+    $('dlg-reset').close(); toast('Senha redefinida para ' + ok + (ok === 1 ? ' pessoa' : ' pessoas') + '. Avise-as para entrar com a nova senha.');
+  });
+
+  // usuário sempre em letras minúsculas (na tela de entrada e no cadastro da equipe)
+  ['af-email', 'fe-email'].forEach(function(id){ var el = $(id); if (el) el.addEventListener('input', function(){ var p = this.selectionStart; this.value = this.value.toLowerCase(); try { this.setSelectionRange(p, p); } catch(x){} }); });
 
   /* ---------- pedidos de acesso (formulário enviado no grupo) ---------- */
   var pedidoEq = null, pedEdit = null;
