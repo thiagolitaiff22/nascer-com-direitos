@@ -2091,8 +2091,8 @@ td,.row{font-size:13px}
       <h1>Nascer com Direitos</h1>
     </div>
     <form id="auth-form" novalidate>
-      <p class="auth-msg" id="auth-intro">Entre com o seu usuário e a senha.</p>
-      <div class="field" id="af-email-wrap"><label for="af-email">CPF</label><input id="af-email" type="text" inputmode="numeric" maxlength="14" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="000.000.000-00"></div>
+      <p class="auth-msg" id="auth-intro">Entre com o seu CPF e a senha.</p>
+      <div class="field" id="af-email-wrap"><label for="af-email">CPF</label><input id="af-email" type="text" inputmode="numeric" maxlength="14" autocomplete="off" name="cpf-nc" autocapitalize="none" spellcheck="false" placeholder="000.000.000-00"></div>
       <div class="field" id="af-senha-wrap"><label for="af-senha">Senha</label><div class="pw"><input id="af-senha" type="password" autocomplete="current-password"><button type="button" class="pw-eye" data-pw="af-senha" aria-label="Mostrar senha" title="Mostrar senha"><svg class="i"><use href="#i-eye"/></svg></button></div></div>
       <div class="field" id="af-senha2-wrap" hidden><label for="af-senha2">Repita a senha</label><div class="pw"><input id="af-senha2" type="password" autocomplete="new-password"><button type="button" class="pw-eye" data-pw="af-senha2" aria-label="Mostrar senha" title="Mostrar senha"><svg class="i"><use href="#i-eye"/></svg></button></div></div>
       <button class="btn primary" type="submit" id="af-go">Entrar</button>
@@ -6710,7 +6710,7 @@ td,.row{font-size:13px}
   /* ---------- login screen ---------- */
   var authMode = 'entrar';
   var AUTH_TXT = {
-    entrar:   { intro: 'Entre com o seu usuário e a senha.', go: 'Entrar' },
+    entrar:   { intro: 'Entre com o seu CPF e a senha.', go: 'Entrar' },
     primeiro: { intro: 'Primeiro acesso: use o e-mail que o escritório cadastrou para você e crie sua senha (mínimo de 8 caracteres).', go: 'Criar senha' },
     esqueci:  { intro: 'Informe seu e-mail. Enviaremos um link para você criar uma nova senha. Quem entra com usuário pede a troca a um administrador.', go: 'Enviar link' },
     nova:     { intro: 'Crie sua nova senha (mínimo de 8 caracteres).', go: 'Salvar nova senha' },

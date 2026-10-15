@@ -135,9 +135,9 @@ button,a,label,[role=button]{touch-action:manipulation}
 <section class="login" id="login">
   <img src="img/logo-nascer-t.png" alt="Nascer com Direitos">
   <h1>Painel do gestor</h1>
-  <p>Entre com o seu usuário e a senha do sistema.</p>
+  <p>Entre com o seu CPF e a senha.</p>
   <form id="f-login" novalidate>
-    <label class="campo"><span>CPF</span><input id="lg-user" inputmode="numeric" maxlength="14" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="000.000.000-00"></label>
+    <label class="campo"><span>CPF</span><input id="lg-user" inputmode="numeric" maxlength="14" autocomplete="off" name="cpf-nc" autocapitalize="none" spellcheck="false" placeholder="000.000.000-00"></label>
     <label class="campo"><span>Senha</span><input id="lg-senha" type="password" inputmode="text" autocomplete="current-password"></label>
     <button class="btn p full" id="lg-go" type="submit">Entrar</button>
     <div class="msg" id="lg-msg" role="status"></div>
