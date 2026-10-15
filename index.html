@@ -2092,7 +2092,7 @@ td,.row{font-size:13px}
     </div>
     <form id="auth-form" novalidate>
       <p class="auth-msg" id="auth-intro">Entre com o seu usuário e a senha.</p>
-      <div class="field" id="af-email-wrap"><label for="af-email">CPF</label><input id="af-email" type="text" inputmode="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="000.000.000-00"></div>
+      <div class="field" id="af-email-wrap"><label for="af-email">CPF</label><input id="af-email" type="text" inputmode="numeric" maxlength="14" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="000.000.000-00"></div>
       <div class="field" id="af-senha-wrap"><label for="af-senha">Senha</label><div class="pw"><input id="af-senha" type="password" autocomplete="current-password"><button type="button" class="pw-eye" data-pw="af-senha" aria-label="Mostrar senha" title="Mostrar senha"><svg class="i"><use href="#i-eye"/></svg></button></div></div>
       <div class="field" id="af-senha2-wrap" hidden><label for="af-senha2">Repita a senha</label><div class="pw"><input id="af-senha2" type="password" autocomplete="new-password"><button type="button" class="pw-eye" data-pw="af-senha2" aria-label="Mostrar senha" title="Mostrar senha"><svg class="i"><use href="#i-eye"/></svg></button></div></div>
       <button class="btn primary" type="submit" id="af-go">Entrar</button>
@@ -2101,6 +2101,7 @@ td,.row{font-size:13px}
         <button type="button" class="linkbtn" data-mode="primeiro">Primeiro acesso</button>
         <button type="button" class="linkbtn" data-mode="esqueci">Esqueci a senha</button>
         <button type="button" class="linkbtn" data-mode="entrar" hidden>Voltar para entrar</button>
+        <button type="button" class="linkbtn" id="af-modo">Entrar com e-mail (administração)</button>
         <button type="button" class="linkbtn" id="af-sair" hidden>Sair</button>
       </div>
     </form>
@@ -7155,9 +7156,20 @@ td,.row{font-size:13px}
   });
 
   // usuário sempre em letras minúsculas (na tela de entrada e no cadastro da equipe)
-  ['af-email', 'fe-email'].forEach(function(id){ var el = $(id); if (el) el.addEventListener('input', function(){
-    if (cpfEhNumero(this.value)){ this.value = cpfMasc(this.value); return; }   // número: vira CPF com pontos e traço
-    var p = this.selectionStart; this.value = this.value.toLowerCase(); try { this.setSelectionRange(p, p); } catch(x){} }); });
+  // entrada: só números (CPF). Para a administração há o modo e-mail, que libera as letras.
+  var afModoEmail = false;
+  $('af-email').addEventListener('input', function(){
+    if (!afModoEmail){ this.value = cpfMasc(this.value); return; }   // só dígitos, com pontos e traço
+    var p = this.selectionStart; this.value = this.value.toLowerCase(); try { this.setSelectionRange(p, p); } catch(x){}
+  });
+  $('af-modo').addEventListener('click', function(){
+    afModoEmail = !afModoEmail; var el = $('af-email'); el.value = '';
+    el.inputMode = afModoEmail ? 'email' : 'numeric'; el.maxLength = afModoEmail ? 120 : 14;
+    el.placeholder = afModoEmail ? 'seu@email.com.br' : '000.000.000-00';
+    document.querySelector('label[for="af-email"]').textContent = afModoEmail ? 'E-mail' : 'CPF';
+    this.textContent = afModoEmail ? 'Entrar com CPF' : 'Entrar com e-mail (administração)'; el.focus();
+  });
+  var feEl = $('fe-email'); if (feEl) feEl.addEventListener('input', function(){ var p = this.selectionStart; this.value = this.value.toLowerCase(); try { this.setSelectionRange(p, p); } catch(x){} });
 
   /* ---------- pedidos de acesso (formulário enviado no grupo) ---------- */
   var pedidoEq = null, pedEdit = null;

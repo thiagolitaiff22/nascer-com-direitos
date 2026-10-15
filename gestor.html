@@ -131,11 +131,12 @@ main{max-width:1180px}
   <h1>Painel do gestor</h1>
   <p>Entre com o seu usuário e a senha do sistema.</p>
   <form id="f-login" novalidate>
-    <label class="campo"><span>CPF</span><input id="lg-user" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="000.000.000-00"></label>
+    <label class="campo"><span>CPF</span><input id="lg-user" inputmode="numeric" maxlength="14" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="000.000.000-00"></label>
     <label class="campo"><span>Senha</span><input id="lg-senha" type="password" inputmode="text" autocomplete="current-password"></label>
     <button class="btn p full" id="lg-go" type="submit">Entrar</button>
     <div class="msg" id="lg-msg" role="status"></div>
   </form>
+  <p style="margin-top:14px"><a href="#" id="lg-modo" style="color:var(--gold2);font-weight:700">Entrar com e-mail (administração)</a></p>
   <p style="margin-top:18px"><a href="campo.html" style="color:var(--gold2);font-weight:700">Sou parceiro ou prospectador</a></p>
 </section>
 
@@ -196,7 +197,15 @@ main{max-width:1180px}
 
   /* ---------- entrada ---------- */
   function msgLogin(t){ $('lg-msg').textContent = t || ''; }
-  $('lg-user').addEventListener('input', function(){ if (cpfEhNumero(this.value)){ this.value = cpfMasc(this.value); return; } var p = this.selectionStart; this.value = this.value.toLowerCase(); try { this.setSelectionRange(p, p); } catch(x){} });
+  var lgEmail = false;   // só números (CPF); o modo e-mail é da administração
+  $('lg-user').addEventListener('input', function(){ if (!lgEmail){ this.value = cpfMasc(this.value); return; } var p = this.selectionStart; this.value = this.value.toLowerCase(); try { this.setSelectionRange(p, p); } catch(x){} });
+  $('lg-modo').addEventListener('click', function(e){
+    e.preventDefault(); lgEmail = !lgEmail; var el = $('lg-user'); el.value = '';
+    el.inputMode = lgEmail ? 'email' : 'numeric'; el.maxLength = lgEmail ? 120 : 14;
+    el.placeholder = lgEmail ? 'seu@email.com.br' : '000.000.000-00';
+    el.parentNode.querySelector('span').textContent = lgEmail ? 'E-mail' : 'CPF';
+    this.textContent = lgEmail ? 'Entrar com CPF' : 'Entrar com e-mail (administração)'; el.focus();
+  });
   $('f-login').addEventListener('submit', async function(e){
     e.preventDefault();
     var email = userEmail($('lg-user').value), senha = $('lg-senha').value;
