@@ -678,6 +678,24 @@ html,body{overflow-x:hidden}
 #l-dpp .rc{font-size:14px}
 #dpp{flex:1 1 0!important;width:0!important;min-width:0!important;text-align:right;font-size:18px!important;letter-spacing:0!important;color:var(--ink)}
 #dpp::placeholder{color:var(--ink2);opacity:.7}
+
+/* adaptação a qualquer aparelho: nada passa da largura da tela (de 320 px até tablet) */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+*,*::before,*::after{box-sizing:border-box}
+html,body{max-width:100%;overflow-x:hidden}
+img,video,canvas,svg{max-width:100%}
+.vista,.wrap,.dados,.lista,.kpis,.grid,.chips,.folha > div,.tela > div{min-width:0;max-width:100%}
+.dados > *,.dados .fone,.fone{min-width:0;max-width:100%}
+.fone input,.fone select{min-width:0;width:100%;flex:1 1 0}
+.grid > *,.kpis > *{min-width:0}
+@media (max-width:359px){
+  :root{--gx:max(14px,env(safe-area-inset-left));--gxr:max(14px,env(safe-area-inset-right))}
+  .doc .t{font-size:14px}
+  .kpi b{font-size:22px}
+}
+@media (min-width:700px){ .vista,.wrap{max-width:640px} .abas{max-width:640px;margin-left:auto;margin-right:auto} }
+.dados{grid-template-columns:minmax(0,1fr)}
+.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
 </head>
@@ -720,7 +738,7 @@ html,body{overflow-x:hidden}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 19;
+  var APP_VERSAO = 20;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
