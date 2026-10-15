@@ -204,6 +204,26 @@ main{max-width:1180px}
       entrar(r.data.session);
     }, function(){ msgLogin('Sem internet. Tente de novo.'); $('lg-go').disabled = false; });
   });
+  function novaSenhaObrigatoria(){
+    return new Promise(function(ok){
+      var f = abrirFolha('<h2>Crie a sua senha</h2><p class="sub">Para a sua segurança, escolha agora uma senha só sua: só números, no mínimo 6, e diferente de 123456.</p>' +
+        '<label class="campo"><span>Nova senha</span><input id="ob-a" type="password" inputmode="numeric" autocomplete="new-password"></label>' +
+        '<label class="campo"><span>Repita a nova senha</span><input id="ob-b" type="password" inputmode="numeric" autocomplete="new-password"></label>' +
+        '<div class="msg" id="ob-msg"></div><button class="btn p full" id="ob-ok">Salvar e entrar</button>');
+      S.obrig = true;   // não fecha clicando fora
+      f.querySelector('#ob-ok').onclick = async function(){
+        var a = f.querySelector('#ob-a').value, b = f.querySelector('#ob-b').value, m = f.querySelector('#ob-msg');
+        if (!/^[0-9]{6,}$/.test(a)){ m.textContent = 'Use só números, com pelo menos 6.'; return; }
+        if (a === '123456'){ m.textContent = 'Escolha uma senha diferente da padrão.'; return; }
+        if (a !== b){ m.textContent = 'As duas senhas não são iguais.'; return; }
+        this.disabled = true; m.textContent = 'Salvando…';
+        var r = await SB.auth.updateUser({ password: a });
+        if (r.error){ m.textContent = 'Não foi possível salvar agora.'; this.disabled = false; return; }
+        await SB.rpc('equipe_senha_trocada');
+        S.obrig = false; fecharFolha(); ok();
+      };
+    });
+  }
   function entrar(session){
     SB.rpc('minha_funcao').then(function(f){
       if (f.error || f.data !== 'admin'){
@@ -213,6 +233,9 @@ main{max-width:1180px}
       }
       S.eu = session.user.email;
       $('login').classList.add('hidden'); $('app').classList.remove('hidden');
+      SB.from('equipe').select('trocar_senha').eq('email', String(session.user.email).toLowerCase()).maybeSingle().then(function(q){
+        if (q.data && q.data.trocar_senha) return novaSenhaObrigatoria();
+      });
       SB.from('equipe').select('nome').eq('email', String(session.user.email).toLowerCase()).maybeSingle().then(function(r){ if (r.data && r.data.nome) $('q-nome').textContent = r.data.nome; });
       carregar();
     });
@@ -525,7 +548,7 @@ main{max-width:1180px}
     fecharFolha();
     var f = document.createElement('div'); f.className = 'fundo'; f.id = 'fundo';
     f.innerHTML = '<div class="folha">' + html + '</div>';
-    f.addEventListener('click', function(e){ if (e.target === f) fecharFolha(); });
+    f.addEventListener('click', function(e){ if (e.target === f && !S.obrig) fecharFolha(); });
     document.body.appendChild(f); return f;
   }
   function fecharFolha(){ var f = $('fundo'); if (f) f.remove(); }
@@ -553,7 +576,7 @@ main{max-width:1180px}
   function novoAcesso(p){
     var f = abrirFolha('<h2>Acesso de ' + esc(p.nome) + '</h2><p class="sub">Defina o usuário e a senha para entrar no aplicativo.</p>' +
       '<label class="campo"><span>Usuário</span><input id="ac-user" autocapitalize="none" spellcheck="false" value="' + esc(sugerirUser(p.nome)) + '"></label>' +
-      '<label class="campo"><span>Senha (só números)</span><input id="ac-senha" inputmode="numeric" value="' + senhaNum() + '"></label>' +
+      '<label class="campo"><span>Senha padrão</span><input id="ac-senha" inputmode="numeric" value="123456"></label><p class="sub">A pessoa cria a senha dela no primeiro acesso.</p>' +
       '<div class="msg" id="ac-msg"></div><div class="fx"><button class="btn p" id="ac-ok">Salvar acesso</button><button class="btn" id="ac-x">Cancelar</button></div>');
     f.querySelector('#ac-x').onclick = fecharFolha;
     f.querySelector('#ac-ok').onclick = async function(){
@@ -561,7 +584,7 @@ main{max-width:1180px}
       if (!/^[a-z0-9._-]{3,30}$/.test(u)){ m.textContent = 'Usuário: de 3 a 30 letras ou números, sem espaço nem acento.'; return; }
       if (s.length < 6){ m.textContent = 'A senha precisa ter pelo menos 6 caracteres.'; return; }
       this.disabled = true; m.textContent = '';
-      var r = await SB.rpc('campo_definir_login', { p_prosp: p.id, p_usuario: u, p_senha: s });
+      var r = await SB.rpc('campo_definir_login', { p_prosp: p.id, p_usuario: u, p_senha: s, p_provisoria: true });
       if (r.error){ m.textContent = 'Não foi possível salvar: ' + (r.error.message || 'tente de novo'); this.disabled = false; return; }
       mostrarAcesso(p, u, s);
     };
@@ -601,7 +624,7 @@ main{max-width:1180px}
       '<label class="campo" id="nc-prbox"><span>Prospectador responsável</span><select id="nc-pros"></select></label>' +
       '<div class="sec">Acesso ao aplicativo</div>' +
       '<div class="fx"><label class="campo" style="margin:0"><span>Usuário</span><input id="nc-user" autocapitalize="none" spellcheck="false"></label>' +
-      '<label class="campo" style="margin:0"><span>Senha (só números)</span><input id="nc-senha" inputmode="numeric" value="' + senhaNum() + '"></label></div>' +
+      '<label class="campo" style="margin:0"><span>Senha padrão</span><input id="nc-senha" inputmode="numeric" value="123456"></label></div><p class="sub" style="margin-top:6px">A pessoa cria a senha dela no primeiro acesso.</p>' +
       '<div class="msg" id="nc-msg"></div><div class="fx"><button class="btn p" id="nc-ok">Cadastrar</button><button class="btn" id="nc-x">Cancelar</button></div>');
     var userEditado = false;
     function seg(id, cb){ f.querySelector(id).addEventListener('click', function(e){ var b = e.target.closest('[data-v]'); if (!b) return; Array.prototype.forEach.call(this.children, function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); cb(b.dataset.v); }); }
@@ -647,7 +670,7 @@ main{max-width:1180px}
       var id = genId();
       var a = await SB.from('prospectadores').upsert({ id: id, data: data });
       if (a.error){ m.textContent = 'Não foi possível cadastrar: ' + (a.error.message || 'tente de novo'); btn.disabled = false; return; }
-      var r = await SB.rpc('campo_definir_login', { p_prosp: id, p_usuario: u, p_senha: s });
+      var r = await SB.rpc('campo_definir_login', { p_prosp: id, p_usuario: u, p_senha: s, p_provisoria: true });
       if (r.error){
         m.textContent = 'Cadastro criado, mas o acesso não: ' + (r.error.message || 'usuário já existe?') + ' Gere o acesso depois, na ficha.';
         S.prosp.push(Object.assign({ id: id }, data)); btn.disabled = false; return;

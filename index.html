@@ -2032,6 +2032,7 @@ td,.row{font-size:13px}
 .eq-ped-form{display:flex;gap:8px;flex-wrap:wrap;flex:1 1 320px}
 .eq-ped-in{height:36px;border-radius:12px;border:1px solid var(--gline,var(--line));background:var(--panel,#fff);color:inherit;padding:0 12px;font:inherit;font-size:13px;flex:1 1 160px;min-width:0}
 .rs-lista{display:flex;flex-direction:column;gap:6px;max-height:240px;overflow:auto;border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.rs-sep{margin:10px 0 2px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
 .rs-lin{display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer}
 .eq-ped-sel{height:36px;border-radius:999px;border:1px solid var(--gline,var(--line));background:var(--panel,#fff);color:inherit;padding:0 12px;font:inherit;font-size:13px;font-weight:600}
 .eq-ped-acoes{align-items:center;flex-wrap:wrap}
@@ -2742,6 +2743,19 @@ td,.row{font-size:13px}
   </form>
 </dialog>
 
+<dialog id="dlg-novasenha">
+  <form class="f" id="form-novasenha" novalidate>
+    <div class="f-head"><h2>Crie a sua senha</h2></div>
+    <div class="f-body">
+      <div class="field full"><span class="hint">Para a sua segurança, escolha agora uma senha só sua. Use só números, no mínimo 6, e diferente de 123456.</span></div>
+      <div class="field full"><label for="ns-a">Nova senha</label><input id="ns-a" type="password" inputmode="numeric" autocomplete="new-password"></div>
+      <div class="field full"><label for="ns-b">Repita a nova senha</label><input id="ns-b" type="password" inputmode="numeric" autocomplete="new-password"></div>
+      <div class="field full"><span class="hint" id="ns-msg" role="status"></span></div>
+    </div>
+    <div class="f-foot"><div class="right"><button class="btn primary" type="submit" id="ns-go">Salvar e entrar</button></div></div>
+  </form>
+</dialog>
+
 <dialog id="dlg-reset">
   <form class="f" id="form-reset" novalidate>
     <div class="f-head"><h2>Redefinir senhas</h2></div>
@@ -2772,7 +2786,7 @@ td,.row{font-size:13px}
     <div class="f-body">
       <div class="field full"><label for="fe-nome">Nome</label><input id="fe-nome" autocomplete="off"></div>
       <div class="field full"><label for="fe-email">Usuário de acesso</label><input id="fe-email" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="ex.: thiago ou nome.sobrenome"><span class="hint">É com este usuário e a senha abaixo que o funcionário entra no sistema. Pode usar um e-mail, se preferir.</span></div>
-      <div class="field full" id="fe-senha-wrap"><label for="fe-senha">Senha de acesso</label><input id="fe-senha" name="nova-senha-equipe" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocapitalize="none" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Só números, mínimo de 6 (aparece o que você digita)"><span class="hint" id="fe-senha-dica">Só números (mínimo de 6). O próprio funcionário pode trocar depois, em Alterar senha.</span></div>
+      <div class="field full" id="fe-senha-wrap"><label for="fe-senha">Senha de acesso</label><input id="fe-senha" name="nova-senha-equipe" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocapitalize="none" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Deixe em branco para usar a senha padrão 123456"><span class="hint" id="fe-senha-dica">Só números (mínimo de 6). O próprio funcionário pode trocar depois, em Alterar senha.</span></div>
       <div class="field"><label for="fe-funcao">Cargo</label><select id="fe-funcao"><option value="closer">Closer · liga e fecha contratos</option><option value="operacional">Agente Operacional · documentos e requerimentos</option><option value="judicial">Agente Judicial · ações e processos</option><option value="admin">Gestor · acesso total</option></select></div>
       <div class="field"><label for="fe-ativo">Acesso</label><select id="fe-ativo"><option value="sim">Ativo</option><option value="nao">Bloqueado</option></select></div>
     </div>
@@ -4999,7 +5013,7 @@ td,.row{font-size:13px}
       if (lg.error){ $('cp-login-status').textContent = 'Rode o arquivo supabase/13_login_app.sql no Supabase para liberar usuário e senha.'; $('cp-usuario').value = ''; }
       else if (lg.data){ $('cp-usuario').value = lg.data.usuario; $('cp-senha').value = lg.data.senha || ''; cpSenhaNova = lg.data.senha || '';
         $('cp-login-status').textContent = 'Acesso ativo: usuário ' + lg.data.usuario + (lg.data.senha ? '' : '. Senha salva antes desta versão: gere ou digite uma nova e clique em Salvar para ela aparecer aqui') + '.'; }
-      else { $('cp-usuario').value = sugerirUsuario(p.nome); $('cp-login-status').textContent = 'Ainda sem usuário e senha. Confira o usuário, gere uma senha e salve.'; }
+      else { $('cp-usuario').value = sugerirUsuario(p.nome); $('cp-senha').value = '123456'; $('cp-login-status').textContent = 'Ainda sem usuário e senha. A senha padrão é 123456: a pessoa cria a dela no primeiro acesso. Confira o usuário e clique em Salvar.'; }
       if (!$('dlg-campo').open) $('dlg-campo').showModal();
       if (novo) toast('Link novo gerado. O antigo não funciona mais.');
     } catch(err){ toast(errMsg(err)); }
@@ -5022,7 +5036,7 @@ td,.row{font-size:13px}
     var u = $('cp-usuario').value.trim().toLowerCase(), pw = $('cp-senha').value.trim();
     if (!/^[a-z0-9._-]{3,30}$/.test(u)) return toast('Usuário: de 3 a 30 letras ou números, sem espaço nem acento');
     if (pw.length < 6) return toast('A senha precisa ter pelo menos 6 caracteres (use Gerar)');
-    var r = await SB.rpc('campo_definir_login', { p_prosp: cpProsp.id, p_usuario: u, p_senha: pw });
+    var r = await SB.rpc('campo_definir_login', { p_prosp: cpProsp.id, p_usuario: u, p_senha: pw, p_provisoria: true });
     if (r.error) return toast(errMsg(r.error));
     cpSenhaNova = pw; $('cp-usuario').value = r.data;
     $('cp-login-status').textContent = 'Senha salva. Já vale no aplicativo: usuário ' + r.data + ' e senha ' + pw + '.';
@@ -6775,12 +6789,33 @@ td,.row{font-size:13px}
 
   /* ---------- entering the app ---------- */
   var iniciado = false, recuperando = false;
+  // senha padrão: a pessoa é obrigada a criar a senha dela no primeiro acesso
+  function novaSenhaObrigatoria(){
+    return new Promise(function(ok){
+      var d = $('dlg-novasenha'); $('ns-a').value = ''; $('ns-b').value = ''; $('ns-msg').textContent = '';
+      d.addEventListener('cancel', function(e){ e.preventDefault(); });
+      $('form-novasenha').onsubmit = async function(e){
+        e.preventDefault();
+        var a = $('ns-a').value, b = $('ns-b').value;
+        if (!/^[0-9]{6,}$/.test(a)){ $('ns-msg').textContent = 'Use só números, com pelo menos 6.'; return; }
+        if (a === '123456'){ $('ns-msg').textContent = 'Escolha uma senha diferente da padrão.'; return; }
+        if (a !== b){ $('ns-msg').textContent = 'As duas senhas não são iguais.'; return; }
+        $('ns-go').disabled = true; $('ns-msg').textContent = 'Salvando…';
+        var r = await SB.auth.updateUser({ password: a });
+        if (r.error){ $('ns-msg').textContent = 'Não foi possível salvar agora (' + (r.error.message || 'tente de novo') + ').'; $('ns-go').disabled = false; return; }
+        await SB.rpc('equipe_senha_trocada');
+        $('ns-go').disabled = false; d.close(); ok();
+      };
+      d.showModal(); setTimeout(function(){ $('ns-a').focus(); }, 30);
+    });
+  }
   async function entrar(session){
     var email = (session.user.email || '').toLowerCase();
     var f = await SB.rpc('minha_funcao');
     if (f.error){ showAuth('entrar'); authMsg('Não foi possível verificar seu acesso agora. Tente de novo.', 'err'); return; }
     if (!f.data){ showAuth('bloqueado', 'O e-mail ' + email + ' ainda não tem acesso liberado. Peça a um administrador do escritório para cadastrar você em Configurações, na parte Equipe.'); return; }
     var p = await SB.from('equipe').select('*').eq('email', email).maybeSingle();
+    if (p.data && p.data.trocar_senha){ $('auth').hidden = true; await novaSenhaObrigatoria(); }
     state.me = { email: email, funcao: f.data, nome: (p.data && p.data.nome) || email };
     document.body.dataset.role = f.data;
     $('me').textContent = state.me.nome + ' · ' + (FUNCAO[f.data] || f.data); $('me-av').textContent = String(state.me.nome || '?').trim().charAt(0).toUpperCase();
@@ -7051,26 +7086,39 @@ td,.row{font-size:13px}
   $('btn-eq-reset').addEventListener('click', function(){
     var alvos = (state.equipe || []).filter(function(u){ return ehAcessoInterno(u.email) && u.ativo; }).sort(function(a, b){ return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
     if (!alvos.length){ toast('Ninguém com acesso por usuário e senha ainda.'); return; }
-    $('rs-senha').value = ''; $('rs-msg').textContent = '';
+    $('rs-senha').value = '123456'; $('rs-msg').textContent = '';
+    var htmlP = '';
     $('rs-lista').innerHTML = alvos.map(function(u){ return '<label class="rs-lin"><input type="checkbox" checked data-rs="' + esc(u.email) + '"> <b>' + esc(u.nome) + '</b> <span class="mini">' + esc(emailParaExibir(u.email)) + ' · ' + esc((CARGOS[cargoDe(u)] || [''])[0]) + '</span></label>'; }).join('');
-    $('dlg-reset').showModal(); setTimeout(function(){ $('rs-senha').focus(); }, 30);
+    $('dlg-reset').showModal(); setTimeout(function(){ $('rs-senha').focus(); $('rs-senha').select(); }, 30);
+    // parceiros e prospectadores com acesso ao aplicativo
+    SB.rpc('campo_logins_lista').then(function(r){
+      var l = (r && r.data) || []; if (!l.length) return;
+      $('rs-lista').insertAdjacentHTML('beforeend', '<div class="rs-sep">Parceiros e prospectadores</div>' + l.map(function(x){
+        return '<label class="rs-lin"><input type="checkbox" data-rsp="' + esc(x.prosp_id) + '" data-rsu="' + esc(x.usuario) + '"> <b>' + esc(x.nome || x.usuario) + '</b> <span class="mini">' + esc(x.usuario) + ' · ' + (x.perfil === 'prospectador' ? 'Prospectador' : 'Parceiro') + '</span></label>';
+      }).join(''));
+    });
   });
   $('rs-cancel').addEventListener('click', function(){ $('dlg-reset').close(); });
   $('rs-senha').addEventListener('input', function(){ this.value = this.value.replace(/\D/g, ''); });
   $('form-reset').addEventListener('submit', async function(e){
     e.preventDefault();
     var s = $('rs-senha').value, marcados = [].slice.call($('rs-lista').querySelectorAll('input[data-rs]:checked')).map(function(c){ return c.dataset.rs; });
+    var marcadosP = [].slice.call($('rs-lista').querySelectorAll('input[data-rsp]:checked')).map(function(c){ return { id: c.dataset.rsp, u: c.dataset.rsu }; });
     if (!/^[0-9]{6,}$/.test(s)){ $('rs-msg').textContent = 'A senha deve ter só números, no mínimo 6.'; return; }
-    if (!marcados.length){ $('rs-msg').textContent = 'Marque pelo menos uma pessoa.'; return; }
+    if (!marcados.length && !marcadosP.length){ $('rs-msg').textContent = 'Marque pelo menos uma pessoa.'; return; }
     $('rs-go').disabled = true; $('rs-msg').textContent = 'Aplicando…';
     var ok = 0, falhas = [];
     for (var i = 0; i < marcados.length; i++){
-      var r = await SB.rpc('equipe_definir_senha', { p_email: marcados[i], p_senha: s });
+      var r = await SB.rpc('equipe_definir_senha', { p_email: marcados[i], p_senha: s, p_provisoria: true });
       if (r.error || !r.data || r.data.erro) falhas.push(emailParaExibir(marcados[i]) + ': ' + ((r.data && r.data.erro) || (r.error && r.error.message) || 'erro')); else ok++;
+    }
+    for (var j = 0; j < marcadosP.length; j++){
+      var rp = await SB.rpc('campo_definir_login', { p_prosp: marcadosP[j].id, p_usuario: marcadosP[j].u, p_senha: s, p_provisoria: true });
+      if (rp.error) falhas.push(marcadosP[j].u + ': ' + (rp.error.message || 'erro')); else ok++;
     }
     $('rs-go').disabled = false;
     if (falhas.length){ $('rs-msg').textContent = ok + ' ok. Não foi possível: ' + falhas.join(' | '); return; }
-    $('dlg-reset').close(); toast('Senha redefinida para ' + ok + (ok === 1 ? ' pessoa' : ' pessoas') + '. Avise-as para entrar com a nova senha.');
+    $('dlg-reset').close(); toast('Senha redefinida para ' + ok + (ok === 1 ? ' pessoa' : ' pessoas') + '. Cada uma cria a senha própria no primeiro acesso.');
   });
 
   // usuário sempre em letras minúsculas (na tela de entrada e no cadastro da equipe)
@@ -7177,7 +7225,8 @@ td,.row{font-size:13px}
     if (!nome){ $('fe-nome').focus(); toast('Informe o nome do funcionário'); return; }
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ $('fe-email').focus(); toast('Informe o usuário de acesso'); return; }
     var interno = ehAcessoInterno(email);
-    if (interno && !eEditing && !senhaNova){ $('fe-senha').focus(); toast('Defina a senha, só com números (mínimo de 6)'); return; }
+    var usouPadrao = false;
+    if (interno && !eEditing && !senhaNova){ senhaNova = '123456'; usouPadrao = true; }   // senha padrão: a pessoa troca no primeiro acesso
     if (interno && senhaNova && !/^[0-9]{6,}$/.test(senhaNova)){ $('fe-senha').focus(); toast('A senha deve ter só números, no mínimo 6'); return; }
     var cargoSel = $('fe-funcao').value;
     var row = { nome: nome, funcao: cargoSel === 'admin' ? 'admin' : 'assistente', cargo: cargoSel, ativo: $('fe-ativo').value === 'sim' };
@@ -7187,11 +7236,11 @@ td,.row{font-size:13px}
       if (r.error) throw r.error;
       if (eEditing && (!r.data || !r.data.length)) throw { code: '42501' };
       if (interno && senhaNova){
-        var rs = await SB.rpc('equipe_definir_senha', { p_email: email, p_senha: senhaNova });
+        var rs = await SB.rpc('equipe_definir_senha', { p_email: email, p_senha: senhaNova, p_provisoria: true });
         if (rs.error || !rs.data || rs.data.erro){ $('fe-senha').value = ''; toast('Cadastrado, mas a senha não foi definida: ' + ((rs.data && rs.data.erro) || (rs.error && rs.error.message) || 'tente de novo')); return; }
       }
       if (pedidoEq){ try { await SB.from('equipe_pedidos').update({ status: 'aprovado' }).eq('id', pedidoEq); } catch(x){} pedidoEq = null; }
-      dlgE.close(); toast(eEditing ? 'Funcionário atualizado' + (senhaNova ? ' e senha trocada' : '') : 'Funcionário cadastrado. Envie a ele o endereço do sistema.');
+      dlgE.close(); toast(eEditing ? 'Funcionário atualizado' + (senhaNova ? ' e senha trocada' : '') : (usouPadrao ? 'Funcionário cadastrado com a senha padrão 123456: ele cria a senha dele no primeiro acesso.' : 'Funcionário cadastrado. Ele cria a senha dele no primeiro acesso.'));
     } catch(err){ toast(eqErr(err)); } finally { $('fe-save').disabled = false; }
   });
   $('fe-del').addEventListener('click', async function(){
