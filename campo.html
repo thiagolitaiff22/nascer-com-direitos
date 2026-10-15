@@ -744,7 +744,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 28;
+  var APP_VERSAO = 29;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -2420,7 +2420,7 @@ button,a,label,[role=button]{touch-action:manipulation}
         .catch(function(){ alert('Sem internet agora. Para entrar a primeira vez precisa de sinal.'); })
         .then(function(){ if (document.body.contains(b)){ b.disabled = false; b.textContent = 'Entrar'; } });
     };
-    var uu = lsGet('campo_usuario'); if (uu) $('usuario').value = uu;
+    var uu = lsGet('campo_usuario'); if (uu && /^d{11}$/.test(uu)) $('usuario').value = maskCpf(uu);   // só CPF; nomes antigos não voltam
   }
   // aplicativo ainda sem o endereço do Supabase (CFG lá em cima): avisa em vez de tentar entrar
   function semConfiguracao(){
