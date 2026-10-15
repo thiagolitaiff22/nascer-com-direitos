@@ -2420,7 +2420,7 @@ button,a,label,[role=button]{touch-action:manipulation}
         .catch(function(){ alert('Sem internet agora. Para entrar a primeira vez precisa de sinal.'); })
         .then(function(){ if (document.body.contains(b)){ b.disabled = false; b.textContent = 'Entrar'; } });
     };
-    var uu = lsGet('campo_usuario'); if (uu && /^d{11}$/.test(uu)) $('usuario').value = maskCpf(uu);   // só CPF; nomes antigos não voltam
+    var uu = lsGet('campo_usuario'); if (uu && /^[0-9]{11}$/.test(uu)) $('usuario').value = maskCpf(uu);   // só CPF; nomes antigos não voltam
   }
   // aplicativo ainda sem o endereço do Supabase (CFG lá em cima): avisa em vez de tentar entrar
   function semConfiguracao(){
