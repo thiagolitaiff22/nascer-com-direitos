@@ -2772,7 +2772,7 @@ td,.row{font-size:13px}
   <form class="f" id="form-senha" novalidate>
     <div class="f-head"><h2>Alterar minha senha</h2></div>
     <div class="f-body">
-      <div class="field full"><label for="sn-nova">Nova senha</label><input id="sn-nova" type="password" autocomplete="new-password" placeholder="Mín. 6 · Maiúscula, minúscula, número e símbolo"></div>
+      <div class="field full"><label for="sn-nova">Nova senha</label><input id="sn-nova" type="password" autocomplete="new-password" placeholder="Mínimo de 6 caracteres"></div>
       <div class="field full"><label for="sn-rep">Repita a nova senha</label><input id="sn-rep" type="password" autocomplete="new-password"></div>
       <div class="field full"><span class="hint" id="sn-msg"></span></div>
     </div>
@@ -6790,6 +6790,7 @@ td,.row{font-size:13px}
   /* ---------- entering the app ---------- */
   var iniciado = false, recuperando = false;
   // senha padrão: a pessoa é obrigada a criar a senha dela no primeiro acesso
+  var SENHA_TROCA_OBRIGATORIA = false;   // true = obriga a criar senha própria no primeiro acesso (desligado: vale a senha padrão 123456)
   function senhaForte(s){
     s = String(s || '');
     if (s.length < 6) return 'A senha precisa ter no mínimo 6 caracteres.';
@@ -6825,8 +6826,10 @@ td,.row{font-size:13px}
     if (!f.data){ showAuth('bloqueado', 'O e-mail ' + email + ' ainda não tem acesso liberado. Peça a um administrador do escritório para cadastrar você em Configurações, na parte Equipe.'); return; }
     var p = await SB.from('equipe').select('*').eq('email', email).maybeSingle();
     // quem ainda está com a senha padrão (123456) ou foi marcado para trocar: cria a própria senha agora
-    var pt = await SB.rpc('equipe_precisa_trocar');
-    if (pt.data === true || (p.data && p.data.trocar_senha)){ $('auth').hidden = true; await novaSenhaObrigatoria(); }
+    if (SENHA_TROCA_OBRIGATORIA){
+      var pt = await SB.rpc('equipe_precisa_trocar');
+      if (pt.data === true || (p.data && p.data.trocar_senha)){ $('auth').hidden = true; await novaSenhaObrigatoria(); }
+    }
     state.me = { email: email, funcao: f.data, nome: (p.data && p.data.nome) || email };
     document.body.dataset.role = f.data;
     $('me').textContent = state.me.nome + ' · ' + (FUNCAO[f.data] || f.data); $('me-av').textContent = String(state.me.nome || '?').trim().charAt(0).toUpperCase();
@@ -7214,8 +7217,7 @@ td,.row{font-size:13px}
   $('form-senha').addEventListener('submit', async function(e){
     e.preventDefault();
     var a = $('sn-nova').value, b = $('sn-rep').value;
-    var pe2 = senhaForte(a); if (pe2){ $('sn-msg').textContent = pe2; return; }
-    if (a === '123456'){ $('sn-msg').textContent = 'Escolha uma senha diferente da padrão.'; return; }
+    if (a.length < 6){ $('sn-msg').textContent = 'A senha precisa ter pelo menos 6 caracteres.'; return; }
     if (a !== b){ $('sn-msg').textContent = 'As duas senhas não são iguais.'; return; }
     $('sn-go').disabled = true; $('sn-msg').textContent = 'Salvando…';
     try {

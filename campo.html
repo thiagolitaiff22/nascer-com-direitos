@@ -720,7 +720,7 @@ html,body{overflow-x:hidden}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 18;
+  var APP_VERSAO = 19;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -2291,6 +2291,7 @@ html,body{overflow-x:hidden}
   var APP = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
   // entrada: usuário e senha que o escritório cadastrou (ou o link antigo, se a pessoa tiver)
   // primeiro acesso com a senha padrão: o aplicativo só segue depois de a pessoa criar a senha dela
+  var SENHA_TROCA_OBRIGATORIA = false;   // true = obriga a criar senha própria no primeiro acesso (desligado: vale a senha padrão 123456)
   function senhaForte(s){
     s = String(s || '');
     if (s.length < 6) return 'A senha precisa ter no mínimo 6 caracteres.';
@@ -2363,7 +2364,7 @@ html,body{overflow-x:hidden}
         .then(function(d){
           if (d && d.token){
             lsSet('campo_usuario', u); token = d.token;
-            if (d.trocar) return telaNovaSenha(d.token);   // senha padrão: precisa criar a própria
+            if (d.trocar && SENHA_TROCA_OBRIGATORIA) return telaNovaSenha(d.token);   // desligado: vale a senha padrão 123456
             return iniciar();
           }
           // não é parceiro: pode ser um gestor do escritório (usuário e senha do sistema) → vai para o painel do gestor
