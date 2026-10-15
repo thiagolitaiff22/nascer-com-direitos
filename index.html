@@ -4113,7 +4113,14 @@ td,.row{font-size:13px}
     return '<span class="reg-mapa" title="' + esc(g.nome) + '"><img src="img/mapas/' + esc(uf) + '.svg" alt="' + esc(uf) + '" onerror="this.replaceWith(document.createTextNode(this.alt))"></span>';
   }
   function ufFlag(r){
-    var p = r && r.responsavelId ? prospById(r.responsavelId) : null, g = regiaoDe(p);
+    // a bandeira é sempre a da cidade/estado da cliente (a mesma do Cadastro); só sem isso usa a região do parceiro
+    var p = r && r.responsavelId ? prospById(r.responsavelId) : null;
+    var g = (r && r.cidadeUf && regiaoPorId(r.cidadeUf)) || regiaoDe(p);
+    var cidade = (r && r.cidade) || (p && p.regiao) || '';
+    if (g && cidade){
+      var b = bandeiraCidade(g, cidade);
+      if (b.indexOf('<img') === 0) return '<span class="uf-flag" title="' + esc(cidade) + '">' + b + '</span>';
+    }
     return g ? ufFlagReg(g) : '';
   }
   function regSelectPreencher(sel){
