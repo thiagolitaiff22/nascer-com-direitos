@@ -127,6 +127,11 @@ html{touch-action:manipulation;overscroll-behavior:none;-webkit-touch-callout:no
 body{-webkit-user-select:none;user-select:none}
 input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:text;font-size:max(16px,1em)}
 button,a,label,[role=button]{touch-action:manipulation}
+.prio{margin-bottom:14px}.prio-s{margin:0 0 10px;font-size:12.5px;color:var(--ink3)}
+.prio-l{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.prio-n{min-width:0}.prio-n b{display:block;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.prio-n span{font-size:12px;color:var(--ink3)}
+.cron{flex:none;font-variant-numeric:tabular-nums;font-weight:800;font-size:14px;padding:5px 9px;border-radius:8px;background:rgba(120,120,120,.15)}
+.cron.crit{color:#e5604d;background:rgba(229,96,77,.15)}.cron.warn{color:#d9a441;background:rgba(217,164,65,.15)}.cron.ok{color:#5fb27a;background:rgba(95,178,122,.15)}
 </style>
 </head>
 <body>
@@ -400,6 +405,40 @@ function tentarParceiro(cpf, senha){
     return '<div class="rosca"><svg viewBox="0 0 140 140" width="130" height="130">' + arcos + '<text x="70" y="75" text-anchor="middle" class="tt">' + fmtN(tot) + '</text></svg><div class="rosca-l">' +
       fatias.map(function(f, i){ return '<div><i style="background:' + cores[i % cores.length] + '"></i>' + esc(f.n) + ' <b>' + fmtN(f.v) + '</b></div>'; }).join('') + '</div></div>';
   }
+  // fim do prazo: 5 anos depois do nascimento; já pedido (DER, protocolo ou processo) ou gestante = não corre prazo
+  function prazoFimDe(c){
+    if (c.fatoGerador === 'gestante' || !c.criancaNasc) return null;
+    if (c.der || String(c.protocoloInss || '').trim() || String(c.processo || '').trim()) return null;
+    var p = String(c.criancaNasc).slice(0, 10).split('-'); if (p.length !== 3) return null;
+    var y = +p[0] + 5, m = +p[1] - 1, d = +p[2], last = new Date(y, m + 1, 0).getDate();
+    return new Date(y, m, Math.min(d, last), 23, 59, 59);
+  }
+  function cronTexto(ms){
+    if (ms <= 0) return 'prazo vencido';
+    var s = Math.floor(ms / 1000), d = Math.floor(s / 86400), hh = Math.floor(s % 86400 / 3600), mm = Math.floor(s % 3600 / 60), ss = s % 60;
+    var z = function(n){ return (n < 10 ? '0' : '') + n; };
+    return d + ' d ' + z(hh) + ':' + z(mm) + ':' + z(ss);
+  }
+  function prioridadeHtml(){
+    var agora = Date.now();
+    var l = S.cli.map(function(c){ var f = prazoFimDe(c); return f ? { c: c, f: f, ms: f.getTime() - agora } : null; }).filter(Boolean)
+      .sort(function(a, b){ return a.ms - b.ms; });
+    var abertos = l.filter(function(x){ return x.ms > 0; }), vencidos = l.length - abertos.length;
+    var lista = abertos.slice(0, 12);
+    var cor = function(ms){ var d = ms / 86400000; return d <= 60 ? 'crit' : d <= 183 ? 'warn' : 'ok'; };
+    var corpo = lista.length ? lista.map(function(x){
+      var c = x.c, d = String(x.f.getFullYear()) + '-' + ('0' + (x.f.getMonth() + 1)).slice(-2) + '-' + ('0' + x.f.getDate()).slice(-2);
+      var br = d.slice(8) + '/' + d.slice(5, 7) + '/' + d.slice(0, 4);
+      return '<div class="prio-l"><div class="prio-n"><b>' + esc(c.nome || 'Sem nome') + '</b><span>' + esc(c.cidade || '') + (c.contratoEm ? ' · contrato fechado' : ' · sem contrato') + ' · vence ' + br + '</span></div>' +
+        '<span class="cron ' + cor(x.ms) + '" data-fim="' + x.f.getTime() + '">' + cronTexto(x.ms) + '</span></div>';
+    }).join('') : '<p class="vazio">Nenhum prazo correndo agora.</p>';
+    return '<section class="cx prio"><h3>Prioridade · prazos mais próximos de vencer' + (vencidos ? ' <small>(' + vencidos + ' já venceram)</small>' : '') + '</h3>' +
+      '<p class="prio-s">O direito de pedir acaba 5 anos depois do nascimento da criança. Contagem até o fim do dia do vencimento; sai da lista quando o INSS ou a Justiça é acionado.</p>' + corpo + '</section>';
+  }
+  setInterval(function(){
+    var els = document.querySelectorAll('.cron[data-fim]'), t = Date.now();
+    for (var i = 0; i < els.length; i++) els[i].textContent = cronTexto(+els[i].getAttribute('data-fim') - t);
+  }, 1000);
   function telaPainel(){
     var ini = P_ini(), ini2 = S.dias ? diaAtras(S.dias * 2) : '', hoje = isoDia(new Date());
     var ps = parceiros(), pids = ps.map(function(p){ return p.id; });
@@ -424,6 +463,9 @@ function tentarParceiro(cpf, senha){
       kpi('Prospectadores', fmtN(prospectadores().length), 'na rede') +
       kpi('No INSS ou na Justiça', fmtN(cInss.length), 'requerimento feito') +
       kpi('Docs pendentes', fmtN(cliRede.filter(function(c){ return c.contratoEm && !docsOk(c); }).length), 'em contratos fechados') + '</div>';
+
+    /* prioridade: clientes com o prazo de 5 anos (do nascimento da criança) mais perto de acabar */
+    html += prioridadeHtml();
 
     /* evolução: semanas (até 90 dias) ou meses (tudo) */
     var rot = [], a = [], b = [], n, i;
