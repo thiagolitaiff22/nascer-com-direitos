@@ -2035,6 +2035,11 @@ td,.row{font-size:13px}
 .rs-lin{display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer}
 .eq-ped-sel{height:36px;border-radius:999px;border:1px solid var(--gline,var(--line));background:var(--panel,#fff);color:inherit;padding:0 12px;font:inherit;font-size:13px;font-weight:600}
 .eq-ped-acoes{align-items:center;flex-wrap:wrap}
+
+.senha-ok{color:#1f7a45;font-weight:700}
+.senha-falta{color:#b3560b;font-weight:700}
+:root[data-theme="dark"] .senha-ok{color:#7fd6a0}
+:root[data-theme="dark"] .senha-falta{color:#f0b070}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -5443,7 +5448,8 @@ td,.row{font-size:13px}
           var ini = String(u.nome || u.email || '?').trim().charAt(0).toUpperCase();
           return '<div class="eq-card' + (u.ativo ? '' : ' off') + '"><div class="eq-av">' + esc(ini) + '</div><div class="eq-info"><b>' + esc(u.nome) + (u.email === meu ? ' <span class="pill muted">você</span>' : '') + '</b>' +
             '<span class="mini">' + (ehAcessoInterno(u.email) ? 'Usuário: ' : '') + esc(emailParaExibir(u.email)) + '</span>' +
-            '<span class="pill ' + (u.ativo ? 'ok' : 'crit') + '">' + (u.ativo ? 'Ativo' : 'Bloqueado') + '</span></div>' +
+            '<span class="pill ' + (u.ativo ? 'ok' : 'crit') + '">' + (u.ativo ? 'Ativo' : 'Bloqueado') + '</span>' +
+              (ehAcessoInterno(u.email) ? ' <span class="pill ' + (u.senha_em ? 'ok' : 'warn') + '" title="' + (u.senha_em ? 'Senha cadastrada em ' + new Date(u.senha_em).toLocaleDateString('pt-BR') : 'Sem senha: ainda não consegue entrar') + '">' + (u.senha_em ? 'Senha cadastrada' : 'Sem senha') + '</span>' : '') + '</div>' +
             '<button type="button" class="btn" data-eq="' + esc(u.email) + '">Editar</button></div>';
         }).join('') + '</div>' : '<div class="eq-vazio">Ninguém neste cargo ainda.</div>') + '</div>';
     }).join('');
@@ -7015,7 +7021,11 @@ td,.row{font-size:13px}
     $('fe-nome').value = u ? u.nome : ''; $('fe-email').value = u ? emailParaExibir(u.email) : ''; $('fe-email').disabled = !!u;
     $('fe-senha').value = '';
     $('fe-senha-wrap').hidden = !!u && !ehAcessoInterno(u.email);
-    $('fe-senha-dica').textContent = u ? 'Deixe em branco para manter a senha atual.' : 'O próprio funcionário pode trocar a senha depois, dentro do sistema.';
+    var dtSenha = u && u.senha_em ? new Date(u.senha_em) : null;
+    $('fe-senha').placeholder = u && ehAcessoInterno(u.email) && dtSenha ? '•••••• senha já cadastrada (digite só para trocar)' : 'Só números, mínimo de 6 (aparece o que você digita)';
+    $('fe-senha-dica').innerHTML = !u ? 'O próprio funcionário pode trocar a senha depois, dentro do sistema.'
+      : dtSenha ? '<span class="senha-ok">✔ Senha cadastrada em ' + dtSenha.toLocaleDateString('pt-BR') + ' às ' + dtSenha.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + '.</span> Deixe em branco para manter.'
+      : '<span class="senha-falta">Ainda não tem senha cadastrada.</span> Digite uma para liberar a entrada.';
     $('fe-funcao').value = u ? cargoDe(u) : 'operacional'; $('fe-ativo').value = !u || u.ativo ? 'sim' : 'nao';
     var eu = u && state.me && u.email === state.me.email;
     $('fe-funcao').disabled = !!eu; $('fe-ativo').disabled = !!eu;
