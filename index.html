@@ -4260,10 +4260,10 @@ td,.row{font-size:13px}
     var html = '<div class="est-row head"><div>Nome</div><div>Cidade</div><div>Clientes</div><div>Contratos</div><div>Concedidos</div><div></div></div>';
     pros.forEach(function(pr){
       var seus = parc.filter(function(p){ return p.prospectadorId === pr.id; }).sort(function(a, b){ return (a.nome || '').localeCompare(b.nome || '', 'pt-BR'); });
-      var n = nums(seus.map(function(x){ return x.id; }));
+      var n = nums(seus.map(function(x){ return x.id; }).concat(pr.tambemParceiro ? [pr.id] : []));
       var fechado = !!estColaps[pr.id];
       html += '<div class="est-row pros' + (fechado ? ' fechado' : '') + '"><div class="est-nome est-nome-pros"><button type="button" class="est-toggle" data-pcol="' + esc(pr.id) + '" aria-expanded="' + !fechado + '" title="' + (fechado ? 'Mostrar' : 'Ocultar') + ' os parceiros"' + (seus.length ? '' : ' disabled') + '><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button><div class="est-txt"><b>' + esc(pr.nome) + '</b><span class="mini">Prospectador · ' + esc(pr.telefone || 'sem telefone') + ' · ' + seus.length + (seus.length === 1 ? ' parceiro' : ' parceiros') + '</span></div></div>' +
-        '<div></div><div class="tnum">' + n.cli + '</div><div class="tnum">' + n.con + '</div><div class="tnum">' + n.cnc + '</div>' + acoes(pr, false) + '</div>';
+        '<div class="est-cid">' + (pr.regiao ? bandeiraCidade(g, pr.regiao) + esc(pr.regiao) : '') + '</div><div class="tnum">' + n.cli + '</div><div class="tnum">' + n.con + '</div><div class="tnum">' + n.cnc + '</div>' + acoes(pr, false) + '</div>';
       if (!fechado) html += seus.map(linhaParceiro).join('');
     });
     var soltos = parc.filter(function(p){ return !p.prospectadorId || !pros.some(function(x){ return x.id === p.prospectadorId; }); }).sort(function(a, b){ return (a.nome || '').localeCompare(b.nome || '', 'pt-BR'); });
@@ -6144,7 +6144,7 @@ td,.row{font-size:13px}
     regSelectPreencher(p ? p.regiaoId || '' : (estadoPreset || ''));
     cidadesDoEstado();
     var ehProsDlg = pPerfil === 'prospectador';
-    ['fp-tipo', 'fp-reg'].forEach(function(id){ $(id).closest('.field').hidden = ehProsDlg; });
+    $('fp-tipo').closest('.field').hidden = ehProsDlg;
     $('fp-clinica-box').hidden = ehProsDlg || $('fp-tipo').value !== 'clinica';
     $('fp-pros-box').hidden = ehProsDlg;
     prosPreencher($('fp-regiao').value, p ? p.prospectadorId || '' : '');
@@ -6196,7 +6196,7 @@ td,.row{font-size:13px}
       palavrasEndereco: $('fp-pal').value.split(',').map(function(s){ return s.trim(); }).filter(Boolean),
       ativo: true, criadoEm: prev.criadoEm || new Date().toISOString(), atualizadoEm: new Date().toISOString() };
     if (prev.valorIndicacao) data.valorIndicacao = prev.valorIndicacao;
-    if (pPerfil === 'prospectador'){ data.perfil = 'prospectador'; data.tipo = 'pessoa'; data.clinica = ''; data.regiao = ''; data.tambemParceiro = $('fp-tambem').checked; }
+    if (pPerfil === 'prospectador'){ data.perfil = 'prospectador'; data.tipo = 'pessoa'; data.clinica = ''; data.tambemParceiro = $('fp-tambem').checked; }
     else { var pr = $('fp-prospectador').value || ''; if (pr) data.prospectadorId = pr; }
     if (prev.criadoPor) data.criadoPor = prev.criadoPor;
     $('fp-save').disabled = true;
