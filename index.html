@@ -5026,7 +5026,9 @@ td,.row{font-size:13px}
     if (r.error) return toast(errMsg(r.error));
     cpSenhaNova = pw; $('cp-usuario').value = r.data;
     $('cp-login-status').textContent = 'Senha salva. Já vale no aplicativo: usuário ' + r.data + ' e senha ' + pw + '.';
-    toast('Usuário e senha salvos');
+    // salvou: a janela fecha; o aviso oferece mandar o acesso no WhatsApp
+    try { $('dlg-campo').close(); } catch(x){}
+    toast('Acesso salvo: usuário ' + r.data + ' · senha ' + pw, 'Mandar no WhatsApp', function(){ $('cp-whats-app').click(); });
   });
   $('cp-whats-app').addEventListener('click', function(){
     if (!cpProsp) return;
