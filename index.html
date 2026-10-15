@@ -3033,7 +3033,7 @@ td,.row{font-size:13px}
     var cidade = r.cidade || (par && par.regiao) || '';
     var partes = [];
     if (cidade) partes.push('<span class="cad-bnd">' + (g ? bandeiraCidade(g, cidade) : '') + '</span><b>' + esc(cidade) + '</b>');
-    partes.push(par ? 'indicação de <b>' + esc(parNome) + '</b>' : esc(r.origem === 'organico' ? 'Orgânico' : 'Sem parceiro'));
+    partes.push(par ? 'indicação de <b>' + esc(parNome) + '</b>' : r.criadoPorNome ? 'cadastro de <b>' + esc(r.criadoPorNome) + '</b>' : esc(r.origem === 'organico' ? 'Orgânico' : 'Sem parceiro'));
     if (quando) partes.push(esc(quando));
     var dcad = String(r.dataCadastro || r.criadoEm || '').slice(0, 10), nd2 = dcad ? -daysUntil(dcad) : null;
     if (leadDe(r) === 'novo' && nd2 != null && nd2 >= 2) partes.push('<span class="cad-atraso">sem ligação há ' + nd2 + ' dias</span>');
@@ -3715,7 +3715,7 @@ td,.row{font-size:13px}
     lista.slice(0, 300).forEach(function(r){
       var st = situacaoCad(r);
       var foto = /^data:image\/(jpeg|png);base64,/.test(r.fotoCliente || '') ? '<img class="av-foto" src="' + r.fotoCliente + '" alt="">' : '';
-      var par = prospById(r.responsavelId), parNome = par ? (par.tipo === 'clinica' && par.clinica ? par.clinica : par.nome) : (r.origem === 'organico' ? 'Orgânico' : '');
+      var par = prospById(r.responsavelId), parNome = par ? (par.tipo === 'clinica' && par.clinica ? par.clinica : par.nome) : (r.criadoPorNome ? 'cadastro de ' + r.criadoPorNome : (r.origem === 'organico' ? 'Orgânico' : ''));
       var onde = [parNome ? 'Indicação de ' + parNome : '', par && par.regiao ? par.regiao : ''].filter(Boolean).join(' · ');
       var dc = String(r.dataCadastro || r.criadoEm || '').slice(0, 10), nd = dc ? -daysUntil(dc) : null;
       var quando = nd == null ? '' : nd <= 0 ? 'cadastrada hoje' : nd === 1 ? 'cadastrada ontem' : 'cadastrada há ' + nd + ' dias';
@@ -5757,7 +5757,9 @@ td,.row{font-size:13px}
       resultado: $('f-comp').value === 'faltou' && !$('f-res').value ? 'ausente' : ($('f-comp').value === 'compareceu' && $('f-res').value === 'ausente' ? '' : $('f-res').value), concluso: $('f-conc').value === 'sim', motivoConcluso: $('f-conc').value === 'sim' ? $('f-mot').value.trim() : '', embargos: $('f-rec').value, pagamento: $('f-pag').value, previsao: $('f-prev').value || '',
       obs: $('f-obs').value.trim(), dataCadastro: $('f-dtcad').value || prev.dataCadastro || iso(new Date()), criadoEm: prev.criadoEm || new Date().toISOString(), atualizadoEm: new Date().toISOString(),
       conferirDados: false,
-      origem: prev.origem || 'organico'
+      origem: prev.origem || 'organico',
+      criadoPorNome: prev.criadoPorNome || (state.editing ? '' : (state.me ? state.me.nome : '')),
+      criadoPorEmail: prev.criadoPorEmail || (state.editing ? '' : (state.me ? state.me.email : ''))
     });
     var pastaCol = $('f-pasta-url') ? $('f-pasta-url').value.trim() : '';
     if (pastaCol){ var pm = pastaCol.match(/folders\/([A-Za-z0-9_-]+)/); data.pastaUrl = pastaCol; data.pastaId = pm ? pm[1] : ''; }

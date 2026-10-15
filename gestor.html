@@ -424,6 +424,17 @@ main{max-width:1180px}
     html += '<div class="grid2"><section class="cx"><h3>Cidades que mais fecham</h3>' + barras(cidades, { cor: 'var(--gold)' }) + '</section>' +
       '<section class="cx"><h3>Prospectadores</h3>' + barras(pros.slice(0, 8).map(function(x){ return { n: x.n, v: x.con, txt: x.con + ' contr. · ' + x.ind + ' indic.', sub: x.parc + (x.parc === 1 ? ' parceiro trazido' : ' parceiros trazidos') }; }), { cor: 'var(--ok)' }) + '</section></div>';
 
+    /* origem dos cadastros: rede de parceiros x cadastros feitos pelo escritório (por pessoa) */
+    var idsP = {}; ps.forEach(function(p){ idsP[p.id] = 1; });
+    var origem = {}, nRede = 0;
+    S.cli.forEach(function(c){
+      var d = dataC(c); if (ini && d < ini) return;
+      if (idsP[c.responsavelId]){ nRede++; return; }
+      var k = c.criadoPorNome || (c.origem === 'organico' ? 'Escritório (sem nome)' : 'Sem origem informada'); origem[k] = (origem[k] || 0) + 1;
+    });
+    var itensOrigem = [{ n: 'Rede de parceiros', v: nRede, txt: fmtN(nRede) }].concat(Object.keys(origem).map(function(k){ return { n: 'Cadastro de ' + k, v: origem[k], txt: fmtN(origem[k]) }; })).sort(function(x, y){ return y.v - x.v; });
+    html += '<div class="grid2"><section class="cx"><h3>Origem dos cadastros <small>(rede x escritório)</small></h3>' + barras(itensOrigem, { cor: 'var(--gold)' }) + '</section><div></div></div>';
+
     /* parceiros parados + composição */
     var parados = porP.filter(function(x){ return x.ind === 0 && x.p.ativo !== false; }).sort(function(x, y){ return String(x.ult).localeCompare(String(y.ult)); }).slice(0, 8);
     var tipoPessoa = ps.filter(function(p){ return p.tipo !== 'clinica'; }).length, tipoClin = ps.length - tipoPessoa;
