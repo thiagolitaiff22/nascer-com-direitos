@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#faf7f2">
 <meta name="robots" content="noindex">
 <title>Nascer com Direitos</title>
@@ -696,6 +696,12 @@ img,video,canvas,svg{max-width:100%}
 @media (min-width:700px){ .vista,.wrap{max-width:640px} .abas{max-width:640px;margin-left:auto;margin-right:auto} }
 .dados{grid-template-columns:minmax(0,1fr)}
 .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+
+/* parece aplicativo: sem zoom por pinça nem por toque duplo, sem puxar a página para os lados */
+html{touch-action:manipulation;overscroll-behavior:none;-webkit-touch-callout:none}
+body{-webkit-user-select:none;user-select:none}
+input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:text;font-size:max(16px,1em)}
+button,a,label,[role=button]{touch-action:manipulation}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
 </head>
@@ -738,7 +744,7 @@ img,video,canvas,svg{max-width:100%}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 24;
+  var APP_VERSAO = 25;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -2471,5 +2477,7 @@ img,video,canvas,svg{max-width:100%}
   }
 })();
 </script>
+
+<script>/* sem zoom por gesto (iPhone) */document.addEventListener('gesturestart',function(e){e.preventDefault()});document.addEventListener('gesturechange',function(e){e.preventDefault()});var _tq=0;document.addEventListener('touchend',function(e){var n=Date.now();if(n-_tq<350)e.preventDefault();_tq=n},{passive:false});</script>
 </body>
 </html>

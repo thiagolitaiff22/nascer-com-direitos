@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="robots" content="noindex">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Gestor">
@@ -121,6 +121,12 @@ main{max-width:1180px}
 .rosca .tt{font-size:22px;font-weight:700;fill:var(--ink)}
 .rosca-l{display:flex;flex-direction:column;gap:6px;font-size:13px}
 .rosca-l i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:8px}
+
+/* parece aplicativo: sem zoom por pinça nem por toque duplo, sem puxar a página para os lados */
+html{touch-action:manipulation;overscroll-behavior:none;-webkit-touch-callout:none}
+body{-webkit-user-select:none;user-select:none}
+input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:text;font-size:max(16px,1em)}
+button,a,label,[role=button]{touch-action:manipulation}
 </style>
 </head>
 <body>
@@ -710,5 +716,7 @@ main{max-width:1180px}
   }
 })();
 </script>
+
+<script>/* sem zoom por gesto (iPhone) */document.addEventListener('gesturestart',function(e){e.preventDefault()});document.addEventListener('gesturechange',function(e){e.preventDefault()});var _tq=0;document.addEventListener('touchend',function(e){var n=Date.now();if(n-_tq<350)e.preventDefault();_tq=n},{passive:false});</script>
 </body>
 </html>
