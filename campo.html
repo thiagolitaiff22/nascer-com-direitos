@@ -738,7 +738,7 @@ img,video,canvas,svg{max-width:100%}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 20;
+  var APP_VERSAO = 21;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -753,13 +753,14 @@ img,video,canvas,svg{max-width:100%}
     { k: 'titulo_verso', arq: 'Título de eleitor - verso', t: 'Título de eleitor', s: 'verso', lado: 'Verso', oculto: true, ic: 'i-idv', fala: 'Agora o verso do título de eleitor, se tiver.' },
     { k: 'residencia', arq: 'Comprovante de residência', t: 'Comprovante de residência', s: 'da mãe', ic: 'i-casa', req: true, fala: 'Tire a foto do comprovante de residência.' },
     { k: 'video', arq: 'Vídeo de concordância', t: 'Vídeo de concordância', s: 'a cliente aceitando os termos do contrato', ic: 'i-video', opcional: true, video: true, fala: 'Grave um vídeo curto com a cliente concordando com os termos do contrato.' },
-    { k: 'procuracao', arq: 'Contrato e procuração', t: 'Contrato e procuração', s: 'fotografe os dois, um em seguida do outro', ic: 'i-pena', opcional: true, multi: true, fala: 'Tire a foto do contrato e, em seguida, da procuração. Toque de novo para cada folha.' }
+    { k: 'procuracao', arq: 'Contrato e procuração', t: 'Contrato e procuração', s: 'fotografe os dois, um em seguida do outro', ic: 'i-pena', opcional: true, multi: true, fala: 'Tire a foto do contrato e, em seguida, da procuração. Toque de novo para cada folha.' },
+    { k: 'outro', arq: 'Outro documento', t: 'Outros documentos', s: 'tire quantas fotos precisar', ic: 'i-doc', opcional: true, multi: true, fala: 'Tire a foto do documento. Toque de novo para cada folha ou documento a mais.' }
   ];
   // formato do enquadramento: cartão (RG/CPF, deitado), folha (A4, em pé) ou rosto (oval)
   // documentos com frente e verso: um cartão só na tela, duas fotos
   var PARES = { rg_frente: { f: 'rg_frente', v: 'rg_verso', nome: 'RG' }, titulo: { f: 'titulo', v: 'titulo_verso', nome: 'Título de eleitor' } };
   function parDe(k){ return k === 'rg_verso' ? PARES.rg_frente : k === 'titulo_verso' ? PARES.titulo : PARES[k] || null; }
-  var MOLDURA = { procuracao: 'folha', rg_frente: 'cartao', rg_verso: 'cartao', cpf: 'cartao', titulo: 'cartao', titulo_verso: 'cartao', residencia: 'folha' };
+  var MOLDURA = { outro: 'folha', procuracao: 'folha', rg_frente: 'cartao', rg_verso: 'cartao', cpf: 'cartao', titulo: 'cartao', titulo_verso: 'cartao', residencia: 'folha' };
   var DICA = { cartao: 'Coloque o documento dentro do quadro e segure firme', folha: 'Coloque a folha inteira dentro do quadro e segure firme', livre: 'Rosto da cliente dentro do círculo' };
   // dados do cadastro em andamento (ficam no celular até o envio)
   // cadastro antigo, sem o tipo guardado: conta como segurada especial
@@ -1317,7 +1318,7 @@ img,video,canvas,svg{max-width:100%}
 
       '<div class="barra"><button class="enviar" id="enviar"' + (n ? '' : ' disabled') + '><svg viewBox="0 0 24 24"><use href="#i-env"/></svg>Enviar cadastro</button></div>';
     (function(){
-      var g1 = document.querySelector('#vista .grid'), ops = Array.prototype.slice.call(document.querySelectorAll('#vista .doc[data-k="video"], #vista .doc[data-k="procuracao"]'));
+      var g1 = document.querySelector('#vista .grid'), ops = Array.prototype.slice.call(document.querySelectorAll('#vista .doc[data-k="video"], #vista .doc[data-k="procuracao"], #vista .doc[data-k="outro"]'));
       if (!g1 || !ops.length || completando) return;
       var box = document.createElement('div'); box.className = 'grupo-opc';
       box.innerHTML = '<div class="rot">Quando possível<small>o closer também pode fazer depois</small></div><div class="grid"></div>';
@@ -2078,7 +2079,8 @@ img,video,canvas,svg{max-width:100%}
     // arquivos que vão para a pasta (ESPECIFICACAO §5): procuração separada; RG + CPF + comprovante de residência juntos em DOCUMENTOS PESSOAIS
     var GRUPOS_ARQ = [
       { nome: 'CONTRATO E PROCURAÇÃO', ks: ['procuracao'] },
-      { nome: 'DOCUMENTOS PESSOAIS', ks: ['rg_frente', 'rg_verso', 'cpf', 'titulo', 'titulo_verso', 'residencia'] }
+      { nome: 'DOCUMENTOS PESSOAIS', ks: ['rg_frente', 'rg_verso', 'cpf', 'titulo', 'titulo_verso', 'residencia'] },
+      { nome: 'OUTROS DOCUMENTOS', ks: ['outro'] }
     ];
     var nDocs = GRUPOS_ARQ.filter(function(g){ return g.ks.some(function(k){ return fotos[k]; }); }).length, nFeito = 0;
     var id = Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
