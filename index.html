@@ -2041,6 +2041,11 @@ td,.row{font-size:13px}
 .senha-falta{color:#b3560b;font-weight:700}
 :root[data-theme="dark"] .senha-ok{color:#7fd6a0}
 :root[data-theme="dark"] .senha-falta{color:#f0b070}
+.prio{margin-bottom:6px}.prio-s{margin:4px 0 8px;font-size:12.5px;color:var(--ink-3)}
+.prio-l{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.prio-n{min-width:0}.prio-n .nome-abrir{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.prio-n span{font-size:12px;color:var(--ink-3)}
+.cron{flex:none;font-variant-numeric:tabular-nums;font-weight:800;font-size:14px;padding:5px 9px;border-radius:8px;background:rgba(120,120,120,.15)}
+.cron.crit{color:#e5604d;background:rgba(229,96,77,.15)}.cron.warn{color:#d9a441;background:rgba(217,164,65,.15)}.cron.ok{color:#5fb27a;background:rgba(95,178,122,.15)}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2196,6 +2201,7 @@ td,.row{font-size:13px}
       </section>
 
       <section id="view-clientes" class="vw-dash" style="display:flex;flex-direction:column;gap:18px">
+        <div id="prio-box"></div>
         <div class="sec-rot">Resumo por status</div>
         <div class="cl-cards">
         <div class="stats">
@@ -4344,7 +4350,42 @@ td,.row{font-size:13px}
   })();
   // sem audiência e sem aviso: some o título da seção de audiência do formulário
   Array.prototype.forEach.call(document.querySelectorAll('.section-lbl'), function(e){ if (/^Audiência$/.test(e.textContent.trim())) e.hidden = true; });
-  function render(){ renderEstadosCfg(); renderRegioes(); renderContratos(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
+  /* prioridade: prazo de 5 anos (do nascimento da criança) mais perto de acabar, com cronômetro ao vivo */
+  function prazoFimData(r){
+    if (r.fatoGerador === 'gestante' || !r.criancaNasc) return null;
+    if (r.der || String(r.protocoloInss || '').trim() || String(r.processo || '').trim()) return null;
+    var p = String(r.criancaNasc).slice(0, 10).split('-'); if (p.length !== 3) return null;
+    var y = +p[0] + PRAZO_ANOS, m = +p[1] - 1, d = +p[2], last = new Date(y, m + 1, 0).getDate();
+    return new Date(y, m, Math.min(d, last), 23, 59, 59);
+  }
+  function cronTexto(ms){
+    if (ms <= 0) return 'prazo vencido';
+    var s = Math.floor(ms / 1000), d = Math.floor(s / 86400), hh = Math.floor(s % 86400 / 3600), mm = Math.floor(s % 3600 / 60), ss = s % 60;
+    var z = function(n){ return (n < 10 ? '0' : '') + n; };
+    return d + ' d ' + z(hh) + ':' + z(mm) + ':' + z(ss);
+  }
+  function renderPrio(){
+    var box = $('prio-box'); if (!box) return;
+    var agora = Date.now();
+    var l = state.rows.filter(function(r){ return !r.arquivado; }).map(function(r){ var f = prazoFimData(r); return f ? { r: r, f: f, ms: f.getTime() - agora } : null; }).filter(Boolean)
+      .sort(function(a, b){ return a.ms - b.ms; });
+    var abertos = l.filter(function(x){ return x.ms > 0; }), vencidos = l.length - abertos.length;
+    var cor = function(ms){ var d = ms / 86400000; return d <= 60 ? 'crit' : d <= 183 ? 'warn' : 'ok'; };
+    var corpo = abertos.slice(0, 10).map(function(x){
+      var r = x.r, f = x.f, br = ('0' + f.getDate()).slice(-2) + '/' + ('0' + (f.getMonth() + 1)).slice(-2) + '/' + f.getFullYear();
+      return '<div class="prio-l"><div class="prio-n"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome || 'Sem nome') + '</button>' +
+        '<span>' + esc(r.cidade || '') + (r.contratoEm ? ' · contrato fechado' : ' · sem contrato') + ' · vence ' + br + '</span></div>' +
+        '<span class="cron ' + cor(x.ms) + '" data-fim="' + f.getTime() + '">' + cronTexto(x.ms) + '</span></div>';
+    }).join('');
+    if (!corpo){ box.innerHTML = ''; return; }
+    box.innerHTML = '<div class="prio"><div class="sec-rot">Prioridade · prazos mais próximos de vencer' + (vencidos ? ' <small>(' + vencidos + ' já venceram)</small>' : '') + '</div>' +
+      '<p class="prio-s">O direito de pedir acaba 5 anos depois do nascimento da criança. Sai desta lista quando o INSS ou a Justiça é acionado.</p>' + corpo + '</div>';
+  }
+  setInterval(function(){
+    var els = document.querySelectorAll('.cron[data-fim]'), t = Date.now();
+    for (var i = 0; i < els.length; i++) els[i].textContent = cronTexto(+els[i].getAttribute('data-fim') - t);
+  }, 1000);
+  function render(){ renderPrio(); renderEstadosCfg(); renderRegioes(); renderContratos(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
   var clQ = '';
   // stage of each process, derived from what is already recorded (no extra typing)
   var ETAPAS = [
