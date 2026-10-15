@@ -2046,6 +2046,10 @@ td,.row{font-size:13px}
 .prio-n{min-width:0}.prio-n .nome-abrir{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.prio-n span{font-size:12px;color:var(--ink-3)}
 .cron{flex:none;font-variant-numeric:tabular-nums;font-weight:800;font-size:14px;padding:5px 9px;border-radius:8px;background:rgba(120,120,120,.15)}
 .cron.crit{color:#e5604d;background:rgba(229,96,77,.15)}.cron.warn{color:#d9a441;background:rgba(217,164,65,.15)}.cron.ok{color:#5fb27a;background:rgba(95,178,122,.15)}
+.radar-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.radar-res{display:flex;gap:8px;flex-wrap:wrap}.radar-chip{font-size:12.5px;padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:var(--panel)}
+.nav-n{margin-left:auto;background:#e5604d;color:#fff;border-radius:999px;font-size:11px;line-height:1;padding:3px 7px;font-weight:800}
+#view-radar .card.list{padding:4px 14px}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2117,6 +2121,7 @@ td,.row{font-size:13px}
   <header class="topnav">
     <div class="brand"><div class="logo"><img src="img/logo-nascer-t.png" alt="Nascer com Direitos"></div><div><b>Nascer com Direitos</b><span>Salário-maternidade</span></div></div>
     <nav class="nav" role="tablist" aria-orientation="horizontal">
+      <div class="nav-lbl" aria-hidden="true">Prazos</div><button class="tab" role="tab" id="tab-radar" aria-selected="false" type="button" title="Radar de prazos"><svg class="i"><use href="#i-clock"/></svg><span>Radar de prazos</span><b class="nav-n" id="radar-n" hidden></b></button>
       <div class="nav-lbl" aria-hidden="true">Comercial</div><button class="tab" role="tab" id="tab-cad" aria-selected="false" type="button" title="Cadastro"><svg class="i"><use href="#i-phone"/></svg><span>Cadastro</span></button>
       <button class="tab" role="tab" id="tab-ctr" aria-selected="false" type="button" title="Contratos fechados"><svg class="i"><use href="#i-check"/></svg><span>Contratos fechados</span></button>
       <div class="nav-lbl" aria-hidden="true">Processos</div><button class="tab" role="tab" id="tab-nasc" aria-selected="false" type="button" title="Pagamento de guia"><svg class="i"><use href="#i-clock"/></svg><span>Pagamento de guia</span></button>
@@ -2174,6 +2179,21 @@ td,.row{font-size:13px}
         </div>
         <div class="sec-rot">Clientes com contrato fechado</div>
         <div class="card list" id="ctr-list"></div>
+      </section>
+
+      <section id="view-radar" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
+        <div class="sec-rot">O que vence primeiro</div>
+        <div class="radar-top">
+          <div class="radar-res" id="radar-res"></div>
+          <select id="radar-tipo" class="tb-sel" aria-label="Tipo de prazo">
+            <option value="">Todos os prazos</option>
+            <option value="cinco">Prazo de 5 anos</option>
+            <option value="guia">Gestantes: data de requerer</option>
+            <option value="exig">Exigência do INSS</option>
+            <option value="aud">Audiência</option>
+          </select>
+        </div>
+        <div class="card list" id="radar-list"></div>
       </section>
 
       <section id="view-nasc" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
@@ -4383,9 +4403,58 @@ td,.row{font-size:13px}
   }
   setInterval(function(){
     var els = document.querySelectorAll('.cron[data-fim]'), t = Date.now();
-    for (var i = 0; i < els.length; i++) els[i].textContent = cronTexto(+els[i].getAttribute('data-fim') - t);
+    for (var i = 0; i < els.length; i++){
+      var ms = +els[i].getAttribute('data-fim') - t;
+      els[i].textContent = ms <= 0 && els[i].getAttribute('data-guia') ? 'já pode requerer' : cronTexto(ms);
+    }
   }, 1000);
-  function render(){ renderPrio(); renderEstadosCfg(); renderRegioes(); renderContratos(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
+  /* ---------- Radar de prazos: todos os prazos num lugar só ---------- */
+  var RADAR_TIPOS = { cinco: 'Prazo de 5 anos', guia: 'Data de requerer', exig: 'Exigência do INSS', aud: 'Audiência' };
+  var radarTipo = '';
+  function fimDoDia(s){ var d = parseDate(s); if (!d) return null; d.setHours(23, 59, 59, 0); return d; }
+  function radarItens(){
+    var agora = Date.now(), out = [];
+    state.rows.forEach(function(r){
+      if (r.arquivado) return;
+      var f;
+      if (fechado(r) && (f = prazoFimData(r))) out.push({ r: r, tipo: 'cinco', f: f, ms: f.getTime() - agora });
+      if (aguardaNasc(r) && r.dpp && (f = fimDoDia(pedeRequerer(r)))) out.push({ r: r, tipo: 'guia', f: f, ms: f.getTime() - agora });
+      if (r.exigenciaPrazo && !r.inssDecisaoEm && (f = fimDoDia(r.exigenciaPrazo))) out.push({ r: r, tipo: 'exig', f: f, ms: f.getTime() - agora });
+      if (isFuture(r) && r.audData){
+        f = fimDoDia(r.audData); var hm = /^(d{1,2}):(d{2})/.exec(String(r.audHora || ''));
+        if (f && hm){ f.setHours(+hm[1], +hm[2], 0, 0); }
+        if (f) out.push({ r: r, tipo: 'aud', f: f, ms: f.getTime() - agora });
+      }
+    });
+    return out.sort(function(a, b){ return a.ms - b.ms; });
+  }
+  function radarCor(it){ var d = it.ms / 86400000; return it.ms <= 0 ? 'crit' : it.tipo === 'aud' ? (d <= 3 ? 'crit' : d <= 10 ? 'warn' : 'ok') : d <= 60 ? 'crit' : d <= 183 ? 'warn' : 'ok'; }
+  function radarTxt(it){
+    if (it.ms <= 0) return it.tipo === 'guia' ? 'já pode requerer' : 'prazo vencido';
+    return cronTexto(it.ms);
+  }
+  function renderRadar(){
+    var itens = radarItens();
+    var crit = itens.filter(function(it){ return it.tipo !== 'aud' ? it.ms / 86400000 <= 60 : it.ms / 86400000 <= 3; }).length;
+    var nb = $('radar-n'); if (nb){ nb.textContent = crit; nb.hidden = !crit; nb.title = crit + ' prazo(s) urgente(s)'; }
+    var res = $('radar-res'), box = $('radar-list'); if (!res || !box) return;
+    var cnt = {}; itens.forEach(function(it){ cnt[it.tipo] = (cnt[it.tipo] || 0) + 1; });
+    res.innerHTML = Object.keys(RADAR_TIPOS).map(function(k){ return '<span class="radar-chip">' + RADAR_TIPOS[k] + ' <b>' + (cnt[k] || 0) + '</b></span>'; }).join('');
+    var lista = radarTipo ? itens.filter(function(it){ return it.tipo === radarTipo; }) : itens;
+    if (!lista.length){ box.innerHTML = '<p class="vazio" style="padding:18px">Nenhum prazo correndo agora.</p>'; return; }
+    box.innerHTML = lista.slice(0, 80).map(function(it){
+      var r = it.r, f = it.f, br = ('0' + f.getDate()).slice(-2) + '/' + ('0' + (f.getMonth() + 1)).slice(-2) + '/' + f.getFullYear();
+      return '<div class="prio-l"><div class="prio-n"><button type="button" class="nome-abrir" data-radar-id="' + esc(r.id) + '">' + esc(r.nome || 'Sem nome') + '</button>' +
+        '<span>' + RADAR_TIPOS[it.tipo] + ' · ' + br + (r.cidade ? ' · ' + esc(r.cidade) : '') + '</span></div>' +
+        '<span class="cron ' + radarCor(it) + '" data-fim="' + f.getTime() + '"' + (it.tipo === 'guia' ? ' data-guia="1"' : '') + '>' + radarTxt(it) + '</span></div>';
+    }).join('');
+  }
+  document.addEventListener('click', function(e){
+    var b = e.target.closest && e.target.closest('[data-radar-id]'); if (!b) return;
+    var r = state.rows.filter(function(x){ return x.id === b.dataset.radarId; })[0]; if (r) openForm(r);
+  });
+  setTimeout(function(){ var s = $('radar-tipo'); if (s) s.addEventListener('change', function(){ radarTipo = s.value; renderRadar(); }); }, 0);
+  function render(){ renderRadar(); renderPrio(); renderEstadosCfg(); renderRegioes(); renderContratos(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
   var clQ = '';
   // stage of each process, derived from what is already recorded (no extra typing)
   var ETAPAS = [
@@ -6079,8 +6148,9 @@ td,.row{font-size:13px}
     } catch(err){ toast(errMsg(err)); }
     finally { $('av-save').disabled = false; }
   });
-  var VIEWS = { d: ['tab-cad', 'view-cad'], i: ['tab-inss', 'view-inss'], k: ['tab-ctr', 'view-ctr'], n: ['tab-nasc', 'view-nasc'], c: ['tab-clientes', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-ret', 'view-ret'], g: ['tab-parc', 'view-parc'], e: ['tab-equipe', 'view-equipe'] };
+  var VIEWS = { z: ['tab-radar', 'view-radar'], d: ['tab-cad', 'view-cad'], i: ['tab-inss', 'view-inss'], k: ['tab-ctr', 'view-ctr'], n: ['tab-nasc', 'view-nasc'], c: ['tab-clientes', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-ret', 'view-ret'], g: ['tab-parc', 'view-parc'], e: ['tab-equipe', 'view-equipe'] };
   var TITULOS = {
+    z: ['Radar de prazos', 'Tudo o que está para vencer, do mais urgente ao menos'],
     d: ['Cadastro', 'Clientes ainda sem requerimento no INSS: dados, documentos e prazo'],
     i: ['INSS', 'Requerimentos administrativos: análise, exigências, concessões e indeferimentos'],
     c: ['Judicial', 'Ações judiciais: acompanhamento do processo até a sentença e o pagamento'],
