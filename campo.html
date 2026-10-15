@@ -744,7 +744,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 29;
+  var APP_VERSAO = 30;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -2463,7 +2463,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     if (Pl.App) Pl.App.addListener('resume', function(){ proximo(); carregarPainel(); sincronia(); });
     // aviso de versão nova do aplicativo
     fetch('https://thiagolitaiff22.github.io/nascer-com-direitos/app/versao.json?' + Date.now()).then(function(r){ return r.json(); }).then(function(v){
-      if (v && v.versao > APP_VERSAO){ var b = document.createElement('a'); b.href = v.url; b.textContent = 'Nova versão do aplicativo: toque para baixar'; b.style.cssText = 'display:block;background:#a07a45;color:#fff;text-align:center;padding:10px;font-weight:700;text-decoration:none'; document.body.insertBefore(b, document.body.firstChild); }
+      if (v && (v.apk || v.versao) > APP_VERSAO){ var b = document.createElement('a'); b.href = v.url; b.textContent = 'Nova versão do aplicativo: toque para baixar'; b.style.cssText = 'display:block;background:#a07a45;color:#fff;text-align:center;padding:10px;font-weight:700;text-decoration:none'; document.body.insertBefore(b, document.body.firstChild); }
     }).catch(function(){});
   }
   // iPhone ou navegador (não é o aplicativo Android): se saiu versão nova, recarrega sozinho uma vez para pegar
