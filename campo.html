@@ -738,7 +738,7 @@ img,video,canvas,svg{max-width:100%}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 22;
+  var APP_VERSAO = 23;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1202,19 +1202,19 @@ img,video,canvas,svg{max-width:100%}
         '<label class="fone cid-campo"><svg viewBox="0 0 24 24"><use href="#i-casa"/></svg><img class="cid-flag" id="np-cflag" alt="" hidden><input id="np-cidade" autocomplete="off" autocapitalize="words" placeholder="' + (uf ? 'Escolher a cidade' : 'Cidade') + '" value="' + esc(novoP.cidade) + '"' + (uf ? ' readonly' : '') + '>' + (uf ? '<svg class="cid-seta" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '') + '<button type="button" class="cid-limpar" id="np-climpar" aria-label="Apagar a cidade" title="Apagar a cidade" hidden><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button></label>' +
       '</div>' +
       '<div class="rot">Acesso ao aplicativo</div><div class="dados">' +
-        '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-pessoa"/></svg><input id="np-usuario" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Usuário" value="' + esc(novoP.usuario) + '"></label>' +
+        '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-pessoa"/></svg><input id="np-usuario" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="CPF do parceiro (é o login)" value="' + esc(maskCpf(novoP.usuario)) + '"></label>' +
         '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-cadeado"/></svg><input id="np-senha" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Senha" value="' + esc(novoP.senha) + '"><button type="button" id="np-gerar" class="mini-btn">gerar outra</button></label>' +
       '</div><p class="nota-form">O parceiro entra com este usuário e esta senha. Anote ou mande pelo WhatsApp quando terminar.</p>' +
       '<div class="barra"><button class="enviar" id="np-criar"><svg viewBox="0 0 24 24"><use href="#i-ok"/></svg>Criar parceiro</button></div>';
     var ref = function(){ novoP.nome = $('np-nome').value; if ($('np-clinica')) novoP.clinica = $('np-clinica').value; novoP.fone = $('np-fone').value; novoP.cidade = $('np-cidade').value; novoP.usuario = $('np-usuario').value; novoP.senha = $('np-senha').value; };
     $('np-tipo').onclick = function(e){ var b = e.target.closest('[data-t]'); if (!b) return; ref(); novoP.tipo = b.dataset.t; vistaProspNovo(); };
-    $('np-nome').addEventListener('input', function(){ novoP.nome = this.value; if (!novoP.userEditado && novoP.tipo === 'pessoa'){ novoP.usuario = sugerirUsuario(this.value); $('np-usuario').value = novoP.usuario; } });
-    if ($('np-clinica')) $('np-clinica').addEventListener('input', function(){ novoP.clinica = this.value; if (!novoP.userEditado){ novoP.usuario = sugerirUsuario(this.value); $('np-usuario').value = novoP.usuario; } });
+    $('np-nome').addEventListener('input', function(){ novoP.nome = this.value; });
+    if ($('np-clinica')) $('np-clinica').addEventListener('input', function(){ novoP.clinica = this.value; });
     $('np-nome').addEventListener('blur', function(){ this.value = bonito(this.value); novoP.nome = this.value; });
     if ($('np-clinica')) $('np-clinica').addEventListener('blur', function(){ this.value = bonito(this.value); novoP.clinica = this.value; });
     $('np-cidade').addEventListener('blur', function(){ this.value = bonito(this.value); novoP.cidade = this.value; });
     $('np-fone').addEventListener('input', function(){ this.value = maskFone(this.value); novoP.fone = this.value; });
-    $('np-usuario').addEventListener('input', function(){ novoP.userEditado = true; this.value = this.value.toLowerCase().replace(/[^a-z0-9._-]/g, ''); novoP.usuario = this.value; });
+    $('np-usuario').addEventListener('input', function(){ novoP.userEditado = true; this.value = maskCpf(this.value); novoP.usuario = this.value.replace(/\D/g, ''); });
     $('np-senha').addEventListener('input', function(){ novoP.senha = this.value; });
     $('np-gerar').onclick = function(){ novoP.senha = gerarSenha(); $('np-senha').value = novoP.senha; };
     // cidades do estado: lista completa para pesquisar e escolher, com a bandeira de cada uma
@@ -1235,7 +1235,7 @@ img,video,canvas,svg{max-width:100%}
       if (novoP.tipo === 'clinica' && clinica.length < 2){ alert('Informe o nome da clínica.'); $('np-clinica').focus(); return; }
       if (!foneOk(novoP.fone)){ alert('Informe o telefone com DDD, por exemplo (92) 99999-9999.'); $('np-fone').focus(); return; }
       if (!cidade){ alert('Informe a cidade do parceiro.'); $('np-cidade').focus(); return; }
-      if (!/^[a-z0-9._-]{3,30}$/.test(novoP.usuario)){ alert('O usuário precisa ter de 3 a 30 letras ou números, sem espaço nem acento.'); $('np-usuario').focus(); return; }
+      if (!cpfOk(novoP.usuario)){ alert('Informe o CPF do parceiro (11 números): ele é o login dele.'); $('np-usuario').focus(); return; }
       if (novoP.senha.length < 6){ alert('A senha precisa ter pelo menos 6 caracteres.'); $('np-senha').focus(); return; }
       if (navigator.onLine === false) return alert('Sem internet agora. Para cadastrar um parceiro é preciso estar conectado.');
       var b = this; b.disabled = true; b.lastChild.textContent = 'Criando…';
@@ -2349,7 +2349,17 @@ img,video,canvas,svg{max-width:100%}
   }
   function tentarGestor(u, p){
     var base = String(u || '').trim().toLowerCase();
-    var em = base.indexOf('@') >= 0 ? base : base.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '.').replace(/[^a-z0-9._-]/g, '') + '@acesso.rodrigueslitaiffadv.com.br';
+    var cd = base.replace(/\D/g, '');
+    if (/^[\d.\-\s]+$/.test(base) && cd.length === 11){
+      // CPF: acha o acesso ligado a ele e tenta como gestor
+      return fetch(CFG.url + '/rest/v1/rpc/login_por_cpf', { method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_cpf: cd }) })
+        .then(function(r){ return r.json(); }).then(function(em){ return tentarGestorEmail(typeof em === 'string' && em ? em : cd + '@acesso.rodrigueslitaiffadv.com.br', p); }).catch(function(){ return false; });
+    }
+    return tentarGestorEmail(null, p, u);
+  }
+  function tentarGestorEmail(emailDado, p, u){
+    var base = String(u || '').trim().toLowerCase();
+    var em = emailDado || (base.indexOf('@') >= 0 ? base : base.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '.').replace(/[^a-z0-9._-]/g, '') + '@acesso.rodrigueslitaiffadv.com.br');
     if (em.charAt(0) === '@') return Promise.resolve(false);
     return fetch(CFG.url + '/auth/v1/token?grant_type=password', { method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ email: em, password: p }) })
       .then(function(r){ return r.ok ? r.json() : null; })
@@ -2372,17 +2382,18 @@ img,video,canvas,svg{max-width:100%}
   function pedirLink(msg){
     $('app').innerHTML = '<div class="login"><div class="entrar"><img class="login-logo" src="img/logo-nascer-t.png" alt="Nascer com Direitos">' +
       '<b class="login-t">Nascer com Direitos</b><p class="login-s">Salário-maternidade<br>' + esc(msg || 'Use o usuário e a senha que a equipe passou para você.') + '</p>' +
-      '<label class="login-rot" for="usuario">Usuário</label><label class="fone" style="margin:0 0 14px"><svg viewBox="0 0 24 24"><use href="#i-pessoa"/></svg><input id="usuario" placeholder="seu usuário" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false"></label>' +
+      '<label class="login-rot" for="usuario">CPF</label><label class="fone" style="margin:0 0 14px"><svg viewBox="0 0 24 24"><use href="#i-pessoa"/></svg><input id="usuario" placeholder="000.000.000-00" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false"></label>' +
       '<label class="login-rot" for="senha">Senha</label><label class="fone" style="margin:0"><svg viewBox="0 0 24 24"><use href="#i-cadeado"/></svg><input id="senha" type="password" placeholder="sua senha" autocomplete="current-password"><button type="button" id="ver-senha" style="border:0;background:none;color:var(--ink2);font:inherit;font-size:14px">mostrar</button></label>' +
       '<button class="enviar" id="entrar">Entrar</button>' +
       '<p class="login-nota">Precisa de internet só para entrar. Depois o aplicativo funciona sem sinal.</p>' +
       (APP ? '' : '<p class="login-nota"><a href="gestor.html" style="color:inherit;font-weight:700">Sou gestor do escritório</a></p>') +
       '</div></div>';
-    $('usuario').addEventListener('input', function(){ var p = this.selectionStart; this.value = this.value.toLowerCase(); try { this.setSelectionRange(p, p); } catch(x){} });
+    $('usuario').addEventListener('input', function(){ if (/^[\d.\-\s]*$/.test(this.value)){ this.value = maskCpf(this.value); return; } var p = this.selectionStart; this.value = this.value.toLowerCase(); try { this.setSelectionRange(p, p); } catch(x){} });
     $('ver-senha').onclick = function(){ var e = $('senha'); e.type = e.type === 'password' ? 'text' : 'password'; this.textContent = e.type === 'password' ? 'mostrar' : 'esconder'; };
     $('senha').addEventListener('keydown', function(e){ if (e.key === 'Enter') $('entrar').click(); });
     $('entrar').onclick = function(){
       var u = $('usuario').value.trim(), p = $('senha').value, b = this;
+      var uCru = u; if (/^[\d.\-\s]+$/.test(u) && u.replace(/\D/g, '').length === 11) u = u.replace(/\D/g, '');   // CPF: só os números
       if (!u || !p) return alert('Digite o usuário e a senha.');
       if (navigator.onLine === false) return alert('Sem internet agora. Para entrar a primeira vez precisa de sinal.');
       b.disabled = true; b.textContent = 'Entrando…';
@@ -2395,7 +2406,7 @@ img,video,canvas,svg{max-width:100%}
             return iniciar();
           }
           // não é parceiro: pode ser um gestor do escritório (usuário e senha do sistema) → vai para o painel do gestor
-          return tentarGestor(u, p).then(function(foi){
+          return tentarGestor(uCru, p).then(function(foi){
             if (!foi) alert((d && (d.erro || d.message)) || 'Não foi possível entrar.');
           });
         })

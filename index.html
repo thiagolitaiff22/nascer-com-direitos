@@ -2092,7 +2092,7 @@ td,.row{font-size:13px}
     </div>
     <form id="auth-form" novalidate>
       <p class="auth-msg" id="auth-intro">Entre com o seu usuário e a senha.</p>
-      <div class="field" id="af-email-wrap"><label for="af-email">Usuário ou e-mail</label><input id="af-email" type="text" autocomplete="username" autocapitalize="none" spellcheck="false"></div>
+      <div class="field" id="af-email-wrap"><label for="af-email">CPF</label><input id="af-email" type="text" inputmode="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="000.000.000-00"></div>
       <div class="field" id="af-senha-wrap"><label for="af-senha">Senha</label><div class="pw"><input id="af-senha" type="password" autocomplete="current-password"><button type="button" class="pw-eye" data-pw="af-senha" aria-label="Mostrar senha" title="Mostrar senha"><svg class="i"><use href="#i-eye"/></svg></button></div></div>
       <div class="field" id="af-senha2-wrap" hidden><label for="af-senha2">Repita a senha</label><div class="pw"><input id="af-senha2" type="password" autocomplete="new-password"><button type="button" class="pw-eye" data-pw="af-senha2" aria-label="Mostrar senha" title="Mostrar senha"><svg class="i"><use href="#i-eye"/></svg></button></div></div>
       <button class="btn primary" type="submit" id="af-go">Entrar</button>
@@ -2605,7 +2605,7 @@ td,.row{font-size:13px}
     <div class="f-head"><div class="ph-tile" style="margin:0"><svg class="i"><use href="#i-phone"/></svg></div><h2 id="cp-title">Acesso do parceiro</h2><button type="button" class="dlg-x" id="cp-x" aria-label="Fechar" title="Fechar"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <div class="f-body">
       <div class="field full"><div class="sec-rot" style="margin:0">Aplicativo (Android)</div><span class="hint">O parceiro instala o aplicativo <b>Nascer com Direitos</b>, entra com o usuário e a senha abaixo e cadastra as clientes mesmo sem internet. Os cadastros sobem sozinhos quando tiver sinal e aparecem em <b>Cadastro</b>, na conta deste parceiro.</span></div>
-      <div class="field"><label for="cp-usuario">Usuário</label><input id="cp-usuario" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="ex.: lene"></div>
+      <div class="field"><label for="cp-usuario">CPF do parceiro (é o login)</label><input id="cp-usuario" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00"></div>
       <div class="field"><label for="cp-senha">Senha</label><div style="display:flex;gap:6px"><input id="cp-senha" autocomplete="new-password" placeholder="digite ou gere" style="flex:1;min-width:0"><button class="btn" type="button" id="cp-gerar" title="Gera uma senha fácil de digitar">Gerar</button><button class="btn primary" type="button" id="cp-salvar-senha" title="Salva e já vale no aplicativo">Salvar</button></div></div>
       <div class="field full"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn" type="button" id="cp-whats-app">Mandar acesso no WhatsApp</button><a class="btn" id="cp-apk" target="_blank" rel="noopener">Baixar o aplicativo</a></div><span class="small" id="cp-login-status"></span></div>
       <div class="field full" style="display:none"><label for="cp-link">Link</label><input id="cp-link" readonly></div>
@@ -2785,7 +2785,8 @@ td,.row{font-size:13px}
     <div class="f-head"><div class="ph-tile" style="margin:0"><svg class="i"><use href="#i-users"/></svg></div><h2 id="fe-title">Novo funcionário</h2></div>
     <div class="f-body">
       <div class="field full"><label for="fe-nome">Nome</label><input id="fe-nome" autocomplete="off"></div>
-      <div class="field full"><label for="fe-email">Usuário de acesso</label><input id="fe-email" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="ex.: thiago ou nome.sobrenome"><span class="hint">É com este usuário e a senha abaixo que o funcionário entra no sistema. Pode usar um e-mail, se preferir.</span></div>
+      <div class="field full"><label for="fe-cpf">CPF (é o login para entrar)</label><input id="fe-cpf" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00"><span class="hint">A pessoa entra no sistema com o CPF e a senha. A senha padrão é 123456.</span></div>
+      <div class="field full" id="fe-email-box"><label for="fe-email">Usuário antigo (só para quem já tinha acesso por nome)</label><input id="fe-email" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="ex.: thiago ou nome.sobrenome"><span class="hint">É com este usuário e a senha abaixo que o funcionário entra no sistema. Pode usar um e-mail, se preferir.</span></div>
       <div class="field full" id="fe-senha-wrap"><label for="fe-senha">Senha de acesso</label><input id="fe-senha" name="nova-senha-equipe" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocapitalize="none" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Em branco = senha padrão 123456 (a pessoa troca no 1º acesso)"><span class="hint" id="fe-senha-dica">Só números (mínimo de 6). O próprio funcionário pode trocar depois, em Alterar senha.</span></div>
       <div class="field"><label for="fe-funcao">Cargo</label><select id="fe-funcao"><option value="closer">Closer · liga e fecha contratos</option><option value="operacional">Agente Operacional · documentos e requerimentos</option><option value="judicial">Agente Judicial · ações e processos</option><option value="admin">Gestor · acesso total</option></select></div>
       <div class="field"><label for="fe-ativo">Acesso</label><select id="fe-ativo"><option value="sim">Ativo</option><option value="nao">Bloqueado</option></select></div>
@@ -5011,9 +5012,9 @@ td,.row{font-size:13px}
       $('cp-apk').href = APK_URL;
       var lg = await SB.rpc('campo_login_status', { p_prosp: p.id });
       if (lg.error){ $('cp-login-status').textContent = 'Rode o arquivo supabase/13_login_app.sql no Supabase para liberar usuário e senha.'; $('cp-usuario').value = ''; }
-      else if (lg.data){ $('cp-usuario').value = lg.data.usuario; $('cp-senha').value = lg.data.senha || ''; cpSenhaNova = lg.data.senha || '';
+      else if (lg.data){ $('cp-usuario').value = /^\d{11}$/.test(lg.data.usuario) ? cpfMasc(lg.data.usuario) : lg.data.usuario; $('cp-senha').value = lg.data.senha || ''; cpSenhaNova = lg.data.senha || '';
         $('cp-login-status').textContent = 'Acesso ativo: usuário ' + lg.data.usuario + (lg.data.senha ? '' : '. Senha salva antes desta versão: gere ou digite uma nova e clique em Salvar para ela aparecer aqui') + '.'; }
-      else { $('cp-usuario').value = sugerirUsuario(p.nome); $('cp-senha').value = '123456'; $('cp-login-status').textContent = 'Ainda sem usuário e senha. A senha padrão é 123456: a pessoa cria a dela no primeiro acesso. Confira o usuário e clique em Salvar.'; }
+      else { $('cp-usuario').value = p.cpf ? cpfMasc(p.cpf) : ''; $('cp-senha').value = '123456'; $('cp-login-status').textContent = 'Ainda sem usuário e senha. A senha padrão é 123456: a pessoa cria a dela no primeiro acesso. Confira o usuário e clique em Salvar.'; }
       if (!$('dlg-campo').open) $('dlg-campo').showModal();
       if (novo) toast('Link novo gerado. O antigo não funciona mais.');
     } catch(err){ toast(errMsg(err)); }
@@ -5025,6 +5026,7 @@ td,.row{font-size:13px}
   }
   $('cp-x').addEventListener('click', function(){ $('dlg-campo').close(); });
   $('cp-fechar').addEventListener('click', function(){ $('dlg-campo').close(); });
+  $('cp-usuario').addEventListener('input', function(){ if (cpfEhNumero(this.value)) this.value = cpfMasc(this.value); });
   $('cp-senha').addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); $('cp-salvar-senha').click(); } });
   $('cp-gerar').addEventListener('click', function(){
     // senha fácil de digitar no celular: só números (6) , sem sequência óbvia
@@ -5034,11 +5036,12 @@ td,.row{font-size:13px}
   $('cp-salvar-senha').addEventListener('click', async function(){
     if (!cpProsp) return;
     var u = $('cp-usuario').value.trim().toLowerCase(), pw = $('cp-senha').value.trim();
-    if (!/^[a-z0-9._-]{3,30}$/.test(u)) return toast('Usuário: de 3 a 30 letras ou números, sem espaço nem acento');
+    if (cpfEhNumero(u)) u = u.replace(/\D/g, '');
+    if (!cpfCerto(u) && !/^[a-z0-9._-]{3,30}$/.test(u)) return toast('Informe o CPF do parceiro (11 números): ele é o login');
     if (pw.length < 6) return toast('A senha precisa ter pelo menos 6 caracteres (use Gerar)');
     var r = await SB.rpc('campo_definir_login', { p_prosp: cpProsp.id, p_usuario: u, p_senha: pw, p_provisoria: true });
     if (r.error) return toast(errMsg(r.error));
-    cpSenhaNova = pw; $('cp-usuario').value = r.data;
+    cpSenhaNova = pw; $('cp-usuario').value = /^\d{11}$/.test(r.data) ? cpfMasc(r.data) : r.data;
     $('cp-login-status').textContent = 'Senha salva. Já vale no aplicativo: usuário ' + r.data + ' e senha ' + pw + '.';
     // salvou: a janela fecha; o aviso oferece mandar o acesso no WhatsApp
     try { $('dlg-campo').close(); } catch(x){}
@@ -6742,9 +6745,13 @@ td,.row{font-size:13px}
   $('btn-sair').addEventListener('click', sair);
   // acesso por usuário: "thiago" vira um endereço interno (não recebe e-mail)
   var DOM_ACESSO = 'acesso.rodrigueslitaiffadv.com.br';
+  function cpfMasc(v){ var d = String(v || '').replace(/\D/g, '').slice(0, 11); if (d.length <= 3) return d; if (d.length <= 6) return d.slice(0, 3) + '.' + d.slice(3); if (d.length <= 9) return d.slice(0, 3) + '.' + d.slice(3, 6) + '.' + d.slice(6); return d.slice(0, 3) + '.' + d.slice(3, 6) + '.' + d.slice(6, 9) + '-' + d.slice(9); }
+  function cpfEhNumero(v){ return /^[\d.\-\s]+$/.test(String(v || '').trim()); }
+  function cpfCerto(v){ var d = String(v || '').replace(/\D/g, ''); if (d.length !== 11 || /^(\d)\1+$/.test(d)) return false; for (var t = 9; t < 11; t++){ var s = 0; for (var i = 0; i < t; i++) s += +d[i] * (t + 1 - i); var r = (s * 10) % 11; if (r === 10) r = 0; if (r !== +d[t]) return false; } return true; }
   function usuarioParaEmail(v){
     v = String(v || '').trim().toLowerCase(); if (!v) return '';
     if (v.indexOf('@') >= 0) return v;
+    if (cpfEhNumero(v) && v.replace(/\D/g, '').length === 11) return v.replace(/\D/g, '') + '@' + DOM_ACESSO;   // o CPF é o usuário
     var u = v.normalize('NFD').replace(new RegExp('[\\u0300-\\u036f]', 'g'), '').replace(/\s+/g, '.').replace(/[^a-z0-9._-]/g, '');
     return u.length >= 2 ? u + '@' + DOM_ACESSO : '';
   }
@@ -6762,6 +6769,11 @@ td,.row{font-size:13px}
   $('auth-form').addEventListener('submit', async function(e){
     e.preventDefault();
     var email = usuarioParaEmail($('af-email').value), senha = $('af-senha').value, senha2 = $('af-senha2').value;
+    // CPF: procura o acesso ligado a ele (quem foi cadastrado antes, pelo nome, também entra pelo CPF depois que o CPF é registrado)
+    var cpfDig = String($('af-email').value || '').replace(/\D/g, '');
+    if (cpfEhNumero($('af-email').value) && cpfDig.length === 11){
+      try { var lk = await SB.rpc('login_por_cpf', { p_cpf: cpfDig }); if (lk && lk.data) email = lk.data; } catch(x){}
+    }
     if (authMode !== 'nova' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ authMsg('Informe o usuário ou o e-mail.', 'err'); $('af-email').focus(); return; }
     if ((authMode === 'primeiro' || authMode === 'esqueci') && ehAcessoInterno(email)){ authMsg('Quem entra com usuário não usa esta opção. Peça a um administrador para definir a senha em Configurações › Equipe.', 'err'); return; }
     if ((authMode === 'primeiro' || authMode === 'nova') && senha.length < 8){ authMsg('A senha precisa ter pelo menos 8 caracteres.', 'err'); $('af-senha').focus(); return; }
@@ -7081,6 +7093,7 @@ td,.row{font-size:13px}
     eEditing = u ? u.email : null;
     $('fe-title').textContent = u ? 'Editar funcionário' : 'Novo funcionário';
     $('fe-nome').value = u ? u.nome : ''; $('fe-email').value = u ? emailParaExibir(u.email) : ''; $('fe-email').disabled = !!u;
+    $('fe-cpf').value = u && u.cpf ? cpfMasc(u.cpf) : ''; $('fe-email-box').hidden = !u || /^\d{11}$/.test(emailParaExibir(u.email));
     $('fe-senha').value = '';
     $('fe-senha-wrap').hidden = !!u && !ehAcessoInterno(u.email);
     var dtSenha = u && u.senha_em ? new Date(u.senha_em) : null;
@@ -7142,7 +7155,9 @@ td,.row{font-size:13px}
   });
 
   // usuário sempre em letras minúsculas (na tela de entrada e no cadastro da equipe)
-  ['af-email', 'fe-email'].forEach(function(id){ var el = $(id); if (el) el.addEventListener('input', function(){ var p = this.selectionStart; this.value = this.value.toLowerCase(); try { this.setSelectionRange(p, p); } catch(x){} }); });
+  ['af-email', 'fe-email'].forEach(function(id){ var el = $(id); if (el) el.addEventListener('input', function(){
+    if (cpfEhNumero(this.value)){ this.value = cpfMasc(this.value); return; }   // número: vira CPF com pontos e traço
+    var p = this.selectionStart; this.value = this.value.toLowerCase(); try { this.setSelectionRange(p, p); } catch(x){} }); });
 
   /* ---------- pedidos de acesso (formulário enviado no grupo) ---------- */
   var pedidoEq = null, pedEdit = null;
@@ -7215,7 +7230,7 @@ td,.row{font-size:13px}
     openEq(null);
     $('fe-nome').value = nomeProprio(p.nome);
     // usuário sugerido: primeiro nome, sem acento e em minúsculas
-    $('fe-email').value = String(p.nome || '').trim().split(/\s+/)[0].normalize('NFD').replace(new RegExp('[\\u0300-\\u036f]', 'g'), '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    $('fe-cpf').value = cpfMasc(p.cpf || '');
     $('fe-funcao').value = { gestor: 'admin', closer: 'closer', judicial: 'judicial' }[p.funcao] || 'operacional';
     setTimeout(function(){ $('fe-senha').focus(); }, 60);
   });
@@ -7240,7 +7255,10 @@ td,.row{font-size:13px}
   $('fe-cancel').addEventListener('click', function(){ pedidoEq = null; dlgE.close(); });
   $('form-eq').addEventListener('submit', async function(e){
     e.preventDefault();
-    var nome = nomeProprio($('fe-nome').value.trim()), email = eEditing || usuarioParaEmail($('fe-email').value), senhaNova = $('fe-senha').value;
+    var cpfFe = $('fe-cpf').value.replace(/\D/g, '');
+    if (!eEditing && !cpfCerto(cpfFe)){ $('fe-cpf').focus(); toast('Informe um CPF válido: ele é o login da pessoa'); return; }
+    if (eEditing && cpfFe && !cpfCerto(cpfFe)){ $('fe-cpf').focus(); toast('CPF inválido'); return; }
+    var nome = nomeProprio($('fe-nome').value.trim()), email = eEditing || (cpfFe + '@' + DOM_ACESSO), senhaNova = $('fe-senha').value;
     if (!nome){ $('fe-nome').focus(); toast('Informe o nome do funcionário'); return; }
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ $('fe-email').focus(); toast('Informe o usuário de acesso'); return; }
     var interno = ehAcessoInterno(email);
@@ -7248,7 +7266,7 @@ td,.row{font-size:13px}
     if (interno && !eEditing && !senhaNova){ senhaNova = '123456'; usouPadrao = true; }   // senha padrão: a pessoa troca no primeiro acesso
     if (interno && senhaNova && senhaNova.length < 6){ $('fe-senha').focus(); toast('A senha provisória deve ter no mínimo 6 caracteres'); return; }
     var cargoSel = $('fe-funcao').value;
-    var row = { nome: nome, funcao: cargoSel === 'admin' ? 'admin' : 'assistente', cargo: cargoSel, ativo: $('fe-ativo').value === 'sim' };
+    var row = { nome: nome, funcao: cargoSel === 'admin' ? 'admin' : 'assistente', cargo: cargoSel, ativo: $('fe-ativo').value === 'sim', cpf: cpfFe || null };
     $('fe-save').disabled = true;
     try {
       var r = eEditing ? await SB.from('equipe').update(row).eq('email', eEditing).select('email') : await SB.from('equipe').insert(Object.assign({ email: email }, row));

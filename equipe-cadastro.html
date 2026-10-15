@@ -36,6 +36,8 @@ button:disabled{opacity:.6}
     <form id="f" novalidate autocomplete="off">
       <label for="nome">Nome completo</label>
       <input id="nome" autocomplete="name" autocapitalize="words" placeholder="Seu nome completo">
+      <label for="cpf">CPF (será o seu login)</label>
+      <input id="cpf" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00">
       <label for="fone">Telefone / WhatsApp</label>
       <input id="fone" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="(92) 99999-9999">
       <label for="funcao">Sua função</label>
@@ -62,6 +64,9 @@ button:disabled{opacity:.6}
   function bonito(n){ return String(n || '').replace(/\s+/g, ' ').trim().toLowerCase().replace(/(^|[\s'-])([a-zà-ÿ])/g, function(m, a, b){ return a + b.toUpperCase(); }).replace(/\s(De|Da|Do|Das|Dos|E)(?=\s)/g, function(m){ return m.toLowerCase(); }); }
   function mask(v){ var d = String(v || '').replace(/\D/g, '').slice(0, 11); if (!d) return ''; if (d.length <= 2) return '(' + d; if (d.length <= 6) return '(' + d.slice(0, 2) + ') ' + d.slice(2); if (d.length <= 10) return '(' + d.slice(0, 2) + ') ' + d.slice(2, 6) + '-' + d.slice(6); return '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7); }
   $('fone').addEventListener('input', function(){ this.value = mask(this.value); });
+  function cpfMasc(v){ var d = String(v || '').replace(/\D/g, '').slice(0, 11); if (d.length <= 3) return d; if (d.length <= 6) return d.slice(0, 3) + '.' + d.slice(3); if (d.length <= 9) return d.slice(0, 3) + '.' + d.slice(3, 6) + '.' + d.slice(6); return d.slice(0, 3) + '.' + d.slice(3, 6) + '.' + d.slice(6, 9) + '-' + d.slice(9); }
+  function cpfCerto(v){ var d = String(v || '').replace(/\D/g, ''); if (d.length !== 11 || /^(\d)\1+$/.test(d)) return false; for (var t = 9; t < 11; t++){ var s = 0; for (var i = 0; i < t; i++) s += +d[i] * (t + 1 - i); var r = (s * 10) % 11; if (r === 10) r = 0; if (r !== +d[t]) return false; } return true; }
+  $('cpf').addEventListener('input', function(){ this.value = cpfMasc(this.value); });
   $('nome').addEventListener('blur', function(){ this.value = bonito(this.value); });
   function msg(t, err){ $('msg').textContent = t || ''; $('msg').className = 'msg' + (err ? ' err' : ''); }
   $('f').addEventListener('submit', function(e){
@@ -69,11 +74,12 @@ button:disabled{opacity:.6}
     if ($('site').value) return;                                   // robô
     var nome = bonito($('nome').value), fone = $('fone').value, fn = $('funcao').value;
     if (nome.length < 3 || nome.indexOf(' ') < 0){ msg('Escreva o nome completo.', true); $('nome').focus(); return; }
+    if (!cpfCerto($('cpf').value)){ msg('Informe um CPF válido.', true); $('cpf').focus(); return; }
     var d = fone.replace(/\D/g, ''); if (d.length < 10){ msg('Informe o telefone com DDD.', true); $('fone').focus(); return; }
     if (!fn){ msg('Escolha a sua função.', true); $('funcao').focus(); return; }
     $('go').disabled = true; msg('Enviando…');
     fetch(CFG.url + '/rest/v1/rpc/equipe_solicitar', { method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ p_nome: nome, p_telefone: fone, p_funcao: fn, p_outra: '' }) })
+      body: JSON.stringify({ p_nome: nome, p_telefone: fone, p_funcao: fn, p_outra: '', p_cpf: $('cpf').value.replace(/\D/g, '') }) })
       .then(function(r){ return r.json(); })
       .then(function(d2){
         if (d2 && d2.ok){ $('form-box').style.display = 'none'; $('ok').style.display = 'block'; window.scrollTo(0, 0); }

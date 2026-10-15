@@ -131,7 +131,7 @@ main{max-width:1180px}
   <h1>Painel do gestor</h1>
   <p>Entre com o seu usuário e a senha do sistema.</p>
   <form id="f-login" novalidate>
-    <label class="campo"><span>Usuário</span><input id="lg-user" autocomplete="username" autocapitalize="none" spellcheck="false"></label>
+    <label class="campo"><span>CPF</span><input id="lg-user" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="000.000.000-00"></label>
     <label class="campo"><span>Senha</span><input id="lg-senha" type="password" inputmode="text" autocomplete="current-password"></label>
     <button class="btn p full" id="lg-go" type="submit">Entrar</button>
     <div class="msg" id="lg-msg" role="status"></div>
@@ -183,19 +183,25 @@ main{max-width:1180px}
   }
   function genId(){ var a = new Uint8Array(16); crypto.getRandomValues(a); return Array.prototype.map.call(a, function(x){ return ('0' + x.toString(16)).slice(-2); }).join(''); }
   function senhaNum(){ var a = new Uint32Array(6); crypto.getRandomValues(a); return Array.prototype.map.call(a, function(x){ return x % 10; }).join(''); }
+  function cpfMasc(v){ var d = String(v || '').replace(/\D/g, '').slice(0, 11); if (d.length <= 3) return d; if (d.length <= 6) return d.slice(0, 3) + '.' + d.slice(3); if (d.length <= 9) return d.slice(0, 3) + '.' + d.slice(3, 6) + '.' + d.slice(6); return d.slice(0, 3) + '.' + d.slice(3, 6) + '.' + d.slice(6, 9) + '-' + d.slice(9); }
+  function cpfEhNumero(v){ return /^[\d.\-\s]+$/.test(String(v || '').trim()); }
+  function cpfCerto(v){ var d = String(v || '').replace(/\D/g, ''); if (d.length !== 11 || /^(\d)\1+$/.test(d)) return false; for (var t = 9; t < 11; t++){ var s = 0; for (var i = 0; i < t; i++) s += +d[i] * (t + 1 - i); var r = (s * 10) % 11; if (r === 10) r = 0; if (r !== +d[t]) return false; } return true; }
   function userEmail(v){
     v = String(v || '').trim().toLowerCase(); if (!v) return '';
     if (v.indexOf('@') >= 0) return v;
+    if (cpfEhNumero(v) && v.replace(/\D/g, '').length === 11) return v.replace(/\D/g, '') + '@' + DOM;
     var u = sem(v).replace(/\s+/g, '.').replace(/[^a-z0-9._-]/g, '');
     return u.length >= 2 ? u + '@' + DOM : '';
   }
 
   /* ---------- entrada ---------- */
   function msgLogin(t){ $('lg-msg').textContent = t || ''; }
-  $('lg-user').addEventListener('input', function(){ var p = this.selectionStart; this.value = this.value.toLowerCase(); try { this.setSelectionRange(p, p); } catch(x){} });
-  $('f-login').addEventListener('submit', function(e){
+  $('lg-user').addEventListener('input', function(){ if (cpfEhNumero(this.value)){ this.value = cpfMasc(this.value); return; } var p = this.selectionStart; this.value = this.value.toLowerCase(); try { this.setSelectionRange(p, p); } catch(x){} });
+  $('f-login').addEventListener('submit', async function(e){
     e.preventDefault();
     var email = userEmail($('lg-user').value), senha = $('lg-senha').value;
+    var dg = $('lg-user').value.replace(/\D/g, '');
+    if (cpfEhNumero($('lg-user').value) && dg.length === 11){ try { var lk = await SB.rpc('login_por_cpf', { p_cpf: dg }); if (lk && lk.data) email = lk.data; } catch(x){} }
     if (!email){ msgLogin('Informe o usuário.'); return; }
     if (!senha){ msgLogin('Informe a senha.'); return; }
     $('lg-go').disabled = true; msgLogin('');
@@ -589,13 +595,13 @@ main{max-width:1180px}
   function sugerirUser(nome){ var w = sem(nome).replace(/^(dona|seu|sr|sra)\.?\s+/, '').split(/\s+/).filter(Boolean); return (w[0] || 'parceiro').replace(/[^a-z0-9]/g, '').slice(0, 20); }
   function novoAcesso(p){
     var f = abrirFolha('<h2>Acesso de ' + esc(p.nome) + '</h2><p class="sub">Defina o usuário e a senha para entrar no aplicativo.</p>' +
-      '<label class="campo"><span>Usuário</span><input id="ac-user" autocapitalize="none" spellcheck="false" value="' + esc(sugerirUser(p.nome)) + '"></label>' +
+      '<label class="campo"><span>CPF (é o login)</span><input id="ac-user" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" value="' + esc(p.cpf ? cpfMasc(p.cpf) : '') + '"></label>' +
       '<label class="campo"><span>Senha padrão</span><input id="ac-senha" inputmode="numeric" value="123456"></label><p class="sub">A pessoa cria a senha dela no primeiro acesso.</p>' +
       '<div class="msg" id="ac-msg"></div><div class="fx"><button class="btn p" id="ac-ok">Salvar acesso</button><button class="btn" id="ac-x">Cancelar</button></div>');
     f.querySelector('#ac-x').onclick = fecharFolha;
     f.querySelector('#ac-ok').onclick = async function(){
-      var u = f.querySelector('#ac-user').value.trim().toLowerCase(), s = f.querySelector('#ac-senha').value.trim(), m = f.querySelector('#ac-msg');
-      if (!/^[a-z0-9._-]{3,30}$/.test(u)){ m.textContent = 'Usuário: de 3 a 30 letras ou números, sem espaço nem acento.'; return; }
+      var u = f.querySelector('#ac-user').value.replace(/\D/g, ''), s = f.querySelector('#ac-senha').value.trim(), m = f.querySelector('#ac-msg');
+      if (!cpfCerto(u)){ m.textContent = 'Informe um CPF válido: ele é o login.'; return; }
       if (s.length < 6){ m.textContent = 'A senha precisa ter pelo menos 6 caracteres.'; return; }
       this.disabled = true; m.textContent = '';
       var r = await SB.rpc('campo_definir_login', { p_prosp: p.id, p_usuario: u, p_senha: s, p_provisoria: true });
@@ -637,7 +643,7 @@ main{max-width:1180px}
       '<label class="campo" id="nc-cidbox"><span>Cidade</span><input id="nc-cidade" list="nc-cidades" autocomplete="off" autocapitalize="words" placeholder="Escolha ou digite"><datalist id="nc-cidades"></datalist></label>' +
       '<label class="campo" id="nc-prbox"><span>Prospectador responsável</span><select id="nc-pros"></select></label>' +
       '<div class="sec">Acesso ao aplicativo</div>' +
-      '<div class="fx"><label class="campo" style="margin:0"><span>Usuário</span><input id="nc-user" autocapitalize="none" spellcheck="false"></label>' +
+      '<div class="fx"><label class="campo" style="margin:0"><span>CPF (é o login)</span><input id="nc-user" inputmode="numeric" maxlength="14" placeholder="000.000.000-00"></label>' +
       '<label class="campo" style="margin:0"><span>Senha padrão</span><input id="nc-senha" inputmode="numeric" value="123456"></label></div><p class="sub" style="margin-top:6px">A pessoa cria a senha dela no primeiro acesso.</p>' +
       '<div class="msg" id="nc-msg"></div><div class="fx"><button class="btn p" id="nc-ok">Cadastrar</button><button class="btn" id="nc-x">Cancelar</button></div>');
     var userEditado = false;
@@ -655,7 +661,7 @@ main{max-width:1180px}
       f.querySelector('#nc-prbox').classList.toggle('hidden', perfil === 'prospectador');
       f.querySelector('#nc-lnome').textContent = perfil === 'parceiro' && tipo === 'clinica' ? 'Nome do responsável pela clínica' : 'Nome completo';
     }
-    function sugere(){ if (userEditado) return; var base = perfil === 'parceiro' && tipo === 'clinica' && f.querySelector('#nc-clinica').value.trim() ? f.querySelector('#nc-clinica').value : f.querySelector('#nc-nome').value; f.querySelector('#nc-user').value = base.trim() ? sugerirUser(base) : ''; }
+    function sugere(){ return; /* o login agora é o CPF */ if (userEditado) return; var base = perfil === 'parceiro' && tipo === 'clinica' && f.querySelector('#nc-clinica').value.trim() ? f.querySelector('#nc-clinica').value : f.querySelector('#nc-nome').value; f.querySelector('#nc-user').value = base.trim() ? sugerirUser(base) : ''; }
     seg('#nc-perfil', function(v){ perfil = v; ajusta(); });
     seg('#nc-tipo', function(v){ tipo = v; ajusta(); sugere(); });
     f.querySelector('#nc-estado').addEventListener('change', pintaPros);
@@ -663,17 +669,17 @@ main{max-width:1180px}
     f.querySelector('#nc-clinica').addEventListener('input', sugere);
     f.querySelector('#nc-nome').addEventListener('blur', function(){ this.value = bonito(this.value); sugere(); });
     f.querySelector('#nc-tel').addEventListener('input', function(){ this.value = mask(this.value); });
-    f.querySelector('#nc-user').addEventListener('input', function(){ userEditado = true; this.value = this.value.toLowerCase().replace(/[^a-z0-9._-]/g, ''); });
+    f.querySelector('#nc-user').addEventListener('input', function(){ this.value = cpfMasc(this.value); });
     f.querySelector('#nc-x').onclick = fecharFolha;
     pintaPros(); ajusta();
     f.querySelector('#nc-ok').onclick = async function(){
       var m = f.querySelector('#nc-msg'), btn = this;
       var nome = bonito(f.querySelector('#nc-nome').value), clinica = bonito(f.querySelector('#nc-clinica').value), tel = f.querySelector('#nc-tel').value;
-      var u = f.querySelector('#nc-user').value.trim(), s = f.querySelector('#nc-senha').value.trim();
+      var u = f.querySelector('#nc-user').value.replace(/\D/g, ''), s = f.querySelector('#nc-senha').value.trim();
       if (nome.length < 3){ m.textContent = 'Informe o nome.'; return; }
       if (perfil === 'parceiro' && tipo === 'clinica' && clinica.length < 2){ m.textContent = 'Informe o nome da clínica.'; return; }
       if (tel.replace(/\D/g, '').length < 10){ m.textContent = 'Informe o telefone com DDD.'; return; }
-      if (!/^[a-z0-9._-]{3,30}$/.test(u)){ m.textContent = 'Usuário: de 3 a 30 letras ou números, sem espaço nem acento.'; return; }
+      if (!cpfCerto(u)){ m.textContent = 'Informe um CPF válido: ele é o login.'; return; }
       if (s.length < 6){ m.textContent = 'A senha precisa ter pelo menos 6 caracteres.'; return; }
       btn.disabled = true; m.textContent = '';
       var data = { nome: nome, tipo: perfil === 'prospectador' ? 'pessoa' : tipo, clinica: perfil === 'parceiro' && tipo === 'clinica' ? clinica : '', telefone: tel,
