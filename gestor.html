@@ -145,6 +145,7 @@ main{max-width:1180px}
     <img src="img/logo-nascer-t.png" alt="">
     <div class="quem"><b id="q-nome">Gestor</b><span id="q-sub">Rede de indicação</span></div>
     <button class="ic" id="b-atualizar" aria-label="Atualizar" title="Atualizar"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7M21 4v5h-5"/></svg></button>
+    <button class="ic" id="b-senha" aria-label="Alterar minha senha" title="Alterar minha senha"><svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2L20 3M16 7l3 3M14 9l2 2"/></svg></button>
     <button class="ic" id="b-sair" aria-label="Sair" title="Sair"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
   </header>
   <main id="main"></main>
@@ -215,6 +216,22 @@ main{max-width:1180px}
       carregar();
     });
   }
+  $('b-senha').addEventListener('click', function(){
+    var f = abrirFolha('<h2>Alterar minha senha</h2><p class="sub">Escolha uma nova senha, só com números (mínimo de 6).</p>' +
+      '<label class="campo"><span>Nova senha</span><input id="sn-a" type="password" inputmode="numeric" autocomplete="new-password"></label>' +
+      '<label class="campo"><span>Repita a nova senha</span><input id="sn-b" type="password" inputmode="numeric" autocomplete="new-password"></label>' +
+      '<div class="msg" id="sn-msg"></div><div class="fx"><button class="btn p" id="sn-ok">Salvar senha</button><button class="btn" id="sn-x">Cancelar</button></div>');
+    f.querySelector('#sn-x').onclick = fecharFolha;
+    f.querySelector('#sn-ok').onclick = async function(){
+      var a = f.querySelector('#sn-a').value, b = f.querySelector('#sn-b').value, m = f.querySelector('#sn-msg');
+      if (!/^[0-9]{6,}$/.test(a)){ m.textContent = 'Use só números, com pelo menos 6.'; return; }
+      if (a !== b){ m.textContent = 'As duas senhas não são iguais.'; return; }
+      this.disabled = true; m.textContent = 'Salvando…';
+      var r = await SB.auth.updateUser({ password: a });
+      if (r.error){ m.textContent = /different from the old/i.test(r.error.message || '') ? 'A nova senha precisa ser diferente da atual.' : 'Não foi possível trocar agora.'; this.disabled = false; return; }
+      fecharFolha(); toast('Senha alterada');
+    };
+  });
   $('b-sair').addEventListener('click', function(){ SB.auth.signOut().then(function(){ location.reload(); }); });
   SB.auth.getSession().then(function(r){ if (r.data && r.data.session) entrar(r.data.session); });
 
