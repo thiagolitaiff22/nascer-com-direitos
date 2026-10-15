@@ -233,9 +233,7 @@ main{max-width:1180px}
       }
       S.eu = session.user.email;
       $('login').classList.add('hidden'); $('app').classList.remove('hidden');
-      SB.from('equipe').select('trocar_senha').eq('email', String(session.user.email).toLowerCase()).maybeSingle().then(function(q){
-        if (q.data && q.data.trocar_senha) return novaSenhaObrigatoria();
-      });
+      SB.rpc('equipe_precisa_trocar').then(function(q){ if (q.data === true) return novaSenhaObrigatoria(); });
       SB.from('equipe').select('nome').eq('email', String(session.user.email).toLowerCase()).maybeSingle().then(function(r){ if (r.data && r.data.nome) $('q-nome').textContent = r.data.nome; });
       carregar();
     });
@@ -249,6 +247,7 @@ main{max-width:1180px}
     f.querySelector('#sn-ok').onclick = async function(){
       var a = f.querySelector('#sn-a').value, b = f.querySelector('#sn-b').value, m = f.querySelector('#sn-msg');
       if (!/^[0-9]{6,}$/.test(a)){ m.textContent = 'Use só números, com pelo menos 6.'; return; }
+      if (a === '123456'){ m.textContent = 'Escolha uma senha diferente da padrão.'; return; }
       if (a !== b){ m.textContent = 'As duas senhas não são iguais.'; return; }
       this.disabled = true; m.textContent = 'Salvando…';
       var r = await SB.auth.updateUser({ password: a });
