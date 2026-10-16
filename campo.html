@@ -447,6 +447,7 @@ body{font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-w
 .topo .logo img{height:52px;width:auto;object-fit:contain;display:block;filter:drop-shadow(0 2px 6px rgba(138,106,61,.22))}
 .topo .quem b{font-size:16px;font-weight:700;letter-spacing:-.01em}
 .topo .quem span{font-size:12.5px;color:var(--ink2)}
+#modo[hidden]{display:none!important}
 .seg-nasc{display:flex;gap:6px;margin:0 0 10px}.seg-nasc button{flex:1;padding:11px 8px;border-radius:12px;border:1px solid var(--gline);background:var(--card);color:var(--ink2);font:inherit;font-size:14px;font-weight:700}
 .seg-nasc button[aria-pressed="true"]{background:var(--gold,#a07a45);color:#fff;border-color:transparent}
 .tema{flex:none;width:38px;height:38px;border-radius:12px;border:1px solid var(--gline);background:var(--card);color:var(--ink2);display:grid;place-items:center;padding:0}
@@ -746,7 +747,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 32;
+  var APP_VERSAO = 33;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
