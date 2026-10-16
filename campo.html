@@ -447,6 +447,8 @@ body{font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-w
 .topo .logo img{height:52px;width:auto;object-fit:contain;display:block;filter:drop-shadow(0 2px 6px rgba(138,106,61,.22))}
 .topo .quem b{font-size:16px;font-weight:700;letter-spacing:-.01em}
 .topo .quem span{font-size:12.5px;color:var(--ink2)}
+.seg-nasc{display:flex;gap:6px;margin:0 0 10px}.seg-nasc button{flex:1;padding:11px 8px;border-radius:12px;border:1px solid var(--gline);background:var(--card);color:var(--ink2);font:inherit;font-size:14px;font-weight:700}
+.seg-nasc button[aria-pressed="true"]{background:var(--gold,#a07a45);color:#fff;border-color:transparent}
 .tema{flex:none;width:38px;height:38px;border-radius:12px;border:1px solid var(--gline);background:var(--card);color:var(--ink2);display:grid;place-items:center;padding:0}
 .tema svg{width:19px;height:19px}
 .tema .lua{display:none}
@@ -744,7 +746,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 31;
+  var APP_VERSAO = 32;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -779,7 +781,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     if (a < 2000 || a > 2100 || dt.getFullYear() !== a || dt.getMonth() !== mes - 1 || dt.getDate() !== d) return '';
     return m[3] + '-' + m[2] + '-' + m[1];
   }
-  function gestante(){ return true; }   // o sistema atende só gestantes: o que importa é a data prevista do parto
+  function gestante(){ return lsGet('campo_nasceu') !== '1'; }   // gestante: data prevista do parto; bebê já nasceu: data de nascimento
   // telefone no padrão (DDD) 00000-0000
   function maskFone(v){ var d = String(v || '').replace(/\D/g, '').slice(0, 11); if (!d) return ''; if (d.length <= 2) return '(' + d; if (d.length <= 6) return '(' + d.slice(0, 2) + ') ' + d.slice(2); if (d.length <= 10) return '(' + d.slice(0, 2) + ') ' + d.slice(2, 6) + '-' + d.slice(6); return '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7); }
   function ufDoApp(){ return String((quem && quem.regiaoId) || '').slice(0, 2).toUpperCase(); }
@@ -1318,8 +1320,10 @@ button,a,label,[role=button]{touch-action:manipulation}
         '<label class="fone cid-campo' + (lsGet('campo_cidade') ? '' : ' falta') + '" id="l-cidade"><svg viewBox="0 0 24 24"><use href="#i-casa"/></svg><img class="cid-flag" id="cidade-flag" alt="" hidden><input id="cidade" autocomplete="off" autocapitalize="words" placeholder="Cidade da cliente" value="' + esc(lsGet('campo_cidade')) + '"' + (ufDoApp() ? ' readonly' : '') + '>' + (ufDoApp() ? '<svg class="cid-seta" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '') + '</label>' +
         '<label class="fone' + (cpfOk(lsGet('campo_cpf')) ? '' : ' falta') + '" id="l-cpf"><svg viewBox="0 0 24 24"><use href="#i-id"/></svg><input id="cpf" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="CPF da cliente" value="' + esc(maskCpf(lsGet('campo_cpf'))) + '"></label>' +
       '</div>' +
-      '<div class="rot">Gestação</div><div class="dados">' +
-        '<label class="fone' + (lsGet('campo_dpp') ? '' : ' falta') + '" id="l-dpp"><svg viewBox="0 0 24 24"><use href="#i-cal"/></svg><span class="rc">Data prevista do parto</span><input id="dpp" type="text" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="dd/mm/aaaa" value="' + esc(isoParaBr(lsGet('campo_dpp'))) + '"></label>' +
+      '<div class="rot">A criança</div><div class="seg-nasc" id="seg-nasc"><button type="button" data-n="0" aria-pressed="' + gest + '">Ainda gestante</button><button type="button" data-n="1" aria-pressed="' + !gest + '">Já nasceu</button></div><div class="dados">' +
+        (gest ?
+        '<label class="fone' + (lsGet('campo_dpp') ? '' : ' falta') + '" id="l-dpp"><svg viewBox="0 0 24 24"><use href="#i-cal"/></svg><span class="rc">Data prevista do parto</span><input id="dpp" type="text" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="dd/mm/aaaa" value="' + esc(isoParaBr(lsGet('campo_dpp'))) + '"></label>' :
+        '<label class="fone' + (lsGet('campo_crianca_nasc') ? '' : ' falta') + '" id="l-cnasc"><svg viewBox="0 0 24 24"><use href="#i-cal"/></svg><span class="rc">Data de nascimento do bebê</span><input id="cnasc" type="text" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="dd/mm/aaaa" value="' + esc(isoParaBr(lsGet('campo_crianca_nasc'))) + '"></label>') +
       '</div>') +
       '<div class="rot">' + (completando ? 'Documentos que faltam' : 'Documentos') + '</div><div class="grid">' + visiveis.map(function(d){
         var par = PARES[d.k] || null, f = par ? parFotos(par) : fotos[d.k];
@@ -1361,6 +1365,14 @@ button,a,label,[role=button]{touch-action:manipulation}
     if ($('cpf')) $('cpf').addEventListener('input', function(){ this.value = maskCpf(this.value); lsSet('campo_cpf', this.value); var l = $('l-cpf'); if (l) l.classList.toggle('falta', !cpfOk(this.value)); });
     $('nome').addEventListener('input', function(){ lsSet('campo_nome', this.value); $('l-nome').classList.toggle('falta', !this.value.trim()); });
     $('nome').addEventListener('blur', function(){ this.value = bonito(this.value); lsSet('campo_nome', this.value); });
+    Array.prototype.forEach.call(document.querySelectorAll('#seg-nasc [data-n]'), function(b){ b.onclick = function(){ lsSet('campo_nasceu', b.dataset.n); vistaNovo(); }; });
+    if ($('cnasc')) $('cnasc').addEventListener('input', function(){
+      var d = this.value.replace(/D/g, '').slice(0, 8), t = d;
+      if (d.length > 4) t = d.slice(0, 2) + '/' + d.slice(2, 4) + '/' + d.slice(4); else if (d.length > 2) t = d.slice(0, 2) + '/' + d.slice(2);
+      this.value = t;
+      var iso = brParaIso(t); lsSet('campo_crianca_nasc', iso);
+      var l = $('l-cnasc'); if (l) l.classList.toggle('falta', !iso);
+    });
     if ($('dpp')) $('dpp').addEventListener('input', function(){
       var d = this.value.replace(/\D/g, '').slice(0, 8), t = d;
       if (d.length > 4) t = d.slice(0, 2) + '/' + d.slice(2, 4) + '/' + d.slice(4); else if (d.length > 2) t = d.slice(0, 2) + '/' + d.slice(2);
@@ -1556,7 +1568,7 @@ button,a,label,[role=button]{touch-action:manipulation}
       if (Object.keys(fotos).length && !confirm('Há fotos de um cadastro em andamento. Sair mesmo assim? As fotos serão apagadas.')) return;
       if (!confirm('Sair desta conta? Para entrar de novo você vai precisar do usuário e da senha.')) return;
       fotos = {}; guardarRascunho();
-      ['campo_token', 'campo_quem', 'campo_painel', 'campo_nome', 'campo_fone', 'campo_cpf', 'campo_cidade', 'campo_aba', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp'].forEach(function(k){ lsSet(k, ''); });
+      ['campo_token', 'campo_quem', 'campo_painel', 'campo_nome', 'campo_fone', 'campo_cpf', 'campo_cidade', 'campo_aba', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp', 'campo_nasceu'].forEach(function(k){ lsSet(k, ''); });
       token = ''; quem = null; painel = null; aba = 'painel';
       pedirLink();
     });
@@ -2078,7 +2090,8 @@ button,a,label,[role=button]{touch-action:manipulation}
     if (!foneOk(($('fone') || {}).value)){ alert('Informe o telefone com DDD, por exemplo (92) 99999-9999.'); if ($('fone')) $('fone').focus(); return; }
     if (!String(lsGet('campo_cidade') || '').trim()){ alert('Escolha a cidade da cliente.'); if ($('cidade')) $('cidade').focus(); return; }
     if (!cpfOk(($('cpf') || {}).value)){ alert('Informe o CPF da cliente (11 números).'); if ($('cpf')) $('cpf').focus(); return; }
-    if (!lsGet('campo_dpp')){ alert('Informe a data prevista do parto, por exemplo 15/03/2027.'); if ($('dpp')) $('dpp').focus(); return; }
+    if (gestante() && !lsGet('campo_dpp')){ alert('Informe a data prevista do parto, por exemplo 15/03/2027.'); if ($('dpp')) $('dpp').focus(); return; }
+    if (!gestante() && !lsGet('campo_crianca_nasc')){ alert('Informe a data de nascimento do bebê, por exemplo 15/03/2026.'); if ($('cnasc')) $('cnasc').focus(); return; }
     var falta = DOCS.filter(function(d){ return obrig(d) && !fotos[d.k]; });
     if (falta.length){
       falar('Está faltando: ' + falta.map(function(d){ return d.t; }).join(', ') + '. Quer enviar assim mesmo?');
@@ -2125,7 +2138,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     p     .then(function(){
        var envio = { id: id, token: token, criado: new Date().toISOString(), completar: comp ? comp.id : '', foto: fotoMini, contato: maskFone(($('fone') || {}).value || ''), cpf: comp ? '' : maskCpf(($('cpf') || {}).value || ''), cidade: comp ? '' : lsGet('campo_cidade'), cidadeUf: ufDoApp(), cliente: comp ? comp.nome : bonito(($('nome') || {}).value || ''), local: local, faltam: falta.map(function(d){ return d.k; }),
          tipoSegurada: tipoAtual(), crianca: '', criancaNasc: comp || gestante() ? '' : lsGet('campo_crianca_nasc'),
-         fatoGerador: 'gestante', dpp: !comp && gestante() ? lsGet('campo_dpp') : '',
+         fatoGerador: comp || gestante() ? 'gestante' : 'parto', dpp: !comp && gestante() ? lsGet('campo_dpp') : '',
          docs: DOCS.filter(function(d){ return fotos[d.k]; }).map(function(d){ return d.k; }), arquivos: [] };
        return Promise.all(arquivos.map(function(a){ return paraBytes(a.blob).then(function(b){ return { nome: a.nome, mime: a.mime, buf: b, tam: b.byteLength, ok: false }; }, function(){ return { nome: a.nome, mime: a.mime, blob: a.blob, tam: a.blob.size, ok: false }; }); }))
          .then(function(l){ envio.arquivos = l; return filaPor(envio); }).then(function(){ return histPor({ id: envio.id, token: token, cliente: envio.cliente + (comp ? ' · documentos' : ''), clienteId: comp ? comp.id : '', criado: envio.criado, enviado: null }); }).then(function(){ return envio; });
@@ -2133,7 +2146,7 @@ button,a,label,[role=button]{touch-action:manipulation}
      .then(function(envio){
        fotos = {}; local = null;
        if (comp){ completando = null; lsSet('campo_completando', ''); if (painel) painel.clientes.forEach(function(c){ if (c.id === comp.id) c.faltaDocs = comp.faltaDocs.filter(function(k){ return envio.docs.indexOf(k) < 0; }); }); }
-       else { ['campo_fone', 'campo_cpf', 'campo_cidade', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp'].forEach(function(k){ lsSet(k, ''); }); }
+       else { ['campo_fone', 'campo_cpf', 'campo_cidade', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp', 'campo_nasceu'].forEach(function(k){ lsSet(k, ''); }); }
        t.remove(); aba = comp ? 'painel' : 'novo'; telaInicial(); window.scrollTo(0, 0);
        var ok = tela('<svg viewBox="0 0 24 24" style="stroke:var(--ok)"><use href="#i-ok"/></svg><b>' + (comp ? 'Documentos guardados' : 'Cadastro guardado') + '</b><p>' + esc(envio.cliente || '') + '<br>' + (comp ? 'Vão para a pasta da cliente sozinhos quando tiver internet.' : 'Está sendo enviado agora: acompanhe na barra embaixo. Pode cadastrar a próxima cliente.') + '</p><button id="t-ok">' + (comp ? 'Entendi' : 'Cadastrar a próxima') + '</button>');
        ok.querySelector('#t-ok').onclick = function(){ ok.remove(); };
