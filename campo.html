@@ -521,6 +521,10 @@ body{font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-w
 .pm-conta .sair{margin-top:0;display:flex;align-items:center;gap:8px;color:var(--ink2);font-weight:600}
 .ini-ok{font-size:13.5px;color:var(--ink2);line-height:1.5;padding:12px 0}
 /* aviso de versão nova */
+/* sem ganhos: menu com três itens, o + fica no meio */
+.abas.sg{grid-template-columns:repeat(3,1fr)}
+.abas.sg button[data-aba="recebimentos"],.abas.sg button[data-aba="conta"]{display:none}
+.abas.sg button[data-aba="novo"]{order:2}.abas.sg button[data-aba="clientes"]{order:3}.abas.sg button[data-aba="painel"]{order:1}
 /* ---------- barra do topo: mais leve e elegante ---------- */
 #app .topo{padding:calc(10px + env(safe-area-inset-top)) 18px 10px;gap:12px;background:rgba(250,246,239,.84);-webkit-backdrop-filter:saturate(1.5) blur(16px);backdrop-filter:saturate(1.5) blur(16px);border-bottom:0;box-shadow:0 1px 0 rgba(160,122,69,.14)}
 html[data-tema="dark"] #app .topo{background:rgba(20,17,13,.84);box-shadow:0 1px 0 rgba(201,164,104,.16)}
@@ -838,7 +842,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 40;
+  var APP_VERSAO = 41;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1061,7 +1065,7 @@ button,a,label,[role=button]{touch-action:manipulation}
   function maiusculas(d){ if (d && d.clientes) d.clientes.forEach(function(c){ if (c.nome) c.nome = bonito(c.nome); if (c.crianca) c.crianca = bonito(c.crianca); }); return d; }   // (nome da função antigo) padrão: Primeira letra maiúscula
   try { painel = maiusculas(JSON.parse(lsGet('campo_painel') || 'null')); } catch(e){}
   function montarCasca(){
-    var perfilCasca = ehProspectador() ? 'p' : 'c';
+    var perfilCasca = (ehProspectador() ? 'p' : 'c') + (semGanho() ? 's' : '');
     if ($('vista') && $('app').dataset.perfil === perfilCasca) return;
     $('app').dataset.perfil = perfilCasca;
     $('app').innerHTML =
@@ -1070,7 +1074,7 @@ button,a,label,[role=button]{touch-action:manipulation}
         '<button type="button" class="tema" id="modo" hidden style="width:auto;padding:0 11px;font-size:12px;font-weight:700"></button>' +
         '<button type="button" class="tema" id="tema" aria-label="Trocar entre modo claro e escuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle class="sol" cx="12" cy="12" r="4"/><path class="sol" d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/><path class="lua" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button></div>' +
       '<main class="vista" id="vista"></main>' +
-      '<nav class="abas" id="abas">' +
+      '<nav class="abas' + (semGanho() ? ' sg' : '') + '" id="abas">' +
         '<button type="button" data-aba="painel"><svg><use href="#i-painel"/></svg>' + (ehProspectador() ? 'Painel' : 'Início') + '</button>' +
         '<button type="button" data-aba="clientes"><svg><use href="#i-grupo"/></svg>' + (ehProspectador() ? 'Parceiros' : 'Mães') + '</button>' +
         '<button type="button" data-aba="novo"><svg><use href="#i-novo"/></svg>' + (ehProspectador() ? 'Novo parceiro' : 'Novo cadastro') + '<span class="bolha" id="bolha" hidden></span></button>' +
@@ -1078,6 +1082,8 @@ button,a,label,[role=button]{touch-action:manipulation}
         '<button type="button" data-aba="conta"><svg><use href="#i-pessoa"/></svg>Conta</button>' +
       '</nav>';
     $('abas').addEventListener('click', function(e){ var b = e.target.closest('[data-aba]'); if (b) irPara(b.dataset.aba); });
+    var tq = document.querySelector('#app .topo .quem'); if (tq){ tq.style.cursor = 'pointer'; tq.onclick = function(){ irPara('conta'); }; }
+    var tl = document.querySelector('#app .topo .logo'); if (tl) tl.onclick = function(){ irPara('painel'); };
     $('tema').addEventListener('click', function(){
       var novo = document.documentElement.getAttribute('data-tema') === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-tema', novo);
@@ -1100,6 +1106,8 @@ button,a,label,[role=button]{touch-action:manipulation}
   var SITE = 'https://thiagolitaiff22.github.io/nascer-com-direitos/';
   var pp = null;   // { parceiros: [...], atualizado }
   // prospectador que também é parceiro (configuração no sistema) pode alternar entre os dois modos
+  // parceiro marcado como "sem ganhos": não vê Meus ganhos nem os marcos de pagamento
+  function semGanho(){ return !!(quem && quem.temGanho === false && quem.perfil !== 'prospectador'); }
   function ehProspectador(){ return !!(quem && quem.perfil === 'prospectador' && !(quem.tambemParceiro && lsGet('campo_modo') === 'parceiro')); }
   function chamar(nome, corpo){
     return fetch(CFG.url + '/rest/v1/rpc/' + nome, { method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) })
@@ -1290,7 +1298,7 @@ button,a,label,[role=button]{touch-action:manipulation}
   }
   var flagTimer = 0;
   new MutationObserver(function(){ clearTimeout(flagTimer); flagTimer = setTimeout(preencherBandeiras, 60); }).observe(document.body, { childList: true, subtree: true });
-  var novoP = { tipo: 'pessoa', nome: '', clinica: '', fone: '', cidade: '', usuario: '', senha: '', userEditado: false };
+  var novoP = { tipo: 'pessoa', nome: '', clinica: '', fone: '', cidade: '', usuario: '', senha: '', userEditado: false, ganho: true };
   function vistaProspNovo(){
     if (!novoP.senha) novoP.senha = '123456';
     var clin = novoP.tipo === 'clinica', uf = String((quem && quem.regiaoId) || '').slice(0, 2).toUpperCase();
@@ -1303,12 +1311,16 @@ button,a,label,[role=button]{touch-action:manipulation}
         '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-fone"/></svg><input id="np-fone" inputmode="tel" maxlength="15" placeholder="(92) 99999-9999" value="' + esc(maskFone(novoP.fone)) + '"></label>' +
         '<label class="fone cid-campo"><svg viewBox="0 0 24 24"><use href="#i-casa"/></svg><img class="cid-flag" id="np-cflag" alt="" hidden><input id="np-cidade" autocomplete="off" autocapitalize="words" placeholder="' + (uf ? 'Escolher a cidade' : 'Cidade') + '" value="' + esc(novoP.cidade) + '"' + (uf ? ' readonly' : '') + '>' + (uf ? '<svg class="cid-seta" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '') + '<button type="button" class="cid-limpar" id="np-climpar" aria-label="Apagar a cidade" title="Apagar a cidade" hidden><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button></label>' +
       '</div>' +
+      '<div class="rot">Este parceiro terá ganhos?</div>' +
+      '<div class="seg" id="np-ganho"><button type="button" data-g="1" aria-pressed="' + (novoP.ganho !== false) + '">Sim, terá ganhos</button><button type="button" data-g="0" aria-pressed="' + (novoP.ganho === false) + '">Não terá ganhos</button></div>' +
+      '<p class="nota-form" style="margin-top:6px">' + (novoP.ganho === false ? 'Ele só cadastra as mães. A aba <b>Meus ganhos</b> não aparece no aplicativo dele.' : 'A aba <b>Meus ganhos</b> aparece no aplicativo dele, com o que for pago.') + '</p>' +
       '<div class="rot">Acesso ao aplicativo</div><div class="dados">' +
         '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-pessoa"/></svg><input id="np-usuario" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="CPF do parceiro (é o login)" value="' + esc(maskCpf(novoP.usuario)) + '"></label>' +
         '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-cadeado"/></svg><input id="np-senha" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Senha" value="' + esc(novoP.senha) + '"><button type="button" id="np-gerar" class="mini-btn">gerar outra</button></label>' +
       '</div><p class="nota-form">O parceiro entra com este usuário e esta senha. Anote ou mande pelo WhatsApp quando terminar.</p>' +
       '<div class="barra"><button class="enviar" id="np-criar"><svg viewBox="0 0 24 24"><use href="#i-ok"/></svg>Criar parceiro</button></div>';
     var ref = function(){ novoP.nome = $('np-nome').value; if ($('np-clinica')) novoP.clinica = $('np-clinica').value; novoP.fone = $('np-fone').value; novoP.cidade = $('np-cidade').value; novoP.usuario = $('np-usuario').value; novoP.senha = $('np-senha').value; };
+    $('np-ganho').onclick = function(e){ var b = e.target.closest('[data-g]'); if (!b) return; ref(); novoP.ganho = b.dataset.g === '1'; vistaProspNovo(); };
     $('np-tipo').onclick = function(e){ var b = e.target.closest('[data-t]'); if (!b) return; ref(); novoP.tipo = b.dataset.t; vistaProspNovo(); };
     $('np-nome').addEventListener('input', function(){ novoP.nome = this.value; });
     if ($('np-clinica')) $('np-clinica').addEventListener('input', function(){ novoP.clinica = this.value; });
@@ -1341,11 +1353,11 @@ button,a,label,[role=button]{touch-action:manipulation}
       if (novoP.senha.length < 6){ alert('A senha precisa ter pelo menos 6 caracteres.'); $('np-senha').focus(); return; }
       if (navigator.onLine === false) return alert('Sem internet agora. Para cadastrar um parceiro é preciso estar conectado.');
       var b = this; b.disabled = true; b.lastChild.textContent = 'Criando…';
-      chamar('prosp_criar_parceiro', { p_token: token, p_nome: nome, p_tipo: novoP.tipo, p_clinica: novoP.tipo === 'clinica' ? clinica : '', p_cidade: cidade, p_telefone: novoP.fone, p_usuario: novoP.usuario, p_senha: novoP.senha })
+      chamar('prosp_criar_parceiro', { p_token: token, p_nome: nome, p_tipo: novoP.tipo, p_clinica: novoP.tipo === 'clinica' ? clinica : '', p_cidade: cidade, p_telefone: novoP.fone, p_usuario: novoP.usuario, p_senha: novoP.senha, p_ganho: novoP.ganho !== false })
         .then(function(d){
           if (d && d.ok){
             var rotulo = novoP.tipo === 'clinica' ? clinica : nome, tel = novoP.fone, usr = d.usuario, sen = novoP.senha;
-            novoP = { tipo: 'pessoa', nome: '', clinica: '', fone: '', cidade: '', usuario: '', senha: '', userEditado: false };
+            novoP = { tipo: 'pessoa', nome: '', clinica: '', fone: '', cidade: '', usuario: '', senha: '', userEditado: false, ganho: true };
             acessoCriado(rotulo, tel, usr, sen);
           } else { alert((d && (d.erro || d.message)) || 'Não foi possível criar o parceiro.'); }
         })
@@ -1393,6 +1405,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     $('vista').onclick = null;   // cada aba põe o seu próprio clique
     document.body.classList.toggle('na-novo', aba === 'novo');
     sincronia();
+    if (semGanho() && aba === 'recebimentos') aba = 'painel';
     if (aba === 'recebimentos'){ carregarReceb(); return vistaRecebimentos(); }
     if (aba === 'conta') return vistaConta();
     if (ehProspectador()) return aba === 'novo' ? vistaProspNovo() : aba === 'clientes' ? vistaProspLista() : vistaProspPainel();
@@ -1558,7 +1571,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     var fl = faltas(c), m = marcos(c);
     if (m.lib) return ['ok', 'deu certo'];
     if (fl.length) return ['fa', fl.length === 1 ? 'falta ' + NOME_DOC[fl[0]].toLowerCase() : 'faltam ' + fl.length + ' documentos'];
-    return ['', m.conf ? 'confirmada' : 'em andamento'];
+    return ['', m.conf && !semGanho() ? 'confirmada' : 'em andamento'];
   }
   function iniciais(n){ var p = String(n || '').trim().split(/\s+/).filter(Boolean); return ((p[0] || '?').charAt(0) + (p.length > 1 ? p[p.length - 1].charAt(0) : '')).toUpperCase(); }
   function resumoParceiro(cl){
@@ -1568,7 +1581,7 @@ button,a,label,[role=button]{touch-action:manipulation}
   }
   function linhaMae(c){
     var s = situacaoSimples(c);
-    return '<button type="button" class="pm-m" data-cli="' + esc(c.id) + '"><span class="pm-av">' + esc(iniciais(c.nome)) + '</span><span class="pm-n"><b>' + esc(bonito(c.nome) || 'Sem nome') + '</b><span class="pm-l2"><span class="pm-s ' + s[0] + '">' + esc(s[1]) + '</span><small>' + (c.cadastro ? esc(quando(c.cadastro)) : '') + '</small></span><span class="pm-pts"><span class="' + (marcos(c).conf ? 'on' : '') + '"><i></i>Confirmada</span><span class="' + (marcos(c).lib ? 'on' : '') + '"><i></i>Benefício liberado</span></span></span><span class="pm-seta">›</span></button>';
+    return '<button type="button" class="pm-m" data-cli="' + esc(c.id) + '"><span class="pm-av">' + esc(iniciais(c.nome)) + '</span><span class="pm-n"><b>' + esc(bonito(c.nome) || 'Sem nome') + '</b><span class="pm-l2"><span class="pm-s ' + s[0] + '">' + esc(s[1]) + '</span><small>' + (c.cadastro ? esc(quando(c.cadastro)) : '') + '</small></span>' + (semGanho() ? '' : '<span class="pm-pts"><span class="' + (marcos(c).conf ? 'on' : '') + '"><i></i>Confirmada</span><span class="' + (marcos(c).lib ? 'on' : '') + '"><i></i>Benefício liberado</span></span>') + '</span><span class="pm-seta">›</span></button>';
   }
   function vistaPainelParceira(){
     var cl = clientesPainel().slice().sort(function(a, b){ return String(b.cadastro || '').localeCompare(String(a.cadastro || '')); });

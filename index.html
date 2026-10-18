@@ -2594,6 +2594,7 @@ td,.row{font-size:13px}
       <div class="field"><label for="fp-reg">Cidade</label><div class="fp-reg-box"><span id="fp-reg-flag" class="fp-flag"></span><input id="fp-reg" list="fp-cidades" autocomplete="off" placeholder="Ex.: Manaus"></div><datalist id="fp-cidades"></datalist></div>
       <div class="field full" id="fp-tambem-box" hidden><label class="chk"><input id="fp-tambem" type="checkbox"> Este prospectador também atua como parceiro</label><span class="hint">No aplicativo ele passa a poder alternar entre prospectar parceiros e cadastrar clientes dele mesmo.</span></div>
       <div class="field full" id="fp-acesso-box" hidden><label>Acesso ao aplicativo</label><button class="btn" type="button" id="fp-acesso"><svg class="i"><use href="#i-phone"/></svg>Configurar login e senha</button><span class="hint">O login é o CPF do parceiro. A senha padrão é 123456 e ele cria a própria no primeiro acesso.</span></div>
+      <div class="field full" id="fp-ganho-box"><label class="chk"><input id="fp-ganho" type="checkbox" checked> Este parceiro terá ganhos</label><span class="hint">Desmarque se ele só vai cadastrar as mães, sem receber. A aba "Meus ganhos" some do aplicativo dele e não entram comissões para ele.</span></div>
       <div class="field full" id="fp-rem-box"><label>Remuneração</label><span class="hint" style="margin-bottom:6px">Quanto esta pessoa recebe por mãe, em cada momento. O aplicativo só mostra o que já foi pago, nunca estes valores.</span></div>
       <div class="field"><label for="fp-cconf">Recebe ao confirmar a mãe</label><input id="fp-cconf" class="fin-valor" type="text" inputmode="numeric"></div>
       <div class="field"><label for="fp-clib">Recebe quando o benefício é liberado</label><input id="fp-clib" class="fin-valor" type="text" inputmode="numeric"></div>
@@ -5311,7 +5312,7 @@ td,.row{font-size:13px}
       if (r.contratoEm) marcos.push(['conf', String(r.contratoEm).slice(0, 10)]);
       if (ganhou(r)) marcos.push(['lib', String(r.inssDecisaoEm || (r.recebimento && r.recebimento.data) || '').slice(0, 10)]);
       marcos.forEach(function(m){
-        [['parc', par.id], ['pros', par.prospectadorId && par.prospectadorId !== par.id ? par.prospectadorId : '']].forEach(function(pp){
+        [['parc', par.semGanho ? '' : par.id], ['pros', par.prospectadorId && par.prospectadorId !== par.id ? par.prospectadorId : '']].forEach(function(pp){
           if (!pp[1]) return;
           var pessoa = prospById(pp[1]); if (!pessoa) return;
           var feito = r.rede && r.rede[m[0]] && r.rede[m[0]][pp[0]], pago = feito && feito.pagoEm ? feito : null;
@@ -6286,6 +6287,7 @@ td,.row{font-size:13px}
     $('fp-acesso-box').hidden = !p;
     $('fp-cconf').value = moedaTxt(p && p.comConf || 0); $('fp-clib').value = moedaTxt(p && (p.comLib || p.valorIndicacao) || 0);
     $('fp-pconf').value = moedaTxt(p && p.prosConf || 0); $('fp-plib').value = moedaTxt(p && p.prosLib || 0);
+    $('fp-ganho').checked = !(p && p.semGanho); $('fp-ganho-box').hidden = ehPros; atualizarGanhoDlg();
     var temPros = !ehPros; $('fp-pconf-box').hidden = $('fp-plib-box').hidden = !temPros;
     $('fp-tambem-box').hidden = !ehPros; $('fp-tambem').checked = !!(p && p.tambemParceiro);
     $('fp-del').hidden = !p; pDelArmed = false; $('fp-del').classList.remove('armed'); $('fp-del').textContent = 'Excluir';
@@ -6293,6 +6295,9 @@ td,.row{font-size:13px}
   }
   $('btn-prosp-novo').addEventListener('click', function(){ openProsp(null); });
   $('fp-cancel').addEventListener('click', function(){ pedidoEq = null; dlgP.close(); });
+  // sem ganhos: esconde o valor que o parceiro recebe (o do prospectador continua)
+  function atualizarGanhoDlg(){ var sem = !$('fp-ganho').checked && !$('fp-ganho-box').hidden; $('fp-cconf').closest('.field').hidden = sem; $('fp-clib').closest('.field').hidden = sem; }
+  $('fp-ganho').addEventListener('change', atualizarGanhoDlg);
   $('fp-acesso').addEventListener('click', function(){
     var p = pEditing ? prospById(pEditing) : null; if (!p) return;
     dlgP.close(); abrirLinkCampo(p, false);
@@ -6334,6 +6339,7 @@ td,.row{font-size:13px}
       ativo: true, criadoEm: prev.criadoEm || new Date().toISOString(), atualizadoEm: new Date().toISOString() };
     if (prev.valorIndicacao) data.valorIndicacao = prev.valorIndicacao;
     data.comConf = moedaNum($('fp-cconf').value); data.comLib = moedaNum($('fp-clib').value);
+    if (pPerfil !== 'prospectador' && !$('fp-ganho').checked) data.semGanho = true;
     if (pPerfil !== 'prospectador'){ data.prosConf = moedaNum($('fp-pconf').value); data.prosLib = moedaNum($('fp-plib').value); }
     else { if (prev.prosConf) data.prosConf = prev.prosConf; if (prev.prosLib) data.prosLib = prev.prosLib; }
     if (pPerfil === 'prospectador'){ data.perfil = 'prospectador'; data.tipo = 'pessoa'; data.clinica = ''; data.tambemParceiro = $('fp-tambem').checked; }
