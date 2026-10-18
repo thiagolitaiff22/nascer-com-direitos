@@ -55,17 +55,17 @@ create or replace function public.campo_recebimentos(p_token text)
 returns jsonb language sql stable security definer set search_path = public as $$
   with eu as (select a.prosp_id as id from public.campo_acessos a where a.token = p_token and a.ativo and length(p_token) >= 20),
   linhas as (
-    select c.data ->> nome as nome, m.key as marco, pa.key as papel, pa.value as p
-    from public.clientes c, jsonb_each(coalesce(c.data -> rede, {}::jsonb)) m, jsonb_each(m.value) pa
-    where jsonb_typeof(pa.value) = object and coalesce(pa.value ->> pagoEm, ) <> 
+    select c.data ->> 'nome' as nome, m.key as marco, pa.key as papel, pa.value as p
+    from public.clientes c, jsonb_each(coalesce(c.data -> 'rede', '{}'::jsonb)) m, jsonb_each(m.value) pa
+    where jsonb_typeof(pa.value) = 'object' and coalesce(pa.value ->> 'pagoEm', '') <> ''
   )
-  select jsonb_build_object(pagamentos, coalesce((
-    select jsonb_agg(jsonb_build_object(mae, l.nome, marco, l.marco, papel, l.papel, valor, (l.p ->> valor)::numeric,
-             pagoEm, l.p ->> pagoEm, forma, l.p ->> forma) order by l.p ->> pagoEm desc, l.nome)
-    from linhas l join eu on l.p ->> pessoaId = eu.id), []::jsonb))
+  select jsonb_build_object('pagamentos', coalesce((
+    select jsonb_agg(jsonb_build_object('mae', l.nome, 'marco', l.marco, 'papel', l.papel, 'valor', (l.p ->> 'valor')::numeric,
+             'pagoEm', l.p ->> 'pagoEm', 'forma', l.p ->> 'forma') order by l.p ->> 'pagoEm' desc, l.nome)
+    from linhas l join eu on l.p ->> 'pessoaId' = eu.id), '[]'::jsonb))
   from eu
 $$;
 revoke all on function public.campo_recebimentos(text) from public;
 grant execute on function public.campo_recebimentos(text) to anon, authenticated;
 
-select ok as recebimentos;
+select 'ok' as recebimentos;
