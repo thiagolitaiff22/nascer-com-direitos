@@ -450,27 +450,46 @@ body{font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-w
 #modo[hidden]{display:none!important}
 .seg-nasc{display:flex;gap:6px;margin:0 0 10px}.seg-nasc button{flex:1;padding:11px 8px;border-radius:12px;border:1px solid var(--gline);background:var(--card);color:var(--ink2);font:inherit;font-size:14px;font-weight:700}
 .seg-nasc button[aria-pressed="true"]{background:var(--gold,#a07a45);color:#fff;border-color:transparent}
-/* ---------- parceiro: início minimalista ---------- */
-#app[data-perfil="c"] .abas{display:none!important}
-#app[data-perfil="c"] .vista{padding-bottom:calc(36px + env(safe-area-inset-bottom))}
-#app[data-perfil="c"] .vista.novo{padding-bottom:calc(110px + env(safe-area-inset-bottom))}
-#app[data-perfil="c"] .barra{bottom:0!important}
-.ini h2{font-size:22px;font-weight:600;letter-spacing:-.01em;margin:10px 0 4px;color:var(--ink)}
-.ini>p{font-size:13.5px;color:var(--ink2);line-height:1.5}
-.ini>p b{color:#8c6a38;font-weight:600}
-.ini-btn{display:flex;align-items:center;justify-content:center;width:100%;height:46px;margin:20px 0 26px;border:0;border-radius:12px;background:#8c6a38;color:#fff;font:inherit;font-size:14px;font-weight:500;letter-spacing:.01em}
-.ini-rot{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#a07a45;font-weight:600;margin-bottom:2px}
-.ini-m{display:flex;align-items:center;gap:11px;width:100%;padding:12px 0;border:0;border-bottom:1px solid var(--line);background:none;font:inherit;text-align:left;color:var(--ink)}
-.ini-m:last-child{border-bottom:0}
-.ini-av{flex:none;width:32px;height:32px;border-radius:50%;border:1px solid var(--line2);color:#8c6a38;font-size:11.5px;font-weight:600;display:grid;place-items:center}
-.ini-n{min-width:0;flex:1}
-.ini-n b{display:block;font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ini-n small{font-size:12px;color:var(--ink2)}
-.ini-s{flex:none;font-size:11.5px;color:var(--ink2);display:flex;align-items:center;gap:6px;white-space:nowrap}
-.ini-s i{width:6px;height:6px;border-radius:50%;background:#c9bda3}
-.ini-s.ok i{background:var(--ok)}.ini-s.fa i{background:var(--warn)}.ini-s.fa{color:var(--warn)}
+/* ---------- parceira: painel e lista (visual próprio) ---------- */
+.pm-ola{margin:4px 0 16px}
+.pm-ola h2{font-family:'Fraunces',Georgia,'Times New Roman',serif;font-weight:600;font-size:30px;line-height:1.08;letter-spacing:-.015em;color:var(--ink)}
+.pm-ola span{display:block;margin-top:5px;font-size:12.5px;color:var(--ink2)}
+.pm-hero{position:relative;overflow:hidden;border-radius:28px;padding:22px 22px 18px;color:#fff;background:radial-gradient(120% 90% at 100% 0%,#d2ae72 0%,rgba(210,174,114,0) 55%),linear-gradient(150deg,#a98349 0%,#7a5a2b 100%);box-shadow:0 18px 36px rgba(122,90,43,.28),inset 0 1px 0 rgba(255,255,255,.25)}
+.pm-marca{position:absolute;right:-26px;bottom:-34px;width:190px;opacity:.16;filter:brightness(0) invert(1);pointer-events:none}
+.pm-hero small{display:block;font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:600;opacity:.85}
+.pm-num{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:84px;line-height:.95;letter-spacing:-.03em;margin:8px 0 2px;text-shadow:0 4px 20px rgba(0,0,0,.18)}
+.pm-hero p{font-size:14px;opacity:.92;margin-bottom:16px}
+.pm-trio{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid rgba(255,255,255,.28);padding-top:12px;position:relative}
+.pm-trio span{font-size:11.5px;opacity:.95;line-height:1.3}
+.pm-trio span+span{border-left:1px solid rgba(255,255,255,.22);padding-left:12px}
+.pm-trio b{display:block;font-family:'Fraunces',Georgia,serif;font-size:22px;font-weight:600;line-height:1.1}
+.pm-hero+.kpis{margin-top:14px}
+.pm-alerta{display:flex;align-items:center;gap:12px;width:100%;margin-top:14px;border:0;border-left:4px solid #d98a3d;border-radius:16px;background:linear-gradient(90deg,#fdf1e0,#fff8ee);padding:13px 14px;text-align:left;font:inherit;color:#5b3a12;box-shadow:0 6px 16px rgba(217,138,61,.14)}
+.pm-alerta .n{flex:none;width:34px;height:34px;border-radius:50%;background:#d98a3d;color:#fff;font-weight:700;display:grid;place-items:center}
+.pm-alerta b{display:block;font-size:14px}.pm-alerta small{font-size:12px;opacity:.8}
+.pm-rot{margin:24px 2px 8px;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#a07a45;font-weight:700}
+.pm-lista{display:grid;gap:8px}
+.pm-m{display:flex;align-items:center;gap:12px;width:100%;border:1px solid var(--line);border-radius:18px;background:var(--card);padding:11px 14px 11px 11px;font:inherit;text-align:left;color:var(--ink);box-shadow:0 4px 14px rgba(60,45,20,.06)}
+.pm-av{flex:none;width:40px;height:40px;border-radius:50%;background:linear-gradient(145deg,#f4e7cc,#e8d3a8);color:#7a5a2b;font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:15px;display:grid;place-items:center}
+.pm-n{min-width:0;flex:1}.pm-n b{display:block;font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pm-n small{font-size:12px;color:var(--ink2)}
+.pm-s{flex:none;font-size:11.5px;font-weight:600;border-radius:999px;padding:5px 10px;background:#efe6d3;color:#7b6338;white-space:nowrap}
+.pm-s.ok{background:#e1f2e8;color:#1f7a45}.pm-s.fa{background:#fdebd8;color:#b2580c}
+.pm-mais{display:block;width:100%;margin-top:10px;border:0;background:none;color:#8c6a38;font:inherit;font-size:13.5px;font-weight:600;padding:8px}
+.pm-busca{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:0 14px;height:46px;box-shadow:0 4px 14px rgba(60,45,20,.05)}
+.pm-busca svg{width:19px;height:19px;stroke:var(--ink2);fill:none;stroke-width:1.9;stroke-linecap:round}
+.pm-busca input{flex:1;min-width:0;border:0;background:none;font:inherit;font-size:15px;color:var(--ink);outline:0}
+.pm-chips{display:flex;gap:7px;overflow-x:auto;margin:12px -16px 14px;padding:0 16px 2px;scrollbar-width:none}.pm-chips::-webkit-scrollbar{display:none}
+.pm-chips button{flex:none;border:1px solid var(--line2);background:var(--card);color:var(--ink2);font:inherit;font-size:12.5px;font-weight:600;border-radius:999px;padding:7px 13px}
+.pm-chips button b{margin-left:3px;font-variant-numeric:tabular-nums}
+.pm-chips button[aria-pressed="true"]{background:#2a2113;border-color:#2a2113;color:#f3ead8}
 .ini-ok{font-size:13.5px;color:var(--ink2);line-height:1.5;padding:12px 0}
-.voltar{border:0;background:none;color:var(--ink2);font:inherit;font-size:13.5px;font-weight:500;padding:2px 0 10px}
+/* aviso de versão nova */
+.atu{position:fixed;left:10px;right:10px;top:calc(10px + env(safe-area-inset-top));z-index:90;display:flex;align-items:center;gap:10px;background:#2a2113;color:#f3ead8;border:1px solid #6b5230;border-radius:16px;padding:11px 12px 11px 15px;box-shadow:0 14px 34px rgba(0,0,0,.38);animation:atuIn .35s ease}
+@keyframes atuIn{from{transform:translateY(-14px);opacity:0}to{transform:none;opacity:1}}
+.atu-t{flex:1;min-width:0}.atu-t b{display:block;font-size:13.5px;font-weight:600}.atu-t span{display:block;font-size:12px;color:#d9ccb0;line-height:1.35;margin-top:1px}
+.atu-ok{flex:none;border:0;border-radius:11px;background:#c9a468;color:#14110d;font:inherit;font-size:13px;font-weight:700;padding:10px 15px}
+.atu-ok:disabled{opacity:.7}
+.atu-x{flex:none;border:0;background:none;color:#bfb192;font-size:21px;line-height:1;padding:2px 6px}
 .tema{flex:none;width:38px;height:38px;border-radius:12px;border:1px solid var(--gline);background:var(--card);color:var(--ink2);display:grid;place-items:center;padding:0}
 .tema svg{width:19px;height:19px}
 .tema .lua{display:none}
@@ -727,7 +746,7 @@ body{-webkit-user-select:none;user-select:none}
 input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:text;font-size:max(16px,1em)}
 button,a,label,[role=button]{touch-action:manipulation}
 </style>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -768,7 +787,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 34;
+  var APP_VERSAO = 35;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1053,9 +1072,9 @@ button,a,label,[role=button]{touch-action:manipulation}
   function vistaProspPainel(){
     var l = listaProsp(), t = somaProsp(l), primeiro = String((quem && quem.nome) || '').trim().split(/\s+/)[0];
     $('vista').innerHTML =
-      '<div class="ola"><b>Olá' + (primeiro ? ', ' + esc(bonito(primeiro)) : '') + '!</b><span>Seus parceiros e os contratos que eles trouxeram</span></div>' +
-      '<div class="hero"><small>Parceiros que você trouxe</small><span class="num">' + l.length + '</span>' +
-        '<div class="lin"><span><b>' + t.ind + '</b> indicações</span><span><b>' + t.con + '</b> contratos</span><span><b>' + t.cnc + '</b> concedidos</span></div></div>' +
+      '<div class="pm-ola"><h2>Olá' + (primeiro ? ', ' + esc(bonito(primeiro)) : '') + '</h2><span>Seus parceiros e os resultados que eles trouxeram</span></div>' +
+      '<div class="pm-hero"><img class="pm-marca" src="img/logo-nascer-t.png" alt=""><small>Parceiros que você trouxe</small><div class="pm-num">' + l.length + '</div><p>' + (l.length === 1 ? 'parceiro na sua rede' : 'parceiros na sua rede') + '</p>' +
+        '<div class="pm-trio"><span><b>' + t.ind + '</b>indicações</span><span><b>' + t.con + '</b>contratos</span><span><b>' + t.cnc + '</b>concedidos</span></div></div>' +
       '<div class="kpis"><div class="kpi" style="--c:var(--ok)"><small>Contratos fechados</small><b>' + t.con + '</b></div>' +
         '<div class="kpi" style="--c:var(--warn)"><small>Guias pagas</small><b>' + t.gui + '</b></div>' +
         '<div class="kpi" style="--c:var(--ok)"><small>Concedidos</small><b>' + t.cnc + '</b></div>' +
@@ -1324,8 +1343,9 @@ button,a,label,[role=button]{touch-action:manipulation}
     document.body.classList.toggle('na-novo', aba === 'novo');
     sincronia();
     if (ehProspectador()) return aba === 'novo' ? vistaProspNovo() : aba === 'clientes' ? vistaProspLista() : vistaProspPainel();
-    if (aba === 'novo') return vistaNovo();
-    return vistaInicio();
+    if (aba === 'painel') return vistaPainel();
+    if (aba === 'clientes') return vistaClientes();
+    vistaNovo();
   }
   function vistaNovo(){
     guardarRascunho();
@@ -1333,7 +1353,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     var falta = DOCS.filter(function(d){ return obrig(d) && !fotos[d.k]; });
     var visiveis = DOCS.filter(function(d){ return !d.oculto && (completando ? completando.faltaDocs.indexOf(d.k) >= 0 : serve(d)); });
     var gest = gestante();
-    $('vista').innerHTML = (completando ? '' : '<button type="button" class="voltar" id="voltar-ini">‹ Voltar</button>') + (completando ?
+    $('vista').innerHTML = (completando ?
       '<div class="completar"><small>Completar documentos de</small><b>' + esc(completando.nome) + '</b><span>Tire só as fotos que estavam faltando e envie.</span><button type="button" id="cancelar-comp">Cancelar</button></div>' :
       '<div class="rot" style="margin-top:0">Dados da cliente</div><div class="dados">' +
         '<label class="fone' + (lsGet('campo_nome').trim() ? '' : ' falta') + '" id="l-nome"><svg viewBox="0 0 24 24"><use href="#i-pessoa"/></svg><input id="nome" autocomplete="off" autocapitalize="words" placeholder="Nome completo da cliente" value="' + esc(lsGet('campo_nome')) + '"></label>' +
@@ -1365,7 +1385,6 @@ button,a,label,[role=button]{touch-action:manipulation}
       ops.forEach(function(c){ c.classList.add('opc'); box.querySelector('.grid').appendChild(c); });
       g1.parentNode.insertBefore(box, g1.nextSibling);
     })();
-    if ($('voltar-ini')) $('voltar-ini').onclick = function(){ irPara('painel'); };
     if (completando){ $('cancelar-comp').onclick = cancelarComplemento; if ($('enviar')) $('enviar').lastChild.textContent = 'Enviar documentos'; }
     else {
     $('fone').addEventListener('input', function(){ this.value = maskFone(this.value); lsSet('campo_fone', this.value); });
@@ -1484,24 +1503,35 @@ button,a,label,[role=button]{touch-action:manipulation}
     return ['', 'em andamento'];
   }
   function iniciais(n){ var p = String(n || '').trim().split(/\s+/).filter(Boolean); return ((p[0] || '?').charAt(0) + (p.length > 1 ? p[p.length - 1].charAt(0) : '')).toUpperCase(); }
-  function vistaInicio(){
+  function resumoParceiro(cl){
+    var ok = 0, pend = 0, and = 0;
+    cl.forEach(function(c){ if (faltas(c).length) pend++; else if (etapaCli(c) === 'ganhou') ok++; else and++; });
+    return { ok: ok, pend: pend, and: and, total: cl.length };
+  }
+  function linhaMae(c){
+    var s = situacaoSimples(c);
+    return '<button type="button" class="pm-m" data-cli="' + esc(c.id) + '"><span class="pm-av">' + esc(iniciais(c.nome)) + '</span><span class="pm-n"><b>' + esc(bonito(c.nome) || 'Sem nome') + '</b><small>' + (c.cadastro ? 'enviada ' + esc(quando(c.cadastro)) : '') + '</small></span><span class="pm-s ' + s[0] + '">' + esc(s[1]) + '</span></button>';
+  }
+  function vistaPainelParceira(){
     var cl = clientesPainel().slice().sort(function(a, b){ return String(b.cadastro || '').localeCompare(String(a.cadastro || '')); });
-    var ok = cl.filter(function(c){ return etapaCli(c) === 'ganhou'; }).length;
+    var r = resumoParceiro(cl);
     var primeiro = String((quem && quem.nome) || '').trim().split(/\s+/)[0];
-    var sub = ok ? '<b>' + ok + (ok === 1 ? ' mãe</b> que você indicou já deu certo.' : ' mães</b> que você indicou já deram certo.')
-      : cl.length ? 'Acompanhe aqui as mães que você enviou.' : 'Comece cadastrando a primeira mãe.';
+    var h = new Date(), atual = painel && painel.atualizado ? new Date(painel.atualizado) : null;
+    var frase = r.ok ? (r.ok === 1 ? 'mãe amparada por você' : 'mães amparadas por você') : 'mães amparadas por você';
     $('vista').innerHTML =
-      '<div class="ini"><h2>Olá' + (primeiro ? ', ' + esc(primeiro.charAt(0) + primeiro.slice(1).toLowerCase()) : '') + '</h2><p>' + sub + '</p>' +
-      '<button type="button" class="ini-btn" id="ini-novo">+&nbsp; Novo cadastro</button>' +
+      '<div class="pm-ola"><h2>Olá, ' + esc(primeiro ? primeiro.charAt(0) + primeiro.slice(1).toLowerCase() : 'parceira') + '</h2><span>' + h.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' }) + (atual ? ' · atualizado às ' + atual.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '') + '</span></div>' +
+      '<div class="pm-hero"><img class="pm-marca" src="img/logo-nascer-t.png" alt=""><small>Deram certo</small><div class="pm-num">' + r.ok + '</div><p>' + frase + '</p>' +
+        '<div class="pm-trio"><span><b>' + r.total + '</b>enviadas</span><span><b>' + r.and + '</b>em andamento</span><span><b>' + r.pend + '</b>com pendência</span></div></div>' +
       '<div id="aviso-fila"></div>' +
-      (cl.length ? '<div class="ini-rot">Enviadas</div><div class="ini-lista">' + cl.slice(0, 300).map(function(c){
-        var s = situacaoSimples(c);
-        return '<button type="button" class="ini-m" data-cli="' + esc(c.id) + '"><span class="ini-av">' + esc(iniciais(c.nome)) + '</span><span class="ini-n"><b>' + esc(bonito(c.nome) || 'Sem nome') + '</b><small>' + (c.cadastro ? quando(c.cadastro) : '') + '</small></span><span class="ini-s ' + s[0] + '"><i></i>' + esc(s[1]) + '</span></button>';
-      }).join('') + '</div>' : '<div class="vazio" style="margin-top:20px">' + (navigator.onLine === false && !painel ? 'Sem internet: a lista aparece quando o celular tiver sinal.' : 'As mães que você enviar aparecem aqui.') + '</div>') +
+      (r.pend ? '<button type="button" class="pm-alerta" data-ir="faltam"><span class="n">' + r.pend + '</span><span><b>' + (r.pend === 1 ? 'mãe com documento faltando' : 'mães com documento faltando') + '</b><small>Toque para ver quais e completar</small></span></button>' : '') +
+      (cl.length ? '<div class="pm-rot">Últimas enviadas</div><div class="pm-lista">' + cl.slice(0, 5).map(linhaMae).join('') + '</div>' + (cl.length > 5 ? '<button type="button" class="pm-mais" data-ir="todos">Ver todas as ' + cl.length + ' mães</button>' : '')
+        : '<div class="vazio" style="margin-top:14px">' + (navigator.onLine === false && !painel ? 'Sem internet: o painel aparece quando o celular tiver sinal.' : 'As mães que você cadastrar aparecem aqui. Toque em <b>Novo cadastro</b> para começar.') + '</div>') +
       '<button type="button" class="sair" id="sair"><svg><use href="#i-sair"/></svg>Sair desta conta</button>' +
-      '<div class="versao">Nascer com Direitos · versão ' + APP_VERSAO + '</div></div>';
-    $('ini-novo').onclick = function(){ irPara('novo'); };
-    $('vista').onclick = function(e){ var c = e.target.closest('[data-cli]'); if (c) fichaCli(c.dataset.cli); };
+      '<div class="versao">Nascer com Direitos · versão ' + APP_VERSAO + '</div>';
+    $('vista').onclick = function(e){
+      var k = e.target.closest('[data-ir]'); if (k){ filtroCli = k.dataset.ir; buscaCli = ''; return irPara('clientes'); }
+      var c = e.target.closest('[data-cli]'); if (c) fichaCli(c.dataset.cli);
+    };
     $('sair').onclick = sair;
     filaTodos().catch(function(){ return []; }).then(function(l){
       var n = l.filter(function(x){ return x.token === token; }).length, el = $('aviso-fila'); if (!el || !n) return;
@@ -1509,9 +1539,32 @@ button,a,label,[role=button]{touch-action:manipulation}
       $('mandar-ja').onclick = function(){ ultimoErro = function(e){ ultimoErro = null; alert('Não foi possível enviar ' + (e.cliente || 'o cadastro') + ': ' + e.erro + '.\n\nO aplicativo continua tentando sozinho.'); }; proximo(true); };
     });
   }
+  var GRUPOS_P = [['todos', 'Todas'], ['faltam', 'Pendências'], ['andamento', 'Em andamento'], ['ganharam', 'Deram certo']];
+  function noGrupoP(c, g){ var fl = faltas(c).length > 0, ok = !fl && etapaCli(c) === 'ganhou'; return g === 'todos' || (g === 'faltam' && fl) || (g === 'ganharam' && ok) || (g === 'andamento' && !fl && !ok); }
+  function vistaClientesParceira(){
+    var cl = clientesPainel().slice().sort(function(a, b){ return String(b.cadastro || '').localeCompare(String(a.cadastro || '')); });
+    if (!GRUPOS_P.some(function(g){ return g[0] === filtroCli; })) filtroCli = 'todos';
+    $('vista').innerHTML =
+      '<div class="pm-ola"><h2>Suas mães</h2><span>' + cl.length + (cl.length === 1 ? ' enviada' : ' enviadas') + ' por você</span></div>' +
+      '<label class="pm-busca"><svg><use href="#i-busca"/></svg><input id="busca-cli" placeholder="Buscar pelo nome" value="' + esc(buscaCli) + '" autocomplete="off"></label>' +
+      '<div class="pm-chips" id="chips">' + GRUPOS_P.map(function(g){ var n = cl.filter(function(c){ return noGrupoP(c, g[0]); }).length; return '<button type="button" data-g="' + g[0] + '" aria-pressed="' + (filtroCli === g[0]) + '">' + g[1] + ' <b>' + n + '</b></button>'; }).join('') + '</div>' +
+      '<div id="lista-cli"></div><div id="fila"></div>';
+    function desenhar(){
+      var q = buscaCli.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+      var l = cl.filter(function(c){ return noGrupoP(c, filtroCli) && (!q || String(c.nome || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().indexOf(q) >= 0); });
+      $('lista-cli').innerHTML = l.length ? '<div class="pm-lista">' + l.slice(0, 300).map(linhaMae).join('') + '</div>'
+        : '<div class="vazio">' + (cl.length ? 'Nenhuma mãe neste filtro.' : navigator.onLine === false && !painel ? 'Sem internet: a lista aparece quando o celular tiver sinal.' : 'Você ainda não enviou nenhuma mãe. Toque em Novo cadastro.') + '</div>';
+    }
+    desenhar();
+    $('busca-cli').addEventListener('input', function(){ buscaCli = this.value; desenhar(); });
+    $('chips').addEventListener('click', function(e){ var b = e.target.closest('[data-g]'); if (!b) return; filtroCli = b.dataset.g; Array.prototype.forEach.call(this.children, function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); desenhar(); });
+    $('lista-cli').addEventListener('click', function(e){ var c = e.target.closest('[data-cli]'); if (c) fichaCli(c.dataset.cli); });
+    mostrarFila();
+  }
 
   /* ---------- aba Painel (antiga, não usada pelo parceiro) ---------- */
   function vistaPainel(){
+    if (!ehProspectador()) return vistaPainelParceira();
     var cl = clientesPainel(), cont = {};
     cl.forEach(function(c){ var k = etapaCli(c); cont[k] = (cont[k] || 0) + 1; });
     var ganharam = cont.ganhou || 0;
@@ -1558,6 +1611,7 @@ button,a,label,[role=button]{touch-action:manipulation}
   var GRUPOS = [['todos', 'Todas'], ['faltam', 'Faltam documentos'], ['preparo', 'Em preparação'], ['inss', 'No INSS'], ['exigencia', 'INSS pediu documento'], ['indeferido', 'Indeferidos'], ['protocolado', 'Na Justiça'], ['marcada', 'Audiência marcada'], ['ganharam', 'Ganharam'], ['faltou', 'Faltaram'], ['perdeu', 'Não ganharam']];
   function noGrupo(c, g){ var k = etapaCli(c); if (g === 'faltam') return faltas(c).length > 0; return g === 'todos' || k === g || (g === 'ganharam' && k === 'ganhou'); }
   function vistaClientes(){
+    if (!ehProspectador()) return vistaClientesParceira();
     var cl = clientesPainel();
     $('vista').innerHTML =
       '<label class="busca"><svg><use href="#i-busca"/></svg><input id="busca-cli" placeholder="Buscar cliente pelo nome" value="' + esc(buscaCli) + '" autocomplete="off"></label>' +
@@ -2520,7 +2574,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     });
   }
   iniciar();
-  if (!APP && 'serviceWorker' in navigator) navigator.serviceWorker.register('campo-sw.js').catch(function(){});
+  if ('serviceWorker' in navigator && location.protocol === 'https:' && location.hostname !== 'localhost') navigator.serviceWorker.register('campo-sw.js').catch(function(){});
   if (APP){
     // botão voltar do Android: fecha a tela aberta (câmera, recorte, conferir); na tela inicial, só minimiza
     var Pl = window.Capacitor.Plugins || {};
@@ -2533,22 +2587,47 @@ button,a,label,[role=button]{touch-action:manipulation}
       if (aba !== 'painel') return irPara('painel');
       Pl.App.minimizeApp();
     });
-    if (Pl.App) Pl.App.addListener('resume', function(){ proximo(); carregarPainel(); sincronia(); });
-    // aviso de versão nova do aplicativo
-    fetch('https://thiagolitaiff22.github.io/nascer-com-direitos/app/versao.json?' + Date.now()).then(function(r){ return r.json(); }).then(function(v){
-      if (v && (v.apk || v.versao) > APP_VERSAO){ var b = document.createElement('a'); b.href = v.url; b.textContent = 'Nova versão do aplicativo: toque para baixar'; b.style.cssText = 'display:block;background:#a07a45;color:#fff;text-align:center;padding:10px;font-weight:700;text-decoration:none'; document.body.insertBefore(b, document.body.firstChild); }
+    if (Pl.App) Pl.App.addListener('resume', function(){ proximo(); carregarPainel(); sincronia(); verificarAtualizacao(); });
+  }
+  /* ---------- aviso de versão nova: aparece em todos os celulares (Android, iPhone e navegador) ---------- */
+  var SITE_VERSAO = 'https://thiagolitaiff22.github.io/nascer-com-direitos/app/versao.json';
+  var avisoAtu = null, ultimaChecagem = 0;
+  function mostrarAtualizacao(v, nativo){
+    if (avisoAtu && document.body.contains(avisoAtu)) return;
+    var d = document.createElement('div'); d.className = 'atu'; d.setAttribute('role', 'alert');
+    d.innerHTML = '<div class="atu-t"><b>' + (nativo ? 'Nova versão do aplicativo' : 'Nova versão disponível') + '</b><span>' + esc(v.novidades || 'Melhorias e correções.') + '</span></div>' +
+      '<button type="button" class="atu-ok">' + (nativo ? 'Baixar' : 'Atualizar') + '</button><button type="button" class="atu-x" aria-label="Agora não">×</button>';
+    document.body.appendChild(d); avisoAtu = d;
+    d.querySelector('.atu-ok').onclick = function(){
+      if (nativo){ window.open(v.url, '_system'); return; }
+      var b = this; b.disabled = true; b.textContent = 'Atualizando…';
+      atualizarApp(v);
+      setTimeout(function(){ if (document.body.contains(b)){ b.disabled = false; b.textContent = 'Atualizar'; } }, 5000);   // se o celular perguntar "sair da página?", dá para tentar de novo
+    };
+    d.querySelector('.atu-x').onclick = function(){ d.remove(); };
+  }
+  // limpa a cópia guardada e recarrega: o que está guardado no celular (cadastros esperando sinal, fotos, login) continua lá
+  function atualizarApp(v){
+    var c = window.caches ? caches.keys().then(function(ks){ return Promise.all(ks.map(function(k){ return caches.delete(k); })); }) : Promise.resolve();
+    var s = navigator.serviceWorker && navigator.serviceWorker.getRegistrations ? navigator.serviceWorker.getRegistrations().then(function(rs){ return Promise.all(rs.map(function(r){ return r.unregister(); })); }) : Promise.resolve();
+    Promise.all([c.catch(function(){}), s.catch(function(){})]).then(function(){ location.replace(location.pathname + '?v=' + ((v && v.versao) || Date.now())); });
+  }
+  function verificarAtualizacao(){
+    if (navigator.onLine === false) return;
+    var agora = Date.now(); if (agora - ultimaChecagem < 20000) return; ultimaChecagem = agora;
+    fetch(SITE_VERSAO + '?t=' + agora, { cache: 'no-store' }).then(function(r){ return r.json(); }).then(function(v){
+      if (!v) return;
+      if (v.versao > APP_VERSAO) return mostrarAtualizacao(v, false);
+      // Android: a "casca" do aplicativo (parte nativa) também tem versão
+      var Pl = window.Capacitor && window.Capacitor.Plugins || {};
+      if (APP && v.apkBuild && Pl.App && Pl.App.getInfo) Pl.App.getInfo().then(function(i){ if (+i.build < v.apkBuild) mostrarAtualizacao(v, true); }).catch(function(){});
     }).catch(function(){});
   }
-  // iPhone ou navegador (não é o aplicativo Android): se saiu versão nova, recarrega sozinho uma vez para pegar
-  if (!window.Capacitor && navigator.onLine !== false){
-    fetch('app/versao.json?' + Date.now()).then(function(r){ return r.json(); }).then(function(v){
-      if (!v || !(v.versao > APP_VERSAO)) return;
-      var ja = ''; try { ja = sessionStorage.getItem('nascer_recarregou') || ''; sessionStorage.setItem('nascer_recarregou', String(v.versao)); } catch(x){}
-      if (ja === String(v.versao)) return;
-      var limpar = window.caches ? caches.keys().then(function(ks){ return Promise.all(ks.map(function(k){ return caches.delete(k); })); }) : Promise.resolve();
-      limpar.catch(function(){}).then(function(){ location.reload(); });
-    }).catch(function(){});
-  }
+  verificarAtualizacao();
+  document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'visible') verificarAtualizacao(); });
+  window.addEventListener('online', verificarAtualizacao);
+  window.addEventListener('focus', verificarAtualizacao);
+  setInterval(verificarAtualizacao, 10 * 60 * 1000);
 })();
 </script>
 
