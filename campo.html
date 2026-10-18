@@ -455,9 +455,7 @@ body{font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-w
 .pm-ola{margin:4px 0 16px}
 .pm-ola h2{font-family:'Fraunces',Georgia,'Times New Roman',serif;font-weight:600;font-size:30px;line-height:1.08;letter-spacing:-.015em;color:var(--ink)}
 .pm-ola span{display:block;margin-top:5px;font-size:12.5px;color:var(--ink2)}
-.pm-hero{position:relative;overflow:hidden;border-radius:28px;padding:22px 22px 18px;color:#fff;background:radial-gradient(120% 90% at 100% 0%,#d2ae72 0%,rgba(210,174,114,0) 55%),linear-gradient(150deg,#a98349 0%,#7a5a2b 100%);box-shadow:0 18px 36px rgba(122,90,43,.28),inset 0 1px 0 rgba(255,255,255,.25)}
-.pm-hero::after{content:"";position:absolute;right:-26px;bottom:-34px;width:190px;height:225px;background:url(img/marca-branca.png) no-repeat center/contain;opacity:.16;pointer-events:none}
-.pm-hero{contain:paint}
+.pm-hero{position:relative;border-radius:28px;padding:22px 22px 18px;color:#fff;background:url(img/marca-suave.png) no-repeat right -24px bottom -30px/190px auto,linear-gradient(150deg,#b08b52 0%,#8f6e3b 55%,#7a5a2b 100%);box-shadow:0 12px 24px rgba(122,90,43,.22)}
 .pm-hero small{display:block;font-size:14px;letter-spacing:.01em;font-weight:500;opacity:.9}
 .pm-num{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:84px;line-height:.95;letter-spacing:-.03em;margin:8px 0 2px;text-shadow:0 4px 20px rgba(0,0,0,.18)}
 .pm-hero p{font-size:14px;opacity:.92;margin-bottom:16px}
@@ -800,7 +798,7 @@ body{-webkit-user-select:none;user-select:none}
 input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:text;font-size:max(16px,1em)}
 button,a,label,[role=button]{touch-action:manipulation}
 </style>
-<link rel="preload" as="image" href="img/marca-branca.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
+<link rel="preload" as="image" href="img/marca-suave.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -842,7 +840,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 42;
+  var APP_VERSAO = 43;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
