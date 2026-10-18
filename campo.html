@@ -787,7 +787,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 35;
+  var APP_VERSAO = 36;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -2599,7 +2599,7 @@ button,a,label,[role=button]{touch-action:manipulation}
       '<button type="button" class="atu-ok">' + (nativo ? 'Baixar' : 'Atualizar') + '</button><button type="button" class="atu-x" aria-label="Agora não">×</button>';
     document.body.appendChild(d); avisoAtu = d;
     d.querySelector('.atu-ok').onclick = function(){
-      if (nativo){ window.open(v.url, '_system'); return; }
+      if (nativo){ location.href = v.url; return; }
       var b = this; b.disabled = true; b.textContent = 'Atualizando…';
       atualizarApp(v);
       setTimeout(function(){ if (document.body.contains(b)){ b.disabled = false; b.textContent = 'Atualizar'; } }, 5000);   // se o celular perguntar "sair da página?", dá para tentar de novo

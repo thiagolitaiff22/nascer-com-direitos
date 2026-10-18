@@ -2,6 +2,11 @@
   "appId": "br.com.nascercomdireitos.app",
   "appName": "Nascer com Direitos",
   "webDir": "www",
+  "server": {
+    "url": "https://thiagolitaiff22.github.io/nascer-com-direitos/campo.html",
+    "errorPath": "offline.html",
+    "androidScheme": "https"
+  },
   "android": {
     "allowMixedContent": false
   },

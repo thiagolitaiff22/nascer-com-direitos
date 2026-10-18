@@ -13,6 +13,6 @@ let sw = fs.readFileSync(path.join(R, 'campo-sw.js'), 'utf8');
 sw = sw.replace(/nascer-campo-v\d+/, 'nascer-campo-v' + (v + 20));
 fs.writeFileSync(path.join(R, 'campo-sw.js'), sw);
 let old = {}; try { old = JSON.parse(fs.readFileSync(path.join(__dirname, 'versao.json'), 'utf8')); } catch (e) {}
-const out = { versao: v, apk: old.apk || 25, apkBuild: old.apkBuild || 0, url: 'https://thiagolitaiff22.github.io/nascer-com-direitos/app/download/nascer-com-direitos.apk', novidades };
+const out = { versao: v, apk: old.apk || 25, apkBuild: old.apkBuild || 0, url: old.url || 'https://github.com/thiagolitaiff22/nascer-com-direitos/raw/main/app/download/nascer-com-direitos.apk', novidades };
 fs.writeFileSync(path.join(__dirname, 'versao.json'), JSON.stringify(out) + '\n');
 console.log('Versão', v, 'pronta. Falta só publicar (git add, commit e push).');

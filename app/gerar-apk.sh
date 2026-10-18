@@ -10,9 +10,9 @@ node montar.js
 npx cap sync android > /dev/null
 rm -f android/app/build/outputs/apk/release/app-release.apk
 (cd android && ./gradlew.bat assembleRelease --no-daemon -q 2>&1 | grep -iv "warning\|deprecat\|unchecked\|Xlint" || true)
-V=$(grep -o 'var APP_VERSAO = [0-9]*' ../campo.html | grep -o '[0-9]*$')
+VC=$(grep -o "versionCode [0-9]*" android/app/build.gradle | grep -o "[0-9]*$")
 mkdir -p download
 cp android/app/build/outputs/apk/release/app-release.apk download/nascer-com-direitos.apk
-printf '{"versao": %s, "url": "https://thiagolitaiff22.github.io/nascer-com-direitos/app/download/nascer-com-direitos.apk"}\n' "$V" > versao.json
+node -e "const fs=require('fs');let o={};try{o=JSON.parse(fs.readFileSync('versao.json','utf8'))}catch(e){};o.apk=+process.argv[1];o.apkBuild=+process.argv[1];o.url='https://github.com/thiagolitaiff22/nascer-com-direitos/raw/main/app/download/nascer-com-direitos.apk';fs.writeFileSync('versao.json',JSON.stringify(o)+'\n')" "$VC"
 "$T/sdk/build-tools/35.0.0/apksigner.bat" verify --print-certs download/nascer-com-direitos.apk | grep -i "signer #1 certificate DN"
-echo "APK pronto: app/download/nascer-com-direitos.apk (versão $V)"
+echo "APK pronto: app/download/nascer-com-direitos.apk (versionCode $VC)"
