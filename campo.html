@@ -456,8 +456,8 @@ body{font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-w
 .pm-ola h2{font-family:'Fraunces',Georgia,'Times New Roman',serif;font-weight:600;font-size:30px;line-height:1.08;letter-spacing:-.015em;color:var(--ink)}
 .pm-ola span{display:block;margin-top:5px;font-size:12.5px;color:var(--ink2)}
 .pm-hero{position:relative;overflow:hidden;border-radius:28px;padding:22px 22px 18px;color:#fff;background:radial-gradient(120% 90% at 100% 0%,#d2ae72 0%,rgba(210,174,114,0) 55%),linear-gradient(150deg,#a98349 0%,#7a5a2b 100%);box-shadow:0 18px 36px rgba(122,90,43,.28),inset 0 1px 0 rgba(255,255,255,.25)}
-.pm-marca{position:absolute;right:-26px;bottom:-34px;width:190px;opacity:.16;pointer-events:none;-webkit-user-drag:none;user-select:none;transform:translateZ(0)}
-.pm-hero{isolation:isolate;-webkit-mask-image:-webkit-radial-gradient(white,black)}
+.pm-hero::after{content:"";position:absolute;right:-26px;bottom:-34px;width:190px;height:225px;background:url(img/marca-branca.png) no-repeat center/contain;opacity:.16;pointer-events:none}
+.pm-hero{contain:paint}
 .pm-hero small{display:block;font-size:14px;letter-spacing:.01em;font-weight:500;opacity:.9}
 .pm-num{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:84px;line-height:.95;letter-spacing:-.03em;margin:8px 0 2px;text-shadow:0 4px 20px rgba(0,0,0,.18)}
 .pm-hero p{font-size:14px;opacity:.92;margin-bottom:16px}
@@ -532,7 +532,7 @@ html[data-tema="dark"] #app .topo{background:rgba(20,17,13,.84);box-shadow:0 1px
 #app .topo .logo img{display:block;width:100%;height:100%;object-fit:contain}
 #app .topo .quem{flex:1;min-width:0}
 #app .topo .quem b{display:block;font-family:'Fraunces',Georgia,serif;font-size:18px;font-weight:600;letter-spacing:-.01em;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#app .topo .quem span{display:block;margin-top:2px;font-size:11.5px;font-weight:600;letter-spacing:.02em;color:#a07a45}
+#app .topo .quem span{display:block;margin-top:2px;font-size:12px;font-weight:600;letter-spacing:.01em;color:#a07a45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #app .topo .sinc{margin:0;border:0;background:none;box-shadow:none;padding:0 2px;gap:0;font-size:11.5px}
 #app .topo .sinc span{display:none}
 #app .topo .sinc.off span{display:inline;margin-left:6px;color:#b7762d;font-weight:600}
@@ -800,7 +800,7 @@ body{-webkit-user-select:none;user-select:none}
 input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:text;font-size:max(16px,1em)}
 button,a,label,[role=button]{touch-action:manipulation}
 </style>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
+<link rel="preload" as="image" href="img/marca-branca.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -842,7 +842,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 41;
+  var APP_VERSAO = 42;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1113,10 +1113,11 @@ button,a,label,[role=button]{touch-action:manipulation}
     return fetch(CFG.url + '/rest/v1/rpc/' + nome, { method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) })
       .then(function(r){ return r.json(); });
   }
+  var ppSig = '';
   function carregarProsp(){
     if (!CFG_OK || !token || navigator.onLine === false) return Promise.resolve();
     return chamar('prosp_painel', { p_token: token }).then(function(d){
-      if (d && d.parceiros){ pp = d; lsSet('campo_pp', JSON.stringify(d)); if (aba !== 'novo' && $('vista') && !document.querySelector('.tela')) telaInicial(); }
+      if (d && d.parceiros){ var sig = JSON.stringify(d.parceiros), mudou = sig !== ppSig; ppSig = sig; pp = d; lsSet('campo_pp', JSON.stringify(d)); if (mudou && aba !== 'novo' && $('vista') && !document.querySelector('.tela')) telaInicial(); }
     }).catch(function(){});
   }
   function listaProsp(){
@@ -1134,7 +1135,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     var l = listaProsp(), t = somaProsp(l), primeiro = String((quem && quem.nome) || '').trim().split(/\s+/)[0];
     $('vista').innerHTML =
       '<div class="pm-ola"><h2>Olá' + (primeiro ? ', ' + esc(bonito(primeiro)) : '') + '</h2><span>Seus parceiros e os resultados que eles trouxeram</span></div>' +
-      '<div class="pm-hero"><img class="pm-marca" src="img/marca-branca.png" alt=""><small>Parceiros que você trouxe</small><div class="pm-num">' + l.length + '</div><p>' + (l.length === 1 ? 'parceiro na sua rede' : 'parceiros na sua rede') + '</p>' +
+      '<div class="pm-hero"><small>Parceiros que você trouxe</small><div class="pm-num">' + l.length + '</div><p>' + (l.length === 1 ? 'parceiro na sua rede' : 'parceiros na sua rede') + '</p>' +
         '<div class="pm-trio"><span><b>' + t.ind + '</b>indicações</span><span><b>' + t.con + '</b>contratos</span><span><b>' + t.cnc + '</b>concedidos</span></div></div>' +
       '<div class="kpis"><div class="kpi" style="--c:var(--ok)"><small>Contratos fechados</small><b>' + t.con + '</b></div>' +
         '<div class="kpi" style="--c:var(--warn)"><small>Guias pagas</small><b>' + t.gui + '</b></div>' +
@@ -1391,8 +1392,10 @@ button,a,label,[role=button]{touch-action:manipulation}
   function telaInicial(){
     montarCasca();
     var clin = quem && quem.tipo === 'clinica' && quem.clinica;
-    $('topo-nome').textContent = clin ? bonito(quem.clinica) : bonito((quem && quem.nome) || '') || 'Parceiro';
-    $('topo-sub').textContent = ehProspectador() ? 'Prospectador' : clin ? 'Clínica parceira' : (quem && quem.perfil === 'prospectador' ? 'Parceiro' : 'Parceira');
+    var quemTxt = clin ? bonito(quem.clinica) : bonito((quem && quem.nome) || '') || 'Parceiro';
+    var papelTxt = ehProspectador() ? 'Prospectador' : clin ? 'Clínica parceira' : (quem && quem.perfil === 'prospectador' ? 'Parceiro' : 'Parceira');
+    $('topo-nome').textContent = 'Nascer com Direitos';
+    $('topo-sub').textContent = quemTxt + ' · ' + papelTxt;
     var bm = $('modo');
     if (bm){
       var duplo = !!(quem && quem.perfil === 'prospectador' && quem.tambemParceiro);
@@ -1535,7 +1538,8 @@ button,a,label,[role=button]{touch-action:manipulation}
   function clientesPainel(){ return (painel && painel.clientes) || []; }
 
   // busca o painel no servidor (e guarda no celular para abrir sem internet)
-  var buscandoPainel = false;
+  var buscandoPainel = false, painelSig = '';
+  try { painelSig = JSON.stringify((JSON.parse(lsGet('campo_painel') || 'null') || {}).clientes || null); } catch(e){}
   // cliente apagado no sistema: tira do histórico do celular (só os que já tinham sido confirmados lá) e cancela o "completar"
   function limparApagados(){
     var ids = {}; ((painel && painel.clientes) || []).forEach(function(c){ ids[c.id] = 1; });
@@ -1557,7 +1561,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     buscandoPainel = true;
     return fetch(CFG.url + '/rest/v1/rpc/campo_painel', { method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_token: token }) })
       .then(function(r){ return r.json(); })
-      .then(function(d){ if (d && d.clientes){ painel = maiusculas(d); lsSet('campo_painel', JSON.stringify(d)); return limparApagados().then(function(){ if (aba !== 'novo' && $('vista')) telaInicial(); }); } })
+      .then(function(d){ if (d && d.clientes){ var sig = JSON.stringify(d.clientes), mudou = sig !== painelSig; painelSig = sig; painel = maiusculas(d); lsSet('campo_painel', JSON.stringify(d)); return limparApagados().then(function(){ if (mudou && aba !== 'novo' && $('vista')) telaInicial(); }); } })
       .catch(function(){}).then(function(){ buscandoPainel = false; });
   }
 
@@ -1591,7 +1595,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     var frase = r.ok ? (r.ok === 1 ? 'mãe amparada por você' : 'mães amparadas por você') : 'mães amparadas por você';
     $('vista').innerHTML =
       '<div class="pm-ola"><h2>Olá, ' + esc(primeiro ? primeiro.charAt(0) + primeiro.slice(1).toLowerCase() : 'parceira') + '</h2><span>' + h.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' }) + (atual ? ' · atualizado às ' + atual.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '') + '</span></div>' +
-      '<div class="pm-hero"><img class="pm-marca" src="img/marca-branca.png" alt=""><small>Deram certo</small><div class="pm-num">' + r.ok + '</div><p>' + frase + '</p>' +
+      '<div class="pm-hero"><small>Deram certo</small><div class="pm-num">' + r.ok + '</div><p>' + frase + '</p>' +
         '<div class="pm-trio"><span><b>' + r.total + '</b>enviadas</span><span><b>' + r.and + '</b>em andamento</span><span><b>' + r.pend + '</b>com pendência</span></div></div>' +
       '<div id="aviso-fila"></div>' +
       (r.pend ? '<button type="button" class="pm-alerta" data-ir="faltam"><span class="n">' + r.pend + '</span><span><b>' + (r.pend === 1 ? 'mãe com documento faltando' : 'mães com documento faltando') + '</b><small>Toque para ver quais e completar</small></span></button>' : '') +
