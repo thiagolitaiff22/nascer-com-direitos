@@ -2046,6 +2046,12 @@ td,.row{font-size:13px}
 .prio-n{min-width:0}.prio-n .nome-abrir{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.prio-n span{font-size:12px;color:var(--ink-3)}
 .cron{flex:none;font-variant-numeric:tabular-nums;font-weight:800;font-size:14px;padding:5px 9px;border-radius:8px;background:rgba(120,120,120,.15)}
 .cron.crit{color:#e5604d;background:rgba(229,96,77,.15)}.cron.warn{color:#d9a441;background:rgba(217,164,65,.15)}.cron.ok{color:#5fb27a;background:rgba(95,178,122,.15)}
+.com-grupo{margin-bottom:14px;overflow:hidden}
+.com-gh{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--line)}
+.com-gh b{font-size:15px}.com-gtot{display:flex;align-items:center;gap:10px}
+.com-grupo .fin-tbl{margin:0}
+#com-filtro{margin-bottom:14px}
+#com-filtro button[aria-pressed="true"]{background:var(--primary,#8c6a38)}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2317,7 +2323,7 @@ td,.row{font-size:13px}
       </section>
 
       <section id="view-fin" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
-        <div class="res-rap fin-sub" role="tablist" aria-label="Parte do financeiro"><button type="button" data-fin="receita" aria-pressed="true">Receita</button><button type="button" data-fin="prosp" aria-pressed="false">Parceiros</button><button type="button" data-fin="resultado" aria-pressed="false">Resultado</button><button type="button" data-fin="anual" aria-pressed="false">Faturamento anual</button></div>
+        <div class="res-rap fin-sub" role="tablist" aria-label="Parte do financeiro"><button type="button" data-fin="receita" aria-pressed="true">Receita</button><button type="button" data-fin="prosp" aria-pressed="false">Parceiros</button><button type="button" data-fin="com" aria-pressed="false">Comissões</button><button type="button" data-fin="resultado" aria-pressed="false">Resultado</button><button type="button" data-fin="anual" aria-pressed="false">Faturamento anual</button></div>
         <div class="fbar">
           <div class="search tb-busca"><svg class="i"><use href="#i-search"/></svg><input id="fin-q" type="search" placeholder="Buscar cliente por nome ou CPF"></div>
           <select id="fin-aud-sel" class="tb-sel" aria-label="Origem"></select>
@@ -2341,6 +2347,7 @@ td,.row{font-size:13px}
         <div class="fin-prosp" hidden>
           <div class="card ct-tab"><table class="ct-tbl fin-tbl"><thead><tr><th>Parceiro</th><th class="dir">Valor por indicação</th><th class="dir">Indicações</th><th class="dir">Ganhos</th><th class="dir">Clientes já pagas</th><th class="dir">A pagar</th><th class="dir">Previsão</th><th class="dir">Se todos derem certo</th></tr></thead><tbody id="fin-prosp-body"></tbody></table></div>
         </div>
+        <div class="fin-com" hidden><div id="com-box"></div></div>
       </section>
 
       <section id="view-ret" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
@@ -2587,6 +2594,11 @@ td,.row{font-size:13px}
       <div class="field"><label for="fp-reg">Cidade</label><div class="fp-reg-box"><span id="fp-reg-flag" class="fp-flag"></span><input id="fp-reg" list="fp-cidades" autocomplete="off" placeholder="Ex.: Manaus"></div><datalist id="fp-cidades"></datalist></div>
       <div class="field full" id="fp-tambem-box" hidden><label class="chk"><input id="fp-tambem" type="checkbox"> Este prospectador também atua como parceiro</label><span class="hint">No aplicativo ele passa a poder alternar entre prospectar parceiros e cadastrar clientes dele mesmo.</span></div>
       <div class="field full" id="fp-acesso-box" hidden><label>Acesso ao aplicativo</label><button class="btn" type="button" id="fp-acesso"><svg class="i"><use href="#i-phone"/></svg>Configurar login e senha</button><span class="hint">O login é o CPF do parceiro. A senha padrão é 123456 e ele cria a própria no primeiro acesso.</span></div>
+      <div class="field full" id="fp-rem-box"><label>Remuneração</label><span class="hint" style="margin-bottom:6px">Quanto esta pessoa recebe por mãe, em cada momento. O aplicativo só mostra o que já foi pago, nunca estes valores.</span></div>
+      <div class="field"><label for="fp-cconf">Recebe ao confirmar a mãe</label><input id="fp-cconf" class="fin-valor" type="text" inputmode="numeric"></div>
+      <div class="field"><label for="fp-clib">Recebe quando o benefício é liberado</label><input id="fp-clib" class="fin-valor" type="text" inputmode="numeric"></div>
+      <div class="field" id="fp-pconf-box"><label for="fp-pconf">Prospectador recebe ao confirmar</label><input id="fp-pconf" class="fin-valor" type="text" inputmode="numeric"></div>
+      <div class="field" id="fp-plib-box"><label for="fp-plib">Prospectador recebe ao liberar</label><input id="fp-plib" class="fin-valor" type="text" inputmode="numeric"></div>
       <div class="field full"><label for="fp-pal">Palavras do endereço</label><input id="fp-pal" placeholder="Ex.: curumitá, nogueira"><span class="hint">Clientes cujo endereço tiver uma dessas palavras ficam com este parceiro. Separe por vírgula.</span></div>
     </div>
     <div class="f-foot">
@@ -2659,6 +2671,20 @@ td,.row{font-size:13px}
         <button class="btn primary" type="submit" id="rec-save">Salvar</button>
       </div>
     </div>
+  </form>
+</dialog>
+
+<dialog id="dlg-com">
+  <form class="f" id="form-com" novalidate>
+    <div class="f-head"><div class="ph-tile" style="margin:0"><svg class="i"><use href="#i-cash"/></svg></div><h2 id="com-titulo">Registrar pagamento</h2></div>
+    <div class="f-body">
+      <div class="field full"><div class="rep-cli" id="com-resumo"></div></div>
+      <div class="field"><label for="com-data">Data do pagamento</label><input id="com-data" type="date"></div>
+      <div class="field"><label for="com-forma">Forma de pagamento</label><select id="com-forma"><option value="pix">Pix</option><option value="transferencia">Transferência bancária</option><option value="dinheiro">Dinheiro em mãos</option></select></div>
+      <div class="field full"><label for="com-obs">Observação (opcional)</label><input id="com-obs" autocomplete="off" placeholder="Ex.: Pix do dia 15, comprovante no WhatsApp"></div>
+      <div class="field full"><span class="hint">O parceiro passa a ver este pagamento no aplicativo dele (data, mãe, momento e valor) assim que você registrar.</span></div>
+    </div>
+    <div class="f-foot"><div class="right"><button class="btn" type="button" id="com-cancel">Cancelar</button><button class="btn primary" type="submit" id="com-ok">Marcar como pago</button></div></div>
   </form>
 </dialog>
 
@@ -4675,6 +4701,7 @@ td,.row{font-size:13px}
   function emAndamento(r){ return !ganhou(r) && !perdeu(r) && !r.arquivado && (requerido(r) || !!String(r.processo || '').trim()); }
   function renderFin(){
     var body = $('fin-body'); if (!body) return;
+    if (finParte === 'com'){ renderCom(); return; }
     var selO = $('fin-aud-sel'), nO = function(k){ return state.rows.filter(function(r){ return ganhou(r) && (!k || origem(r) === k); }).length; };
     selO.innerHTML = '<option value="">INSS e Judicial · ' + nO('') + '</option><option value="inss">Concedidos no INSS · ' + nO('inss') + '</option><option value="justica">Ganhos no Judicial · ' + nO('justica') + '</option>';
     selO.value = finSessao; selO.classList.toggle('ativo', !!finSessao);
@@ -5265,6 +5292,113 @@ td,.row{font-size:13px}
       return '<tr' + (i === 2 ? ' class="fin-destaque"' : '') + '><td class="nome">' + c[0] + '<div class="mini">' + c[1] + '</div></td><td class="dir n">' + c[2] + '</td><td class="dir n">' + brl(c[3]) + '</td><td class="dir n fin-custo">− ' + brl(c[4]) + '</td><td class="dir n fin-apagar">' + brl(c[3] - c[4]) + '</td></tr>';
     }).join('');
   }
+  /* ---------- Comissões: dois momentos (contrato fechado · benefício liberado), valor por pessoa, baixa no BI ---------- */
+  var MARCO_ROT = { conf: 'Contrato fechado', lib: 'Benefício liberado' };
+  var comFiltro = 'pendentes', comSel = {}, comAlvo = [];
+  function comValor(par, marco, papel){
+    if (!par) return 0;
+    var k = papel === 'parc' ? (marco === 'conf' ? 'comConf' : 'comLib') : (marco === 'conf' ? 'prosConf' : 'prosLib');
+    var v = Number(par[k]);
+    if (!(v > 0) && papel === 'parc' && marco === 'lib') v = Number(par.valorIndicacao) || 0;   // valor antigo por indicação
+    return v > 0 ? v : 0;
+  }
+  function comLinhas(){
+    var out = [];
+    state.rows.forEach(function(r){
+      if (!r.responsavelId) return;
+      var par = prospById(r.responsavelId); if (!par) return;
+      var marcos = [];
+      if (r.contratoEm) marcos.push(['conf', String(r.contratoEm).slice(0, 10)]);
+      if (ganhou(r)) marcos.push(['lib', String(r.inssDecisaoEm || (r.recebimento && r.recebimento.data) || '').slice(0, 10)]);
+      marcos.forEach(function(m){
+        [['parc', par.id], ['pros', par.prospectadorId && par.prospectadorId !== par.id ? par.prospectadorId : '']].forEach(function(pp){
+          if (!pp[1]) return;
+          var pessoa = prospById(pp[1]); if (!pessoa) return;
+          var feito = r.rede && r.rede[m[0]] && r.rede[m[0]][pp[0]], pago = feito && feito.pagoEm ? feito : null;
+          var v = pago ? Number(pago.valor) || 0 : comValor(par, m[0], pp[0]);
+          if (!pago && !(v > 0)) return;
+          out.push({ cli: r, marco: m[0], papel: pp[0], pessoa: pessoa, valor: v, quando: m[1], pago: pago, key: r.id + '|' + m[0] + '|' + pp[0] });
+        });
+      });
+    });
+    return out;
+  }
+  function comCard(ico, rot, v, cls, cap){
+    return '<div class="card stat"><div class="stat-h"><svg class="i"><use href="#' + ico + '"/></svg>' + rot + '</div><div class="stat-v tnum' + (cls ? ' ' + cls : '') + '">' + v + '</div><div class="stat-c">' + cap + '</div></div>';
+  }
+  function renderCom(){
+    var box = $('com-box'); if (!box) return;
+    var todas = comLinhas();
+    var q = String(finQ || '').toLowerCase();
+    var L = todas.filter(function(x){ return !q || String(x.cli.nome || '').toLowerCase().indexOf(q) >= 0 || String(x.pessoa.nome || '').toLowerCase().indexOf(q) >= 0; });
+    var pend = L.filter(function(x){ return !x.pago; }), pagas = L.filter(function(x){ return x.pago; });
+    var soma = function(a){ return a.reduce(function(s, x){ return s + x.valor; }, 0); };
+    var pessoasPend = {}; pend.forEach(function(x){ pessoasPend[x.pessoa.id] = 1; });
+    $('fin-stats').innerHTML =
+      comCard('i-cash', 'A pagar agora', brl(soma(pend)), 'warn', pend.length + (pend.length === 1 ? ' item pendente' : ' itens pendentes')) +
+      comCard('i-check', 'Já pago', brl(soma(pagas)), 'ok', pagas.length + (pagas.length === 1 ? ' pagamento registrado' : ' pagamentos registrados')) +
+      comCard('i-users', 'Pessoas a receber', Object.keys(pessoasPend).length, '', 'com pagamento pendente') +
+      comCard('i-clock', 'Total geral', brl(soma(L)), '', 'pago + a pagar');
+    $('fin-regra').innerHTML = 'Cada <b>contrato fechado</b> e cada <b>benefício liberado</b> gera um item para o parceiro (e para o prospectador dele), com o valor definido em <b>Parceiros › Editar › Remuneração</b>. Marque os itens e clique em <b>Pagar</b> para registrar a baixa; o parceiro vê só o que já foi pago.';
+    $('fin-count').textContent = L.length + (L.length === 1 ? ' item' : ' itens');
+    var mostrar = comFiltro === 'pagas' ? pagas : comFiltro === 'todas' ? L : pend;
+    var grupos = {}; mostrar.forEach(function(x){ (grupos[x.pessoa.id] = grupos[x.pessoa.id] || { pessoa: x.pessoa, itens: [] }).itens.push(x); });
+    var ordem = Object.keys(grupos).sort(function(a, b){ return soma(grupos[b].itens.filter(function(x){ return !x.pago; })) - soma(grupos[a].itens.filter(function(x){ return !x.pago; })) || String(grupos[a].pessoa.nome).localeCompare(grupos[b].pessoa.nome, 'pt-BR'); });
+    var sel = '<div class="res-rap" id="com-filtro" role="tablist">' + [['pendentes', 'A pagar · ' + pend.length], ['pagas', 'Pagas · ' + pagas.length], ['todas', 'Todas · ' + L.length]].map(function(o){ return '<button type="button" data-cf="' + o[0] + '" aria-pressed="' + (comFiltro === o[0]) + '">' + o[1] + '</button>'; }).join('') + '</div>';
+    var corpo = ordem.length ? ordem.map(function(id){
+      var g = grupos[id], ps = g.itens.filter(function(x){ return !x.pago; }), marcadas = ps.filter(function(x){ return comSel[x.key]; });
+      var papelTxt = g.itens.some(function(x){ return x.papel === 'pros'; }) && !g.itens.some(function(x){ return x.papel === 'parc'; }) ? 'Prospectador' : (g.pessoa.perfil === 'prospectador' ? 'Prospectador' : 'Parceiro');
+      return '<div class="card ct-tab com-grupo"><div class="com-gh"><div><b>' + esc(g.pessoa.nome || '—') + '</b><span class="mini"> ' + papelTxt + (g.pessoa.regiao ? ' · ' + esc(g.pessoa.regiao) : '') + '</span></div>' +
+        '<div class="com-gtot">' + (ps.length ? '<span class="mini">a pagar</span> <b class="tnum">' + brl(soma(ps)) + '</b>' : '<span class="mini">tudo pago</span>') +
+        (ps.length ? ' <button type="button" class="btn primary" data-compagar="' + esc(id) + '">' + (marcadas.length ? 'Pagar ' + marcadas.length + ' · ' + brl(soma(marcadas)) : 'Pagar tudo') + '</button>' : '') + '</div></div>' +
+        '<table class="ct-tbl fin-tbl"><thead><tr><th style="width:32px"></th><th>Mãe</th><th>Momento</th><th>Data</th><th class="dir">Valor</th><th>Situação</th></tr></thead><tbody>' +
+        g.itens.sort(function(a, b){ return (a.pago ? 1 : 0) - (b.pago ? 1 : 0) || String(a.quando).localeCompare(String(b.quando)); }).map(function(x){
+          return '<tr><td>' + (x.pago ? '' : '<input type="checkbox" data-comchk="' + esc(x.key) + '"' + (comSel[x.key] ? ' checked' : '') + '>') + '</td><td class="nome">' + esc(x.cli.nome || '—') + '</td><td>' + MARCO_ROT[x.marco] + (x.papel === 'pros' ? ' <span class="mini">(via parceiro ' + esc((prospById(x.cli.responsavelId) || {}).nome || '') + ')</span>' : '') + '</td><td>' + (x.quando ? fmtDate(x.quando) : '—') + '</td><td class="dir n">' + brl(x.valor) + '</td><td>' +
+            (x.pago ? '<span class="pill ok">pago em ' + fmtDate(x.pago.pagoEm) + '</span> <span class="mini">' + esc(({ pix: 'Pix', transferencia: 'Transferência', dinheiro: 'Dinheiro' })[x.pago.forma] || '') + '</span> <button type="button" class="linkbtn" data-comdesf="' + esc(x.key) + '">desfazer</button>' : '<span class="pill warn">a pagar</span>') + '</td></tr>';
+        }).join('') + '</tbody></table></div>';
+    }).join('') : '<div class="card"><div class="vazio" style="margin:14px">' + (comFiltro === 'pendentes' ? 'Nenhum pagamento pendente. Quando um contrato for fechado ou um benefício for liberado, o item aparece aqui.' : 'Nada para mostrar neste filtro.') + (todas.length ? '' : ' <br>Defina os valores em <b>Parceiros › Editar › Remuneração</b> para os itens aparecerem.') + '</div></div>';
+    box.innerHTML = sel + corpo;
+  }
+  function comLinhaPorChave(k){ return comLinhas().filter(function(x){ return x.key === k; })[0]; }
+  document.addEventListener('click', function(e){
+    var f = e.target.closest && e.target.closest('[data-cf]'); if (f){ comFiltro = f.dataset.cf; return renderCom(); }
+    var pg = e.target.closest && e.target.closest('[data-compagar]'); if (pg){
+      var todas = comLinhas().filter(function(x){ return !x.pago && x.pessoa.id === pg.dataset.compagar; });
+      var marc = todas.filter(function(x){ return comSel[x.key]; });
+      comAlvo = marc.length ? marc : todas;
+      var tot = comAlvo.reduce(function(s, x){ return s + x.valor; }, 0);
+      $('com-titulo').textContent = 'Pagar ' + (comAlvo[0] ? comAlvo[0].pessoa.nome : '');
+      $('com-resumo').innerHTML = '<b>' + comAlvo.length + (comAlvo.length === 1 ? ' item' : ' itens') + '</b> · total <b>' + moedaTxt(tot) + '</b><br><span class="mini">' + comAlvo.map(function(x){ return esc(x.cli.nome) + ' (' + MARCO_ROT[x.marco].toLowerCase() + ')'; }).join(', ') + '</span>';
+      $('com-data').value = iso(new Date()); $('com-forma').value = 'pix'; $('com-obs').value = '';
+      $('dlg-com').showModal(); return;
+    }
+    var ds = e.target.closest && e.target.closest('[data-comdesf]'); if (ds){
+      var x = comLinhaPorChave(ds.dataset.comdesf); if (!x || !x.pago) return;
+      var rede = JSON.parse(JSON.stringify(x.cli.rede || {})); if (rede[x.marco]) delete rede[x.marco][x.papel];
+      patchRow(x.cli.id, { rede: rede, atualizadoEm: new Date().toISOString() }).then(function(){ toast('Pagamento desfeito: ' + x.cli.nome + ' · ' + x.pessoa.nome); }, function(err){ toast(errMsg(err)); });
+    }
+  });
+  document.addEventListener('change', function(e){
+    var c = e.target.closest && e.target.closest('[data-comchk]'); if (!c) return;
+    if (c.checked) comSel[c.dataset.comchk] = 1; else delete comSel[c.dataset.comchk];
+    renderCom();
+  });
+  $('com-cancel').addEventListener('click', function(){ $('dlg-com').close(); });
+  $('form-com').addEventListener('submit', async function(e){
+    e.preventDefault(); if (!comAlvo.length) return;
+    var data = $('com-data').value || iso(new Date()), forma = $('com-forma').value, obs = $('com-obs').value.trim();
+    var porCli = {}; comAlvo.forEach(function(x){ (porCli[x.cli.id] = porCli[x.cli.id] || { cli: x.cli, itens: [] }).itens.push(x); });
+    $('com-ok').disabled = true;
+    try {
+      for (var id in porCli){
+        var g = porCli[id], rede = JSON.parse(JSON.stringify(g.cli.rede || {}));
+        g.itens.forEach(function(x){ (rede[x.marco] = rede[x.marco] || {})[x.papel] = { pessoaId: x.pessoa.id, valor: x.valor, pagoEm: data, forma: forma, obs: obs, por: (state.user && state.user.email) || '' }; delete comSel[x.key]; });
+        await patchRow(id, { rede: rede, atualizadoEm: new Date().toISOString() });
+      }
+      $('dlg-com').close(); toast('Pagamento registrado: ' + comAlvo.length + (comAlvo.length === 1 ? ' item' : ' itens') + ' · ' + moedaTxt(comAlvo.reduce(function(s, x){ return s + x.valor; }, 0)));
+    } catch(err){ toast(errMsg(err)); } finally { $('com-ok').disabled = false; comAlvo = []; }
+  });
+
   function renderFinProsp(base, card){
     var grupos = {};
     base.forEach(function(r){ if (!r.responsavelId) return; (grupos[r.responsavelId] = grupos[r.responsavelId] || []).push(r); });
@@ -5298,9 +5432,9 @@ td,.row{font-size:13px}
   document.querySelector('.fin-sub').addEventListener('click', function(e){
     var b = e.target.closest('[data-fin]'); if (!b) return; finParte = b.dataset.fin;
     Array.prototype.forEach.call(this.querySelectorAll('[data-fin]'), function(x){ x.setAttribute('aria-pressed', String(x === b)); });
-    document.querySelector('.fin-receita').hidden = finParte !== 'receita'; document.querySelector('.fin-prosp').hidden = finParte !== 'prosp'; document.querySelector('.fin-resultado').hidden = finParte !== 'resultado'; document.querySelector('.fin-anual').hidden = finParte !== 'anual';
+    document.querySelector('.fin-receita').hidden = finParte !== 'receita'; document.querySelector('.fin-prosp').hidden = finParte !== 'prosp'; document.querySelector('.fin-resultado').hidden = finParte !== 'resultado'; document.querySelector('.fin-anual').hidden = finParte !== 'anual'; document.querySelector('.fin-com').hidden = finParte !== 'com';
     $('fin-pag-sel').hidden = finParte !== 'receita';
-    $('fin-ano-sel').hidden = $('fin-ano-csv').hidden = finParte !== 'anual'; $('fin-aud-sel').hidden = finParte === 'anual';
+    $('fin-ano-sel').hidden = $('fin-ano-csv').hidden = finParte !== 'anual'; $('fin-aud-sel').hidden = finParte === 'anual' || finParte === 'com';
     renderFin();
   });
   $('fin-aud-sel').addEventListener('change', function(){ finSessao = this.value; renderFin(); });
@@ -6150,6 +6284,9 @@ td,.row{font-size:13px}
     prosPreencher($('fp-regiao').value, p ? p.prospectadorId || '' : '');
     $('fp-pal').value = p ? (p.palavrasEndereco || []).join(', ') : '';
     $('fp-acesso-box').hidden = !p;
+    $('fp-cconf').value = moedaTxt(p && p.comConf || 0); $('fp-clib').value = moedaTxt(p && (p.comLib || p.valorIndicacao) || 0);
+    $('fp-pconf').value = moedaTxt(p && p.prosConf || 0); $('fp-plib').value = moedaTxt(p && p.prosLib || 0);
+    var temPros = !ehPros; $('fp-pconf-box').hidden = $('fp-plib-box').hidden = !temPros;
     $('fp-tambem-box').hidden = !ehPros; $('fp-tambem').checked = !!(p && p.tambemParceiro);
     $('fp-del').hidden = !p; pDelArmed = false; $('fp-del').classList.remove('armed'); $('fp-del').textContent = 'Excluir';
     dlgP.showModal(); $('fp-nome').focus();
@@ -6196,6 +6333,9 @@ td,.row{font-size:13px}
       palavrasEndereco: $('fp-pal').value.split(',').map(function(s){ return s.trim(); }).filter(Boolean),
       ativo: true, criadoEm: prev.criadoEm || new Date().toISOString(), atualizadoEm: new Date().toISOString() };
     if (prev.valorIndicacao) data.valorIndicacao = prev.valorIndicacao;
+    data.comConf = moedaNum($('fp-cconf').value); data.comLib = moedaNum($('fp-clib').value);
+    if (pPerfil !== 'prospectador'){ data.prosConf = moedaNum($('fp-pconf').value); data.prosLib = moedaNum($('fp-plib').value); }
+    else { if (prev.prosConf) data.prosConf = prev.prosConf; if (prev.prosLib) data.prosLib = prev.prosLib; }
     if (pPerfil === 'prospectador'){ data.perfil = 'prospectador'; data.tipo = 'pessoa'; data.clinica = ''; data.tambemParceiro = $('fp-tambem').checked; }
     else { var pr = $('fp-prospectador').value || ''; if (pr) data.prospectadorId = pr; }
     if (prev.criadoPor) data.criadoPor = prev.criadoPor;

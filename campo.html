@@ -133,7 +133,7 @@ html,body{font-size:15px}
 .sinc.off i{background:var(--warn)}
 .vista{max-width:560px;margin:0 auto;padding:14px 16px calc(84px + env(safe-area-inset-bottom))}
 .vista.novo{padding-bottom:calc(160px + env(safe-area-inset-bottom))}
-.abas{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--card);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);padding-bottom:env(safe-area-inset-bottom)}
+.abas{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--card);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom)}
 .abas button{position:relative;border:0;background:none;color:var(--ink2);font:inherit;font-size:12px;font-weight:600;padding:9px 0 10px;display:flex;flex-direction:column;align-items:center;gap:3px}
 .abas svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .abas button[aria-current="true"]{color:var(--ink);box-shadow:inset 0 2px 0 var(--ink)}
@@ -450,6 +450,7 @@ body{font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-w
 #modo[hidden]{display:none!important}
 .seg-nasc{display:flex;gap:6px;margin:0 0 10px}.seg-nasc button{flex:1;padding:11px 8px;border-radius:12px;border:1px solid var(--gline);background:var(--card);color:var(--ink2);font:inherit;font-size:14px;font-weight:700}
 .seg-nasc button[aria-pressed="true"]{background:var(--gold,#a07a45);color:#fff;border-color:transparent}
+.abas button{font-size:10.5px!important;letter-spacing:-.01em}
 /* ---------- parceira: painel e lista (visual próprio) ---------- */
 .pm-ola{margin:4px 0 16px}
 .pm-ola h2{font-family:'Fraunces',Georgia,'Times New Roman',serif;font-weight:600;font-size:30px;line-height:1.08;letter-spacing:-.015em;color:var(--ink)}
@@ -492,6 +493,18 @@ body{font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-w
 .pm-vazio{text-align:center;padding:34px 20px;color:var(--ink2);font-size:14px;line-height:1.5}
 .pm-vazio b{display:block;font-family:'Fraunces',Georgia,serif;font-size:20px;color:var(--ink);margin-bottom:4px}
 
+.pm-pts{display:flex;flex-wrap:wrap;gap:3px 12px;margin-top:6px}
+.pm-pts span{display:flex;align-items:center;gap:5px;font-size:11px;color:#b6a98c}.pm-pts i{width:8px;height:8px;border-radius:50%;border:1.5px solid #c9bda3;box-sizing:border-box}
+.pm-pts span.on{color:#7a5a2b;font-weight:600}.pm-pts span.on i{background:linear-gradient(145deg,#c9a468,#8c6a38);border-color:transparent}
+.pm-hero-b .pm-num-m{font-size:46px;margin:6px 0 2px}
+.pm-duo{grid-template-columns:1fr 1.1fr}
+.pm-mes{display:flex;justify-content:space-between;align-items:baseline}.pm-mes span{font-family:'Inter',system-ui,sans-serif;font-size:13px;font-weight:600;color:#7a5a2b}
+.pm-val{flex:none;font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:16px;color:var(--ink)}
+.pm-pag{cursor:default}
+.pm-conta{display:grid;gap:10px}
+.pm-conta button{display:block;width:100%;text-align:left;border:1px solid var(--line);border-radius:18px;background:var(--card);padding:15px 16px;font:inherit;color:var(--ink);box-shadow:0 4px 14px rgba(60,45,20,.06)}
+.pm-conta button b{display:block;font-size:15px}.pm-conta button small{font-size:12.5px;color:var(--ink2)}
+.pm-conta .sair{margin-top:0;display:flex;align-items:center;gap:8px;color:var(--ink2);font-weight:600}
 .ini-ok{font-size:13.5px;color:var(--ink2);line-height:1.5;padding:12px 0}
 /* aviso de versão nova */
 .atu{position:fixed;left:10px;right:10px;top:calc(10px + env(safe-area-inset-top));z-index:90;display:flex;align-items:center;gap:10px;background:#2a2113;color:#f3ead8;border:1px solid #6b5230;border-radius:16px;padding:11px 12px 11px 15px;box-shadow:0 14px 34px rgba(0,0,0,.38);animation:atuIn .35s ease}
@@ -777,6 +790,7 @@ button,a,label,[role=button]{touch-action:manipulation}
   <symbol id="i-som" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></symbol>
   <symbol id="i-painel" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></symbol>
   <symbol id="i-grupo" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.9-3.4 3.4-5.5 6.5-5.5s5.6 2.1 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c1.8.8 3 2.6 3.5 5.2"/></symbol>
+  <symbol id="i-moeda" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M14.6 9.3c-.6-.8-1.5-1.3-2.6-1.3-1.5 0-2.6.8-2.6 1.9 0 2.6 5.2 1.3 5.2 3.9 0 1.1-1.1 1.9-2.6 1.9-1.1 0-2.1-.5-2.7-1.3M12 6.5V8m0 8v1.5"/></symbol>
   <symbol id="i-novo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></symbol>
   <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
   <symbol id="i-busca" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></symbol>
@@ -797,7 +811,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 37;
+  var APP_VERSAO = 38;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1030,9 +1044,11 @@ button,a,label,[role=button]{touch-action:manipulation}
         '<button type="button" class="tema" id="tema" aria-label="Trocar entre modo claro e escuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle class="sol" cx="12" cy="12" r="4"/><path class="sol" d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/><path class="lua" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button></div>' +
       '<main class="vista" id="vista"></main>' +
       '<nav class="abas" id="abas">' +
-        '<button type="button" data-aba="painel"><svg><use href="#i-painel"/></svg>Painel</button>' +
+        '<button type="button" data-aba="painel"><svg><use href="#i-painel"/></svg>' + (ehProspectador() ? 'Painel' : 'Início') + '</button>' +
+        '<button type="button" data-aba="clientes"><svg><use href="#i-grupo"/></svg>' + (ehProspectador() ? 'Parceiros' : 'Mães') + '</button>' +
         '<button type="button" data-aba="novo"><svg><use href="#i-novo"/></svg>' + (ehProspectador() ? 'Novo parceiro' : 'Novo cadastro') + '<span class="bolha" id="bolha" hidden></span></button>' +
-        '<button type="button" data-aba="clientes"><svg><use href="#i-grupo"/></svg>' + (ehProspectador() ? 'Parceiros' : 'Clientes') + '</button>' +
+        '<button type="button" data-aba="recebimentos"><svg><use href="#i-moeda"/></svg>Recebimentos</button>' +
+        '<button type="button" data-aba="conta"><svg><use href="#i-pessoa"/></svg>Conta</button>' +
       '</nav>';
     $('abas').addEventListener('click', function(e){ var b = e.target.closest('[data-aba]'); if (b) irPara(b.dataset.aba); });
     $('tema').addEventListener('click', function(){
@@ -1092,13 +1108,11 @@ button,a,label,[role=button]{touch-action:manipulation}
       '<div class="rot">Seus parceiros' + (l.length ? ' · ' + l.length : '') + '</div>' +
       (l.length ? '<div class="lista">' + l.slice(0, 8).map(linhaParc).join('') + '</div>' + (l.length > 8 ? '<button type="button" class="sair" id="ver-todos">Ver todos os parceiros</button>' : '')
                 : '<div class="vazio">Você ainda não cadastrou parceiros. Toque em <b>Novo parceiro</b>.</div>') +
-      '<button type="button" class="sair" id="sair"><svg><use href="#i-sair"/></svg>Sair desta conta</button>' +
-      '<div class="versao">Nascer com Direitos · versão ' + APP_VERSAO + '</div>';
+      '';
     $('vista').onclick = function(e){
       var p = e.target.closest('[data-parc]'); if (p) return fichaParceiro(p.dataset.parc);
       if (e.target.closest('#ver-todos')) irPara('clientes');
     };
-    $('sair').onclick = sair;
   }
   var buscaParc = '';
   function vistaProspLista(){
@@ -1352,6 +1366,8 @@ button,a,label,[role=button]{touch-action:manipulation}
     $('vista').onclick = null;   // cada aba põe o seu próprio clique
     document.body.classList.toggle('na-novo', aba === 'novo');
     sincronia();
+    if (aba === 'recebimentos'){ carregarReceb(); return vistaRecebimentos(); }
+    if (aba === 'conta') return vistaConta();
     if (ehProspectador()) return aba === 'novo' ? vistaProspNovo() : aba === 'clientes' ? vistaProspLista() : vistaProspPainel();
     if (aba === 'painel') return vistaPainel();
     if (aba === 'clientes') return vistaClientes();
@@ -1506,21 +1522,26 @@ button,a,label,[role=button]{touch-action:manipulation}
   }
 
   /* ---------- início do parceiro: só o essencial (cadastrar, mães enviadas, quantas deram certo) ---------- */
+  function marcos(c){
+    var lib = c.liberada !== undefined ? !!c.liberada : etapaCli(c) === 'ganhou';
+    var conf = c.confirmada !== undefined ? !!c.confirmada : (lib || etapaCli(c) !== 'preparo');
+    return { conf: conf || lib, lib: lib };
+  }
   function situacaoSimples(c){
-    var fl = faltas(c);
+    var fl = faltas(c), m = marcos(c);
+    if (m.lib) return ['ok', 'deu certo'];
     if (fl.length) return ['fa', fl.length === 1 ? 'falta ' + NOME_DOC[fl[0]].toLowerCase() : 'faltam ' + fl.length + ' documentos'];
-    if (etapaCli(c) === 'ganhou') return ['ok', 'deu certo'];
-    return ['', 'em andamento'];
+    return ['', m.conf ? 'confirmada' : 'em andamento'];
   }
   function iniciais(n){ var p = String(n || '').trim().split(/\s+/).filter(Boolean); return ((p[0] || '?').charAt(0) + (p.length > 1 ? p[p.length - 1].charAt(0) : '')).toUpperCase(); }
   function resumoParceiro(cl){
     var ok = 0, pend = 0, and = 0;
-    cl.forEach(function(c){ if (faltas(c).length) pend++; else if (etapaCli(c) === 'ganhou') ok++; else and++; });
+    cl.forEach(function(c){ if (marcos(c).lib) ok++; else if (faltas(c).length) pend++; else and++; });
     return { ok: ok, pend: pend, and: and, total: cl.length };
   }
   function linhaMae(c){
     var s = situacaoSimples(c);
-    return '<button type="button" class="pm-m" data-cli="' + esc(c.id) + '"><span class="pm-av">' + esc(iniciais(c.nome)) + '</span><span class="pm-n"><b>' + esc(bonito(c.nome) || 'Sem nome') + '</b><span class="pm-l2"><span class="pm-s ' + s[0] + '">' + esc(s[1]) + '</span><small>' + (c.cadastro ? esc(quando(c.cadastro)) : '') + '</small></span></span><span class="pm-seta">›</span></button>';
+    return '<button type="button" class="pm-m" data-cli="' + esc(c.id) + '"><span class="pm-av">' + esc(iniciais(c.nome)) + '</span><span class="pm-n"><b>' + esc(bonito(c.nome) || 'Sem nome') + '</b><span class="pm-l2"><span class="pm-s ' + s[0] + '">' + esc(s[1]) + '</span><small>' + (c.cadastro ? esc(quando(c.cadastro)) : '') + '</small></span><span class="pm-pts"><span class="' + (marcos(c).conf ? 'on' : '') + '"><i></i>Confirmada</span><span class="' + (marcos(c).lib ? 'on' : '') + '"><i></i>Benefício liberado</span></span></span><span class="pm-seta">›</span></button>';
   }
   function vistaPainelParceira(){
     var cl = clientesPainel().slice().sort(function(a, b){ return String(b.cadastro || '').localeCompare(String(a.cadastro || '')); });
@@ -1536,21 +1557,59 @@ button,a,label,[role=button]{touch-action:manipulation}
       (r.pend ? '<button type="button" class="pm-alerta" data-ir="faltam"><span class="n">' + r.pend + '</span><span><b>' + (r.pend === 1 ? 'mãe com documento faltando' : 'mães com documento faltando') + '</b><small>Toque para ver quais e completar</small></span></button>' : '') +
       (cl.length ? '<div class="pm-rot">Últimas enviadas</div><div class="pm-lista">' + cl.slice(0, 5).map(linhaMae).join('') + '</div>' + (cl.length > 5 ? '<button type="button" class="pm-mais" data-ir="todos">Ver todas as ' + cl.length + ' mães</button>' : '')
         : '<div class="vazio" style="margin-top:14px">' + (navigator.onLine === false && !painel ? 'Sem internet: o painel aparece quando o celular tiver sinal.' : 'As mães que você cadastrar aparecem aqui. Toque em <b>Novo cadastro</b> para começar.') + '</div>') +
-      '<button type="button" class="sair" id="sair"><svg><use href="#i-sair"/></svg>Sair desta conta</button>' +
-      '<div class="versao">Nascer com Direitos · versão ' + APP_VERSAO + '</div>';
+      '';
     $('vista').onclick = function(e){
       var k = e.target.closest('[data-ir]'); if (k){ filtroCli = k.dataset.ir; buscaCli = ''; return irPara('clientes'); }
       var c = e.target.closest('[data-cli]'); if (c) fichaCli(c.dataset.cli);
     };
-    $('sair').onclick = sair;
     filaTodos().catch(function(){ return []; }).then(function(l){
       var n = l.filter(function(x){ return x.token === token; }).length, el = $('aviso-fila'); if (!el || !n) return;
       el.innerHTML = '<div class="aviso-fila"><div><b>' + n + (n === 1 ? ' cadastro esperando' : ' cadastros esperando') + ' internet</b><span>Guardados neste celular. Sobem sozinhos.</span></div><button type="button" id="mandar-ja">Enviar agora</button></div>';
       $('mandar-ja').onclick = function(){ ultimoErro = function(e){ ultimoErro = null; alert('Não foi possível enviar ' + (e.cliente || 'o cadastro') + ': ' + e.erro + '.\n\nO aplicativo continua tentando sozinho.'); }; proximo(true); };
     });
   }
+  /* ---------- recebimentos: só o que já foi pago (data, mãe, momento, valor) ---------- */
+  var receb = null; try { receb = JSON.parse(lsGet('campo_receb') || 'null'); } catch(e){}
+  function carregarReceb(){
+    if (!CFG_OK || !token || navigator.onLine === false) return Promise.resolve();
+    return chamar('campo_recebimentos', { p_token: token }).then(function(d){
+      if (d && d.pagamentos){ receb = d; lsSet('campo_receb', JSON.stringify(d)); if (aba === 'recebimentos' && $('vista')) vistaRecebimentos(); }
+    }).catch(function(){});
+  }
+  function reais(v){ return (Number(v) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+  var MARCO_APP = { conf: 'Mãe confirmada', lib: 'Benefício liberado' };
+  var MESES_L = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+  function vistaRecebimentos(){
+    var pg = (receb && receb.pagamentos) || [], hoje = new Date(), mesAtual = hoje.getFullYear() + '-' + ('0' + (hoje.getMonth() + 1)).slice(-2);
+    var tot = pg.reduce(function(s, x){ return s + (Number(x.valor) || 0); }, 0);
+    var doMes = pg.filter(function(x){ return String(x.pagoEm || '').slice(0, 7) === mesAtual; }).reduce(function(s, x){ return s + (Number(x.valor) || 0); }, 0);
+    var cl = clientesPainel(), conf = cl.filter(function(c){ return marcos(c).conf; }).length, lib = cl.filter(function(c){ return marcos(c).lib; }).length;
+    var meses = {}; pg.forEach(function(x){ var k = String(x.pagoEm || '').slice(0, 7); (meses[k] = meses[k] || []).push(x); });
+    var chaves = Object.keys(meses).sort().reverse();
+    $('vista').innerHTML =
+      '<div class="pm-ola"><h2>Recebimentos</h2><span>Tudo o que já foi pago a você, com data e valor</span></div>' +
+      '<div class="pm-hero pm-hero-b"><img class="pm-marca" src="img/logo-nascer-t.png" alt=""><small>Recebido no total</small><div class="pm-num pm-num-m">' + esc(reais(tot)) + '</div><p>' + pg.length + (pg.length === 1 ? ' pagamento registrado' : ' pagamentos registrados') + '</p>' +
+        '<div class="pm-trio pm-duo"><span><b>' + esc(reais(doMes)) + '</b>neste mês</span><span><b>' + conf + ' · ' + lib + '</b>confirmadas · liberadas</span></div></div>' +
+      (chaves.length ? chaves.map(function(k){
+        var p = k.split('-'), arr = meses[k], sub = arr.reduce(function(s, x){ return s + (Number(x.valor) || 0); }, 0);
+        return '<div class="pm-rot pm-mes">' + (MESES_L[+p[1] - 1] || k) + ' de ' + p[0] + '<span>' + esc(reais(sub)) + '</span></div><div class="pm-lista">' + arr.map(function(x){
+          return '<div class="pm-m pm-pag"><span class="pm-av">' + esc(iniciais(x.mae)) + '</span><span class="pm-n"><b>' + esc(bonito(x.mae) || 'Mãe') + '</b><span class="pm-l2"><span class="pm-s ' + (x.marco === 'lib' ? 'ok' : '') + '">' + MARCO_APP[x.marco] + '</span><small>pago em ' + esc(dataBR(x.pagoEm)) + (x.forma ? ' · ' + esc(({ pix: 'Pix', transferencia: 'transferência', dinheiro: 'dinheiro' })[x.forma] || '') : '') + '</small></span></span><span class="pm-val">' + esc(reais(x.valor)) + '</span></div>';
+        }).join('') + '</div>';
+      }).join('') : '<div class="pm-vazio" style="margin-top:18px"><b>Seus recebimentos aparecem aqui</b>Quando um pagamento for feito, você vê a data, a mãe e o valor. Sem surpresas, tudo registrado.</div>');
+  }
+  /* ---------- conta ---------- */
+  function vistaConta(){
+    var nome = bonito((quem && quem.nome) || '') || 'Sua conta';
+    $('vista').innerHTML =
+      '<div class="pm-ola"><h2>Sua conta</h2><span>' + esc(nome) + ' · ' + (ehProspectador() ? 'Prospectador' : 'Parceiro') + '</span></div>' +
+      '<div class="pm-conta"><button type="button" id="verif-atu"><b>Verificar atualização</b><small>Veja se há uma versão nova do aplicativo</small></button>' +
+      '<button type="button" class="sair" id="sair"><svg><use href="#i-sair"/></svg>Sair desta conta</button></div>' +
+      '<div class="versao">Nascer com Direitos · versão ' + APP_VERSAO + '</div>';
+    $('sair').onclick = sair;
+    $('verif-atu').onclick = function(){ var b = this; b.querySelector('small').textContent = 'Verificando…'; ultimaChecagem = 0; verificarAtualizacao(); setTimeout(function(){ if (document.body.contains(b)) b.querySelector('small').textContent = document.querySelector('.atu') ? 'Há uma versão nova: use o aviso no topo' : 'Seu aplicativo está atualizado'; }, 1800); };
+  }
   var GRUPOS_P = [['todos', 'Todas'], ['faltam', 'Pendências'], ['andamento', 'Andamento'], ['ganharam', 'Deram certo']];
-  function noGrupoP(c, g){ var fl = faltas(c).length > 0, ok = !fl && etapaCli(c) === 'ganhou'; return g === 'todos' || (g === 'faltam' && fl) || (g === 'ganharam' && ok) || (g === 'andamento' && !fl && !ok); }
+  function noGrupoP(c, g){ var ok = marcos(c).lib, fl = !ok && faltas(c).length > 0; return g === 'todos' || (g === 'faltam' && fl) || (g === 'ganharam' && ok) || (g === 'andamento' && !fl && !ok); }
   function vistaClientesParceira(){
     var cl = clientesPainel().slice().sort(function(a, b){ return String(b.cadastro || '').localeCompare(String(a.cadastro || '')); });
     if (!GRUPOS_P.some(function(g){ return g[0] === filtroCli; })) filtroCli = 'todos';
@@ -1683,8 +1742,8 @@ button,a,label,[role=button]{touch-action:manipulation}
       if (Object.keys(fotos).length && !confirm('Há fotos de um cadastro em andamento. Sair mesmo assim? As fotos serão apagadas.')) return;
       if (!confirm('Sair desta conta? Para entrar de novo você vai precisar do usuário e da senha.')) return;
       fotos = {}; guardarRascunho();
-      ['campo_token', 'campo_quem', 'campo_painel', 'campo_nome', 'campo_fone', 'campo_cpf', 'campo_cidade', 'campo_aba', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp', 'campo_nasceu'].forEach(function(k){ lsSet(k, ''); });
-      token = ''; quem = null; painel = null; aba = 'painel';
+      ['campo_token', 'campo_quem', 'campo_painel', 'campo_receb', 'campo_nome', 'campo_fone', 'campo_cpf', 'campo_cidade', 'campo_aba', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp', 'campo_nasceu'].forEach(function(k){ lsSet(k, ''); });
+      token = ''; quem = null; painel = null; receb = null; aba = 'painel';
       pedirLink();
     });
   }
