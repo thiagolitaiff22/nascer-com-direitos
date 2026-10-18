@@ -450,6 +450,27 @@ body{font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-w
 #modo[hidden]{display:none!important}
 .seg-nasc{display:flex;gap:6px;margin:0 0 10px}.seg-nasc button{flex:1;padding:11px 8px;border-radius:12px;border:1px solid var(--gline);background:var(--card);color:var(--ink2);font:inherit;font-size:14px;font-weight:700}
 .seg-nasc button[aria-pressed="true"]{background:var(--gold,#a07a45);color:#fff;border-color:transparent}
+/* ---------- parceiro: início minimalista ---------- */
+#app[data-perfil="c"] .abas{display:none!important}
+#app[data-perfil="c"] .vista{padding-bottom:calc(36px + env(safe-area-inset-bottom))}
+#app[data-perfil="c"] .vista.novo{padding-bottom:calc(110px + env(safe-area-inset-bottom))}
+#app[data-perfil="c"] .barra{bottom:0!important}
+.ini h2{font-size:22px;font-weight:600;letter-spacing:-.01em;margin:10px 0 4px;color:var(--ink)}
+.ini>p{font-size:13.5px;color:var(--ink2);line-height:1.5}
+.ini>p b{color:#8c6a38;font-weight:600}
+.ini-btn{display:flex;align-items:center;justify-content:center;width:100%;height:46px;margin:20px 0 26px;border:0;border-radius:12px;background:#8c6a38;color:#fff;font:inherit;font-size:14px;font-weight:500;letter-spacing:.01em}
+.ini-rot{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#a07a45;font-weight:600;margin-bottom:2px}
+.ini-m{display:flex;align-items:center;gap:11px;width:100%;padding:12px 0;border:0;border-bottom:1px solid var(--line);background:none;font:inherit;text-align:left;color:var(--ink)}
+.ini-m:last-child{border-bottom:0}
+.ini-av{flex:none;width:32px;height:32px;border-radius:50%;border:1px solid var(--line2);color:#8c6a38;font-size:11.5px;font-weight:600;display:grid;place-items:center}
+.ini-n{min-width:0;flex:1}
+.ini-n b{display:block;font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ini-n small{font-size:12px;color:var(--ink2)}
+.ini-s{flex:none;font-size:11.5px;color:var(--ink2);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.ini-s i{width:6px;height:6px;border-radius:50%;background:#c9bda3}
+.ini-s.ok i{background:var(--ok)}.ini-s.fa i{background:var(--warn)}.ini-s.fa{color:var(--warn)}
+.ini-ok{font-size:13.5px;color:var(--ink2);line-height:1.5;padding:12px 0}
+.voltar{border:0;background:none;color:var(--ink2);font:inherit;font-size:13.5px;font-weight:500;padding:2px 0 10px}
 .tema{flex:none;width:38px;height:38px;border-radius:12px;border:1px solid var(--gline);background:var(--card);color:var(--ink2);display:grid;place-items:center;padding:0}
 .tema svg{width:19px;height:19px}
 .tema .lua{display:none}
@@ -747,7 +768,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 33;
+  var APP_VERSAO = 34;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1303,9 +1324,8 @@ button,a,label,[role=button]{touch-action:manipulation}
     document.body.classList.toggle('na-novo', aba === 'novo');
     sincronia();
     if (ehProspectador()) return aba === 'novo' ? vistaProspNovo() : aba === 'clientes' ? vistaProspLista() : vistaProspPainel();
-    if (aba === 'painel') return vistaPainel();
-    if (aba === 'clientes') return vistaClientes();
-    vistaNovo();
+    if (aba === 'novo') return vistaNovo();
+    return vistaInicio();
   }
   function vistaNovo(){
     guardarRascunho();
@@ -1313,7 +1333,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     var falta = DOCS.filter(function(d){ return obrig(d) && !fotos[d.k]; });
     var visiveis = DOCS.filter(function(d){ return !d.oculto && (completando ? completando.faltaDocs.indexOf(d.k) >= 0 : serve(d)); });
     var gest = gestante();
-    $('vista').innerHTML = (completando ?
+    $('vista').innerHTML = (completando ? '' : '<button type="button" class="voltar" id="voltar-ini">‹ Voltar</button>') + (completando ?
       '<div class="completar"><small>Completar documentos de</small><b>' + esc(completando.nome) + '</b><span>Tire só as fotos que estavam faltando e envie.</span><button type="button" id="cancelar-comp">Cancelar</button></div>' :
       '<div class="rot" style="margin-top:0">Dados da cliente</div><div class="dados">' +
         '<label class="fone' + (lsGet('campo_nome').trim() ? '' : ' falta') + '" id="l-nome"><svg viewBox="0 0 24 24"><use href="#i-pessoa"/></svg><input id="nome" autocomplete="off" autocapitalize="words" placeholder="Nome completo da cliente" value="' + esc(lsGet('campo_nome')) + '"></label>' +
@@ -1345,6 +1365,7 @@ button,a,label,[role=button]{touch-action:manipulation}
       ops.forEach(function(c){ c.classList.add('opc'); box.querySelector('.grid').appendChild(c); });
       g1.parentNode.insertBefore(box, g1.nextSibling);
     })();
+    if ($('voltar-ini')) $('voltar-ini').onclick = function(){ irPara('painel'); };
     if (completando){ $('cancelar-comp').onclick = cancelarComplemento; if ($('enviar')) $('enviar').lastChild.textContent = 'Enviar documentos'; }
     else {
     $('fone').addEventListener('input', function(){ this.value = maskFone(this.value); lsSet('campo_fone', this.value); });
@@ -1455,7 +1476,41 @@ button,a,label,[role=button]{touch-action:manipulation}
       .catch(function(){}).then(function(){ buscandoPainel = false; });
   }
 
-  /* ---------- aba Painel ---------- */
+  /* ---------- início do parceiro: só o essencial (cadastrar, mães enviadas, quantas deram certo) ---------- */
+  function situacaoSimples(c){
+    var fl = faltas(c);
+    if (fl.length) return ['fa', fl.length === 1 ? 'falta ' + NOME_DOC[fl[0]].toLowerCase() : 'faltam ' + fl.length + ' documentos'];
+    if (etapaCli(c) === 'ganhou') return ['ok', 'deu certo'];
+    return ['', 'em andamento'];
+  }
+  function iniciais(n){ var p = String(n || '').trim().split(/\s+/).filter(Boolean); return ((p[0] || '?').charAt(0) + (p.length > 1 ? p[p.length - 1].charAt(0) : '')).toUpperCase(); }
+  function vistaInicio(){
+    var cl = clientesPainel().slice().sort(function(a, b){ return String(b.cadastro || '').localeCompare(String(a.cadastro || '')); });
+    var ok = cl.filter(function(c){ return etapaCli(c) === 'ganhou'; }).length;
+    var primeiro = String((quem && quem.nome) || '').trim().split(/\s+/)[0];
+    var sub = ok ? '<b>' + ok + (ok === 1 ? ' mãe</b> que você indicou já deu certo.' : ' mães</b> que você indicou já deram certo.')
+      : cl.length ? 'Acompanhe aqui as mães que você enviou.' : 'Comece cadastrando a primeira mãe.';
+    $('vista').innerHTML =
+      '<div class="ini"><h2>Olá' + (primeiro ? ', ' + esc(primeiro.charAt(0) + primeiro.slice(1).toLowerCase()) : '') + '</h2><p>' + sub + '</p>' +
+      '<button type="button" class="ini-btn" id="ini-novo">+&nbsp; Novo cadastro</button>' +
+      '<div id="aviso-fila"></div>' +
+      (cl.length ? '<div class="ini-rot">Enviadas</div><div class="ini-lista">' + cl.slice(0, 300).map(function(c){
+        var s = situacaoSimples(c);
+        return '<button type="button" class="ini-m" data-cli="' + esc(c.id) + '"><span class="ini-av">' + esc(iniciais(c.nome)) + '</span><span class="ini-n"><b>' + esc(bonito(c.nome) || 'Sem nome') + '</b><small>' + (c.cadastro ? quando(c.cadastro) : '') + '</small></span><span class="ini-s ' + s[0] + '"><i></i>' + esc(s[1]) + '</span></button>';
+      }).join('') + '</div>' : '<div class="vazio" style="margin-top:20px">' + (navigator.onLine === false && !painel ? 'Sem internet: a lista aparece quando o celular tiver sinal.' : 'As mães que você enviar aparecem aqui.') + '</div>') +
+      '<button type="button" class="sair" id="sair"><svg><use href="#i-sair"/></svg>Sair desta conta</button>' +
+      '<div class="versao">Nascer com Direitos · versão ' + APP_VERSAO + '</div></div>';
+    $('ini-novo').onclick = function(){ irPara('novo'); };
+    $('vista').onclick = function(e){ var c = e.target.closest('[data-cli]'); if (c) fichaCli(c.dataset.cli); };
+    $('sair').onclick = sair;
+    filaTodos().catch(function(){ return []; }).then(function(l){
+      var n = l.filter(function(x){ return x.token === token; }).length, el = $('aviso-fila'); if (!el || !n) return;
+      el.innerHTML = '<div class="aviso-fila"><div><b>' + n + (n === 1 ? ' cadastro esperando' : ' cadastros esperando') + ' internet</b><span>Guardados neste celular. Sobem sozinhos.</span></div><button type="button" id="mandar-ja">Enviar agora</button></div>';
+      $('mandar-ja').onclick = function(){ ultimoErro = function(e){ ultimoErro = null; alert('Não foi possível enviar ' + (e.cliente || 'o cadastro') + ': ' + e.erro + '.\n\nO aplicativo continua tentando sozinho.'); }; proximo(true); };
+    });
+  }
+
+  /* ---------- aba Painel (antiga, não usada pelo parceiro) ---------- */
   function vistaPainel(){
     var cl = clientesPainel(), cont = {};
     cl.forEach(function(c){ var k = etapaCli(c); cont[k] = (cont[k] || 0) + 1; });
@@ -1545,14 +1600,9 @@ button,a,label,[role=button]{touch-action:manipulation}
     var atual = passos.findIndex(function(p){ return !p.ok && !p.ruim; });
     var info = [TIPOS[c.tipoSegurada] || '', c.crianca ? 'Criança: ' + String(c.crianca) : '', c.criancaNasc ? 'nasceu em ' + dataBR(c.criancaNasc) : ''].filter(Boolean).join(' · ');
     var f = document.createElement('div'); f.className = 'folha';
-    f.innerHTML = '<div><div class="puxa"></div><h3>' + esc(c.nome) + '</h3><div class="sub">' + ETP[k][0] + (c.contato ? ' · ' + esc(c.contato) : '') + '</div>' +
-      (info ? '<div class="ficha-info">' + esc(info) + '</div>' : '') +
-      ((tl || zp) ? '<div class="acoes">' + (tl ? '<a class="lig" href="' + tl + '"><svg><use href="#i-fone"/></svg>Ligar</a>' : '') + (zp ? '<a class="lig" href="' + zp + '" target="_blank" rel="noopener">WhatsApp</a>' : '') + '</div>' : '') +
+    f.innerHTML = '<div><div class="puxa"></div><h3>' + esc(bonito(c.nome)) + '</h3><div class="sub">' + esc(situacaoSimples(c)[1]) + (c.cadastro ? ' · enviada ' + esc(quando(c.cadastro)) : '') + '</div>' +
       (faltas(c).length ? '<div class="falta-box"><b>Faltam documentos</b><span>' + esc(nomesFaltas(faltas(c))) + '</span>' + (c.temPasta !== false ? '<button type="button" class="enviar" data-completar style="height:50px;font-size:16px;margin-top:10px">Completar documentos</button>' : '<span>O escritório ainda está criando a pasta desta cliente.</span>') + '</div>' : '') +
-      '<ol class="tempo">' + passos.map(function(p, i){
-        var cls = p.ruim ? 'ruim' : p.ok ? 'feito' : i === atual ? 'atual' : '';
-        return '<li class="' + cls + '"><span class="pt">' + (p.ok ? '<svg viewBox="0 0 24 24"><use href="#i-ok"/></svg>' : '') + '</span><div><b>' + p.t + '</b><span>' + esc(p.d) + '</span></div></li>';
-      }).join('') + '</ol>' +
+      (faltas(c).length ? '' : '<div class="ini-ok">Tudo certo com os documentos desta mãe. Agora é com a nossa equipe.</div>') +
       '<button type="button" class="sair" style="margin-top:6px" data-fecha>Fechar</button></div>';
     document.body.appendChild(f);
     f.addEventListener('click', function(e){

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Propostas de layout · Parceiro</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#14110d;font-family:"Segoe UI",Roboto,Arial,sans-serif;color:#2a2318;padding:40px 48px 48px;width:1500px}
+h1{color:#f3ead8;font-size:30px;margin-bottom:4px}
+.s{color:#bfb192;font-size:16px;margin-bottom:30px}
+.row{display:flex;gap:44px;justify-content:center}
+.col{width:400px}
+.tt{color:#e3c58a;font-weight:800;font-size:20px;margin-bottom:2px}
+.td{color:#bfb192;font-size:14px;line-height:1.45;margin-bottom:16px;min-height:62px}
+.ph{width:400px;height:800px;border-radius:44px;border:9px solid #3a3022;background:#faf6ef;overflow:hidden;position:relative;box-shadow:0 24px 60px rgba(0,0,0,.55);display:flex;flex-direction:column}
+.bar{display:flex;align-items:center;justify-content:space-between;padding:26px 24px 8px}
+.who{display:flex;align-items:center;gap:10px}
+.logo{width:38px;height:38px;border-radius:50%;background:#f1e7d3;display:grid;place-items:center;color:#a07a45;font-weight:800;font-size:15px}
+.who b{display:block;font-size:15px}.who span{font-size:12px;color:#8a7a60}
+.dot{width:36px;height:36px;border-radius:12px;border:1px solid #e6dac3;background:#fff;display:grid;place-items:center;color:#8a7a60;font-size:15px}
+.gold{background:linear-gradient(135deg,#b08b52,#8c6a38);color:#fff}
+.mae{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid #eee3cf}
+.mae:last-child{border:0}
+.av{width:40px;height:40px;border-radius:50%;background:#f1e7d3;color:#8c6a38;font-weight:800;display:grid;place-items:center;flex:none}
+.mae b{display:block;font-size:15px}.mae span{font-size:12.5px;color:#8a7a60}
+.tg{margin-left:auto;font-size:12px;font-weight:700;border-radius:999px;padding:5px 10px;white-space:nowrap}
+.ok{background:#e4f3ea;color:#1f7a45}.fa{background:#fdebd8;color:#b2580c}.an{background:#efe6d3;color:#7b6338}
+/* A */
+.a .pad{padding:8px 24px}
+.a h2{font-size:27px;line-height:1.15;margin:14px 0 4px}
+.a .hi{color:#8a7a60;font-size:14px;margin-bottom:22px}
+.a .cta{border-radius:26px;padding:26px 24px;color:#fff;background:linear-gradient(135deg,#b08b52,#8c6a38);box-shadow:0 14px 30px rgba(140,106,56,.35)}
+.a .cta .pl{width:54px;height:54px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:32px;margin-bottom:34px}
+.a .cta b{font-size:24px;display:block}.a .cta span{font-size:14px;opacity:.9}
+.a .ct{display:flex;align-items:baseline;gap:8px;margin:24px 0 6px}
+.a .ct b{font-size:44px;color:#8c6a38;line-height:1}.a .ct span{font-size:15px;color:#6e5f45}
+.a .lt{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#a07a45;font-weight:800;margin:14px 0 2px}
+/* B */
+.b .hero{margin:6px 22px 0;border-radius:28px;background:#2a2113;color:#f3ead8;padding:24px;position:relative;overflow:hidden}
+.b .hero::after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(201,164,104,.35),transparent 70%)}
+.b .hero small{font-size:13px;color:#d9ccb0}
+.b .hero .n{font-size:76px;font-weight:800;color:#f1d79b;line-height:1;margin:6px 0 2px}
+.b .hero p{font-size:15px;color:#d9ccb0}
+.b .pills{display:flex;gap:6px;margin-top:16px}
+.b .pills i{flex:1;height:8px;border-radius:99px;background:#4a3b22}.b .pills i.on{background:#c9a468}
+.b .lt{font-size:17px;font-weight:800;margin:22px 24px 4px}
+.b .lst{padding:0 24px;flex:1;overflow:hidden}
+.b .fab{position:absolute;left:22px;right:22px;bottom:22px;height:62px;border-radius:22px;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:800;font-size:18px;color:#fff;background:linear-gradient(135deg,#b08b52,#8c6a38);box-shadow:0 14px 30px rgba(140,106,56,.4)}
+/* C */
+.c .pad{padding:6px 24px}
+.c h2{font-size:30px;line-height:1.12;margin:12px 0 18px}
+.c h2 em{font-style:normal;color:#a07a45}
+.c .tiles{display:grid;grid-template-columns:1fr;gap:14px}
+.c .tile{border-radius:24px;padding:22px;display:flex;align-items:center;gap:16px;border:1px solid #e6dac3;background:#fff}
+.c .tile.main{background:linear-gradient(135deg,#b08b52,#8c6a38);color:#fff;border:0;padding:30px 24px;box-shadow:0 14px 30px rgba(140,106,56,.35)}
+.c .ic{width:58px;height:58px;border-radius:18px;background:rgba(255,255,255,.22);display:grid;place-items:center;font-size:30px;flex:none}
+.c .tile:not(.main) .ic{background:#f1e7d3;color:#8c6a38}
+.c .tile b{font-size:21px;display:block}.c .tile span{font-size:13.5px;opacity:.85}
+.c .big{margin-top:22px;border-radius:24px;background:#f1e7d3;padding:20px 22px;display:flex;align-items:center;gap:16px}
+.c .big .n{font-size:52px;font-weight:800;color:#8c6a38;line-height:1}
+.c .big span{font-size:15px;color:#5b4a2c;line-height:1.35}
+.c .rec{margin-top:18px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#a07a45;font-weight:800}
+</style>
+</head>
+<body>
+<h1>Tela inicial do parceiro: 3 propostas</h1>
+<div class="s">Só o essencial: cadastrar, ver as mães enviadas e quantas deram certo. Sem contratos, sem etapas, sem valores.</div>
+<div class="row">
+
+<!-- A -->
+<div class="col">
+  <div class="tt">A · Um botão, nada mais</div>
+  <div class="td">O cadastro é o herói da tela. Cartão dourado grande, contador discreto e lista curta logo abaixo.</div>
+  <div class="ph a">
+    <div class="bar"><div class="who"><div class="logo">M</div><div><b>Marcos Tavares</b><span>Parceiro</span></div></div><div class="dot">☾</div></div>
+    <div class="pad">
+      <h2>Olá, Marcos!</h2><div class="hi">Vamos cadastrar uma nova mãe?</div>
+      <div class="cta"><div class="pl">＋</div><b>Novo cadastro</b><span>Fotografe os documentos e envie</span></div>
+      <div class="ct"><b>4</b><span>mães que já deram certo</span></div>
+      <div class="lt">Enviadas por você</div>
+      <div class="mae"><div class="av">A</div><div><b>Ana Paula Ferreira</b><span>enviada ontem</span></div><div class="tg fa">Falta vídeo</div></div>
+      <div class="mae"><div class="av">B</div><div><b>Beatriz Santos Lima</b><span>há 6 dias</span></div><div class="tg ok">Completa</div></div>
+      <div class="mae"><div class="av">L</div><div><b>Luana Freitas</b><span>há 3 dias</span></div><div class="tg fa">Falta certidão</div></div>
+      <div class="mae"><div class="av">C</div><div><b>Camila Rocha</b><span>há 30 dias</span></div><div class="tg ok">Completa</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- B -->
+<div class="col">
+  <div class="tt">B · O resultado em destaque</div>
+  <div class="td">Primeiro o que motiva: quantas deram certo. O botão de cadastro fica fixo embaixo, sempre ao alcance do polegar.</div>
+  <div class="ph b">
+    <div class="bar"><div class="who"><div class="logo">M</div><div><b>Marcos Tavares</b><span>Parceiro</span></div></div><div class="dot">☾</div></div>
+    <div class="hero"><small>Mães que deram certo</small><div class="n">4</div><p>de 11 que você enviou. Continue assim!</p>
+      <div class="pills"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div></div>
+    <div class="lt">Enviadas por você</div>
+    <div class="lst">
+      <div class="mae"><div class="av">A</div><div><b>Ana Paula Ferreira</b><span>enviada ontem</span></div><div class="tg fa">Falta vídeo</div></div>
+      <div class="mae"><div class="av">B</div><div><b>Beatriz Santos Lima</b><span>há 6 dias</span></div><div class="tg an">Em análise</div></div>
+      <div class="mae"><div class="av">L</div><div><b>Luana Freitas</b><span>há 3 dias</span></div><div class="tg fa">Falta certidão</div></div>
+      <div class="mae"><div class="av">C</div><div><b>Camila Rocha</b><span>há 30 dias</span></div><div class="tg ok">Deu certo</div></div>
+      <div class="mae"><div class="av">D</div><div><b>Daniela Souza</b><span>há 60 dias</span></div><div class="tg ok">Deu certo</div></div>
+    </div>
+    <div class="fab">＋ Novo cadastro</div>
+  </div>
+</div>
+
+<!-- C -->
+<div class="col">
+  <div class="tt">C · Dois toques, dois caminhos</div>
+  <div class="td">Tela quase vazia, como um assistente: "Cadastrar mãe" ou "Minhas mães". O contador entra como uma frase simples.</div>
+  <div class="ph c">
+    <div class="bar"><div class="who"><div class="logo">M</div><div><b>Marcos Tavares</b><span>Parceiro</span></div></div><div class="dot">☾</div></div>
+    <div class="pad">
+      <h2>Olá, Marcos.<br><em>O que vamos fazer hoje?</em></h2>
+      <div class="tiles">
+        <div class="tile main"><div class="ic">＋</div><div><b>Cadastrar uma mãe</b><span>Tirar as fotos dos documentos</span></div></div>
+        <div class="tile"><div class="ic">☰</div><div><b>Minhas mães</b><span>11 enviadas · 2 com documento faltando</span></div></div>
+      </div>
+      <div class="big"><div class="n">4</div><span>mães que você indicou<br><b>já deram certo</b></span></div>
+      <div class="rec">Último envio</div>
+      <div class="mae"><div class="av">A</div><div><b>Ana Paula Ferreira</b><span>enviada ontem</span></div><div class="tg fa">Falta vídeo</div></div>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>
