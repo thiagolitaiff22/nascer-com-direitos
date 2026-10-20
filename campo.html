@@ -522,6 +522,7 @@ body{font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-w
 .esc-novo i{flex:none;width:46px;height:46px;border-radius:15px;background:linear-gradient(145deg,#f4e7cc,#e8d3a8);display:grid;place-items:center;color:#7a5a2b}
 .esc-novo i svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .esc-novo b{display:block;font-family:'Fraunces',Georgia,serif;font-size:17px;font-weight:600}.esc-novo small{font-size:12.5px;color:var(--ink2)}
+.pm-ganho{display:block;margin-top:5px;font-size:11.5px;color:var(--ink2)}.pm-ganho u{color:#8c6a38;font-weight:600;text-decoration:none}
 .pm-acoes{display:grid;grid-template-columns:1fr;gap:8px;margin:12px 0 4px}
 .pm-btn{height:46px;border:0;border-radius:14px;background:#8c6a38;color:#fff;font:inherit;font-size:14px;font-weight:600}
 .pm-btn.pm-ghost{text-transform:none;letter-spacing:0;background:rgba(160,122,69,.12);color:#7a5a2b}
@@ -848,7 +849,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 45;
+  var APP_VERSAO = 46;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1147,7 +1148,7 @@ button,a,label,[role=button]{touch-action:manipulation}
   function somaProsp(l){ return l.reduce(function(a, x){ a.ind += +x.indicacoes || 0; a.con += +x.contratos || 0; a.cnc += +x.concedidos || 0; a.pag += +x.pagos || 0; a.gui += +x.guiasPagas || 0; return a; }, { ind: 0, con: 0, cnc: 0, pag: 0, gui: 0 }); }
   function linhaParc(x){
     var inds = +x.indicacoes || 0, con = +x.contratos || 0, bloq = x.ativo === false;
-    return '<button type="button" class="pm-m" data-parc="' + esc(x.id) + '"><span class="pm-av">' + esc(iniciais(nomeParc(x))) + '</span><span class="pm-n"><b>' + esc(nomeParc(x)) + '</b><span class="pm-l2"><span class="pm-s' + (bloq ? ' fa' : '') + '">' + (bloq ? 'acesso bloqueado' : con + (con === 1 ? ' contrato' : ' contratos')) + '</span><small>' + (x.cidade ? esc(bonito(x.cidade)) + ' · ' : '') + inds + (inds === 1 ? ' indicação' : ' indicações') + '</small></span></span><span class="pm-seta">›</span></button>';
+    return '<button type="button" class="pm-m" data-parc="' + esc(x.id) + '"><span class="pm-av">' + esc(iniciais(nomeParc(x))) + '</span><span class="pm-n"><b>' + esc(nomeParc(x)) + '</b><span class="pm-l2"><span class="pm-s' + (bloq ? ' fa' : '') + '">' + (bloq ? 'acesso bloqueado' : con + (con === 1 ? ' contrato' : ' contratos')) + '</span><small>' + (x.cidade ? esc(bonito(x.cidade)) + ' · ' : '') + inds + (inds === 1 ? ' indicação' : ' indicações') + '</small></span><span class="pm-ganho">' + (x.ganho === false ? 'Sem ganhos' : (Number(x.comConf) || Number(x.comLib) ? 'Ganha ' + reaisCurto(x.comConf) + ' + ' + reaisCurto(x.comLib) : 'Ganhos sem valor definido')) + ' · <u>editar</u></span></span><span class="pm-seta">›</span></button>';
   }
   function avisoFila(){
     filaTodos().catch(function(){ return []; }).then(function(l){
@@ -1435,7 +1436,7 @@ button,a,label,[role=button]{touch-action:manipulation}
       '<div class="acesso-caixa"><span>Usuário</span><b>' + esc(x.usuario || '—') + '</b><span>Situação</span><b>' + (x.ativo === false ? 'Acesso bloqueado' : 'Ativo') + '</b>' +
       '<span>Ganhos</span><b>' + (x.ganho === false ? 'Sem ganhos' : (Number(x.comConf) || Number(x.comLib) ? reaisCurto(x.comConf) + ' + ' + reaisCurto(x.comLib) : 'sem valor definido')) + '</b>' +
       '<span>Indicações</span><b>' + (+x.indicacoes || 0) + '</b><span>Contratos</span><b>' + (+x.contratos || 0) + '</b><span>Concedidos</span><b>' + (+x.concedidos || 0) + '</b></div>' +
-      '<button id="t-ganho">Definir os ganhos deste parceiro</button><button class="sec2" id="t-senha">Gerar nova senha e mandar</button>' + (x.telefone ? '<button class="sec2" id="t-ligar">Ligar para o parceiro</button>' : '') +
+      '<button id="t-ganho">Editar os ganhos deste parceiro</button><button class="sec2" id="t-senha">Gerar nova senha e mandar</button>' + (x.telefone ? '<button class="sec2" id="t-ligar">Ligar para o parceiro</button>' : '') +
       '<button class="sec2" id="t-ativo">' + (x.ativo === false ? 'Liberar o acesso' : 'Bloquear o acesso') + '</button><button class="sec2" id="t-fecha">Fechar</button>');
     t.querySelector('#t-fecha').onclick = function(){ t.remove(); };
     t.querySelector('#t-ganho').onclick = function(){ t.remove(); definirGanho(x); };
