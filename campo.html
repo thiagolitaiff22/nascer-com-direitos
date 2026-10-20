@@ -562,7 +562,9 @@ html,body{max-width:100%}body{overflow-x:clip}
 @media (max-height:520px) and (orientation:landscape){
   .abas{position:static;margin:12px auto;max-width:560px}.vista{padding-bottom:20px}
 }
-.abas button{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.abas button{min-width:0;white-space:nowrap}
+.abas button:not([data-aba="novo"]){overflow:hidden;text-overflow:ellipsis}
+.abas button[data-aba="novo"]{overflow:visible}
 .pm-n b,.pm-t b{overflow-wrap:anywhere}
 img,svg,video,canvas{max-width:100%}
 /* sem ganhos: menu com três itens, o + fica no meio */
@@ -886,7 +888,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 48;
+  var APP_VERSAO = 49;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
