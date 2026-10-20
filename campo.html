@@ -527,11 +527,44 @@ body{font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-w
 .pm-push>div{flex:1;min-width:0}.pm-push b{display:block;font-size:13.5px;color:#5b4320}.pm-push span{display:block;font-size:12px;color:#8a7554;line-height:1.35;margin-top:1px}
 .pm-push button{flex:none;border:0;border-radius:11px;background:#8c6a38;color:#fff;font:inherit;font-size:13px;font-weight:600;padding:9px 14px}
 .pm-push button#push-nao{background:none;color:#a69677;font-size:20px;padding:2px 6px}
+.gn-in{display:block;text-align:left;margin:0 0 10px}
+.gn-in>span{display:block;font-size:12.5px;font-weight:600;color:var(--ink2);margin:0 2px 5px}
+.gn-in>div{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line2);border-radius:16px;padding:0 14px;height:50px}
+.gn-in svg,.tela .gn-in svg{flex:none;width:22px;height:22px;stroke:#8c6a38;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.gn-in input{flex:1;min-width:0;width:100%;border:0;background:none;font:inherit;font-size:17px;color:var(--ink);outline:0;text-align:left}
+.tela > div{max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px);overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.tela .seg{margin:0 0 12px}
+.tela .seg button{width:auto;height:auto;margin:0;font-size:14px;font-weight:600;padding:11px 6px;white-space:nowrap;background:none;color:var(--ink2);border-radius:11px!important}
+.tela .seg button[aria-pressed="true"]{background:var(--card);color:var(--ink)}
+.tela .nota-form,.tela p{text-align:left}
 .pm-acoes{display:grid;grid-template-columns:1fr;gap:8px;margin:12px 0 4px}
 .pm-btn{height:46px;border:0;border-radius:14px;background:#8c6a38;color:#fff;font:inherit;font-size:14px;font-weight:600}
 .pm-btn.pm-ghost{text-transform:none;letter-spacing:0;background:rgba(160,122,69,.12);color:#7a5a2b}
 .ini-ok{font-size:13.5px;color:var(--ink2);line-height:1.5;padding:12px 0}
 /* aviso de versão nova */
+/* ---------- molda a qualquer aparelho: do iPhone SE ao tablet ---------- */
+html,body{max-width:100%}body{overflow-x:clip}
+@media (max-width:359px){
+  .vista{padding-left:12px;padding-right:12px}
+  .pm-ola h2{font-size:25px}
+  .pm-num{font-size:68px}.pm-hero{padding:18px 16px 14px}
+  .pm-trio span{font-size:10.5px}.pm-trio b{font-size:19px}
+  .abas button{font-size:9.5px!important}
+  .pm-filtro{gap:6px}.pm-filtro button b{font-size:20px}.pm-filtro button span{font-size:10.5px}
+  .gn-res{gap:8px}.gn-res b{font-size:15px}
+  .pm-m{padding:10px 10px 10px 8px;gap:9px}.pm-av{width:34px;height:34px;font-size:13px}
+}
+@media (min-width:600px){
+  .vista{max-width:640px}
+  .abas{left:0!important;right:0!important;margin-left:auto!important;margin-right:auto!important;width:min(560px,calc(100% - 24px))!important;transform:none!important}
+}
+@media (min-width:900px){ .vista{max-width:720px} }
+@media (max-height:520px) and (orientation:landscape){
+  .abas{position:static;margin:12px auto;max-width:560px}.vista{padding-bottom:20px}
+}
+.abas button{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pm-n b,.pm-t b{overflow-wrap:anywhere}
+img,svg,video,canvas{max-width:100%}
 /* sem ganhos: menu com três itens, o + fica no meio */
 .abas.sg{grid-template-columns:repeat(3,1fr)}
 .abas.sg button[data-aba="recebimentos"],.abas.sg button[data-aba="conta"]{display:none}
@@ -853,7 +886,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 47;
+  var APP_VERSAO = 48;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1337,10 +1370,9 @@ button,a,label,[role=button]{touch-action:manipulation}
   function numReais(t){ return (Number(String(t || '').replace(/\D/g, '')) || 0) / 100; }
   // dois campos de valor: o que o parceiro recebe ao confirmar a mãe e quando o benefício é liberado
   function camposGanho(pref, conf, lib){
-    return '<div class="dados">' +
-      '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-moeda"/></svg><span class="rc">Ao confirmar a mãe</span><input id="' + pref + '-conf" inputmode="numeric" autocomplete="off" placeholder="R$ 0,00" value="' + esc(maskReais(Math.round((Number(conf) || 0) * 100))) + '"></label>' +
-      '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-moeda"/></svg><span class="rc">Quando o benefício é liberado</span><input id="' + pref + '-lib" inputmode="numeric" autocomplete="off" placeholder="R$ 0,00" value="' + esc(maskReais(Math.round((Number(lib) || 0) * 100))) + '"></label></div>' +
-      '<p class="nota-form" style="margin-top:6px">Você define quanto ele recebe por mãe, em cada momento. Pode ser o valor que quiser, ou deixar em branco para nenhum valor.</p>';
+    var campo = function(id, rot, v){ return '<label class="gn-in"><span>' + rot + '</span><div><svg viewBox="0 0 24 24"><use href="#i-moeda"/></svg><input id="' + pref + '-' + id + '" inputmode="numeric" autocomplete="off" placeholder="R$ 0,00" value="' + esc(maskReais(Math.round((Number(v) || 0) * 100))) + '"></div></label>'; };
+    return '<div class="gn-campos">' + campo('conf', 'Ao confirmar a mãe', conf) + campo('lib', 'Quando o benefício é liberado', lib) + '</div>' +
+      '<p class="nota-form" style="margin-top:2px">Você define quanto ele recebe por mãe, em cada momento. Pode ser o valor que quiser, ou deixar em branco para nenhum valor.</p>';
   }
   function ligarCamposGanho(pref, aoMudar){
     [pref + '-conf', pref + '-lib'].forEach(function(id){ var el = $(id); if (el) el.addEventListener('input', function(){ this.value = maskReais(this.value); if (aoMudar) aoMudar(); }); });
@@ -1366,7 +1398,7 @@ button,a,label,[role=button]{touch-action:manipulation}
         '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-cadeado"/></svg><input id="np-senha" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Senha" value="' + esc(novoP.senha) + '"><button type="button" id="np-gerar" class="mini-btn">gerar outra</button></label>' +
       '</div><p class="nota-form">O parceiro entra com este usuário e esta senha. Anote ou mande pelo WhatsApp quando terminar.</p>' +
       '<div class="barra"><button class="enviar" id="np-criar"><svg viewBox="0 0 24 24"><use href="#i-ok"/></svg>Criar parceiro</button></div>';
-    var ref = function(){ novoP.nome = $('np-nome').value; if ($('np-clinica')) novoP.clinica = $('np-clinica').value; novoP.fone = $('np-fone').value; novoP.cidade = $('np-cidade').value; novoP.usuario = $('np-usuario').value; novoP.senha = $('np-senha').value; if ($('np-conf')){ novoP.conf = $('np-conf').value; novoP.lib = $('np-lib').value; } };
+    var ref = function(){ novoP.nome = $('np-nome').value; if ($('np-clinica')) novoP.clinica = $('np-clinica').value; novoP.fone = $('np-fone').value; novoP.cidade = $('np-cidade').value; novoP.usuario = String($('np-usuario').value || '').replace(/\D/g, ''); novoP.senha = $('np-senha').value; if ($('np-conf')){ novoP.conf = $('np-conf').value; novoP.lib = $('np-lib').value; } };
     $('np-ganho').onclick = function(e){ var b = e.target.closest('[data-g]'); if (!b) return; ref(); novoP.ganho = b.dataset.g === '1'; vistaProspNovo(); };
     $('np-tipo').onclick = function(e){ var b = e.target.closest('[data-t]'); if (!b) return; ref(); novoP.tipo = b.dataset.t; vistaProspNovo(); };
     $('np-nome').addEventListener('input', function(){ novoP.nome = this.value; });
@@ -1401,7 +1433,7 @@ button,a,label,[role=button]{touch-action:manipulation}
       if (novoP.senha.length < 6){ alert('A senha precisa ter pelo menos 6 caracteres.'); $('np-senha').focus(); return; }
       if (navigator.onLine === false) return alert('Sem internet agora. Para cadastrar um parceiro é preciso estar conectado.');
       var b = this; b.disabled = true; b.lastChild.textContent = 'Criando…';
-      chamar('prosp_criar_parceiro', { p_token: token, p_nome: nome, p_tipo: novoP.tipo, p_clinica: novoP.tipo === 'clinica' ? clinica : '', p_cidade: cidade, p_telefone: novoP.fone, p_usuario: novoP.usuario, p_senha: novoP.senha, p_ganho: novoP.ganho !== false, p_com_conf: numReais(novoP.conf), p_com_lib: numReais(novoP.lib) })
+      chamar('prosp_criar_parceiro', { p_token: token, p_nome: nome, p_tipo: novoP.tipo, p_clinica: novoP.tipo === 'clinica' ? clinica : '', p_cidade: cidade, p_telefone: novoP.fone, p_usuario: String(novoP.usuario || '').replace(/\D/g, ''), p_senha: novoP.senha, p_ganho: novoP.ganho !== false, p_com_conf: numReais(novoP.conf), p_com_lib: numReais(novoP.lib) })
         .then(function(d){
           if (d && d.ok){
             var rotulo = novoP.tipo === 'clinica' ? clinica : nome, tel = novoP.fone, usr = d.usuario, sen = novoP.senha;
