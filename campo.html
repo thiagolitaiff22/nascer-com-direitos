@@ -523,6 +523,10 @@ body{font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-w
 .esc-novo i svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .esc-novo b{display:block;font-family:'Fraunces',Georgia,serif;font-size:17px;font-weight:600}.esc-novo small{font-size:12.5px;color:var(--ink2)}
 .pm-ganho{display:block;margin-top:5px;font-size:11.5px;color:var(--ink2)}.pm-ganho u{color:#8c6a38;font-weight:600;text-decoration:none}
+.pm-push{display:flex;align-items:center;gap:10px;margin-top:14px;padding:12px 12px 12px 14px;border-radius:16px;background:#fbf3e3;border:1px solid #ecdcb8}
+.pm-push>div{flex:1;min-width:0}.pm-push b{display:block;font-size:13.5px;color:#5b4320}.pm-push span{display:block;font-size:12px;color:#8a7554;line-height:1.35;margin-top:1px}
+.pm-push button{flex:none;border:0;border-radius:11px;background:#8c6a38;color:#fff;font:inherit;font-size:13px;font-weight:600;padding:9px 14px}
+.pm-push button#push-nao{background:none;color:#a69677;font-size:20px;padding:2px 6px}
 .pm-acoes{display:grid;grid-template-columns:1fr;gap:8px;margin:12px 0 4px}
 .pm-btn{height:46px;border:0;border-radius:14px;background:#8c6a38;color:#fff;font:inherit;font-size:14px;font-weight:600}
 .pm-btn.pm-ghost{text-transform:none;letter-spacing:0;background:rgba(160,122,69,.12);color:#7a5a2b}
@@ -849,7 +853,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 46;
+  var APP_VERSAO = 47;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1175,7 +1179,7 @@ button,a,label,[role=button]{touch-action:manipulation}
       var ir = e.target.closest('[data-ir]'); if (ir) return irPara(ir.dataset.ir);
       var p = e.target.closest('[data-parc]'); if (p) return fichaParceiro(p.dataset.parc);
     };
-    avisoFila();
+    avisoFila(); depoisDoInicio();
   }
   var buscaParc = '';
   function vistaProspLista(){
@@ -1653,6 +1657,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     var s = situacaoSimples(c);
     return '<button type="button" class="pm-m" data-cli="' + esc(c.id) + '"><span class="pm-av">' + esc(iniciais(c.nome)) + '</span><span class="pm-n"><b>' + esc(bonito(c.nome) || 'Sem nome') + '</b><span class="pm-l2"><span class="pm-s ' + s[0] + '">' + esc(s[1]) + '</span><small>' + (c.cadastro ? esc(quando(c.cadastro)) : '') + '</small></span>' + (semGanho() ? '' : '<span class="pm-pts"><span class="' + (marcos(c).conf ? 'on' : '') + '"><i></i>Confirmada</span><span class="' + (marcos(c).lib ? 'on' : '') + '"><i></i>Benefício liberado</span></span>') + '</span><span class="pm-seta">›</span></button>';
   }
+  function depoisDoInicio(){ setTimeout(function(){ conviteAvisos(); reativarAvisos(); }, 600); }
   function vistaPainelParceira(){
     var cl = clientesPainel().slice().sort(function(a, b){ return String(b.cadastro || '').localeCompare(String(a.cadastro || '')); });
     var r = resumoParceiro(cl);
@@ -1672,6 +1677,7 @@ button,a,label,[role=button]{touch-action:manipulation}
       var k = e.target.closest('[data-ir]'); if (k){ filtroCli = k.dataset.ir; buscaCli = ''; return irPara('clientes'); }
       var c = e.target.closest('[data-cli]'); if (c) fichaCli(c.dataset.cli);
     };
+    depoisDoInicio();
     filaTodos().catch(function(){ return []; }).then(function(l){
       var n = l.filter(function(x){ return x.token === token; }).length, el = $('aviso-fila'); if (!el || !n) return;
       el.innerHTML = '<div class="aviso-fila"><div><b>' + n + (n === 1 ? ' cadastro esperando' : ' cadastros esperando') + ' internet</b><span>Guardados neste celular. Sobem sozinhos.</span></div><button type="button" id="mandar-ja">Enviar agora</button></div>';
@@ -1706,15 +1712,76 @@ button,a,label,[role=button]{touch-action:manipulation}
         }).join('') + '</div>';
       }).join('') : '<div class="pm-vazio" style="margin-top:22px"><b>Nada por aqui ainda</b>Quando um pagamento for feito, você vê a data, a mãe e o valor. Tudo registrado, sem surpresas.</div>');
   }
+  /* ---------- avisos no celular (notificações) ---------- */
+  var VAPID_PUBLICA = 'BESx_bCvncjwXN3sNTHSS4cuAzzSG-zRhBFHDL35ipgNP4lAvl6AQ0xkyuhNXckkraHGi9b0MD-P56F6vlMTyaA';
+  function b64uParaBytes(s){ var p = '='.repeat((4 - s.length % 4) % 4), b = (s + p).replace(/-/g, '+').replace(/_/g, '/'), r = atob(b), a = new Uint8Array(r.length); for (var i = 0; i < r.length; i++) a[i] = r.charCodeAt(i); return a; }
+  function pushNativo(){ return !!(window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications && APP); }
+  function pushSuporte(){ return pushNativo() || ('serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window); }
+  function ios(){ return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); }
+  function instaladoNaTela(){ return window.navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches); }
+  function avisosAtivos(){ return lsGet('campo_push') === '1'; }
+  function registrarDispositivo(tipo, endpoint, dados){ return chamar('push_registrar', { p_token: token, p_tipo: tipo, p_endpoint: endpoint, p_dados: dados || {} }); }
+  function ativarAvisos(){
+    if (!token) return Promise.resolve({ ok: false, msg: 'Entre na sua conta primeiro.' });
+    if (pushNativo()){
+      var PN = window.Capacitor.Plugins.PushNotifications;
+      return PN.requestPermissions().then(function(p){
+        if (p.receive !== 'granted') return { ok: false, msg: 'Você não permitiu os avisos. Dá para liberar nas configurações do celular.' };
+        PN.addListener('registration', function(t){ registrarDispositivo('fcm', t.value); });
+        PN.addListener('pushNotificationActionPerformed', function(n){ var a = n && n.notification && n.notification.data && n.notification.data.aba; if (a) irPara(a); });
+        return PN.register().then(function(){ lsSet('campo_push', '1'); return { ok: true }; });
+      }).catch(function(){ return { ok: false, msg: 'Não foi possível ativar os avisos agora.' }; });
+    }
+    if (ios() && !instaladoNaTela()) return Promise.resolve({ ok: false, msg: 'No iPhone, primeiro adicione o aplicativo à Tela de Início (Compartilhar › Adicionar à Tela de Início) e abra por lá.' });
+    if (!pushSuporte()) return Promise.resolve({ ok: false, msg: 'Este celular ou navegador não aceita avisos.' });
+    return Notification.requestPermission().then(function(perm){
+      if (perm !== 'granted') return { ok: false, msg: 'Você não permitiu os avisos. Dá para liberar nas configurações do celular.' };
+      return navigator.serviceWorker.ready.then(function(reg){
+        return reg.pushManager.getSubscription().then(function(s){ return s || reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64uParaBytes(VAPID_PUBLICA) }); });
+      }).then(function(sub){ return registrarDispositivo('webpush', sub.endpoint, { subscription: sub.toJSON() }); })
+        .then(function(){ lsSet('campo_push', '1'); return { ok: true }; });
+    }).catch(function(){ return { ok: false, msg: 'Não foi possível ativar os avisos agora.' }; });
+  }
+  function desativarAvisos(){
+    lsSet('campo_push', '');
+    if (pushNativo()){ try { window.Capacitor.Plugins.PushNotifications.unregister(); } catch(e){} return Promise.resolve(); }
+    if (!('serviceWorker' in navigator)) return Promise.resolve();
+    return navigator.serviceWorker.ready.then(function(reg){ return reg.pushManager.getSubscription(); }).then(function(s){
+      if (!s) return; var ep = s.endpoint; return s.unsubscribe().then(function(){ return chamar('push_remover', { p_token: token, p_endpoint: ep }); });
+    }).catch(function(){});
+  }
+  // a cada abertura: se os avisos estavam ativos, confirma o registro (o endereço do celular pode mudar)
+  function reativarAvisos(){
+    if (!token || !avisosAtivos() || !pushSuporte()) return;
+    if (pushNativo()){ ativarAvisos(); return; }
+    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') ativarAvisos();
+  }
+  // convite para ativar, uma vez, no Início
+  function conviteAvisos(){
+    if (!pushSuporte() || avisosAtivos() || lsGet('campo_push_nao') === '1') return;
+    if (typeof Notification !== 'undefined' && Notification.permission === 'denied') return;
+    var v = $('vista'); if (!v || document.getElementById('convite-push') || (aba !== 'painel')) return;
+    var d = document.createElement('div'); d.id = 'convite-push'; d.className = 'pm-push';
+    d.innerHTML = '<div><b>Receba os avisos no celular</b><span>Pagamentos, mães confirmadas e novidades, mesmo com o aplicativo fechado.</span></div><button type="button" id="push-sim">Ativar</button><button type="button" id="push-nao" aria-label="Agora não">×</button>';
+    var alvo = v.querySelector('.pm-hero'); if (alvo) alvo.insertAdjacentElement('afterend', d); else v.insertBefore(d, v.firstChild);
+    d.querySelector('#push-nao').onclick = function(){ lsSet('campo_push_nao', '1'); d.remove(); };
+    d.querySelector('#push-sim').onclick = function(){ var b = this; b.disabled = true; b.textContent = '…'; ativarAvisos().then(function(r){ if (r.ok){ d.remove(); } else { b.disabled = false; b.textContent = 'Ativar'; alert(r.msg); } }); };
+  }
   /* ---------- conta ---------- */
   function vistaConta(){
     var nome = bonito((quem && quem.nome) || '') || 'Sua conta';
     $('vista').innerHTML =
       '<div class="pm-ola"><h2>Sua conta</h2><span>' + esc(nome) + ' · ' + (ehProspectador() ? 'Prospectador' : 'Parceiro') + '</span></div>' +
-      '<div class="pm-conta"><button type="button" id="verif-atu"><b>Verificar atualização</b><small>Veja se há uma versão nova do aplicativo</small></button>' +
+      '<div class="pm-conta">' + (pushSuporte() ? '<button type="button" id="avisos-btn"><b>Avisos no celular</b><small id="avisos-sub">' + (avisosAtivos() ? 'Ativados · toque para desativar' : 'Desativados · toque para ativar') + '</small></button>' : '') + '<button type="button" id="verif-atu"><b>Verificar atualização</b><small>Veja se há uma versão nova do aplicativo</small></button>' +
       '<button type="button" class="sair" id="sair"><svg><use href="#i-sair"/></svg>Sair desta conta</button></div>' +
       '<div class="versao">Nascer com Direitos · versão ' + APP_VERSAO + '</div>';
     $('sair').onclick = sair;
+    if ($('avisos-btn')) $('avisos-btn').onclick = function(){
+      var sub = $('avisos-sub');
+      if (avisosAtivos()){ desativarAvisos().then(function(){ sub.textContent = 'Desativados · toque para ativar'; }); return; }
+      sub.textContent = 'Ativando…';
+      ativarAvisos().then(function(r){ if (r.ok) sub.textContent = 'Ativados · toque para desativar'; else { sub.textContent = 'Desativados · toque para ativar'; alert(r.msg); } });
+    };
     $('verif-atu').onclick = function(){ var b = this; b.querySelector('small').textContent = 'Verificando…'; ultimaChecagem = 0; verificarAtualizacao(); setTimeout(function(){ if (document.body.contains(b)) b.querySelector('small').textContent = document.querySelector('.atu') ? 'Há uma versão nova: use o aviso no topo' : 'Seu aplicativo está atualizado'; }, 1800); };
   }
   var GRUPOS_P = [['todos', 'Todas'], ['faltam', 'Pendências'], ['andamento', 'Andamento'], ['ganharam', 'Deram certo']];
@@ -2732,10 +2799,13 @@ button,a,label,[role=button]{touch-action:manipulation}
     $('app').innerHTML = '<div class="login"><div class="entrar"><b class="login-t">Nascer com Direitos</b><p class="login-s">Salário-maternidade</p>' +
       '<div class="aviso"><b>Aplicativo ainda não configurado</b>O escritório precisa colocar o endereço e a chave do Supabase no campo.html (os mesmos do config.js). Avise o escritório.</div></div></div>';
   }
+  // toque num aviso com o aplicativo já aberto (Web Push) ou chegada pelo endereço
+  if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', function(e){ if (e.data && e.data.tipo === 'abrir' && e.data.aba) irPara(e.data.aba); });
   function iniciar(){
     if (!CFG_OK) return semConfiguracao();
     if (!token) return pedirLink();
     lsSet('campo_token', token);
+    var mAba = /[#&]aba=([a-z]+)/.exec(location.hash || ''); if (mAba){ aba = mAba[1]; lsSet('campo_aba', aba); }
     if (location.hash) history.replaceState(null, '', location.pathname);
     try { quem = JSON.parse(lsGet('campo_quem') || 'null'); } catch(e){}
     var semRede = false;
