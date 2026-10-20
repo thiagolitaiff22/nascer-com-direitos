@@ -567,6 +567,14 @@ html,body{max-width:100%}body{overflow-x:clip}
 .abas button[data-aba="novo"]{overflow:visible}
 .pm-n b,.pm-t b{overflow-wrap:anywhere}
 img,svg,video,canvas{max-width:100%}
+.l-sm{display:none}
+@media (max-width:519px){ .l-lg{display:none}.l-sm{display:inline} }
+#app .topo .quem #topo-sub span{display:inline}
+.abas{padding-left:8px!important;padding-right:8px!important}
+.abas button[data-aba="novo"] svg{margin-bottom:-3px}
+#app .topo .quem b{font-size:clamp(14px,4.8vw,18px)}
+#app .topo .quem #topo-sub{font-size:clamp(10.5px,3.1vw,12px)}
+@media (max-width:359px){ #app .topo{gap:9px;padding-left:12px;padding-right:12px}#app .topo .logo{width:30px;height:30px}#app .topo .quem b{font-size:13.5px}#app .topo .quem #topo-sub .t-papel{display:none}#app .topo .sinc:not(.off){display:none} }
 /* sem ganhos: menu com três itens, o + fica no meio */
 .abas.sg{grid-template-columns:repeat(3,1fr)}
 .abas.sg button[data-aba="recebimentos"],.abas.sg button[data-aba="conta"]{display:none}
@@ -578,7 +586,7 @@ html[data-tema="dark"] #app .topo{background:rgba(20,17,13,.84);box-shadow:0 1px
 #app .topo .logo img{display:block;width:100%;height:100%;object-fit:contain}
 #app .topo .quem{flex:1;min-width:0}
 #app .topo .quem b{display:block;font-family:'Fraunces',Georgia,serif;font-size:18px;font-weight:600;letter-spacing:-.01em;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#app .topo .quem span{display:block;margin-top:2px;font-size:12px;font-weight:600;letter-spacing:.01em;color:#a07a45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#app .topo .quem #topo-sub{display:block;margin-top:2px;font-size:12px;font-weight:600;letter-spacing:.01em;color:#a07a45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #app .topo .sinc{margin:0;border:0;background:none;box-shadow:none;padding:0 2px;gap:0;font-size:11.5px}
 #app .topo .sinc span{display:none}
 #app .topo .sinc.off span{display:inline;margin-left:6px;color:#b7762d;font-weight:600}
@@ -888,7 +896,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 49;
+  var APP_VERSAO = 50;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1111,11 +1119,11 @@ button,a,label,[role=button]{touch-action:manipulation}
   function maiusculas(d){ if (d && d.clientes) d.clientes.forEach(function(c){ if (c.nome) c.nome = bonito(c.nome); if (c.crianca) c.crianca = bonito(c.crianca); }); return d; }   // (nome da função antigo) padrão: Primeira letra maiúscula
   try { painel = maiusculas(JSON.parse(lsGet('campo_painel') || 'null')); } catch(e){}
   function navBotoes(){
-    var b = function(a, ic, t, extra){ return '<button type="button" data-aba="' + a + '"><svg><use href="#' + ic + '"/></svg>' + t + (extra || '') + '</button>'; };
+    var b = function(a, ic, t, extra){ var p = String(t).split('|'); return '<button type="button" data-aba="' + a + '"><svg><use href="#' + ic + '"/></svg>' + (p[1] ? '<span class="l-lg">' + p[0] + '</span><span class="l-sm">' + p[1] + '</span>' : p[0]) + (extra || '') + '</button>'; };
     var bolha = '<span class="bolha" id="bolha" hidden></span>';
     return ehProspectador()
-      ? b('painel', 'i-painel', 'Início') + b('clientes', 'i-grupo', 'Parceiros') + b('novo', 'i-novo', 'Novo', bolha) + b('maes', 'i-bebe', 'Mães') + b('recebimentos', 'i-moeda', 'Meus ganhos')
-      : b('painel', 'i-painel', 'Início') + b('clientes', 'i-grupo', 'Mães') + b('novo', 'i-novo', 'Novo cadastro', bolha) + b('recebimentos', 'i-moeda', 'Meus ganhos') + b('conta', 'i-pessoa', 'Conta');
+      ? b('painel', 'i-painel', 'Início') + b('clientes', 'i-grupo', 'Parceiros') + b('novo', 'i-novo', 'Novo', bolha) + b('maes', 'i-bebe', 'Mães') + b('recebimentos', 'i-moeda', 'Meus ganhos|Ganhos')
+      : b('painel', 'i-painel', 'Início') + b('clientes', 'i-grupo', 'Mães') + b('novo', 'i-novo', 'Novo cadastro|Novo', bolha) + b('recebimentos', 'i-moeda', 'Meus ganhos|Ganhos') + b('conta', 'i-pessoa', 'Conta');
   }
   // o + do prospectador pergunta o que ele quer cadastrar
   function escolherNovo(){
@@ -1499,7 +1507,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     var quemTxt = clin ? bonito(quem.clinica) : bonito((quem && quem.nome) || '') || 'Parceiro';
     var papelTxt = ehProspectador() ? 'Prospectador' : clin ? 'Clínica parceira' : (quem && quem.perfil === 'prospectador' ? 'Parceiro' : 'Parceira');
     $('topo-nome').textContent = 'Nascer com Direitos';
-    $('topo-sub').textContent = quemTxt + ' · ' + papelTxt;
+    $('topo-sub').innerHTML = '<span class="t-nome">' + esc(quemTxt) + '</span><span class="t-papel"> · ' + esc(papelTxt) + '</span>';
     var bm = $('modo');
     if (bm){
       var duplo = false;   // o prospectador faz tudo no mesmo menu: não há mais troca de modo
