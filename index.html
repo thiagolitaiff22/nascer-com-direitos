@@ -2052,6 +2052,13 @@ td,.row{font-size:13px}
 .com-grupo .fin-tbl{margin:0}
 #com-filtro{margin-bottom:14px}
 #com-filtro button[aria-pressed="true"]{background:var(--primary,#8c6a38)}
+.est-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.est-chip{position:relative;display:inline-flex;align-items:center;gap:8px;padding:8px 14px 8px 10px;border:1px solid var(--line-2,#d9ccb0);border-radius:999px;cursor:pointer;background:var(--panel);font-size:13.5px;font-weight:600;color:var(--ink-2,inherit);user-select:none;transition:background .15s,border-color .15s}
+.est-chip input{position:absolute;opacity:0;pointer-events:none;width:0;height:0}
+.est-chip img{width:22px;height:15px;border-radius:3px;object-fit:cover;box-shadow:0 0 0 1px rgba(0,0,0,.18)}
+.est-chip:hover{border-color:var(--primary,#a07a45)}
+.est-chip:has(input:checked){background:var(--primary,#a07a45);border-color:transparent;color:#fff}
+.est-chip:has(input:focus-visible){outline:2px solid var(--primary,#a07a45);outline-offset:2px}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2820,12 +2827,12 @@ td,.row{font-size:13px}
     <div class="f-head"><div class="ph-tile" style="margin:0"><svg class="i"><use href="#i-users"/></svg></div><h2 id="fe-title">Novo funcionário</h2></div>
     <div class="f-body">
       <div class="field full"><label for="fe-nome">Nome</label><input id="fe-nome" autocomplete="off"></div>
-      <div class="field full"><label for="fe-cpf">CPF (é o login para entrar)</label><input id="fe-cpf" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00"><span class="hint">A pessoa entra no sistema com o CPF e a senha. A senha padrão é 123456.</span></div>
+      <div class="field full"><label for="fe-cpf">CPF (é o login para entrar)</label><input id="fe-cpf" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00"><span class="hint">A pessoa entra no sistema com o CPF. A senha inicial é <b>123456</b>; no primeiro acesso ela cria a dela (só números).</span></div>
       <div class="field full" id="fe-email-box"><label for="fe-email">Usuário antigo (só para quem já tinha acesso por nome)</label><input id="fe-email" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="ex.: thiago ou nome.sobrenome"><span class="hint">É com este usuário e a senha abaixo que o funcionário entra no sistema. Pode usar um e-mail, se preferir.</span></div>
-      <div class="field full" id="fe-senha-wrap"><label for="fe-senha">Senha de acesso</label><input id="fe-senha" name="nova-senha-equipe" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocapitalize="none" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Em branco = senha padrão 123456 (a pessoa troca no 1º acesso)"><span class="hint" id="fe-senha-dica">Só números (mínimo de 6). O próprio funcionário pode trocar depois, em Alterar senha.</span></div>
+      <div class="field full" id="fe-senha-wrap"><label for="fe-senha" id="fe-senha-lbl">Nova senha (opcional)</label><input id="fe-senha" name="nova-senha-equipe" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocapitalize="none" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Em branco = senha padrão 123456 (a pessoa troca no 1º acesso)"><span class="hint" id="fe-senha-dica">Só números (mínimo de 6). O próprio funcionário pode trocar depois, em Alterar senha.</span></div>
       <div class="field"><label for="fe-funcao">Cargo</label><select id="fe-funcao"><option value="closer">Closer · liga e fecha contratos</option><option value="operacional">Agente Operacional · documentos e requerimentos</option><option value="judicial">Agente Judicial · ações e processos</option><option value="admin">Gestor · acesso total</option></select></div>
       <div class="field"><label for="fe-ativo">Acesso</label><select id="fe-ativo"><option value="sim">Ativo</option><option value="nao">Bloqueado</option></select></div>
-      <div class="field full" id="fe-estados-box"><label>Estados que esta pessoa gere (painel do gestor)</label><div id="fe-estados" class="rs-lista"></div><span class="hint">Marque os estados dela. Sem nenhum marcado, ela vê todos os estados. Quem tem estado marcado vê e cadastra só aquele estado no painel do gestor; o sistema completo (BI) continua com tudo.</span></div>
+      <div class="field full" id="fe-estados-box"><label>Estados que esta pessoa gere (painel do gestor)</label><div id="fe-estados" class="rs-lista"></div><span class="hint">Toque nos estados dela. Sem nenhum marcado, ela vê todos. No painel do gestor ela vê e cadastra só os estados marcados.</span></div>
     </div>
     <div class="f-foot">
       <button class="btn danger" type="button" id="fe-del" hidden>Excluir</button>
@@ -7307,7 +7314,7 @@ function tentarParceiro(cpf, senha){
     $('fe-nome').value = u ? u.nome : ''; $('fe-email').value = u ? emailParaExibir(u.email) : ''; $('fe-email').disabled = !!u;
     $('fe-cpf').value = u && u.cpf ? cpfMasc(u.cpf) : ''; $('fe-email-box').hidden = !u || /^\d{11}$/.test(emailParaExibir(u.email));
     $('fe-senha').value = '';
-    $('fe-senha-wrap').hidden = !!u && !ehAcessoInterno(u.email);
+    $('fe-senha-wrap').hidden = !u || !ehAcessoInterno(u.email);   // funcionário novo: sem campo de senha (vale a padrão 123456); ao editar, só para redefinir
     var dtSenha = u && u.senha_em ? new Date(u.senha_em) : null;
     $('fe-senha').placeholder = u && ehAcessoInterno(u.email) && dtSenha ? '•••••• senha já cadastrada (digite só para trocar)' : 'Só números, mínimo de 6 (aparece o que você digita)';
     $('fe-senha-dica').innerHTML = !u ? 'O próprio funcionário pode trocar a senha depois, dentro do sistema.'
@@ -7315,7 +7322,8 @@ function tentarParceiro(cpf, senha){
       : '<span class="senha-falta">Ainda não tem senha cadastrada.</span> Digite uma para liberar a entrada.';
     $('fe-funcao').value = u ? cargoDe(u) : 'operacional'; $('fe-ativo').value = !u || u.ativo ? 'sim' : 'nao';
     var mEst = (u && Array.isArray(u.estados)) ? u.estados : [];
-    $('fe-estados').innerHTML = (state.regioes || []).map(function(g){ return '<label class="rs-lin"><input type="checkbox" data-est="' + esc(g.id) + '"' + (mEst.indexOf(g.id) >= 0 ? ' checked' : '') + '> <b>' + esc(g.nome) + '</b></label>'; }).join('');
+    $('fe-estados').className = 'est-chips';
+    $('fe-estados').innerHTML = (state.regioes || []).map(function(g){ var uf = String(g.uf || g.id || '').toUpperCase(); return '<label class="est-chip"><input type="checkbox" data-est="' + esc(g.id) + '"' + (mEst.indexOf(g.id) >= 0 ? ' checked' : '') + '><img src="img/flags/' + esc(uf) + '.svg" alt="" onerror="this.remove()"><span>' + esc(g.nome) + '</span></label>'; }).join('');
     var eu = u && state.me && u.email === state.me.email;
     $('fe-funcao').disabled = !!eu; $('fe-ativo').disabled = !!eu;
     $('fe-del').hidden = !u || !!eu; eDelArmed = false; $('fe-del').classList.remove('armed'); $('fe-del').textContent = 'Excluir';
@@ -7457,7 +7465,7 @@ function tentarParceiro(cpf, senha){
     // usuário sugerido: primeiro nome, sem acento e em minúsculas
     $('fe-cpf').value = cpfMasc(p.cpf || '');
     $('fe-funcao').value = { gestor: 'admin', closer: 'closer', judicial: 'judicial' }[p.funcao] || 'operacional';
-    setTimeout(function(){ $('fe-senha').focus(); }, 60);
+    setTimeout(function(){ $('fe-funcao').focus(); }, 60);
   });
   $('btn-senha').addEventListener('click', function(){ $('sn-nova').value = ''; $('sn-rep').value = ''; $('sn-msg').textContent = ''; $('dlg-senha').showModal(); setTimeout(function(){ $('sn-nova').focus(); }, 30); });
   $('sn-cancel').addEventListener('click', function(){ $('dlg-senha').close(); });
@@ -7478,6 +7486,7 @@ function tentarParceiro(cpf, senha){
     var u = (state.equipe || []).filter(function(x){ return x.email === b.dataset.eq; })[0]; if (u) openEq(u);
   });
   $('fe-cancel').addEventListener('click', function(){ pedidoEq = null; dlgE.close(); });
+  $('fe-cpf').addEventListener('input', function(){ this.value = cpfMasc(this.value); });   // 000.000.000-00
   $('form-eq').addEventListener('submit', async function(e){
     e.preventDefault();
     var cpfFe = $('fe-cpf').value.replace(/\D/g, '');
