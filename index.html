@@ -2056,8 +2056,9 @@ td,.row{font-size:13px}
 .est-chip{position:relative;display:inline-flex;align-items:center;gap:8px;padding:8px 14px 8px 10px;border:1px solid var(--line-2,#d9ccb0);border-radius:999px;cursor:pointer;background:var(--panel);font-size:13.5px;font-weight:600;color:var(--ink-2,inherit);user-select:none;transition:background .15s,border-color .15s}
 .est-chip input{position:absolute;opacity:0;pointer-events:none;width:0;height:0}
 .est-chip img{width:22px;height:15px;border-radius:3px;object-fit:cover;box-shadow:0 0 0 1px rgba(0,0,0,.18)}
-.est-chip:hover{border-color:var(--primary,#a07a45)}
-.est-chip:has(input:checked){background:var(--primary,#a07a45);border-color:transparent;color:#fff}
+.est-chip:hover{border-color:#a07a45}
+.est-chip:has(input:checked){background:#a07a45;border-color:transparent;color:#fff}
+.est-chip:has(input:checked) span{color:#fff}
 .est-chip:has(input:focus-visible){outline:2px solid var(--primary,#a07a45);outline-offset:2px}
 </style>
 <script src="vendor/supabase.min.js"></script>
