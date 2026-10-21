@@ -2060,6 +2060,19 @@ td,.row{font-size:13px}
 .est-chip:has(input:checked){background:#a07a45;border-color:transparent;color:#fff}
 .est-chip:has(input:checked) span{color:#fff}
 .est-chip:has(input:focus-visible){outline:2px solid var(--primary,#a07a45);outline-offset:2px}
+.eq-grupos{gap:20px!important}
+.eq-sec h4{display:flex;align-items:baseline;gap:8px;margin:0 0 8px;font-size:14px;font-weight:700}
+.eq-sec h4 span{font-size:12px;font-weight:600;color:var(--ink-3)}
+.eq-tab{padding:0;overflow:hidden}
+.eq-row{display:grid;grid-template-columns:36px minmax(0,1fr) auto auto;align-items:center;gap:14px;padding:11px 16px;border-top:1px solid var(--line)}
+.eq-row:first-child{border-top:0}
+.eq-row.off{opacity:.65}
+.eq-row .eq-av{width:36px;height:36px;border-radius:12px;font-size:14px}
+.eq-nome{min-width:0}
+.eq-nome b{display:block;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.eq-nome small{display:block;font-size:12px;color:var(--ink-3);margin-top:1px}
+.eq-row .btn{padding:6px 14px;font-size:12.5px}
+@media (max-width:560px){.eq-row{grid-template-columns:36px minmax(0,1fr) auto;row-gap:8px}.eq-row .btn{grid-column:2 / 4;justify-self:start}}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -5656,15 +5669,13 @@ td,.row{font-size:13px}
     if (!eq.length){ box.innerHTML = '<div class="card empty">Ninguém cadastrado ainda. Clique em <b>Novo funcionário</b>.</div>'; return; }
     box.innerHTML = CARGOS_ORDEM.map(function(k){
       var lista = eq.filter(function(u){ return cargoDe(u) === k; });
-      return '<div class="eq-grupo"><div class="eq-grupo-h"><b>' + CARGOS[k][0] + '</b><span class="mini">' + lista.length + '</span><span class="eq-grupo-d">' + CARGOS[k][1] + '</span></div>' +
-        (lista.length ? '<div class="eq-cards">' + lista.map(function(u){
-          var ini = String(u.nome || u.email || '?').trim().charAt(0).toUpperCase();
-          return '<div class="eq-card' + (u.ativo ? '' : ' off') + '"><div class="eq-av">' + esc(ini) + '</div><div class="eq-info"><b>' + esc(u.nome) + (u.email === meu ? ' <span class="pill muted">você</span>' : '') + '</b>' +
-            '<span class="mini">' + (ehAcessoInterno(u.email) ? 'Usuário: ' : '') + esc(emailParaExibir(u.email)) + '</span>' +
-            '<span class="pill ' + (u.ativo ? 'ok' : 'crit') + '">' + (u.ativo ? 'Ativo' : 'Bloqueado') + '</span>' +
-              (ehAcessoInterno(u.email) ? ' <span class="pill ' + (u.senha_em ? 'ok' : 'warn') + '" title="' + (u.senha_em ? 'Senha cadastrada em ' + new Date(u.senha_em).toLocaleDateString('pt-BR') : 'Sem senha: ainda não consegue entrar') + '">' + (u.senha_em ? 'Senha cadastrada' : 'Sem senha') + '</span>' : '') + '</div>' +
-            '<button type="button" class="btn" data-eq="' + esc(u.email) + '">Editar</button></div>';
-        }).join('') + '</div>' : '<div class="eq-vazio">Ninguém neste cargo ainda.</div>') + '</div>';
+      if (!lista.length) return '';
+      return '<section class="eq-sec"><h4>' + CARGOS[k][0] + '<span>' + lista.length + '</span></h4><div class="card eq-tab">' + lista.map(function(u){
+        var ini = String(u.nome || u.email || '?').trim().charAt(0).toUpperCase(), ex = emailParaExibir(u.email), login = /^d{11}$/.test(ex) ? cpfMasc(ex) : ex;
+        var interno = ehAcessoInterno(u.email), semSenha = interno && !u.senha_em;
+        var st = !u.ativo ? '<span class="pill crit">Bloqueado</span>' : semSenha ? '<span class="pill warn" title="Ainda não consegue entrar">Sem senha</span>' : '<span class="pill ok"' + (u.senha_em ? ' title="Senha cadastrada em ' + new Date(u.senha_em).toLocaleDateString('pt-BR') + '"' : '') + '>Ativo</span>';
+        return '<div class="eq-row' + (u.ativo ? '' : ' off') + '"><span class="eq-av">' + esc(ini) + '</span><div class="eq-nome"><b>' + esc(u.nome) + (u.email === meu ? ' <span class="pill muted">você</span>' : '') + '</b><small>' + esc(login) + '</small></div>' + st + '<button type="button" class="btn" data-eq="' + esc(u.email) + '">Editar</button></div>';
+      }).join('') + '</div></section>';
     }).join('');
   }
 
