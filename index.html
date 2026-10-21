@@ -2830,7 +2830,7 @@ td,.row{font-size:13px}
       <div class="field full"><label for="fe-cpf">CPF (é o login para entrar)</label><input id="fe-cpf" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00"><span class="hint">A pessoa entra no sistema com o CPF. A senha inicial é <b>123456</b>; no primeiro acesso ela cria a dela (só números).</span></div>
       <div class="field full" id="fe-email-box"><label for="fe-email">Usuário antigo (só para quem já tinha acesso por nome)</label><input id="fe-email" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="ex.: thiago ou nome.sobrenome"><span class="hint">É com este usuário e a senha abaixo que o funcionário entra no sistema. Pode usar um e-mail, se preferir.</span></div>
       <div class="field full" id="fe-senha-wrap"><label for="fe-senha" id="fe-senha-lbl">Nova senha (opcional)</label><input id="fe-senha" name="nova-senha-equipe" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocapitalize="none" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Em branco = senha padrão 123456 (a pessoa troca no 1º acesso)"><span class="hint" id="fe-senha-dica">Só números (mínimo de 6). O próprio funcionário pode trocar depois, em Alterar senha.</span></div>
-      <div class="field"><label for="fe-funcao">Cargo</label><select id="fe-funcao"><option value="closer">Closer · liga e fecha contratos</option><option value="operacional">Agente Operacional · documentos e requerimentos</option><option value="judicial">Agente Judicial · ações e processos</option><option value="admin">Gestor · acesso total</option></select></div>
+      <div class="field"><label for="fe-funcao">Cargo</label><select id="fe-funcao"><option value="closer">Closer · liga e fecha contratos</option><option value="operacional">Agente Operacional · documentos e requerimentos</option><option value="judicial">Agente Judicial · ações e processos</option><option value="posvenda">Pós-venda · acompanha a cliente depois do contrato</option><option value="admin">Gestor · acesso total</option></select></div>
       <div class="field"><label for="fe-ativo">Acesso</label><select id="fe-ativo"><option value="sim">Ativo</option><option value="nao">Bloqueado</option></select></div>
       <div class="field full" id="fe-estados-box"><label>Estados que esta pessoa gere (painel do gestor)</label><div id="fe-estados" class="rs-lista"></div><span class="hint">Toque nos estados dela. Sem nenhum marcado, ela vê todos. No painel do gestor ela vê e cadastra só os estados marcados.</span></div>
     </div>
@@ -5640,14 +5640,14 @@ td,.row{font-size:13px}
     renderContest();
   });
 
-  var CARGOS = { closer: ['Closers', 'Comercial: ligam para as mães e fecham os contratos'], operacional: ['Agentes operacionais', 'Documentos, requerimentos e acompanhamento no INSS'], judicial: ['Agentes judiciais', 'Ações na Justiça, audiências e acompanhamento dos processos'], admin: ['Gestores', 'Acesso total ao sistema'] };
-  var CARGOS_ORDEM = ['closer', 'operacional', 'judicial', 'admin'];
+  var CARGOS = { closer: ['Closers', 'Comercial: ligam para as mães e fecham os contratos'], operacional: ['Agentes operacionais', 'Documentos, requerimentos e acompanhamento no INSS'], judicial: ['Agentes judiciais', 'Ações na Justiça, audiências e acompanhamento dos processos'], posvenda: ['Pós-venda', 'Acompanham a cliente depois do contrato e do benefício'], admin: ['Gestores', 'Acesso total ao sistema'] };
+  var CARGOS_ORDEM = ['closer', 'operacional', 'judicial', 'posvenda', 'admin'];
   function cargoDe(u){ return u && CARGOS[u.cargo] ? u.cargo : (u && u.funcao === 'admin' ? 'admin' : 'operacional'); }
   function renderEquipe(){
     var box = $('eq-list'); if (!box) return;
     var eq = (state.equipe || []).slice().sort(function(a, b){ return (a.nome || '').localeCompare(b.nome || '', 'pt-BR'); });
     var meu = state.me ? state.me.email : '';
-    var cont = { closer: 0, operacional: 0, judicial: 0, admin: 0 }, bloq = 0;
+    var cont = { closer: 0, operacional: 0, judicial: 0, posvenda: 0, admin: 0 }, bloq = 0;
     eq.forEach(function(u){ cont[cargoDe(u)]++; if (!u.ativo) bloq++; });
     var res = $('eq-resumo');
     if (res) res.innerHTML = CARGOS_ORDEM.map(function(k){ return '<div class="eq-chip"><b>' + cont[k] + '</b><span>' + CARGOS[k][0] + '</span></div>'; }).join('') +
@@ -7404,7 +7404,7 @@ function tentarParceiro(cpf, senha){
     var ps = (state.pedidos || []).filter(function(p){ return p.status === 'pendente'; }).sort(function(a, b){ return String(a.criado_em).localeCompare(String(b.criado_em)); });
     box.hidden = !ps.length || !isAdmin();
     if (box.hidden){ box.innerHTML = ''; return; }
-    var FN = { gestor: 'Gestor', closer: 'Closer', prospectador: 'Prospectador', parceiro: 'Parceiro', operacional: 'Agente Operacional', judicial: 'Agente Judicial' };
+    var FN = { gestor: 'Gestor', closer: 'Closer', prospectador: 'Prospectador', parceiro: 'Parceiro', operacional: 'Agente Operacional', judicial: 'Agente Judicial', posvenda: 'Pós-venda' };
     var opcoes = function(sel){ return Object.keys(FN).map(function(k){ return '<option value="' + k + '"' + (k === sel ? ' selected' : '') + '>' + FN[k] + '</option>'; }).join(''); };
     box.innerHTML = '<div class="sec-rot">Pedidos de acesso · ' + ps.length + '</div>' + ps.map(function(p){
       if (p.id === pedEdit){
@@ -7464,7 +7464,7 @@ function tentarParceiro(cpf, senha){
     $('fe-nome').value = nomeProprio(p.nome);
     // usuário sugerido: primeiro nome, sem acento e em minúsculas
     $('fe-cpf').value = cpfMasc(p.cpf || '');
-    $('fe-funcao').value = { gestor: 'admin', closer: 'closer', judicial: 'judicial' }[p.funcao] || 'operacional';
+    $('fe-funcao').value = { gestor: 'admin', closer: 'closer', judicial: 'judicial', posvenda: 'posvenda' }[p.funcao] || 'operacional';
     setTimeout(function(){ $('fe-funcao').focus(); }, 60);
   });
   $('btn-senha').addEventListener('click', function(){ $('sn-nova').value = ''; $('sn-rep').value = ''; $('sn-msg').textContent = ''; $('dlg-senha').showModal(); setTimeout(function(){ $('sn-nova').focus(); }, 30); });
