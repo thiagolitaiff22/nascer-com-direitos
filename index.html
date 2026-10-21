@@ -2011,6 +2011,7 @@ td,.row{font-size:13px}
 #cad-list select.lead-contato{background-color:#e3eefc!important;color:#1f4f8f!important}
 #cad-list select.lead-retornar{background-color:#fdf0d5!important;color:#8a5a00!important}
 #cad-list select.lead-sem_resposta{background-color:#ececec!important;color:#555!important}
+#cad-list select.lead-desqualificado{background-color:#e9e6df!important;color:#4a4437!important}
 #cad-list select.lead-perdido{background-color:#fbe3e1!important;color:#a02e24!important}
 #cad-list .btn.tent{height:auto;padding:2px 4px;border:0!important;background:none!important;box-shadow:none!important;color:var(--ink-3);font-size:12px;font-weight:600;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px}
 #cad-list .btn.tent:hover{color:var(--ink);text-decoration-color:currentColor}
@@ -2018,6 +2019,7 @@ td,.row{font-size:13px}
 :root[data-theme="dark"] #cad-list select.lead-contato{background-color:rgba(80,140,230,.2)!important;color:#9cc2ff!important}
 :root[data-theme="dark"] #cad-list select.lead-retornar{background-color:rgba(230,170,60,.2)!important;color:#f0c46b!important}
 :root[data-theme="dark"] #cad-list select.lead-sem_resposta{background-color:rgba(255,255,255,.1)!important;color:#c9c9c9!important}
+:root[data-theme="dark"] #cad-list select.lead-desqualificado{background-color:rgba(255,255,255,.1)!important;color:#d9d3c4!important}
 :root[data-theme="dark"] #cad-list select.lead-perdido{background-color:rgba(230,90,80,.2)!important;color:#ff9b93!important}
 
 .eq-pedidos{margin:6px 0 14px;padding:14px 16px;border-radius:16px;background:var(--gsoft,#f8f1e4);border:1px solid var(--gline,var(--line))}
@@ -3107,6 +3109,7 @@ td,.row{font-size:13px}
     if (cidade) partes.push('<span class="cad-bnd">' + (g ? bandeiraCidade(g, cidade) : '') + '</span><b>' + esc(cidade) + '</b>');
     partes.push(par ? 'indicação de <b>' + esc(parNome) + '</b>' : r.criadoPorNome ? 'cadastro de <b>' + esc(r.criadoPorNome) + '</b>' : esc(r.origem === 'organico' ? 'Orgânico' : 'Sem parceiro'));
     if (quando) partes.push(esc(quando));
+    if (r.leadStatus === 'desqualificado' && r.desqualMotivo) partes.push('<span class="cad-atraso" title="Motivo da desqualificação">Motivo: ' + esc(r.desqualMotivo) + '</span>');
     var dcad = String(r.dataCadastro || r.criadoEm || '').slice(0, 10), nd2 = dcad ? -daysUntil(dcad) : null;
     if (leadDe(r) === 'novo' && nd2 != null && nd2 >= 2) partes.push('<span class="cad-atraso">sem ligação há ' + nd2 + ' dias</span>');
     return partes.join(' · ');
@@ -3774,7 +3777,7 @@ td,.row{font-size:13px}
     var nFalta = todos.filter(docsPendentes).length;
     var SITS = [['', 'Todas as situações · ' + todos.length], ['faltam', 'Faltam documentos · ' + nFalta], ['pronto', 'Prontos para requerer · ' + conta.pronto], ['conferir', 'Conferir dados · ' + conta.conferir], ['incompleto', 'Dados incompletos · ' + conta.incompleto], ['gestante', 'Aguardando o parto · ' + conta.gestante], ['prazo', 'Prazo perto do fim · ' + nPrazo], ['pendencias', 'Pendências (documento ou dados)'],
       ['l:novo', 'Para ligar (novos) · ' + todos.filter(function(r){ return leadDe(r) === 'novo'; }).length], ['l:retornar', 'Retornar depois · ' + todos.filter(function(r){ return leadDe(r) === 'retornar'; }).length],
-      ['l:sem_resposta', 'Sem resposta · ' + todos.filter(function(r){ return leadDe(r) === 'sem_resposta'; }).length], ['l:contato', 'Em contato · ' + todos.filter(function(r){ return leadDe(r) === 'contato'; }).length]];
+      ['l:sem_resposta', 'Sem resposta · ' + todos.filter(function(r){ return leadDe(r) === 'sem_resposta'; }).length], ['l:contato', 'Em contato · ' + todos.filter(function(r){ return leadDe(r) === 'contato'; }).length], ['l:desqualificado', 'Desqualificados · ' + todos.filter(function(r){ return leadDe(r) === 'desqualificado'; }).length]];
     $('cad-sit').innerHTML = SITS.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === cadSit ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
     $('cad-sit').classList.toggle('ativo', !!cadSit);
     var lista = todos.filter(function(r){ return (!cadSit || (cadSit === 'faltam' ? docsPendentes(r) : cadSit === 'pendencias' ? (docsPendentes(r) || situacaoCad(r)[0] === 'incompleto') : cadSit === 'prazo' ? !!prazoTag(r) : /^l:/.test(cadSit) ? leadDe(r) === cadSit.slice(2) : situacaoCad(r)[0] === cadSit)) && buscaCliente(r, cadQ); })
@@ -3968,7 +3971,7 @@ td,.row{font-size:13px}
   });
 
   /* ---------- Cadastro como lead, Contratos fechados e Pagamento de guia ---------- */
-  var LEAD = { novo: 'Novo lead', contato: 'Em contato', sem_resposta: 'Sem resposta', retornar: 'Retornar depois', perdido: 'Perdido (não fechou)' };
+  var LEAD = { novo: 'Novo lead', contato: 'Em contato', sem_resposta: 'Sem resposta', retornar: 'Retornar depois', perdido: 'Perdido (não fechou)', desqualificado: 'Desqualificado' };
   // regras automáticas: 3 tentativas sem atender = sem resposta; em contato há mais de 3 dias = sem resposta;
   // sem resposta há mais de 15 dias = perdido; "retornar depois" volta para "novo lead" na data marcada
   var LEAD_TENTATIVAS = 3, LEAD_DIAS_CONTATO = 3, LEAD_DIAS_PERDIDO = 15;
@@ -3985,7 +3988,7 @@ td,.row{font-size:13px}
     }
     return k;
   }
-  var LEAD_ORDEM = { novo: 0, retornar: 1, contato: 2, sem_resposta: 3, perdido: 4 };
+  var LEAD_ORDEM = { novo: 0, retornar: 1, contato: 2, sem_resposta: 3, perdido: 4, desqualificado: 5 };
   function leadSelect(r){
     var k = leadDe(r);
     return '<select class="inss-sel lead-sel lead-' + k + '" data-lead="' + esc(r.id) + '" aria-label="Situação do contato com ' + esc(r.nome) + '">' +
@@ -4121,11 +4124,16 @@ td,.row{font-size:13px}
         await patchRow(r.id, { ctrEtapa: sl.value, atualizadoEm: new Date().toISOString() });
         toast(CTR_ETAPAS[sl.value][0] + ': ' + r.nome, 'Desfazer', function(){ patchRow(r.id, antesC).catch(function(e2){ toast(errMsg(e2)); }); });
       } else {
-        var antesL = { leadStatus: r.leadStatus || '', arquivado: !!r.arquivado, arquivadoEm: r.arquivadoEm || '' };
+        var antesL = { leadStatus: r.leadStatus || '', arquivado: !!r.arquivado, arquivadoEm: r.arquivadoEm || '', desqualMotivo: r.desqualMotivo || '', desqualEm: r.desqualEm || '' };
         var agoraL = new Date().toISOString();
         var p = { leadStatus: sl.value, leadMudouEm: agoraL, atualizadoEm: agoraL };
         if (sl.value === 'contato' || sl.value === 'sem_resposta') p.ultimoContatoEm = agoraL;
         if (sl.value === 'novo'){ p.tentativas = 0; p.retornarEm = ''; }
+        if (sl.value === 'desqualificado'){
+          var motivo = String(window.prompt('Desqualificado: descreva o motivo (obrigatório).', r.desqualMotivo || '') || '').trim();
+          if (motivo.length < 3){ toast('Informe o motivo para desqualificar.'); render(); return; }
+          p.desqualMotivo = motivo.slice(0, 300); p.desqualEm = iso(new Date());
+        } else if (r.desqualMotivo){ p.desqualMotivo = ''; p.desqualEm = ''; }
         if (sl.value === 'retornar'){
           var dias = parseInt(window.prompt('Voltar a ligar em quantos dias?', '2'), 10);
           if (!(dias > 0 && dias < 120)){ render(); return; }
@@ -4133,7 +4141,7 @@ td,.row{font-size:13px}
         }
         if (sl.value === 'perdido'){ p.arquivado = true; p.arquivadoEm = iso(new Date()); }
         await patchRow(r.id, p);
-        toast(LEAD[sl.value] + ': ' + r.nome + (sl.value === 'perdido' ? ' (foi para Arquivados)' : ''), 'Desfazer', function(){ patchRow(r.id, antesL).catch(function(e2){ toast(errMsg(e2)); }); });
+        toast(LEAD[sl.value] + ': ' + r.nome + (sl.value === 'desqualificado' ? ' · ' + p.desqualMotivo : '') + (sl.value === 'perdido' ? ' (foi para Arquivados)' : ''), 'Desfazer', function(){ patchRow(r.id, antesL).catch(function(e2){ toast(errMsg(e2)); }); });
       }
     } catch(err){ toast(errMsg(err)); render(); }
   });
