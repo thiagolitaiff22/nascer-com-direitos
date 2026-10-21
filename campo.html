@@ -898,7 +898,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 52;
+  var APP_VERSAO = 53;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1540,7 +1540,7 @@ button,a,label,[role=button]{touch-action:manipulation}
       '<div class="completar"><small>Completar documentos de</small><b>' + esc(completando.nome) + '</b><span>Tire só as fotos que estavam faltando e envie.</span><button type="button" id="cancelar-comp">Cancelar</button></div>' :
       '<div class="rot" style="margin-top:0">Dados da cliente</div><div class="dados">' +
         '<label class="fone' + (lsGet('campo_nome').trim() ? '' : ' falta') + '" id="l-nome"><svg viewBox="0 0 24 24"><use href="#i-pessoa"/></svg><input id="nome" autocomplete="off" autocapitalize="words" placeholder="Nome completo da cliente" value="' + esc(lsGet('campo_nome')) + '"></label>' +
-        '<label class="fone"><svg viewBox="0 0 24 24"><use href="#i-fone"/></svg><input id="fone" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="(92) 99999-9999" value="' + esc(maskFone(lsGet('campo_fone'))) + '"></label>' +
+        '<label class="fone' + (foneOk(lsGet('campo_fone')) ? '' : ' falta') + '" id="l-fone"><svg viewBox="0 0 24 24"><use href="#i-fone"/></svg><input id="fone" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="(92) 99999-9999" value="' + esc(maskFone(lsGet('campo_fone'))) + '"></label>' +
         '<label class="fone cid-campo' + (lsGet('campo_cidade') ? '' : ' falta') + '" id="l-cidade"><svg viewBox="0 0 24 24"><use href="#i-casa"/></svg><img class="cid-flag" id="cidade-flag" alt="" hidden><input id="cidade" autocomplete="off" autocapitalize="words" placeholder="Cidade da cliente" value="' + esc(lsGet('campo_cidade')) + '"' + (ufDoApp() ? ' readonly' : '') + '>' + (ufDoApp() ? '<svg class="cid-seta" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '') + '</label>' +
         '<label class="fone' + (cpfOk(lsGet('campo_cpf')) ? '' : ' falta') + '" id="l-cpf"><svg viewBox="0 0 24 24"><use href="#i-id"/></svg><input id="cpf" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="CPF da cliente" value="' + esc(maskCpf(lsGet('campo_cpf'))) + '"></label>' +
       '</div>' +
@@ -1570,7 +1570,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     })();
     if (completando){ $('cancelar-comp').onclick = cancelarComplemento; if ($('enviar')) $('enviar').lastChild.textContent = 'Enviar documentos'; }
     else {
-    $('fone').addEventListener('input', function(){ this.value = maskFone(this.value); lsSet('campo_fone', this.value); });
+    $('fone').addEventListener('input', function(){ this.value = maskFone(this.value); lsSet('campo_fone', this.value); var l = $('l-fone'); if (l) l.classList.toggle('falta', !foneOk(this.value)); });
     if ($('cidade')){
       var uf0 = ufDoApp();
       var pintaB = function(){ var im = $('cidade-flag'), n = $('cidade').value; if (!im) return; if (!n || !uf0){ im.hidden = true; return; } bandeiraDe(uf0, n, function(u){ if (u){ im.src = u; im.hidden = false; } else im.hidden = true; }); };
@@ -2497,12 +2497,20 @@ button,a,label,[role=button]{touch-action:manipulation}
       return montar([]);
     }
     var nm = ($('nome') || {}).value || '';
-    if (!nm.trim()){ falar('Digite o nome completo da cliente.'); alert('Digite o nome completo da cliente.'); $('nome').focus(); return; }
-    if (!foneOk(($('fone') || {}).value)){ alert('Informe o telefone com DDD, por exemplo (92) 99999-9999.'); if ($('fone')) $('fone').focus(); return; }
-    if (!String(lsGet('campo_cidade') || '').trim()){ alert('Escolha a cidade da cliente.'); if ($('cidade')) $('cidade').focus(); return; }
-    if (!cpfOk(($('cpf') || {}).value)){ alert('Informe o CPF da cliente (11 números).'); if ($('cpf')) $('cpf').focus(); return; }
-    if (gestante() && !lsGet('campo_dpp')){ alert('Informe a data prevista do parto, por exemplo 15/03/2027.'); if ($('dpp')) $('dpp').focus(); return; }
-    if (!gestante() && !lsGet('campo_crianca_nasc')){ alert('Informe a data de nascimento do bebê, por exemplo 15/03/2026.'); if ($('cnasc')) $('cnasc').focus(); return; }
+    // dados principais: sem eles o cadastro não é enviado
+    var faltaDados = [], primeiro = null;
+    var pede = function(ok, rot, id){ if (!ok){ faltaDados.push(rot); if (!primeiro) primeiro = id; } };
+    pede(nm.trim().length >= 3, 'nome completo da mãe', 'nome');
+    pede(foneOk(($('fone') || {}).value), 'telefone com DDD', 'fone');
+    pede(String(lsGet('campo_cidade') || '').trim(), 'cidade', 'cidade');
+    pede(cpfOk(($('cpf') || {}).value), 'CPF (11 números)', 'cpf');
+    if (gestante()) pede(lsGet('campo_dpp'), 'data prevista do parto', 'dpp');
+    else pede(lsGet('campo_crianca_nasc'), 'data de nascimento da criança', 'cnasc');
+    if (faltaDados.length){
+      ['l-nome', 'l-fone', 'l-cidade', 'l-cpf', 'l-dpp', 'l-cnasc'].forEach(function(i){ var l = $(i); if (l && l.querySelector('input') && !l.querySelector('input').value.trim()) l.classList.add('falta'); });
+      var msg = 'Para enviar o cadastro, falta preencher: ' + faltaDados.join(', ') + '.';
+      falar(msg); alert(msg); if ($(primeiro)) $(primeiro).focus(); return;
+    }
     var falta = DOCS.filter(function(d){ return obrig(d) && !fotos[d.k]; });
     if (falta.length){
       falar('Está faltando: ' + falta.map(function(d){ return d.t; }).join(', ') + '. Quer enviar assim mesmo?');
