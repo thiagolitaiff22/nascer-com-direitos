@@ -537,6 +537,8 @@ body{font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-w
 .tela .seg button{width:auto;height:auto;margin:0;font-size:14px;font-weight:600;padding:11px 6px;white-space:nowrap;background:none;color:var(--ink2);border-radius:11px!important}
 .tela .seg button[aria-pressed="true"]{background:var(--card);color:var(--ink)}
 .tela .nota-form,.tela p{text-align:left}
+.inst-passos{margin:6px 0 14px;padding-left:20px;text-align:left;font-size:14.5px;line-height:1.55;color:var(--ink)}
+.inst-passos li{margin:6px 0}
 .pm-acoes{display:grid;grid-template-columns:1fr;gap:8px;margin:12px 0 4px}
 .pm-btn{height:46px;border:0;border-radius:14px;background:#8c6a38;color:#fff;font:inherit;font-size:14px;font-weight:600}
 .pm-btn.pm-ghost{text-transform:none;letter-spacing:0;background:rgba(160,122,69,.12);color:#7a5a2b}
@@ -896,7 +898,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 51;
+  var APP_VERSAO = 52;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1809,15 +1811,32 @@ button,a,label,[role=button]{touch-action:manipulation}
     d.querySelector('#push-nao').onclick = function(){ lsSet('campo_push_nao', '1'); d.remove(); };
     d.querySelector('#push-sim').onclick = function(){ var b = this; b.disabled = true; b.textContent = '…'; ativarAvisos().then(function(r){ if (r.ok){ d.remove(); } else { b.disabled = false; b.textContent = 'Ativar'; alert(r.msg); } }); };
   }
+  /* ---------- instalar o aplicativo pelo navegador (sem baixar arquivo, sem alerta de "arquivo perigoso") ---------- */
+  var instalarEv = null;
+  window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); instalarEv = e; });
+  window.addEventListener('appinstalled', function(){ instalarEv = null; lsSet('campo_instalado', '1'); var b = $('inst-btn'); if (b) b.remove(); });
+  function podeInstalar(){ return !APP && !instaladoNaTela(); }
+  function instalarApp(){
+    if (instalarEv){ var ev = instalarEv; ev.prompt(); return ev.userChoice.then(function(r){ if (r && r.outcome === 'accepted') instalarEv = null; }).catch(function(){}); }
+    var f = document.createElement('div'); f.className = 'folha';
+    var passos = ios()
+      ? '<li>Toque no botão <b>Compartilhar</b> (o quadrado com a seta para cima).</li><li>Escolha <b>Adicionar à Tela de Início</b>.</li><li>Toque em <b>Adicionar</b>. O ícone aparece junto dos seus aplicativos.</li>'
+      : '<li>Abra este endereço no <b>Chrome</b>.</li><li>Toque nos <b>três pontinhos</b> do canto de cima.</li><li>Escolha <b>Instalar aplicativo</b> (ou "Adicionar à tela inicial").</li>';
+    f.innerHTML = '<div><div class="puxa"></div><h3>Instalar o aplicativo</h3><div class="sub">Sem baixar arquivo e sem alertas de segurança. Ele atualiza sozinho.</div><ol class="inst-passos">' + passos + '</ol><button type="button" class="sair" style="margin-top:6px" data-fecha>Entendi</button></div>';
+    document.body.appendChild(f);
+    f.addEventListener('click', function(e){ if (e.target === f || e.target.closest('[data-fecha]')) f.remove(); });
+    return Promise.resolve();
+  }
   /* ---------- conta ---------- */
   function vistaConta(){
     var nome = bonito((quem && quem.nome) || '') || 'Sua conta';
     $('vista').innerHTML =
       '<div class="pm-ola"><h2>Sua conta</h2><span>' + esc(nome) + ' · ' + (ehProspectador() ? 'Prospectador' : 'Parceiro') + '</span></div>' +
-      '<div class="pm-conta">' + (pushSuporte() ? '<button type="button" id="avisos-btn"><b>Avisos no celular</b><small id="avisos-sub">' + (avisosAtivos() ? 'Ativados · toque para desativar' : 'Desativados · toque para ativar') + '</small></button>' : '') + '<button type="button" id="verif-atu"><b>Verificar atualização</b><small>Veja se há uma versão nova do aplicativo</small></button>' +
+      '<div class="pm-conta">' + (podeInstalar() ? '<button type="button" id="inst-btn"><b>Instalar o aplicativo</b><small>Sem baixar arquivo e sem alertas. Atualiza sozinho.</small></button>' : '') + (pushSuporte() ? '<button type="button" id="avisos-btn"><b>Avisos no celular</b><small id="avisos-sub">' + (avisosAtivos() ? 'Ativados · toque para desativar' : 'Desativados · toque para ativar') + '</small></button>' : '') + '<button type="button" id="verif-atu"><b>Verificar atualização</b><small>Veja se há uma versão nova do aplicativo</small></button>' +
       '<button type="button" class="sair" id="sair"><svg><use href="#i-sair"/></svg>Sair desta conta</button></div>' +
       '<div class="versao">Nascer com Direitos · versão ' + APP_VERSAO + '</div>';
     $('sair').onclick = sair;
+    if ($('inst-btn')) $('inst-btn').onclick = instalarApp;
     if ($('avisos-btn')) $('avisos-btn').onclick = function(){
       var sub = $('avisos-sub');
       if (avisosAtivos()){ desativarAvisos().then(function(){ sub.textContent = 'Desativados · toque para ativar'; }); return; }
@@ -2806,10 +2825,12 @@ button,a,label,[role=button]{touch-action:manipulation}
       '<label class="login-rot" for="senha">Senha</label><label class="fone" style="margin:0"><svg viewBox="0 0 24 24"><use href="#i-cadeado"/></svg><input id="senha" type="password" placeholder="sua senha" autocomplete="current-password"><button type="button" id="ver-senha" style="border:0;background:none;color:var(--ink2);font:inherit;font-size:14px">mostrar</button></label>' +
       '<button class="enviar" id="entrar">Entrar</button>' +
       '<p class="login-nota"><a href="equipe-cadastro.html" style="color:inherit;font-weight:700">Primeiro acesso</a> &nbsp;·&nbsp; <a href="#" id="esqueci" style="color:inherit;font-weight:700">Esqueci a senha</a></p>' +
+      (podeInstalar() ? '<p class="login-nota"><a href="#" id="inst-login" style="color:inherit;font-weight:700">Instalar o aplicativo no celular</a></p>' : '') +
       '<p class="login-nota">Precisa de internet só para entrar. Depois o aplicativo funciona sem sinal.</p>' +
       '</div></div>';
     $('usuario').addEventListener('input', function(){ this.value = maskCpf(this.value); });   // só números
     $('esqueci').onclick = function(e){ e.preventDefault(); alert('Esqueceu a senha? Procure o escritório: o gestor redefine e ela volta a ser 123456. No próximo acesso você cria outra.'); };
+    if ($('inst-login')) $('inst-login').onclick = function(e){ e.preventDefault(); instalarApp(); };
     $('ver-senha').onclick = function(){ var e = $('senha'); e.type = e.type === 'password' ? 'text' : 'password'; this.textContent = e.type === 'password' ? 'mostrar' : 'esconder'; };
     $('senha').addEventListener('keydown', function(e){ if (e.key === 'Enter') $('entrar').click(); });
     $('entrar').onclick = function(){
