@@ -1436,6 +1436,11 @@ td,.row{font-size:13px}
 .app th,.app .thead > *{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* ---------- Contratos fechados / Pagamento de guia ---------- */
+#desq-list .row{grid-template-columns:minmax(0,2fr) minmax(0,1.2fr) minmax(0,1fr) minmax(0,2fr) auto!important;align-items:center;gap:14px!important;padding-top:8px!important;padding-bottom:8px!important}
+#desq-list .row.head{grid-template-columns:minmax(0,2fr) minmax(0,1.2fr) minmax(0,1fr) minmax(0,2fr) auto!important}
+#desq-list .c-act{display:flex;gap:8px;align-items:center;justify-content:flex-end}
+#desq-list .row[data-linha]{cursor:pointer}#desq-list .row[data-linha]:hover{background:var(--hover)}#desq-list .row.aberto{background:var(--soft)}
+#desq-list .desq-motivo{white-space:normal;overflow-wrap:anywhere;line-height:1.35}
 #ctr-list .row,#nasc-list .row{grid-template-columns:minmax(0,2.2fr) minmax(0,1.2fr) minmax(0,1.1fr) minmax(0,1.5fr) minmax(190px,1.4fr) 36px!important;align-items:center;gap:16px!important;min-height:46px;padding-top:6px!important;padding-bottom:6px!important}
 #nasc-list .row{grid-template-columns:minmax(0,2.2fr) minmax(0,1.2fr) minmax(0,1.1fr) minmax(0,1.2fr) minmax(0,1.4fr) minmax(150px,1fr)!important}
 #ctr-list .row[data-linha],#nasc-list .row[data-linha]{cursor:pointer}
@@ -2148,6 +2153,7 @@ td,.row{font-size:13px}
     <nav class="nav" role="tablist" aria-orientation="horizontal">
       <div class="nav-lbl" aria-hidden="true">Comercial</div><button class="tab" role="tab" id="tab-cad" aria-selected="false" type="button" title="Cadastro"><svg class="i"><use href="#i-phone"/></svg><span>Cadastro</span></button>
       <button class="tab" role="tab" id="tab-ctr" aria-selected="false" type="button" title="Contratos fechados"><svg class="i"><use href="#i-check"/></svg><span>Contratos fechados</span></button>
+      <button class="tab" role="tab" id="tab-desq" aria-selected="false" type="button" title="Leads desqualificados"><svg class="i"><use href="#i-bellx"/></svg><span>Leads desqualificados</span></button>
       <div class="nav-lbl" aria-hidden="true">Processos</div><button class="tab" role="tab" id="tab-nasc" aria-selected="false" type="button" title="Pagamento de guia"><svg class="i"><use href="#i-clock"/></svg><span>Pagamento de guia</span></button>
       <button class="tab" role="tab" id="tab-inss" aria-selected="false" type="button" title="INSS"><svg class="i"><use href="#i-inss"/></svg><span>INSS</span></button>
       <button class="tab" role="tab" id="tab-clientes" aria-selected="true" type="button" title="Judicial"><svg class="i"><use href="#i-gavel"/></svg><span>Judicial</span></button>
@@ -2202,6 +2208,18 @@ td,.row{font-size:13px}
         </div>
         <div class="sec-rot">Clientes com contrato fechado</div>
         <div class="card list" id="ctr-list"></div>
+      </section>
+
+      <section id="view-desq" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
+        <div class="sec-rot">Resumo dos leads desqualificados</div>
+        <div class="stats" id="desq-stats"></div>
+        <div class="fbar">
+          <div class="search tb-busca"><svg class="i"><use href="#i-search"/></svg><input id="desq-q" type="search" autocomplete="off" placeholder="Buscar por nome, CPF ou motivo"></div>
+          <span class="tb-fim fb-count tnum" id="desq-count"></span>
+        </div>
+        <div class="sec-rot">Quem foi desqualificado</div>
+        <div class="card list" id="desq-list"></div>
+        <p class="foot-note">Para desqualificar alguém, use a situação <b>Desqualificado</b> no Cadastro e escreva o motivo. Se a situação mudar, use <b>Reativar</b>: a pessoa volta ao Cadastro como novo lead.</p>
       </section>
 
       <section id="view-nasc" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
@@ -3024,7 +3042,8 @@ td,.row{font-size:13px}
   // Controle: protocolado, não arquivado e com a audiência ainda por acontecer (depois vai para o Financeiro)
   function noControle(r){ return !!String(r.processo || '').trim() && !r.arquivado && !jaRealizada(r); }
   // Cadastro: ainda sem requerimento no INSS e sem número de processo
-  function noCadastro(r){ return !String(r.processo || '').trim() && !requerido(r) && !r.arquivado && !r.contratoEm; }
+  function noCadastro(r){ return !String(r.processo || '').trim() && !requerido(r) && !r.arquivado && !r.contratoEm && r.leadStatus !== 'desqualificado'; }
+  function desqualificada(r){ return r.leadStatus === 'desqualificado' && !r.contratoEm && !r.arquivado; }
   // INSS: requerimento feito, ainda sem ação judicial
   // contrato fechado com a documentação toda ok: sai de Contratos fechados e vai para o INSS redigir o requerimento
   function prontoRequerer(r){ return fechado(r) && !aguardaNasc(r) && !docsPendentes(r) && !dadosFaltando(r).length; }
@@ -3109,7 +3128,6 @@ td,.row{font-size:13px}
     if (cidade) partes.push('<span class="cad-bnd">' + (g ? bandeiraCidade(g, cidade) : '') + '</span><b>' + esc(cidade) + '</b>');
     partes.push(par ? 'indicação de <b>' + esc(parNome) + '</b>' : r.criadoPorNome ? 'cadastro de <b>' + esc(r.criadoPorNome) + '</b>' : esc(r.origem === 'organico' ? 'Orgânico' : 'Sem parceiro'));
     if (quando) partes.push(esc(quando));
-    if (r.leadStatus === 'desqualificado' && r.desqualMotivo) partes.push('<span class="cad-atraso" title="Motivo da desqualificação">Motivo: ' + esc(r.desqualMotivo) + '</span>');
     var dcad = String(r.dataCadastro || r.criadoEm || '').slice(0, 10), nd2 = dcad ? -daysUntil(dcad) : null;
     if (leadDe(r) === 'novo' && nd2 != null && nd2 >= 2) partes.push('<span class="cad-atraso">sem ligação há ' + nd2 + ' dias</span>');
     return partes.join(' · ');
@@ -3777,7 +3795,7 @@ td,.row{font-size:13px}
     var nFalta = todos.filter(docsPendentes).length;
     var SITS = [['', 'Todas as situações · ' + todos.length], ['faltam', 'Faltam documentos · ' + nFalta], ['pronto', 'Prontos para requerer · ' + conta.pronto], ['conferir', 'Conferir dados · ' + conta.conferir], ['incompleto', 'Dados incompletos · ' + conta.incompleto], ['gestante', 'Aguardando o parto · ' + conta.gestante], ['prazo', 'Prazo perto do fim · ' + nPrazo], ['pendencias', 'Pendências (documento ou dados)'],
       ['l:novo', 'Para ligar (novos) · ' + todos.filter(function(r){ return leadDe(r) === 'novo'; }).length], ['l:retornar', 'Retornar depois · ' + todos.filter(function(r){ return leadDe(r) === 'retornar'; }).length],
-      ['l:sem_resposta', 'Sem resposta · ' + todos.filter(function(r){ return leadDe(r) === 'sem_resposta'; }).length], ['l:contato', 'Em contato · ' + todos.filter(function(r){ return leadDe(r) === 'contato'; }).length], ['l:desqualificado', 'Desqualificados · ' + todos.filter(function(r){ return leadDe(r) === 'desqualificado'; }).length]];
+      ['l:sem_resposta', 'Sem resposta · ' + todos.filter(function(r){ return leadDe(r) === 'sem_resposta'; }).length], ['l:contato', 'Em contato · ' + todos.filter(function(r){ return leadDe(r) === 'contato'; }).length]];
     $('cad-sit').innerHTML = SITS.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === cadSit ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
     $('cad-sit').classList.toggle('ativo', !!cadSit);
     var lista = todos.filter(function(r){ return (!cadSit || (cadSit === 'faltam' ? docsPendentes(r) : cadSit === 'pendencias' ? (docsPendentes(r) || situacaoCad(r)[0] === 'incompleto') : cadSit === 'prazo' ? !!prazoTag(r) : /^l:/.test(cadSit) ? leadDe(r) === cadSit.slice(2) : situacaoCad(r)[0] === cadSit)) && buscaCliente(r, cadQ); })
@@ -4044,6 +4062,40 @@ td,.row{font-size:13px}
     });
     box.innerHTML = html;
   }
+  var desqQ = '', desqAberto = {};
+  function renderDesq(){
+    var box = $('desq-list'); if (!box) return;
+    var todos = state.rows.filter(desqualificada);
+    var mes = iso(new Date()).slice(0, 7), nMes = todos.filter(function(r){ return String(r.desqualEm || r.leadMudouEm || '').slice(0, 7) === mes; }).length;
+    $('desq-stats').innerHTML = cardLista('data-desq-filtro', 'i-bellx', 'Leads desqualificados', todos.length, 'no total', '', '') + cardLista('data-desq-filtro', 'i-clock', 'Neste mês', nMes, 'desqualificados em ' + mes.slice(5) + '/' + mes.slice(0, 4), 'mes', '');
+    var q = semAcento(desqQ);
+    var lista = todos.filter(function(r){ return !q || buscaOk(r, desqQ) || semAcento(r.desqualMotivo || '').indexOf(q) >= 0; })
+      .sort(function(a, b){ return String(b.desqualEm || b.leadMudouEm || '').localeCompare(String(a.desqualEm || a.leadMudouEm || '')) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); });
+    $('desq-count').textContent = lista.length + (lista.length === 1 ? ' lead' : ' leads');
+    var html = '<div class="row head"><div>Lead</div><div>Contato</div><div>Desqualificado em</div><div>Motivo</div><div></div></div>';
+    if (!lista.length) html += '<div class="empty">' + (todos.length ? 'Nenhum lead encontrado.' : 'Nenhum lead desqualificado até agora. Use a situação <b>Desqualificado</b> no Cadastro.') + '</div>';
+    lista.slice(0, 300).forEach(function(r){
+      var d = String(r.desqualEm || r.leadMudouEm || '').slice(0, 10);
+      html += '<div class="row' + (desqAberto[r.id] ? ' aberto' : '') + '" data-linha="' + esc(r.id) + '">' + nomeCell(r) +
+        '<div><span class="lbl">Contato</span>' + telCell(r, true) + '</div>' +
+        '<div><span class="lbl">Desqualificado em</span><div class="val">' + (d ? fmtDate(d) : '—') + '</div><div class="mini">' + esc(prospName(r.responsavelId) || '') + '</div></div>' +
+        '<div><span class="lbl">Motivo</span><div class="val desq-motivo">' + (r.desqualMotivo ? esc(r.desqualMotivo) : '<span class="mini">sem motivo registrado</span>') + '</div></div>' +
+        '<div class="c-act"><button type="button" class="btn" data-act="reativar" data-id="' + esc(r.id) + '" title="Volta para o Cadastro como novo lead">Reativar</button>' + editBtn(r) + '</div></div>' + (desqAberto[r.id] ? fichaCliente(r) : '');
+    });
+    box.innerHTML = html;
+  }
+  $('desq-q').addEventListener('input', function(){ desqQ = this.value.trim(); renderDesq(); });
+  ligarLista('desq', function(){ return desqAberto; }, renderDesq);
+  $('desq-list').addEventListener('click', async function(e){
+    var b = e.target.closest('[data-act="reativar"]'); if (!b) return;
+    var r = acharRow(b.dataset.id); if (!r) return;
+    var antes = { leadStatus: r.leadStatus, desqualMotivo: r.desqualMotivo || '', desqualEm: r.desqualEm || '', tentativas: r.tentativas || 0 };
+    try {
+      var ag = new Date().toISOString();
+      await patchRow(r.id, { leadStatus: 'novo', desqualMotivo: '', desqualEm: '', tentativas: 0, leadMudouEm: ag, atualizadoEm: ag });
+      toast('Reativado: ' + r.nome + ' voltou ao Cadastro', 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
+    } catch(err){ toast(errMsg(err)); }
+  });
   function pedeRequerer(r){ var d = parseDate(r.dpp); if (!d) return null; d.setDate(d.getDate() - 28); return iso(d); }
   function renderNasc(){
     var box = $('nasc-list'); if (!box) return;
@@ -4442,7 +4494,7 @@ td,.row{font-size:13px}
     var els = document.querySelectorAll('.cron[data-fim]'), t = Date.now();
     for (var i = 0; i < els.length; i++) els[i].textContent = cronTexto(+els[i].getAttribute('data-fim') - t);
   }, 1000);
-  function render(){ renderEstadosCfg(); renderRegioes(); renderContratos(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
+  function render(){ renderEstadosCfg(); renderRegioes(); renderContratos(); renderDesq(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
   var clQ = '';
   // stage of each process, derived from what is already recorded (no extra typing)
   var ETAPAS = [
@@ -6242,12 +6294,13 @@ td,.row{font-size:13px}
     } catch(err){ toast(errMsg(err)); }
     finally { $('av-save').disabled = false; }
   });
-  var VIEWS = { d: ['tab-cad', 'view-cad'], i: ['tab-inss', 'view-inss'], k: ['tab-ctr', 'view-ctr'], n: ['tab-nasc', 'view-nasc'], c: ['tab-clientes', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-ret', 'view-ret'], g: ['tab-parc', 'view-parc'], e: ['tab-equipe', 'view-equipe'] };
+  var VIEWS = { d: ['tab-cad', 'view-cad'], i: ['tab-inss', 'view-inss'], k: ['tab-ctr', 'view-ctr'], q: ['tab-desq', 'view-desq'], n: ['tab-nasc', 'view-nasc'], c: ['tab-clientes', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-ret', 'view-ret'], g: ['tab-parc', 'view-parc'], e: ['tab-equipe', 'view-equipe'] };
   var TITULOS = {
     d: ['Cadastro', 'Clientes ainda sem requerimento no INSS: dados, documentos e prazo'],
     i: ['INSS', 'Requerimentos administrativos: análise, exigências, concessões e indeferimentos'],
     c: ['Judicial', 'Ações judiciais: acompanhamento do processo até a sentença e o pagamento'],
     k: ['Contratos fechados', 'Clientes com contrato assinado: regularizar documentos e requerer no INSS'],
+    q: ['Leads desqualificados', 'Quem foi desqualificado e o motivo; dá para reativar'],
     n: ['Pagamento de guia', 'Contratos fechados de gestantes: pagamento da guia enquanto o bebê não nasce'],
     a: ['Audiências', 'Pauta por dia, avisos e convites'],
     l: ['Clientes', 'Todas as clientes e a etapa de cada caso'],
