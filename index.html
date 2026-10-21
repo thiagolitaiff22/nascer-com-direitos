@@ -2846,7 +2846,7 @@ td,.row{font-size:13px}
       <div class="field full" id="fe-senha-wrap"><label for="fe-senha" id="fe-senha-lbl">Nova senha (opcional)</label><input id="fe-senha" name="nova-senha-equipe" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocapitalize="none" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Em branco = senha padrão 123456 (a pessoa troca no 1º acesso)"><span class="hint" id="fe-senha-dica">Só números (mínimo de 6). O próprio funcionário pode trocar depois, em Alterar senha.</span></div>
       <div class="field"><label for="fe-funcao">Cargo</label><select id="fe-funcao"><option value="closer">Closer · liga e fecha contratos</option><option value="operacional">Agente Operacional · documentos e requerimentos</option><option value="judicial">Agente Judicial · ações e processos</option><option value="posvenda">Pós-venda · acompanha a cliente depois do contrato</option><option value="admin">Gestor · acesso total</option></select></div>
       <div class="field"><label for="fe-ativo">Acesso</label><select id="fe-ativo"><option value="sim">Ativo</option><option value="nao">Bloqueado</option></select></div>
-      <div class="field full" id="fe-estados-box"><label>Estados que esta pessoa gere (painel do gestor)</label><div id="fe-estados" class="rs-lista"></div><span class="hint">Toque nos estados dela. Sem nenhum marcado, ela vê todos. No painel do gestor ela vê e cadastra só os estados marcados.</span></div>
+      <div class="field full" id="fe-estados-box"><label>Estados do gestor (só no painel do gestor do celular)</label><div id="fe-estados" class="rs-lista"></div><span class="hint">No sistema (BI) todos os gestores veem todos os estados. Esta marcação só limita o painel do gestor no celular. Sem nenhum marcado, ele vê todos.</span></div>
     </div>
     <div class="f-foot">
       <button class="btn danger" type="button" id="fe-del" hidden>Excluir</button>
@@ -7335,6 +7335,7 @@ function tentarParceiro(cpf, senha){
     $('fe-funcao').value = u ? cargoDe(u) : 'operacional'; $('fe-ativo').value = !u || u.ativo ? 'sim' : 'nao';
     var mEst = (u && Array.isArray(u.estados)) ? u.estados : [];
     $('fe-estados').className = 'est-chips';
+    var boxEst = $('fe-estados-box'); if (boxEst) boxEst.hidden = $('fe-funcao').value !== 'admin';
     $('fe-estados').innerHTML = (state.regioes || []).map(function(g){ var uf = String(g.uf || g.id || '').toUpperCase(); return '<label class="est-chip"><input type="checkbox" data-est="' + esc(g.id) + '"' + (mEst.indexOf(g.id) >= 0 ? ' checked' : '') + '><img src="img/flags/' + esc(uf) + '.svg" alt="" onerror="this.remove()"><span>' + esc(g.nome) + '</span></label>'; }).join('');
     var eu = u && state.me && u.email === state.me.email;
     $('fe-funcao').disabled = !!eu; $('fe-ativo').disabled = !!eu;
@@ -7499,6 +7500,7 @@ function tentarParceiro(cpf, senha){
   });
   $('fe-cancel').addEventListener('click', function(){ pedidoEq = null; dlgE.close(); });
   $('fe-cpf').addEventListener('input', function(){ this.value = cpfMasc(this.value); });   // 000.000.000-00
+  $('fe-funcao').addEventListener('change', function(){ var b = $('fe-estados-box'); if (b) b.hidden = this.value !== 'admin'; });   // estados só para Gestor
   $('form-eq').addEventListener('submit', async function(e){
     e.preventDefault();
     var cpfFe = $('fe-cpf').value.replace(/\D/g, '');
@@ -7513,7 +7515,7 @@ function tentarParceiro(cpf, senha){
     if (interno && senhaNova && senhaNova.length < 6){ $('fe-senha').focus(); toast('A senha provisória deve ter no mínimo 6 caracteres'); return; }
     var cargoSel = $('fe-funcao').value;
     var estSel = [].slice.call($('fe-estados').querySelectorAll('input[data-est]:checked')).map(function(c){ return c.dataset.est; });
-    var row = { nome: nome, funcao: cargoSel === 'admin' ? 'admin' : 'assistente', cargo: cargoSel, ativo: $('fe-ativo').value === 'sim', cpf: cpfFe || null, estados: estSel.length ? estSel : null };
+    var row = { nome: nome, funcao: cargoSel === 'admin' ? 'admin' : 'assistente', cargo: cargoSel, ativo: $('fe-ativo').value === 'sim', cpf: cpfFe || null, estados: cargoSel === 'admin' && estSel.length ? estSel : null };
     $('fe-save').disabled = true;
     try {
       var r = eEditing ? await SB.from('equipe').update(row).eq('email', eEditing).select('email') : await SB.from('equipe').insert(Object.assign({ email: email }, row));
