@@ -896,7 +896,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 50;
+  var APP_VERSAO = 51;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1589,7 +1589,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     $('nome').addEventListener('blur', function(){ this.value = bonito(this.value); lsSet('campo_nome', this.value); });
     Array.prototype.forEach.call(document.querySelectorAll('#seg-nasc [data-n]'), function(b){ b.onclick = function(){ lsSet('campo_nasceu', b.dataset.n); vistaNovo(); }; });
     if ($('cnasc')) $('cnasc').addEventListener('input', function(){
-      var d = this.value.replace(/D/g, '').slice(0, 8), t = d;
+      var d = this.value.replace(/\D/g, '').slice(0, 8), t = d;
       if (d.length > 4) t = d.slice(0, 2) + '/' + d.slice(2, 4) + '/' + d.slice(4); else if (d.length > 2) t = d.slice(0, 2) + '/' + d.slice(2);
       this.value = t;
       var iso = brParaIso(t); lsSet('campo_crianca_nasc', iso);
