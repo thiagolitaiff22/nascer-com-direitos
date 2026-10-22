@@ -1321,6 +1321,12 @@ section.vw-dash{gap:10px!important}
 .ficha-foto span{font-size:12.5px;color:var(--ink-3)}
 .av-foto{flex:none;width:28px;height:28px;border-radius:50%;object-fit:cover;border:1px solid var(--line)}
 .falta-tag{flex:none;font-size:11px;font-weight:700;color:var(--red);background:var(--red-soft);border:1px solid currentColor;border-radius:4px;padding:0 6px;white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.ficha-card{position:fixed;inset:0;z-index:9000;background:rgba(20,14,8,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+.ficha-card>div{width:min(720px,100%);max-height:88vh;display:flex;flex-direction:column;background:var(--panel,#fff);color:var(--ink,#2b2118);border:1px solid var(--line-2,#ddd);border-radius:18px;box-shadow:0 30px 80px -20px rgba(0,0,0,.55);overflow:hidden}
+.fc-topo{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line,#e6dcc8)}
+.fc-nome{font-size:18px;font-weight:700}
+.fc-corpo{overflow:auto;padding:4px 18px 18px}
+.fc-corpo .ficha{border:0!important;background:none!important;box-shadow:none!important;padding:0!important;margin:0!important}
 .docs-app{margin:14px 0 0}.docs-app>b{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-bottom:8px}
 .docs-chips{display:flex;flex-wrap:wrap;gap:8px}
 .doc-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;font-size:13px;font-weight:600;border:1px solid var(--line-2,#ddd)}
@@ -3351,6 +3357,10 @@ td,.row{font-size:13px}
     finally { b.disabled = false; b.innerHTML = rot; }
   });
   // compacto (aba Cadastro): só os dados do cadastro, sem processo, audiência, aviso e pagamento
+  // observações escritas pela equipe: o texto automático do envio pelo app (quem cadastrou, o que não foi fotografado) fica de fora
+  function obsDaEquipe(r){
+    return String(r.obs || '').split('\n').filter(function(l){ return l.trim() && !/^(Cadastrada pelo celular|Não foi fotografado|Nome nos documentos|CPF lido|Localização da casa)/i.test(l.trim()); }).join('\n');
+  }
   function fichaCliente(r, compacto){
     var proc = String(r.processo || '').trim();
     var aud = r.audData ? fmtDate(r.audData) + (r.audHora ? ' às ' + r.audHora : '') + ' · ' + (r.online ? 'online' : 'presencial') : '';
@@ -3372,7 +3382,7 @@ td,.row{font-size:13px}
       ['Processo', proc], ['Ajuizado em', r.protocolo ? fmtDate(r.protocolo) : ''],
       ['Teses da contestação', teses], ['Audiência', aud],
       ['Aviso', aviso], ['Resultado', res],
-      ['Pagamento', r.pagamento && PAG[r.pagamento] ? PAG[r.pagamento][0] : ''], ['Observações', r.obs]
+      ['Pagamento', r.pagamento && PAG[r.pagamento] ? PAG[r.pagamento][0] : ''], ['Observações', obsDaEquipe(r)]
     ].filter(function(c){ return c[1] !== null; });
     if (compacto) campos = campos.filter(function(c){ return ['Nome completo', 'CPF', 'RG', 'Nascimento', 'NIT / PIS', 'Telefone', 'Cidade', 'Endereço', 'Parceiro', 'Criança', 'Testemunhas', 'Observações'].indexOf(c[0]) >= 0; });
     var fl = faltaDocs(r);
@@ -3388,6 +3398,30 @@ td,.row{font-size:13px}
       (r.pastaUrl ? '<a class="btn" href="' + esc(r.pastaUrl) + '" target="_blank" rel="noopener"><svg class="i"><use href="#i-folder"/></svg>Pasta no Drive</a>' : '') +
       '</div></div>';
   }
+  /* ---------- card com os dados do cliente (abre ao clicar na linha) ---------- */
+  var cardAberto = null;
+  function fecharCard(){ if (cardAberto){ cardAberto.el.remove(); cardAberto = null; } }
+  function pintarCard(){
+    if (!cardAberto) return;
+    var r = acharRow(cardAberto.id); if (!r){ fecharCard(); return; }
+    cardAberto.el.querySelector('.fc-corpo').innerHTML = fichaCliente(r, cardAberto.compacto);
+    cardAberto.el.querySelector('.fc-nome').textContent = r.nome || 'Cliente';
+  }
+  function abrirCard(id, compacto){
+    var r = acharRow(id); if (!r) return;
+    fecharCard();
+    var el = document.createElement('div'); el.className = 'ficha-card';
+    el.innerHTML = '<div role="dialog" aria-modal="true"><div class="fc-topo"><b class="fc-nome"></b><button type="button" class="ico-btn" data-fc-x aria-label="Fechar"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div><div class="fc-corpo"></div></div>';
+    document.body.appendChild(el);
+    cardAberto = { el: el, id: id, compacto: !!compacto };
+    pintarCard();
+    el.addEventListener('click', function(e){
+      if (e.target === el || e.target.closest('[data-fc-x]')){ fecharCard(); return; }
+      var b = e.target.closest('[data-act="edit"]');
+      if (b){ var rr = acharRow(cardAberto.id); var cp = cardAberto.compacto; fecharCard(); if (rr) openForm(rr, false, cp); }
+    });
+  }
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && cardAberto && !dlg.open) fecharCard(); });
   function avisoCell(r){
     var n = daysUntil(r.audData), s = sit(r);
     var pend = !r.avisado && r.audData && n >= 0;
@@ -3973,8 +4007,7 @@ td,.row{font-size:13px}
     if (b && b.dataset.act !== 'abrir') return;
     var ln = b ? { dataset: { linha: b.dataset.id } } : e.target.closest('[data-linha]');
     if (!ln || (!b && e.target.closest('a,button,select,input,label,.ficha'))) return;
-    if (inssAberto[ln.dataset.linha]) delete inssAberto[ln.dataset.linha]; else inssAberto[ln.dataset.linha] = 1;
-    renderInss();
+    abrirCard(ln.dataset.linha); return;
   });
   document.addEventListener('change', async function(e){
     var sel = e.target.closest && e.target.closest('select[data-inss]'); if (!sel) return;
@@ -4017,8 +4050,7 @@ td,.row{font-size:13px}
     if (b && b.dataset.act !== 'abrir') return;
     var ln = b ? { dataset: { linha: b.dataset.id } } : e.target.closest('[data-linha]');
     if (!ln || (!b && e.target.closest('a,button,select,input,label,.ficha'))) return;
-    if (cadAberto[ln.dataset.linha]) delete cadAberto[ln.dataset.linha]; else cadAberto[ln.dataset.linha] = 1;
-    renderCad();
+    abrirCard(ln.dataset.linha, true); return;
   });
 
   /* ---------- Cadastro como lead, Contratos fechados e Pagamento de guia ---------- */
@@ -4176,8 +4208,7 @@ td,.row{font-size:13px}
       }
       var ln = b && b.dataset.act === 'abrir' ? { dataset: { linha: b.dataset.id } } : e.target.closest('[data-linha]');
       if (!ln || (!b && e.target.closest('a,button,select,input,label,.ficha'))) return;
-      var ab = getAberto(); if (ab[ln.dataset.linha]) delete ab[ln.dataset.linha]; else ab[ln.dataset.linha] = 1;
-      render();
+      abrirCard(ln.dataset.linha); return;
     });
   }
   ligarLista('ctr', function(){ return ctrAberto; }, renderContratos);
@@ -4527,7 +4558,7 @@ td,.row{font-size:13px}
     var els = document.querySelectorAll('.cron[data-fim]'), t = Date.now();
     for (var i = 0; i < els.length; i++) els[i].textContent = cronTexto(+els[i].getAttribute('data-fim') - t);
   }, 1000);
-  function render(){ renderEstadosCfg(); renderRegioes(); renderContratos(); renderDesq(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
+  function render(){ pintarCard(); renderEstadosCfg(); renderRegioes(); renderContratos(); renderDesq(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
   var clQ = '';
   // stage of each process, derived from what is already recorded (no extra typing)
   var ETAPAS = [
@@ -6274,11 +6305,10 @@ td,.row{font-size:13px}
       // a linha inteira funciona como botão: abre e fecha os dados do cliente
       var ln = e.target.closest('[data-linha]');
       if (!ln || e.target.closest('a,button,select,input,label,.ficha')) return;
-      if (clAberto[ln.dataset.linha]) delete clAberto[ln.dataset.linha]; else clAberto[ln.dataset.linha] = 1;
-      renderList(); return;
+      abrirCard(ln.dataset.linha); return;
     }
     if (b.dataset.act === 'more'){ state.limit += 100; renderList(); return; }
-    if (b.dataset.act === 'abrir'){ if (clAberto[b.dataset.id]) delete clAberto[b.dataset.id]; else clAberto[b.dataset.id] = 1; renderList(); return; }
+    if (b.dataset.act === 'abrir'){ abrirCard(b.dataset.id); return; }
     var r = state.rows.find(function(x){ return x.id === b.dataset.id; }); if (!r) return;
     if (b.dataset.act === 'edit') return openForm(r);
     if (b.dataset.act === 'pasta'){
