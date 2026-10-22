@@ -3,7 +3,8 @@
 // Uso:  node app/lancar.js "o que mudou, em uma frase curta"
 const fs = require('fs'), path = require('path');
 const R = path.join(__dirname, '..');
-const novidades = process.argv.slice(2).join(' ').trim() || 'Melhorias e correções.';
+const args = process.argv.slice(2), forcar = args.includes('--minima');   // --minima: versões antigas deixam de enviar cadastros até atualizar
+const novidades = args.filter(a => a !== '--minima').join(' ').trim() || 'Melhorias e correções.';
 let h = fs.readFileSync(path.join(R, 'campo.html'), 'utf8');
 const atual = +(h.match(/var APP_VERSAO = (\d+);/) || [])[1];
 const v = atual + 1;
@@ -13,6 +14,6 @@ let sw = fs.readFileSync(path.join(R, 'campo-sw.js'), 'utf8');
 sw = sw.replace(/nascer-campo-v\d+/, 'nascer-campo-v' + (v + 20));
 fs.writeFileSync(path.join(R, 'campo-sw.js'), sw);
 let old = {}; try { old = JSON.parse(fs.readFileSync(path.join(__dirname, 'versao.json'), 'utf8')); } catch (e) {}
-const out = { versao: v, apk: old.apk || 25, apkBuild: old.apkBuild || 0, url: old.url || 'https://github.com/thiagolitaiff22/nascer-com-direitos/raw/main/app/download/nascer-com-direitos.apk', novidades };
+const out = { versao: v, apk: old.apk || 25, apkBuild: old.apkBuild || 0, minima: forcar ? v : (old.minima || 0), url: old.url || 'https://github.com/thiagolitaiff22/nascer-com-direitos/raw/main/app/download/nascer-com-direitos.apk', novidades };
 fs.writeFileSync(path.join(__dirname, 'versao.json'), JSON.stringify(out) + '\n');
 console.log('Versão', v, 'pronta. Falta só publicar (git add, commit e push).');

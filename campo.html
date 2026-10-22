@@ -898,7 +898,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 54;
+  var APP_VERSAO = 55;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -2485,6 +2485,7 @@ button,a,label,[role=button]{touch-action:manipulation}
   function tela(html){ var t = document.createElement('div'); t.className = 'tela'; t.innerHTML = '<div>' + html + '</div>'; document.body.appendChild(t); return t; }
 
   function enviar(){
+    if (exigirVersao()) return;
     if (completando){
       var aindaFalta = completando.faltaDocs.filter(function(k){ return !fotos[k]; });
       if (!Object.keys(fotos).length) return alert('Tire pelo menos uma das fotos que estavam faltando.');
@@ -2620,6 +2621,7 @@ button,a,label,[role=button]{touch-action:manipulation}
   }
   function mandar(envio){
     if (enviando || !quem || !quem.envioUrl) return Promise.resolve();
+    if (exigirVersao()) return Promise.resolve();
     enviando = true;
     var tot = envio.arquivos.length + 1, feitos = envio.arquivos.filter(function(a){ return a.ok; }).length;
     // andamento pelo tamanho (bytes) de cada arquivo
@@ -2910,7 +2912,22 @@ button,a,label,[role=button]{touch-action:manipulation}
   }
   /* ---------- aviso de versão nova: aparece em todos os celulares (Android, iPhone e navegador) ---------- */
   var SITE_VERSAO = 'https://thiagolitaiff22.github.io/nascer-com-direitos/app/versao.json';
-  var avisoAtu = null, ultimaChecagem = 0;
+  var avisoAtu = null, ultimaChecagem = 0, bloqueioEl = null;
+  // versão mínima para enviar cadastros (versao.json › minima): app mais antigo que isso não envia, só atualiza
+  function versaoMinima(){ return +lsGet('campo_minima') || 0; }
+  function desatualizado(){ return APP_VERSAO < versaoMinima(); }
+  function bloquearVersao(v){
+    if (bloqueioEl && document.body.contains(bloqueioEl)) return;
+    var d = document.createElement('div'); bloqueioEl = d; d.setAttribute('role', 'alertdialog');
+    d.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(20,14,8,.92);display:flex;align-items:center;justify-content:center;padding:24px';
+    d.innerHTML = '<div style="background:var(--card,#fffaf0);color:var(--ink,#2b2118);border-radius:26px;max-width:420px;width:100%;padding:28px 24px;text-align:center;box-shadow:0 30px 70px -20px rgba(0,0,0,.6)">' +
+      '<b style="display:block;font-family:Fraunces,Georgia,serif;font-size:26px;line-height:1.15;margin-bottom:12px">Atualize o aplicativo</b>' +
+      '<p style="font-size:16px;line-height:1.45;margin:0 0 20px;color:var(--ink2,#5a4a38)">Esta versão está desatualizada e o envio de cadastros está pausado para não perder dados da cliente. Seus cadastros guardados no celular não se perdem: vão sair sozinhos depois de atualizar.</p>' +
+      '<button type="button" id="bloq-ok" style="width:100%;border:0;border-radius:999px;padding:16px;font:inherit;font-size:18px;font-weight:700;color:#fff;background:linear-gradient(135deg,#d6b373,#8c6a38)">Atualizar agora</button></div>';
+    document.body.appendChild(d);
+    d.querySelector('#bloq-ok').onclick = function(){ var b = this; b.disabled = true; b.textContent = 'Atualizando…'; atualizarApp(v || {}); setTimeout(function(){ b.disabled = false; b.textContent = 'Atualizar agora'; }, 6000); };
+  }
+  function exigirVersao(){ if (!desatualizado()) return false; bloquearVersao(); verificarAtualizacao(); return true; }
   function mostrarAtualizacao(v, nativo){
     if (avisoAtu && document.body.contains(avisoAtu)) return;
     var d = document.createElement('div'); d.className = 'atu'; d.setAttribute('role', 'alert');
@@ -2936,6 +2953,9 @@ button,a,label,[role=button]{touch-action:manipulation}
     var agora = Date.now(); if (agora - ultimaChecagem < 20000) return; ultimaChecagem = agora;
     fetch(SITE_VERSAO + '?t=' + agora, { cache: 'no-store' }).then(function(r){ return r.json(); }).then(function(v){
       if (!v) return;
+      lsSet('campo_minima', String(+v.minima || 0));
+      if (+v.minima > APP_VERSAO) return bloquearVersao(v);
+      if (bloqueioEl){ bloqueioEl.remove(); bloqueioEl = null; }
       if (v.versao > APP_VERSAO) return mostrarAtualizacao(v, false);
       // Android: a "casca" do aplicativo (parte nativa) também tem versão
       var Pl = window.Capacitor && window.Capacitor.Plugins || {};
