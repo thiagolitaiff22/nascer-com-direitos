@@ -1301,6 +1301,7 @@ section.vw-dash{gap:10px!important}
 .cid-uf-flag img{width:24px;height:16px;border-radius:3px;object-fit:cover;box-shadow:0 0 0 1px rgba(0,0,0,.14)}
 .cid-sheet{position:fixed;inset:0;z-index:99998;background:rgba(20,14,8,.55);display:flex;align-items:center;justify-content:center;padding:16px}
 .cid-sheet>div{background:var(--panel,#fff);color:var(--ink,#2b2118);border-radius:18px;width:min(460px,100%);max-height:80vh;display:flex;flex-direction:column;padding:18px;box-shadow:0 30px 70px -20px rgba(0,0,0,.5)}
+.cid-sheet.mini-sheet{align-items:flex-start;padding-top:18vh}.cid-sheet.mini-sheet>div{width:min(380px,100%);padding:12px;max-height:60vh}.cid-sheet.mini-sheet input{margin-bottom:6px}
 .cid-sheet h3{margin:0 0 2px;font-size:18px}.cid-sheet p{margin:0 0 10px;font-size:13px;color:var(--ink-3,#7a6c58)}
 .cid-sheet input{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;margin-bottom:10px}
 .cid-sheet .lista{overflow:auto;display:flex;flex-direction:column;gap:2px;min-height:120px}
@@ -5953,15 +5954,15 @@ td,.row{font-size:13px}
   /* Parceiro com pesquisa: o seletor abre uma lista com busca (a lista é grande) */
   function escolherParceiroForm(){
     var sel = $('f-resp'), f = document.createElement('div'); f.className = 'cid-sheet';
-    f.innerHTML = '<div><h3>Parceiro</h3><p>Quem trouxe a cliente · parceiros e prospectadores</p><input type="search" placeholder="Pesquisar pelo nome" autocomplete="off" spellcheck="false"><div class="lista"></div><div style="text-align:right;margin-top:10px"><button type="button" class="btn" data-x>Cancelar</button></div></div>';
+    f.innerHTML = '<div><input type="search" placeholder="Pesquisar parceiro ou prospectador…" autocomplete="off" spellcheck="false"><div class="lista"></div><div style="text-align:right;margin-top:10px"><button type="button" class="btn" data-x>Cancelar</button></div></div>';
     (sel.closest('dialog') || document.body).appendChild(f);
     var busca = f.querySelector('input'), box = f.querySelector('.lista');
     var itens = [].map.call(sel.options, function(o){ return { v: o.value, n: o.textContent }; });
     function pintar(){
-      var q = semAcento(busca.value), v = itens.filter(function(x){ return !q || !x.v || semAcento(x.n).indexOf(q) >= 0; });
+      var q = semAcento(busca.value), v = itens.filter(function(x){ return q ? (x.v && semAcento(x.n).indexOf(q) >= 0) : !x.v; }).slice(0, 8);
       box.innerHTML = v.length ? v.map(function(x){ return '<button type="button" data-v="' + esc(x.v) + '"' + (x.v === sel.value ? ' class="atual"' : '') + '><span>' + esc(x.n) + '</span></button>'; }).join('') : '<span class="mini">Ninguém com esse nome.</span>';
     }
-    pintar(); setTimeout(function(){ busca.focus(); }, 50); busca.addEventListener('input', pintar);
+    f.classList.add('mini-sheet'); pintar(); setTimeout(function(){ busca.focus(); }, 50); busca.addEventListener('input', pintar);
     box.addEventListener('click', function(e){ var b = e.target.closest('button[data-v]'); if (!b) return; sel.value = b.dataset.v; sel.dispatchEvent(new Event('change')); f.remove(); });
     f.querySelector('[data-x]').onclick = function(){ f.remove(); };
     f.addEventListener('click', function(e){ if (e.target === f) f.remove(); });
