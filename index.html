@@ -1213,7 +1213,23 @@ section.vw-dash{gap:10px!important}
 #view-cad > .sec-rot{margin:30px 0 10px!important}
 #view-cad > .sec-rot:not(.sec-rot ~ .sec-rot){margin-top:0!important}
 #view-cad > .fbar{margin-top:30px!important}
-.cad-stats{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+.cad-stats{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+#ctr-guia,#ctr-sit{display:none!important}
+.pv-lane{margin:0 0 22px}.pv-lane-t{display:flex;align-items:baseline;gap:10px;margin:0 0 10px;font-size:16px}.pv-lane-t small{color:var(--ink-3);font-size:12.5px}
+.pv-board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:start}
+@media (max-width:1100px){.pv-board{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.pv-col{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:10px;min-height:120px;display:flex;flex-direction:column;gap:8px}
+.pv-col.alvo{outline:2px dashed var(--gold,#a07a45);background:var(--hover)}
+.pv-col.fim{border-style:dashed;background:transparent}
+.pv-col-t{font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2);padding:2px 4px}
+.pv-dica,.pv-vazio{font-size:12.5px;color:var(--ink-3);padding:6px 4px;line-height:1.4}
+.pv-card{background:var(--panel);border:1px solid var(--line-2);border-radius:12px;padding:10px 11px;display:flex;flex-direction:column;gap:5px;cursor:pointer;box-shadow:0 1px 0 rgba(0,0,0,.04)}
+.pv-card:hover{border-color:var(--gold,#a07a45)}.pv-card b{font-size:14px}
+.pv-falta{display:flex;flex-wrap:wrap;gap:4px}.pv-falta span{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--red-soft);color:var(--red);border:1px solid var(--red)}
+.pv-ok{font-size:11.5px;color:#1f8a54;font-weight:600}
+.pv-card select{width:100%;margin-top:4px;padding:7px 8px;border-radius:9px;border:1px solid var(--line-2);background:var(--soft);color:inherit;font:inherit;font-size:12.5px}
+.prio-tag{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:800;letter-spacing:.02em;background:rgba(224,160,40,.2);color:#9a6a00;border:1px solid rgba(224,160,40,.5)}
+.prio-tag.crit{background:rgba(220,60,50,.16);color:#c0362c;border-color:rgba(220,60,50,.5)}
 @media (max-width:900px){ .cad-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important} }
 #cad-list .row{grid-template-columns:minmax(0,2.2fr) minmax(0,1.3fr) minmax(0,1fr) minmax(0,.7fr) minmax(0,1.7fr) minmax(150px,1.1fr) 36px!important;align-items:center;gap:16px!important;min-height:46px;padding-top:6px!important;padding-bottom:6px!important}
 #cad-list .row[data-linha]{cursor:pointer}
@@ -2177,9 +2193,9 @@ td,.row{font-size:13px}
     <div class="brand"><div class="logo"><img src="img/logo-nascer-t.png" alt="Nascer com Direitos"></div><div><b>Nascer com Direitos</b><span>Salário-maternidade</span></div></div>
     <nav class="nav" role="tablist" aria-orientation="horizontal">
       <div class="nav-lbl" aria-hidden="true">Comercial</div><button class="tab" role="tab" id="tab-cad" aria-selected="false" type="button" title="Cadastro"><svg class="i"><use href="#i-phone"/></svg><span>Cadastro</span></button>
-      <button class="tab" role="tab" id="tab-ctr" aria-selected="false" type="button" title="Contratos fechados"><svg class="i"><use href="#i-check"/></svg><span>Contratos fechados</span></button>
+      <button class="tab" role="tab" id="tab-ctr" aria-selected="false" type="button" title="Pós-venda"><svg class="i"><use href="#i-check"/></svg><span>Pós-venda</span></button>
       <button class="tab" role="tab" id="tab-desq" aria-selected="false" type="button" title="Leads desqualificados"><svg class="i"><use href="#i-bellx"/></svg><span>Leads desqualificados</span></button>
-      <div class="nav-lbl" aria-hidden="true">Processos</div><button class="tab" role="tab" id="tab-nasc" aria-selected="false" type="button" title="Pagamento de guia"><svg class="i"><use href="#i-clock"/></svg><span>Pagamento de guia</span></button>
+      <div class="nav-lbl" aria-hidden="true">Processos</div><button class="tab" role="tab" id="tab-nasc" aria-selected="false" type="button" title="Aguardando nascimento"><svg class="i"><use href="#i-clock"/></svg><span>Aguardando nascimento</span></button>
       <button class="tab" role="tab" id="tab-inss" aria-selected="false" type="button" title="INSS"><svg class="i"><use href="#i-inss"/></svg><span>INSS</span></button>
       <button class="tab" role="tab" id="tab-clientes" aria-selected="true" type="button" title="Judicial"><svg class="i"><use href="#i-gavel"/></svg><span>Judicial</span></button>
       <div class="nav-lbl" aria-hidden="true">Gestão</div><button class="tab admin-only" role="tab" id="tab-fin" aria-selected="false" type="button" title="Financeiro"><svg class="i"><use href="#i-cash"/></svg><span>Financeiro</span></button>
@@ -2224,15 +2240,15 @@ td,.row{font-size:13px}
       </section>
 
       <section id="view-ctr" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
-        <div class="sec-rot">Resumo dos contratos fechados</div>
+        <div class="sec-rot">Resumo do Pós-venda</div>
         <div class="stats" id="ctr-stats"></div>
         <div class="fbar">
           <div class="search tb-busca"><svg class="i"><use href="#i-search"/></svg><input id="ctr-q" type="search" autocomplete="off" placeholder="Buscar cliente por nome ou CPF"></div>
           <select id="ctr-sit" class="tb-sel" aria-label="Filtrar"></select>
           <a class="btn guia-link" id="ctr-guia" href="https://sal.rfb.gov.br/home" target="_blank" rel="noopener noreferrer" title="Abre o SAL da Receita Federal: gerar a guia e fazer o pagamento"><svg class="i"><use href="#i-cash"/></svg>Gerar e pagar guia</a><span class="tb-fim fb-count tnum" id="ctr-count"></span>
         </div>
-        <div class="sec-rot">Clientes com contrato fechado</div>
-        <div class="card list" id="ctr-list"></div>
+        <div class="sec-rot">Kanban de documentação</div>
+        <div class="list" id="ctr-list"></div>
       </section>
 
       <section id="view-desq" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
@@ -2255,7 +2271,7 @@ td,.row{font-size:13px}
           <select id="nasc-sit" class="tb-sel" aria-label="Filtrar"></select>
           <span class="tb-fim fb-count tnum" id="nasc-count"></span>
         </div>
-        <div class="sec-rot">Contratos fechados aguardando o nascimento</div>
+        <div class="sec-rot">Aguardando o nascimento e a certidão</div>
         <div class="card list" id="nasc-list"></div>
       </section>
 
@@ -3076,7 +3092,7 @@ td,.row{font-size:13px}
   function desqualificada(r){ return r.leadStatus === 'desqualificado' && !r.contratoEm && !r.arquivado; }
   // INSS: requerimento feito, ainda sem ação judicial
   // contrato fechado com a documentação toda ok: sai de Contratos fechados e vai para o INSS redigir o requerimento
-  function prontoRequerer(r){ return fechado(r) && !aguardaNasc(r) && !docsPendentes(r) && !dadosFaltando(r).length; }
+  function prontoRequerer(r){ return fechado(r) && regularizada(r) && !aguardaNasc(r) && !esperaCert(r) && !dadosFaltando(r).length; }
   function noInss(r){ return !String(r.processo || '').trim() && !r.arquivado && (requerido(r) || prontoRequerer(r)); }
   function passEtapaCl(r, f){
     if (!noControle(r)) return false;
@@ -3157,6 +3173,7 @@ td,.row{font-size:13px}
     var partes = [];
     if (cidade) partes.push('<span class="cad-bnd">' + (g ? bandeiraCidade(g, cidade) : '') + '</span><b>' + esc(cidade) + (g ? '/' + esc(String(g.uf || g.id).toUpperCase()) : '') + '</b>');
     partes.push(par ? 'indicação de <b>' + esc(parNome) + '</b>' : r.criadoPorNome ? 'cadastro de <b>' + esc(r.criadoPorNome) + '</b>' : esc(r.origem === 'organico' ? 'Orgânico' : 'Sem parceiro'));
+    if (tagPrioridade(r)) partes.unshift(tagPrioridade(r));
     if (quando) partes.push(esc(quando));
     var dcad = String(r.dataCadastro || r.criadoEm || '').slice(0, 10), nd2 = dcad ? -daysUntil(dcad) : null;
     if (leadDe(r) === 'novo' && nd2 != null && nd2 >= 2) partes.push('<span class="cad-atraso">sem ligação há ' + nd2 + ' dias</span>');
@@ -3855,20 +3872,21 @@ td,.row{font-size:13px}
     var nPrazo = todos.filter(function(r){ return !!prazoTag(r); }).length;
     var cardC = function(ico, rot, n, cap, cor, filtro){ return '<div class="card stat cad-filtro' + (cadSit === filtro ? ' ativo' : '') + '" role="button" tabindex="0" aria-pressed="' + (cadSit === filtro) + '" data-cad-filtro="' + filtro + '" title="Mostrar na lista" data-cor-fixa="1" style="--cor-linha:var(' + cor + ')"><div class="stat-h"><svg class="i"><use href="#' + ico + '"/></svg>' + rot + '</div><div class="stat-v tnum">' + n + '</div><div class="stat-c">' + cap + '</div><div class="stat-viz"></div></div>'; };
     $('cad-stats').innerHTML =
+      cardC('i-bellx', 'Prioridade', todos.filter(function(r){ return prioridadeNasc(r) != null; }).length, 'gestantes com parto em até ' + PRIORIDADE_DIAS + ' dias: fechar já', '--red', 'prioridade') +
       cardC('i-users', 'Em cadastro', todos.length, 'ainda sem requerimento no INSS' + (conta.gestante ? ' · ' + conta.gestante + ' aguardando o parto' : ''), '--line-2', '') +
       cardC('i-check', 'Prontos para requerer', conta.pronto, 'dados preenchidos e documentação completa', '--green', 'pronto') +
       cardC('i-clock', 'Conferir dados', conta.conferir, 'cadastrados pelo celular', '--amber', 'conferir') +
       // pendências: documento que o parceiro ainda não mandou ou dados incompletos (cada cliente conta uma vez)
       cardC('i-bellx', 'Pendências', todos.filter(function(r){ return docsPendentes(r) || situacaoCad(r)[0] === 'incompleto'; }).length, nFaltaC + ' com documento pendente · ' + conta.incompleto + ' com dados incompletos · ' + semTel + ' sem telefone' + (nPrazo ? ' · ' + nPrazo + ' com prazo perto do fim' : ''), '--red', 'pendencias');
     var nFalta = todos.filter(docsPendentes).length;
-    var SITS = [['', 'Todas as situações · ' + todos.length], ['faltam', 'Faltam documentos · ' + nFalta], ['pronto', 'Prontos para requerer · ' + conta.pronto], ['conferir', 'Conferir dados · ' + conta.conferir], ['incompleto', 'Dados incompletos · ' + conta.incompleto], ['gestante', 'Aguardando o parto · ' + conta.gestante], ['prazo', 'Prazo perto do fim · ' + nPrazo], ['pendencias', 'Pendências (documento ou dados)'],
+    var SITS = [['', 'Todas as situações · ' + todos.length], ['prioridade', 'Prioridade (parto perto) · ' + todos.filter(function(r){ return prioridadeNasc(r) != null; }).length], ['faltam', 'Faltam documentos · ' + nFalta], ['pronto', 'Prontos para requerer · ' + conta.pronto], ['conferir', 'Conferir dados · ' + conta.conferir], ['incompleto', 'Dados incompletos · ' + conta.incompleto], ['gestante', 'Aguardando o parto · ' + conta.gestante], ['prazo', 'Prazo perto do fim · ' + nPrazo], ['pendencias', 'Pendências (documento ou dados)'],
       ['l:novo', 'Para ligar (novos) · ' + todos.filter(function(r){ return leadDe(r) === 'novo'; }).length], ['l:retornar', 'Retornar depois · ' + todos.filter(function(r){ return leadDe(r) === 'retornar'; }).length],
       ['l:sem_resposta', 'Sem resposta · ' + todos.filter(function(r){ return leadDe(r) === 'sem_resposta'; }).length], ['l:contato', 'Em contato · ' + todos.filter(function(r){ return leadDe(r) === 'contato'; }).length]];
     $('cad-sit').innerHTML = SITS.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === cadSit ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
     $('cad-sit').classList.toggle('ativo', !!cadSit);
-    var lista = todos.filter(function(r){ return (!cadSit || (cadSit === 'faltam' ? docsPendentes(r) : cadSit === 'pendencias' ? (docsPendentes(r) || situacaoCad(r)[0] === 'incompleto') : cadSit === 'prazo' ? !!prazoTag(r) : /^l:/.test(cadSit) ? leadDe(r) === cadSit.slice(2) : situacaoCad(r)[0] === cadSit)) && buscaCliente(r, cadQ); })
+    var lista = todos.filter(function(r){ return (!cadSit || (cadSit === 'prioridade' ? prioridadeNasc(r) != null : cadSit === 'faltam' ? docsPendentes(r) : cadSit === 'pendencias' ? (docsPendentes(r) || situacaoCad(r)[0] === 'incompleto') : cadSit === 'prazo' ? !!prazoTag(r) : /^l:/.test(cadSit) ? leadDe(r) === cadSit.slice(2) : situacaoCad(r)[0] === cadSit)) && buscaCliente(r, cadQ); })
       // mais recente primeiro (pelo dia do cadastro); no mesmo dia, em ordem alfabética
-      .sort(function(a, b){ var da = String(a.dataCadastro || a.criadoEm || '').slice(0, 10), db = String(b.dataCadastro || b.criadoEm || '').slice(0, 10); return (LEAD_ORDEM[leadDe(a)] - LEAD_ORDEM[leadDe(b)]) || db.localeCompare(da) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); });
+      .sort(function(a, b){ var da = String(a.dataCadastro || a.criadoEm || '').slice(0, 10), db = String(b.dataCadastro || b.criadoEm || '').slice(0, 10); var pa = prioridadeNasc(a), pb = prioridadeNasc(b); if (pa != null || pb != null){ if (pa == null) return 1; if (pb == null) return -1; if (pa !== pb) return pa - pb; } return (LEAD_ORDEM[leadDe(a)] - LEAD_ORDEM[leadDe(b)]) || db.localeCompare(da) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); });
     var nParaLigar = todos.filter(function(r){ return leadDe(r) === 'novo'; }).length;
     $('cad-count').textContent = lista.length + (lista.length === 1 ? ' cliente' : ' clientes') + (nParaLigar ? ' · ' + nParaLigar + ' para ligar' : '');
     var html = '<div class="row head"><div>Cliente</div><div>Telefone</div><div>Atendimento</div><div></div><div></div></div>';
@@ -4080,8 +4098,15 @@ td,.row{font-size:13px}
   }
   var CTR_ETAPAS = { regularizar: ['Regularizar documentos', 'crit'] };
   function fechado(r){ return !!r.contratoEm && !r.arquivado && !String(r.processo || '').trim() && !requerido(r); }
-  function aguardaNasc(r){ return fechado(r) && r.fatoGerador === 'gestante' && !r.criancaNasc; }
-  function noContratos(r){ return fechado(r) && !aguardaNasc(r) && !prontoRequerer(r); }
+  // fluxo: contrato fechado → Pós-venda (regulariza documentos) → Aguardando nascimento (gestante) → certidão → INSS
+  function regularizada(r){ return r.posEtapa === 'regularizada'; }
+  function aguardaNasc(r){ return fechado(r) && regularizada(r) && r.fatoGerador === 'gestante' && !r.criancaNasc; }
+  function esperaCert(r){ return fechado(r) && regularizada(r) && !r.certidaoRecebida && (!!r.criancaNasc || r.fatoGerador !== 'gestante'); }
+  function noContratos(r){ return fechado(r) && !regularizada(r); }
+  // prioridade do closer: gestante com parto até 30 dias (ou que já passou): depois de nascer a mãe perde a chance
+  var PRIORIDADE_DIAS = 30;
+  function prioridadeNasc(r){ if (r.fatoGerador !== 'gestante' || r.criancaNasc || !r.dpp) return null; var n = daysUntil(r.dpp); return n != null && n <= PRIORIDADE_DIAS ? n : null; }
+  function tagPrioridade(r){ var n = prioridadeNasc(r); if (n == null) return ''; return '<span class="prio-tag' + (n <= 7 ? ' crit' : '') + '" title="Fechar o contrato antes de o bebê nascer">' + (n < 0 ? 'PRIORIDADE · parto previsto passou há ' + (-n) + ' dias' : n === 0 ? 'PRIORIDADE · parto previsto é hoje' : 'PRIORIDADE · parto em ' + n + (n === 1 ? ' dia' : ' dias')) + '</span>'; }
   function etapaCtr(r){ return 'regularizar'; }
   // guia da contribuição: aguardando pagamento ou paga (controle em Contratos fechados)
   function guiaDe(r){ return r.guiaStatus === 'paga' ? 'paga' : 'aguardando'; }
@@ -4094,40 +4119,73 @@ td,.row{font-size:13px}
     return '<div class="c-name"><div class="name">' + ufFlag(r) + '<button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome) + '</button>' + pastaIco(r) + '</div><div class="addr">' + (r.cpf ? 'CPF ' + esc(r.cpf) : 'CPF não informado') + (r.tipoSegurada ? ' · ' + esc(TIPOS[r.tipoSegurada] || '') : '') + '</div></div>';
   }
   function editBtn(r){ return '<button type="button" class="ico-btn" data-act="edit" data-id="' + esc(r.id) + '" title="Editar cadastro" aria-label="Editar ' + esc(r.nome) + '"><svg class="i"><use href="#i-pencil"/></svg></button>'; }
+  /* ---------- Pós-venda (Kanban): regulariza a documentação de quem fechou contrato ---------- */
+  var POS_COLS = {
+    gest: [['recem', 'Recém-chegada'], ['falta_doc', 'Falta documento'], ['falta_gov', 'Falta senha gov.br'], ['regularizada', 'Regularizada']],
+    nasc: [['recem', 'Recém-chegada'], ['rural', 'Documentação rural'], ['falta_gov', 'Falta senha gov.br'], ['regularizada', 'Regularizada']]
+  };
+  function posLane(r){ return r.fatoGerador === 'gestante' ? 'gest' : 'nasc'; }
+  function posEtapaDe(r){
+    var cols = POS_COLS[posLane(r)].map(function(c){ return c[0]; });
+    if (r.posEtapa && cols.indexOf(r.posEtapa) >= 0 && r.posEtapa !== 'regularizada') return r.posEtapa;
+    return posLane(r) === 'nasc' ? 'rural' : (docsPendentes(r) ? 'falta_doc' : 'recem');
+  }
+  var ctrQ2 = '';
+  function posCard(r){
+    var lane = posLane(r), cols = POS_COLS[lane], et = posEtapaDe(r), falta = docsApp(r).filter(function(x){ return !x.ok; });
+    var tag = lane === 'gest' ? tagPrioridade(r) : '';
+    var quando = lane === 'gest' ? (r.dpp ? 'parto previsto ' + fmtDate(r.dpp) : 'sem data do parto') : (r.criancaNasc ? 'nasceu em ' + fmtDate(r.criancaNasc) : 'bebê já nasceu');
+    return '<div class="pv-card" draggable="true" data-linha="' + esc(r.id) + '" data-pv="' + esc(r.id) + '">' +
+      '<b>' + esc(r.nome || 'Sem nome') + '</b>' + (tag ? '<div>' + tag + '</div>' : '') +
+      '<div class="mini">' + esc(quando) + (r.contato ? ' · ' + esc(fmtTel(r.contato)) : '') + '</div>' +
+      '<div class="mini">' + (r.contratoPor ? 'fechado por ' + esc(r.contratoPor) + ' · ' : '') + esc(prospName(r.responsavelId) || 'sem parceiro') + '</div>' +
+      (falta.length ? '<div class="pv-falta">' + falta.map(function(x){ return '<span>' + esc(x.n) + '</span>'; }).join('') + '</div>' : '<div class="pv-ok">documentos do app completos</div>') +
+      '<select data-pos="' + esc(r.id) + '" aria-label="Mover ' + esc(r.nome) + '">' + cols.map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === et ? ' selected' : '') + '>' + (c[0] === 'regularizada' ? 'Regularizada (sai do Pós-venda)' : c[1]) + '</option>'; }).join('') + '</select></div>';
+  }
   function renderContratos(){
     var box = $('ctr-list'); if (!box) return;
-    var todos = state.rows.filter(noContratos), c = { regularizar: 0 }, gc = { aguardando: 0, paga: 0 };
-    todos.forEach(function(r){ c[etapaCtr(r)]++; gc[guiaDe(r)]++; });
-    $('ctr-stats').innerHTML =
-      cardLista('data-ctr-filtro', 'i-users', 'Contratos fechados', todos.length, 'esperando o requerimento no INSS', '', ctrSit) +
-      cardLista('data-ctr-filtro', 'i-bellx', 'Regularizar documentos', c.regularizar, 'quando completar, vai para o INSS', 'regularizar', ctrSit) +
-      cardLista('data-ctr-filtro', 'i-cash', 'Aguardando pagamento da guia', gc.aguardando, 'guia ainda não paga', 'g_aguardando', ctrSit) +
-      cardLista('data-ctr-filtro', 'i-check', 'Guias pagas', gc.paga, 'pagamento confirmado', 'g_paga', ctrSit);
-    $('ctr-sit').innerHTML = [['', 'Todas as etapas · ' + todos.length]].concat(Object.keys(CTR_ETAPAS).map(function(k){ return [k, CTR_ETAPAS[k][0] + ' · ' + c[k]]; })).concat([['g_aguardando', 'Aguardando pagamento da guia · ' + gc.aguardando], ['g_paga', 'Guias pagas · ' + gc.paga]])
-      .map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === ctrSit ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
-    var ordem = { regularizar: 0 };
-    var lista = todos.filter(function(r){ return (!ctrSit || (ctrSit === 'g_aguardando' ? guiaDe(r) === 'aguardando' : ctrSit === 'g_paga' ? guiaDe(r) === 'paga' : etapaCtr(r) === ctrSit)) && buscaOk(r, ctrQ); })
-      .sort(function(a, b){ return ordem[etapaCtr(a)] - ordem[etapaCtr(b)] || String(a.contratoEm).localeCompare(String(b.contratoEm)) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); });
-    $('ctr-count').textContent = lista.length + (lista.length === 1 ? ' cliente' : ' clientes');
-    var html = '<div class="row head"><div>Cliente</div><div>Contato</div><div>Contrato</div><div>Documentos</div><div>Guia</div><div></div></div>';
-    if (!lista.length) html += '<div class="empty">' + (todos.length ? 'Nenhuma cliente neste filtro.' : 'Nenhum contrato com pendência. Quando a documentação estiver completa, a cliente vai para o <b>INSS</b>.') + '</div>';
-    var ultimo = '';
-    lista.slice(0, 300).forEach(function(r){
-      var k = etapaCtr(r);
-      if (!ctrSit && k !== ultimo){ ultimo = k; html += '<div class="grp-head ' + CTR_ETAPAS[k][1] + '">' + CTR_ETAPAS[k][0] + ' <span class="tnum">' + c[k] + '</span></div>'; }
-      html += '<div class="row' + (ctrAberto[r.id] ? ' aberto' : '') + '" data-linha="' + esc(r.id) + '">' + nomeCell(r) +
-        '<div><span class="lbl">Contato</span>' + telCell(r, true) + '</div>' +
-        '<div><span class="lbl">Contrato</span><div class="val">' + fmtDate(String(r.contratoEm).slice(0, 10)) + '</div><div class="mini">' + (r.contratoPor ? 'fechado por ' + esc(r.contratoPor) + ' · ' : '') + esc(prospName(r.responsavelId) || '') + '</div></div>' +
-        '<div><span class="lbl">Documentos</span>' + docsCell(r) + '</div>' +
-        '<div><span class="lbl">Etapa</span><select class="inss-sel ' + CTR_ETAPAS[k][1] + '" data-ctr="' + esc(r.id) + '" aria-label="Etapa de ' + esc(r.nome) + '">' +
-          Object.keys(CTR_ETAPAS).map(function(x){ return '<option value="' + x + '"' + (x === k ? ' selected' : '') + '>' + CTR_ETAPAS[x][0] + '</option>'; }).join('') + '</select>' +
-          '<select class="inss-sel guia-sel ' + (guiaDe(r) === 'paga' ? 'ok' : 'warn') + '" data-guia="' + esc(r.id) + '" aria-label="Guia de ' + esc(r.nome) + '" title="' + (r.guiaPagaEm ? 'Paga em ' + fmtDate(String(r.guiaPagaEm).slice(0, 10)) : 'Guia ainda não paga') + '">' +
-            '<option value="aguardando"' + (guiaDe(r) === 'aguardando' ? ' selected' : '') + '>Guia: aguardando pagamento</option><option value="paga"' + (guiaDe(r) === 'paga' ? ' selected' : '') + '>Guia paga</option></select>' +
-          (k === 'pronto' ? '<button type="button" class="btn inss-acao" data-act="requerer" data-id="' + esc(r.id) + '" title="Lançar o requerimento feito no Meu INSS">Registrar requerimento</button>' : '') + '</div>' +
-        '<div class="c-act">' + editBtn(r) + '</div></div>' + (ctrAberto[r.id] ? fichaCliente(r) : '');
-    });
-    box.innerHTML = html;
+    var todos = state.rows.filter(noContratos).filter(function(r){ return buscaOk(r, ctrQ2); });
+    var gest = todos.filter(function(r){ return posLane(r) === 'gest'; }), nasc = todos.filter(function(r){ return posLane(r) === 'nasc'; });
+    var gov = todos.filter(function(r){ return posEtapaDe(r) === 'falta_gov'; });
+    $('ctr-stats').innerHTML = cardLista('data-ctr-filtro', 'i-users', 'No Pós-venda', todos.length, 'contratos fechados em regularização', '', '') +
+      cardLista('data-ctr-filtro', 'i-clock', 'Gestantes', gest.length, 'regularizar antes do parto', 'g', '') +
+      cardLista('data-ctr-filtro', 'i-bellx', 'Bebê já nasceu', nasc.length, 'cobrar documentação rural', 'n', '') +
+      cardLista('data-ctr-filtro', 'i-check', 'Falta senha gov.br', gov.length, 'pedir à mãe', 'gov', '');
+    $('ctr-count').textContent = todos.length + (todos.length === 1 ? ' cliente' : ' clientes');
+    function quadro(titulo, sub, lane, lista){
+      var cols = POS_COLS[lane];
+      var ord = lista.slice().sort(function(x, y){
+        if (lane === 'gest'){ var dx = x.dpp || '9999', dy = y.dpp || '9999'; return dx.localeCompare(dy) || String(x.nome).localeCompare(String(y.nome), 'pt'); }
+        return String(x.contratoEm).localeCompare(String(y.contratoEm)) || String(x.nome).localeCompare(String(y.nome), 'pt');
+      });
+      return '<div class="pv-lane"><div class="pv-lane-t"><b>' + titulo + '</b> <span class="tnum">' + lista.length + '</span><small>' + sub + '</small></div><div class="pv-board">' +
+        cols.map(function(c){
+          var cards = c[0] === 'regularizada' ? [] : ord.filter(function(r){ return posEtapaDe(r) === c[0]; });
+          return '<div class="pv-col' + (c[0] === 'regularizada' ? ' fim' : '') + '" data-col="' + c[0] + '" data-lane="' + lane + '"><div class="pv-col-t">' + c[1] + (c[0] === 'regularizada' ? '' : ' <span class="tnum">' + cards.length + '</span>') + '</div>' +
+            (c[0] === 'regularizada' ? '<div class="pv-dica">Arraste para cá ou escolha no cartão: ' + (lane === 'gest' ? 'a mãe vai para <b>Aguardando nascimento</b>' : 'a mãe vai para <b>certidão</b>, depois INSS') + '.</div>' : cards.map(posCard).join('') || '<div class="pv-vazio">—</div>') + '</div>';
+        }).join('') + '</div></div>';
+    }
+    box.innerHTML = quadro('Gestantes', 'regularizar tudo antes do parto', 'gest', gest) + quadro('Bebê já nasceu', 'só dá certo com documentação rural', 'nasc', nasc);
   }
+  async function moverPos(id, etapa){
+    var r = acharRow(id); if (!r) return;
+    var antes = { posEtapa: r.posEtapa || '' };
+    try {
+      await patchRow(id, { posEtapa: etapa, posMudouEm: new Date().toISOString(), atualizadoEm: new Date().toISOString() });
+      var nome = (POS_COLS[posLane(r)].filter(function(c){ return c[0] === etapa; })[0] || [0, etapa])[1];
+      toast(etapa === 'regularizada' ? r.nome + ' regularizada: ' + (posLane(r) === 'gest' ? 'foi para Aguardando nascimento' : 'foi para a certidão') : r.nome + ': ' + nome, 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
+    } catch(err){ toast(errMsg(err)); render(); }
+  }
+  document.addEventListener('change', function(e){ var s = e.target.closest && e.target.closest('select[data-pos]'); if (s) moverPos(s.dataset.pos, s.value); });
+  document.addEventListener('dragstart', function(e){ var c = e.target.closest && e.target.closest('.pv-card'); if (!c) return; e.dataTransfer.setData('text/plain', c.dataset.pv); e.dataTransfer.effectAllowed = 'move'; });
+  document.addEventListener('dragover', function(e){ var col = e.target.closest && e.target.closest('.pv-col'); if (col){ e.preventDefault(); col.classList.add('alvo'); } });
+  document.addEventListener('dragleave', function(e){ var col = e.target.closest && e.target.closest('.pv-col'); if (col) col.classList.remove('alvo'); });
+  document.addEventListener('drop', function(e){
+    var col = e.target.closest && e.target.closest('.pv-col'); if (!col) return;
+    e.preventDefault(); col.classList.remove('alvo');
+    var id = e.dataTransfer.getData('text/plain'), r = acharRow(id); if (!r || posLane(r) !== col.dataset.lane) return;
+    moverPos(id, col.dataset.col);
+  });
   var desqQ = '', desqAberto = {};
   function renderDesq(){
     var box = $('desq-list'); if (!box) return;
@@ -4165,25 +4223,29 @@ td,.row{font-size:13px}
   function pedeRequerer(r){ var d = parseDate(r.dpp); if (!d) return null; d.setDate(d.getDate() - 28); return iso(d); }
   function renderNasc(){
     var box = $('nasc-list'); if (!box) return;
-    var todos = state.rows.filter(aguardaNasc);
+    var todos = state.rows.filter(function(r){ return aguardaNasc(r) || esperaCert(r); });
     var pode = todos.filter(function(r){ var n = daysUntil(pedeRequerer(r)); return n != null && n <= 0; });
-    var atras = todos.filter(function(r){ var n = daysUntil(r.dpp); return n != null && n < 0; });
+    pode = pode.filter(aguardaNasc);
+    var atras = todos.filter(function(r){ var n = daysUntil(r.dpp); return aguardaNasc(r) && n != null && n < 0; });
+    var certs = todos.filter(esperaCert);
     var pend = todos.filter(docsPendentes);
     $('nasc-stats').innerHTML =
-      cardLista('data-nasc-filtro', 'i-clock', 'Pagamento de guia', todos.length, 'contratos fechados de gestantes', '', nascSit) +
+      cardLista('data-nasc-filtro', 'i-clock', 'Aguardando nascimento', todos.length - certs.length, 'gestantes regularizadas esperando o parto', '', nascSit) +
+      cardLista('data-nasc-filtro', 'i-file', 'Cobrar certidão', certs.length, 'bebê nasceu: pedir a certidão à mãe', 'cert', nascSit) +
       cardLista('data-nasc-filtro', 'i-check', 'Já podem requerer', pode.length, 'a partir de 28 dias antes do parto', 'pode', nascSit) +
       cardLista('data-nasc-filtro', 'i-bellx', 'Passou da data prevista', atras.length, 'confirmar se o bebê nasceu', 'atrasou', nascSit) +
       cardLista('data-nasc-filtro', 'i-bellx', 'Documentos pendentes', pend.length, 'falta documento ou dado', 'docs', nascSit);
-    $('nasc-sit').innerHTML = [['', 'Todas · ' + todos.length], ['pode', 'Já podem requerer · ' + pode.length], ['atrasou', 'Passou da data prevista · ' + atras.length], ['docs', 'Documentos pendentes · ' + pend.length]]
+    $('nasc-sit').innerHTML = [['', 'Todas · ' + todos.length], ['pode', 'Já podem requerer · ' + pode.length], ['atrasou', 'Passou da data prevista · ' + atras.length], ['cert', 'Cobrar certidão · ' + certs.length], ['docs', 'Documentos pendentes · ' + pend.length]]
       .map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === nascSit ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
     var lista = todos.filter(function(r){
       if (nascSit === 'pode' && pode.indexOf(r) < 0) return false;
       if (nascSit === 'atrasou' && atras.indexOf(r) < 0) return false;
       if (nascSit === 'docs' && !docsPendentes(r)) return false;
+      if (nascSit === 'cert' && !esperaCert(r)) return false;
       return buscaOk(r, nascQ);
     }).sort(function(a, b){ return String(a.dpp || '9999').localeCompare(String(b.dpp || '9999')) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); });
     $('nasc-count').textContent = lista.length + (lista.length === 1 ? ' cliente' : ' clientes');
-    var html = '<div class="row head"><div>Cliente</div><div>Contato</div><div>Parto previsto</div><div>Pode requerer a partir de</div><div>Documentos</div><div></div></div>';
+    var html = '<div class="row head"><div>Cliente</div><div>Contato</div><div>Parto / nascimento</div><div>Pode requerer a partir de</div><div>Documentos</div><div></div></div>';
     if (!lista.length) html += '<div class="empty">' + (todos.length ? 'Nenhuma cliente neste filtro.' : 'Nenhuma gestante com contrato fechado. Elas aparecem aqui quando o fato gerador é <b>Ainda gestante</b>.') + '</div>';
     lista.slice(0, 300).forEach(function(r){
       var n = daysUntil(r.dpp), pr = pedeRequerer(r), np = daysUntil(pr);
@@ -4192,7 +4254,7 @@ td,.row{font-size:13px}
         '<div><span class="lbl">Parto previsto</span><div class="val">' + (r.dpp ? fmtDate(r.dpp) : '<span class="muted-dash">não informado</span>') + '</div>' + (n != null ? '<div class="mini">' + (n < 0 ? 'passou há ' + (-n) + ' dias' : n === 0 ? 'é hoje' : 'faltam ' + n + ' dias') + '</div>' : '') + '</div>' +
         '<div><span class="lbl">Pode requerer</span><div class="val">' + (pr ? fmtDate(pr) : '—') + '</div>' + (np != null ? '<div class="mini">' + (np <= 0 ? '<b>já pode requerer</b>' : 'em ' + np + ' dias') + '</div>' : '') + '</div>' +
         '<div><span class="lbl">Documentos</span>' + docsCell(r) + '</div>' +
-        '<div class="c-act"><button type="button" class="btn inss-acao" data-act="nasceu" data-id="' + esc(r.id) + '" title="O bebê nasceu: informar a data e liberar para requerer">Nasceu</button>' + editBtn(r) + '</div>' +
+        '<div class="c-act">' + (esperaCert(r) ? '<button type="button" class="btn inss-acao" data-act="certidao" data-id="' + esc(r.id) + '" title="A mãe mandou a certidão: segue para o INSS">Recebi a certidão</button>' : '<button type="button" class="btn inss-acao" data-act="nasceu" data-id="' + esc(r.id) + '" title="O bebê nasceu: informar a data e pedir a certidão">Nasceu</button>') + editBtn(r) + '</div>' +
       '</div>' + (nascAberto[r.id] ? fichaCliente(r) : '');
     });
     box.innerHTML = html;
@@ -4205,6 +4267,7 @@ td,.row{font-size:13px}
         var r = acharRow(b.dataset.id);
         if (b.dataset.act === 'edit'){ if (r) openForm(r); return; }
         if (b.dataset.act === 'requerer'){ if (r) abrirRequerimento(r); return; }
+        if (b.dataset.act === 'certidao'){ if (!r) return; var antesC = { certidaoRecebida: !!r.certidaoRecebida, certidaoEm: r.certidaoEm || '' }; patchRow(r.id, { certidaoRecebida: true, certidaoEm: iso(new Date()), atualizadoEm: new Date().toISOString() }).then(function(){ toast('Certidão recebida: ' + r.nome + ' segue para o INSS', 'Desfazer', function(){ patchRow(r.id, antesC).catch(function(e2){ toast(errMsg(e2)); }); }); }).catch(function(e2){ toast(errMsg(e2)); }); return; }
         if (b.dataset.act === 'nasceu'){ if (!r) return; openForm(r); $('f-fato').value = 'parto'; $('f-fato').dispatchEvent(new Event('change')); setTimeout(function(){ $('f-cnasc').focus(); }, 60); toast('Informe a data de nascimento da criança e salve'); return; }
       }
       var ln = b && b.dataset.act === 'abrir' ? { dataset: { linha: b.dataset.id } } : e.target.closest('[data-linha]');
@@ -4222,7 +4285,7 @@ td,.row{font-size:13px}
   filtroCards($('nasc-stats'), 'data-nasc-filtro', function(f){ nascSit = nascSit === f ? '' : f; }, renderNasc);
   $('ctr-sit').addEventListener('change', function(){ ctrSit = this.value; renderContratos(); });
   $('nasc-sit').addEventListener('change', function(){ nascSit = this.value; renderNasc(); });
-  $('ctr-q').addEventListener('input', function(){ ctrQ = this.value.trim(); renderContratos(); });
+  $('ctr-q').addEventListener('input', function(){ ctrQ2 = this.value.trim(); renderContratos(); });
   $('nasc-q').addEventListener('input', function(){ nascQ = this.value.trim(); renderNasc(); });
   document.addEventListener('click', function(e){ if (e.target.closest && e.target.closest('select[data-lead],select[data-ctr],select[data-guia]')) e.stopPropagation(); }, true);
   document.addEventListener('change', async function(e){
@@ -4275,6 +4338,7 @@ td,.row{font-size:13px}
     f.innerHTML = '<div><h3>Fechar contrato</h3><p>' + esc(r.nome) + '</p>' +
       '<label class="mini" style="display:block;margin:6px 0 4px">Quem fechou o contrato?</label><select id="fc-quem" style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;margin-bottom:10px"><option value="">Escolha quem fechou</option>' +
       quem.map(function(u){ return '<option value="' + esc(u.email) + '"' + (String(u.email).toLowerCase() === meu ? ' selected' : '') + '>' + esc(u.nome || u.email) + '</option>'; }).join('') + '</select>' +
+      '<label class="mini" style="display:block;margin:0 0 4px">A criança</label><select id="fc-fato" style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;margin-bottom:10px"><option value="gestante"' + (r.fatoGerador === 'gestante' ? ' selected' : '') + '>Ainda gestante</option><option value="parto"' + (r.fatoGerador !== 'gestante' ? ' selected' : '') + '>Já nasceu (cobrar documentação rural)</option></select>' +
       '<label class="mini" style="display:block;margin:0 0 4px">Data do fechamento</label><input type="date" id="fc-data" value="' + iso(new Date()) + '">' +
       '<p style="margin:0 0 10px">A cliente vai para <b>Contratos fechados</b>.</p>' +
       '<div style="display:flex;gap:8px;justify-content:flex-end"><button type="button" class="btn" data-x>Cancelar</button><button type="button" class="btn primary" data-ok>Confirmar fechamento</button></div></div>';
@@ -4285,12 +4349,13 @@ td,.row{font-size:13px}
       var sel = f.querySelector('#fc-quem'), data = f.querySelector('#fc-data').value || iso(new Date());
       if (!sel.value){ toast('Escolha quem fechou o contrato.'); sel.focus(); return; }
       var u = (state.equipe || []).filter(function(x){ return x.email === sel.value; })[0];
-      var antes = { contratoEm: r.contratoEm || '', leadStatus: r.leadStatus || '', contratoPor: r.contratoPor || '', contratoPorEmail: r.contratoPorEmail || '' };
+      var fatoNovo = f.querySelector('#fc-fato').value === 'gestante' ? 'gestante' : (r.fatoGerador && r.fatoGerador !== 'gestante' ? r.fatoGerador : 'parto');
+      var antes = { contratoEm: r.contratoEm || '', leadStatus: r.leadStatus || '', contratoPor: r.contratoPor || '', contratoPorEmail: r.contratoPorEmail || '', fatoGerador: r.fatoGerador || '', posEtapa: r.posEtapa || '' };
       this.disabled = true;
       try {
-        await patchRow(r.id, { contratoEm: data, leadStatus: 'fechado', contratoPor: (u && u.nome) || sel.value, contratoPorEmail: sel.value, atualizadoEm: new Date().toISOString() });
+        await patchRow(r.id, { contratoEm: data, leadStatus: 'fechado', contratoPor: (u && u.nome) || sel.value, contratoPorEmail: sel.value, fatoGerador: fatoNovo, posEtapa: '', atualizadoEm: new Date().toISOString() });
         f.remove();
-        toast('Contrato fechado por ' + ((u && u.nome) || sel.value) + ': ' + r.nome, 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
+        toast('Contrato fechado por ' + ((u && u.nome) || sel.value) + ': ' + r.nome + ' · foi para o Pós-venda', 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
       } catch(err){ this.disabled = false; toast(errMsg(err)); }
     };
   }
@@ -6461,9 +6526,9 @@ td,.row{font-size:13px}
     d: ['Cadastro', 'Clientes ainda sem requerimento no INSS: dados, documentos e prazo'],
     i: ['INSS', 'Requerimentos administrativos: análise, exigências, concessões e indeferimentos'],
     c: ['Judicial', 'Ações judiciais: acompanhamento do processo até a sentença e o pagamento'],
-    k: ['Contratos fechados', 'Clientes com contrato assinado: regularizar documentos e requerer no INSS'],
+    k: ['Pós-venda', 'Contratos fechados: regularizar a documentação (Kanban) antes de seguir'],
     q: ['Leads desqualificados', 'Quem foi desqualificado e o motivo; dá para reativar'],
-    n: ['Pagamento de guia', 'Contratos fechados de gestantes: pagamento da guia enquanto o bebê não nasce'],
+    n: ['Aguardando nascimento', 'Gestantes regularizadas esperando o parto e certidão de nascimento a cobrar'],
     a: ['Audiências', 'Pauta por dia, avisos e convites'],
     l: ['Clientes', 'Todas as clientes e a etapa de cada caso'],
     p: ['Pós-audiência', 'Resultados, conclusos, recursos e pagamentos'],
