@@ -1215,19 +1215,26 @@ section.vw-dash{gap:10px!important}
 #view-cad > .fbar{margin-top:30px!important}
 .cad-stats{grid-template-columns:repeat(5,minmax(0,1fr))!important}
 #ctr-guia,#ctr-sit{display:none!important}
-.pv-lane{margin:0 0 22px}.pv-lane-t{display:flex;align-items:baseline;gap:10px;margin:0 0 10px;font-size:16px}.pv-lane-t small{color:var(--ink-3);font-size:12.5px}
-.pv-board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:start}
-@media (max-width:1100px){.pv-board{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.pv-col{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:10px;min-height:120px;display:flex;flex-direction:column;gap:8px}
+#pv-lane button{padding:8px 14px;white-space:nowrap;font-size:13px}#pv-atr{white-space:nowrap}
+.pv-board{display:flex;gap:14px;align-items:stretch;overflow-x:auto;padding:2px 2px 14px}
+.pv-col{flex:1 0 270px;max-width:340px;min-width:260px;background:var(--soft);border:1px solid var(--line);border-radius:16px;display:flex;flex-direction:column;max-height:calc(100vh - 330px);min-height:240px}
 .pv-col.alvo{outline:2px dashed var(--gold,#a07a45);background:var(--hover)}
-.pv-col.fim{border-style:dashed;background:transparent}
-.pv-col-t{font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2);padding:2px 4px}
-.pv-dica,.pv-vazio{font-size:12.5px;color:var(--ink-3);padding:6px 4px;line-height:1.4}
-.pv-card{background:var(--panel);border:1px solid var(--line-2);border-radius:12px;padding:10px 11px;display:flex;flex-direction:column;gap:5px;cursor:pointer;box-shadow:0 1px 0 rgba(0,0,0,.04)}
-.pv-card:hover{border-color:var(--gold,#a07a45)}.pv-card b{font-size:14px}
-.pv-falta{display:flex;flex-wrap:wrap;gap:4px}.pv-falta span{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--red-soft);color:var(--red);border:1px solid var(--red)}
-.pv-ok{font-size:11.5px;color:#1f8a54;font-weight:600}
-.pv-card select{width:100%;margin-top:4px;padding:7px 8px;border-radius:9px;border:1px solid var(--line-2);background:var(--soft);color:inherit;font:inherit;font-size:12.5px}
+.pv-col>header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px 8px}
+.pv-col>header b{font-size:14px;font-weight:700}
+.pv-n-col{min-width:26px;text-align:center;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700;background:var(--panel);border:1px solid var(--line-2);color:var(--ink-2)}
+.pv-body{padding:4px 10px 12px;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+.pv-vazio{font-size:12.5px;color:var(--ink-3);text-align:center;padding:18px 6px}
+.pv-card{background:var(--panel);border:1px solid var(--line-2);border-radius:12px;padding:13px 14px 10px;display:flex;flex-direction:column;gap:6px;cursor:pointer}
+.pv-card:hover{border-color:var(--gold,#a07a45)}
+.pv-n{font-size:15px;font-weight:700;line-height:1.25}
+.pv-l{font-size:13px;color:var(--ink-2)}
+.pv-ok{font-size:12.5px;color:#1f8a54;font-weight:600}
+.pv-atraso{font-size:12.5px;color:var(--red);font-weight:700}
+.pv-pe{display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid var(--line);margin-top:6px;padding-top:9px}
+.pv-av{width:28px;height:28px;border-radius:50%;display:inline-grid;place-items:center;font-size:11px;font-weight:800;background:var(--hover);color:var(--ink-2);border:1px solid var(--line-2)}
+.pv-ic{display:flex;align-items:center;gap:8px}.pv-ic .i{width:18px;height:18px;stroke:var(--ink-2)}
+.pv-pend .i{stroke:var(--red)}
+.pv-ic select{max-width:120px;padding:4px 6px;border-radius:8px;border:1px solid var(--line-2);background:var(--soft);color:inherit;font:inherit;font-size:12px}
 .prio-tag{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:800;letter-spacing:.02em;background:rgba(224,160,40,.2);color:#9a6a00;border:1px solid rgba(224,160,40,.5)}
 .prio-tag.crit{background:rgba(220,60,50,.16);color:#c0362c;border-color:rgba(220,60,50,.5)}
 @media (max-width:900px){ .cad-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important} }
@@ -2244,7 +2251,9 @@ td,.row{font-size:13px}
         <div class="stats" id="ctr-stats"></div>
         <div class="fbar">
           <div class="search tb-busca"><svg class="i"><use href="#i-search"/></svg><input id="ctr-q" type="search" autocomplete="off" placeholder="Buscar cliente por nome ou CPF"></div>
-          <select id="ctr-sit" class="tb-sel" aria-label="Filtrar"></select>
+          <select id="ctr-sit" class="tb-sel" aria-label="Filtrar" hidden></select>
+          <div class="seg-bi" id="pv-lane" style="flex:none"><button type="button" data-l="gest" aria-pressed="true">Gestantes</button><button type="button" data-l="nasc" aria-pressed="false">Bebê já nasceu</button></div>
+          <button type="button" class="btn" id="pv-atr" aria-pressed="false">Só atrasados</button>
           <a class="btn guia-link" id="ctr-guia" href="https://sal.rfb.gov.br/home" target="_blank" rel="noopener noreferrer" title="Abre o SAL da Receita Federal: gerar a guia e fazer o pagamento"><svg class="i"><use href="#i-cash"/></svg>Gerar e pagar guia</a><span class="tb-fim fb-count tnum" id="ctr-count"></span>
         </div>
         <div class="sec-rot">Kanban de documentação</div>
@@ -4130,43 +4139,57 @@ td,.row{font-size:13px}
     if (r.posEtapa && cols.indexOf(r.posEtapa) >= 0 && r.posEtapa !== 'regularizada') return r.posEtapa;
     return posLane(r) === 'nasc' ? 'rural' : (docsPendentes(r) ? 'falta_doc' : 'recem');
   }
-  var ctrQ2 = '';
-  function posCard(r){
-    var lane = posLane(r), cols = POS_COLS[lane], et = posEtapaDe(r), falta = docsApp(r).filter(function(x){ return !x.ok; });
-    var tag = lane === 'gest' ? tagPrioridade(r) : '';
-    var quando = lane === 'gest' ? (r.dpp ? 'parto previsto ' + fmtDate(r.dpp) : 'sem data do parto') : (r.criancaNasc ? 'nasceu em ' + fmtDate(r.criancaNasc) : 'bebê já nasceu');
+  var ctrQ2 = '', pvLane = 'gest', pvAtr = false;
+  var PV_DIAS_ATRASO = 7;
+  function diasNoPos(r){ var d = diasDesdeIso(r.posMudouEm || r.contratoEm); return d == null ? 0 : d; }
+  function iniciais(n){ var p = String(n || '?').trim().split(/\s+/); return ((p[0] || '?').charAt(0) + (p.length > 1 ? p[p.length - 1].charAt(0) : '')).toUpperCase(); }
+  function posCard(r, fim){
+    var lane = posLane(r), cols = POS_COLS[lane], et = fim ? 'regularizada' : posEtapaDe(r), docs = docsApp(r), ok = docs.filter(function(x){ return x.ok; }).length;
+    var tag = lane === 'gest' && !fim ? tagPrioridade(r) : '';
+    var quando = lane === 'gest' ? 'Gestante' + (r.dpp ? ' · parto ' + fmtDate(r.dpp) : '') : 'Bebê já nasceu' + (r.criancaNasc ? ' · ' + fmtDate(r.criancaNasc) : '');
+    var d = diasNoPos(r), atraso = !fim && d >= PV_DIAS_ATRASO;
+    var cid = cidadeCli(r);
+    var dest = lane === 'gest' ? (aguardaNasc(r) ? 'Aguardando nascimento' : esperaCert(r) ? 'Cobrar certidão' : 'INSS') : (esperaCert(r) ? 'Cobrar certidão' : 'INSS');
     return '<div class="pv-card" draggable="true" data-linha="' + esc(r.id) + '" data-pv="' + esc(r.id) + '">' +
-      '<b>' + esc(r.nome || 'Sem nome') + '</b>' + (tag ? '<div>' + tag + '</div>' : '') +
-      '<div class="mini">' + esc(quando) + (r.contato ? ' · ' + esc(fmtTel(r.contato)) : '') + '</div>' +
-      '<div class="mini">' + (r.contratoPor ? 'fechado por ' + esc(r.contratoPor) + ' · ' : '') + esc(prospName(r.responsavelId) || 'sem parceiro') + '</div>' +
-      (falta.length ? '<div class="pv-falta">' + falta.map(function(x){ return '<span>' + esc(x.n) + '</span>'; }).join('') + '</div>' : '<div class="pv-ok">documentos do app completos</div>') +
-      '<select data-pos="' + esc(r.id) + '" aria-label="Mover ' + esc(r.nome) + '">' + cols.map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === et ? ' selected' : '') + '>' + (c[0] === 'regularizada' ? 'Regularizada (sai do Pós-venda)' : c[1]) + '</option>'; }).join('') + '</select></div>';
+      '<div class="pv-n">' + esc(r.nome || 'Sem nome') + '</div>' + (tag ? '<div>' + tag + '</div>' : '') +
+      '<div class="pv-l">' + esc(quando) + '</div>' +
+      '<div class="pv-l">' + (cid ? esc(cid) + ' · ' : '') + ok + '/' + docs.length + ' docs</div>' +
+      (fim ? '<div class="pv-ok">segue para ' + esc(dest) + '</div>' : atraso ? '<div class="pv-atraso">' + d + ' dias no Pós-venda</div>' : '<div class="pv-l">' + (d <= 0 ? 'chegou hoje' : d + (d === 1 ? ' dia' : ' dias') + ' no Pós-venda') + '</div>') +
+      '<div class="pv-pe"><span class="pv-av" title="' + esc(r.contratoPor ? 'Fechou: ' + r.contratoPor : 'Sem closer registrado') + '">' + esc(iniciais(r.contratoPor || prospName(r.responsavelId))) + '</span>' +
+      '<span class="pv-ic">' + (r.pastaUrl ? '<a href="' + esc(r.pastaUrl) + '" target="_blank" rel="noopener" title="Pasta no Drive" onclick="event.stopPropagation()"><svg class="i"><use href="#i-folder"/></svg></a>' : '') +
+      (docs.length - ok ? '<span class="pv-pend" title="Faltam: ' + esc(docs.filter(function(x){ return !x.ok; }).map(function(x){ return x.n; }).join(', ')) + '"><svg class="i"><use href="#i-bellx"/></svg></span>' : '') +
+      '<select data-pos="' + esc(r.id) + '" aria-label="Mover ' + esc(r.nome) + '" title="Mover para outra coluna">' + cols.map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === et ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '</select></span></div></div>';
   }
   function renderContratos(){
     var box = $('ctr-list'); if (!box) return;
-    var todos = state.rows.filter(noContratos).filter(function(r){ return buscaOk(r, ctrQ2); });
-    var gest = todos.filter(function(r){ return posLane(r) === 'gest'; }), nasc = todos.filter(function(r){ return posLane(r) === 'nasc'; });
-    var gov = todos.filter(function(r){ return posEtapaDe(r) === 'falta_gov'; });
-    $('ctr-stats').innerHTML = cardLista('data-ctr-filtro', 'i-users', 'No Pós-venda', todos.length, 'contratos fechados em regularização', '', '') +
-      cardLista('data-ctr-filtro', 'i-clock', 'Gestantes', gest.length, 'regularizar antes do parto', 'g', '') +
-      cardLista('data-ctr-filtro', 'i-bellx', 'Bebê já nasceu', nasc.length, 'cobrar documentação rural', 'n', '') +
-      cardLista('data-ctr-filtro', 'i-check', 'Falta senha gov.br', gov.length, 'pedir à mãe', 'gov', '');
-    $('ctr-count').textContent = todos.length + (todos.length === 1 ? ' cliente' : ' clientes');
-    function quadro(titulo, sub, lane, lista){
-      var cols = POS_COLS[lane];
-      var ord = lista.slice().sort(function(x, y){
-        if (lane === 'gest'){ var dx = x.dpp || '9999', dy = y.dpp || '9999'; return dx.localeCompare(dy) || String(x.nome).localeCompare(String(y.nome), 'pt'); }
-        return String(x.contratoEm).localeCompare(String(y.contratoEm)) || String(x.nome).localeCompare(String(y.nome), 'pt');
-      });
-      return '<div class="pv-lane"><div class="pv-lane-t"><b>' + titulo + '</b> <span class="tnum">' + lista.length + '</span><small>' + sub + '</small></div><div class="pv-board">' +
-        cols.map(function(c){
-          var cards = c[0] === 'regularizada' ? [] : ord.filter(function(r){ return posEtapaDe(r) === c[0]; });
-          return '<div class="pv-col' + (c[0] === 'regularizada' ? ' fim' : '') + '" data-col="' + c[0] + '" data-lane="' + lane + '"><div class="pv-col-t">' + c[1] + (c[0] === 'regularizada' ? '' : ' <span class="tnum">' + cards.length + '</span>') + '</div>' +
-            (c[0] === 'regularizada' ? '<div class="pv-dica">Arraste para cá ou escolha no cartão: ' + (lane === 'gest' ? 'a mãe vai para <b>Aguardando nascimento</b>' : 'a mãe vai para <b>certidão</b>, depois INSS') + '.</div>' : cards.map(posCard).join('') || '<div class="pv-vazio">—</div>') + '</div>';
-        }).join('') + '</div></div>';
-    }
-    box.innerHTML = quadro('Gestantes', 'regularizar tudo antes do parto', 'gest', gest) + quadro('Bebê já nasceu', 'só dá certo com documentação rural', 'nasc', nasc);
+    Array.prototype.forEach.call($('pv-lane').querySelectorAll('button'), function(bt){ bt.setAttribute('aria-pressed', String(bt.dataset.l === pvLane)); });
+    $('pv-atr').setAttribute('aria-pressed', String(pvAtr)); $('pv-atr').classList.toggle('primary', pvAtr);
+    var busca = function(r){ return buscaOk(r, ctrQ2); };
+    var emPos = state.rows.filter(noContratos).filter(busca);
+    var regs = state.rows.filter(function(r){ return fechado(r) && regularizada(r) && busca(r); });
+    var gest = emPos.filter(function(r){ return posLane(r) === 'gest'; }), nasc = emPos.filter(function(r){ return posLane(r) === 'nasc'; });
+    var atrasadas = emPos.filter(function(r){ return diasNoPos(r) >= PV_DIAS_ATRASO; }), semDoc = emPos.filter(function(r){ return docsApp(r).some(function(x){ return !x.ok; }); });
+    var prio = emPos.filter(function(r){ return prioridadeNasc(r) != null; });
+    $('ctr-stats').innerHTML = cardLista('data-ctr-filtro', 'i-users', 'Clientes no Pós-venda', emPos.length, gest.length + ' gestantes · ' + nasc.length + ' com bebê nascido', '', '') +
+      cardLista('data-ctr-filtro', 'i-file', 'Documentos faltando', semDoc.length, 'RG, CPF, título ou residência', 'x', '') +
+      cardLista('data-ctr-filtro', 'i-bellx', 'Parto perto', prio.length, 'gestantes com parto em até ' + PRIORIDADE_DIAS + ' dias', 'p', '') +
+      cardLista('data-ctr-filtro', 'i-clock', 'Atrasadas', atrasadas.length, 'mais de ' + PV_DIAS_ATRASO + ' dias no Pós-venda', 'a', '');
+    var lane = pvLane, lista = (lane === 'gest' ? gest : nasc).filter(function(r){ return !pvAtr || diasNoPos(r) >= PV_DIAS_ATRASO; });
+    var fimLista = regs.filter(function(r){ return posLane(r) === lane; });
+    $('ctr-count').textContent = lista.length + (lista.length === 1 ? ' cliente' : ' clientes');
+    var ord = function(x, y){
+      if (lane === 'gest'){ var px = prioridadeNasc(x), py = prioridadeNasc(y); if (px != null || py != null){ if (px == null) return 1; if (py == null) return -1; if (px !== py) return px - py; } var dx = x.dpp || '9999', dy = y.dpp || '9999'; return dx.localeCompare(dy) || String(x.nome).localeCompare(String(y.nome), 'pt'); }
+      return String(x.contratoEm).localeCompare(String(y.contratoEm)) || String(x.nome).localeCompare(String(y.nome), 'pt');
+    };
+    box.innerHTML = '<div class="pv-board">' + POS_COLS[lane].map(function(c){
+      var fim = c[0] === 'regularizada';
+      var cards = (fim ? fimLista : lista.filter(function(r){ return posEtapaDe(r) === c[0]; })).slice().sort(ord).slice(0, 80);
+      return '<section class="pv-col' + (fim ? ' fim' : '') + '" data-col="' + c[0] + '" data-lane="' + lane + '"><header><b>' + c[1] + '</b><span class="pv-n-col tnum">' + cards.length + '</span></header>' +
+        '<div class="pv-body">' + (cards.map(function(r){ return posCard(r, fim); }).join('') || '<div class="pv-vazio">Nenhuma cliente</div>') + '</div></section>';
+    }).join('') + '</div>';
   }
+  $('pv-lane').addEventListener('click', function(e){ var bt = e.target.closest('button[data-l]'); if (!bt) return; pvLane = bt.dataset.l; renderContratos(); });
+  $('pv-atr').addEventListener('click', function(){ pvAtr = !pvAtr; renderContratos(); });
   async function moverPos(id, etapa){
     var r = acharRow(id); if (!r) return;
     var antes = { posEtapa: r.posEtapa || '' };
