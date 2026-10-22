@@ -1290,11 +1290,24 @@ section.vw-dash{gap:10px!important}
 #form.novo .f-body > .field:has(#f-nome){display:flex!important;order:1}
 #form.novo .f-body > .field:has(#f-cpf){display:flex!important;order:2}
 #form.novo .f-body > .field:has(#f-contato){display:flex!important;order:3}
-#form.novo .f-body > .field:has(#f-cidade){display:flex!important;order:4}
+#form.novo .f-body > .field:has(#f-uf){display:flex!important;order:4}
+#form.novo .f-body > .field:has(#f-cidade){display:flex!important;order:5}
 #form.novo .f-body > .field:has(#f-resp){display:flex!important;order:6;grid-column:auto!important}
 #form.novo .f-body > .field:has(#f-fato){display:none!important}
 #form.novo .f-body > #f-seg-box{display:flex!important;order:7;grid-column:1/-1;flex-direction:column;gap:6px}
 #f-seg-box{display:none}
+.cid-wrap{position:relative;display:flex;align-items:center}.cid-wrap select,.cid-wrap input{width:100%;padding-left:44px!important}
+.cid-uf-flag{position:absolute;left:12px;top:50%;transform:translateY(-50%);display:flex;align-items:center;pointer-events:none;z-index:1}
+.cid-uf-flag img{width:24px;height:16px;border-radius:3px;object-fit:cover;box-shadow:0 0 0 1px rgba(0,0,0,.14)}
+.cid-sheet{position:fixed;inset:0;z-index:99998;background:rgba(20,14,8,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+.cid-sheet>div{background:var(--panel,#fff);color:var(--ink,#2b2118);border-radius:18px;width:min(460px,100%);max-height:80vh;display:flex;flex-direction:column;padding:18px;box-shadow:0 30px 70px -20px rgba(0,0,0,.5)}
+.cid-sheet h3{margin:0 0 2px;font-size:18px}.cid-sheet p{margin:0 0 10px;font-size:13px;color:var(--ink-3,#7a6c58)}
+.cid-sheet input{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;margin-bottom:10px}
+.cid-sheet .lista{overflow:auto;display:flex;flex-direction:column;gap:2px;min-height:120px}
+.cid-sheet .lista button{display:flex;align-items:center;gap:12px;text-align:left;padding:10px 12px;border:0;border-radius:10px;background:none;color:inherit;font:inherit;font-size:15px;cursor:pointer}
+.cid-sheet .lista button:hover,.cid-sheet .lista button.atual{background:var(--soft,#f3ead9)}
+.cid-sheet .lista img,.cid-sheet .lista .vazio{width:26px;height:18px;border-radius:3px;object-fit:cover;flex:none;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+.cid-sheet .lista .vazio{background:var(--line,#e6dcc8);box-shadow:none}
 .seg-bi{display:flex;gap:8px}.seg-bi button{flex:1;padding:12px 10px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--panel,#fff);color:var(--ink-2,#5a4a38);font:inherit;font-size:14px;font-weight:700;cursor:pointer}
 .seg-bi button[aria-pressed="true"]{background:var(--gold,#a07a45);color:#fff;border-color:transparent}
 #form.novo .f-body > .field:has(#f-cnasc){display:flex!important;order:9}
@@ -2547,7 +2560,8 @@ td,.row{font-size:13px}
       <div class="field full"><label>Pasta da cliente</label><div class="folder-box" id="f-pasta"></div></div>
       <div class="field"><label for="f-cpf">CPF</label><input id="f-cpf" inputmode="numeric" placeholder="000.000.000-00" class="tnum"><span class="hint" id="h-cpf"></span></div>
       <div class="field"><label for="f-contato">Contato (telefone / WhatsApp)</label><input id="f-contato" inputmode="tel" placeholder="(97) 00000-0000" class="tnum"></div>
-      <div class="field"><label for="f-cidade">Cidade</label><input id="f-cidade" autocomplete="off" placeholder="Cidade da mãe"></div>
+      <div class="field"><label for="f-uf">Estado</label><div class="cid-wrap"><span id="f-uf-flag" class="cid-uf-flag"></span><select id="f-uf"></select></div></div>
+      <div class="field"><label for="f-cidade">Cidade</label><div class="cid-wrap"><span id="f-cid-flag" class="cid-uf-flag"></span><input id="f-cidade" readonly autocomplete="off" placeholder="Escolher a cidade" style="cursor:pointer"></div></div>
       <div class="field"><label for="f-tipo">Tipo de segurada</label><select id="f-tipo"><option value="">Não informado</option><option value="especial">Segurada especial (rural / pescadora)</option><option value="urbana">Empregada / urbana</option><option value="individual">Contribuinte individual / MEI / facultativa</option><option value="desempregada">Desempregada (período de graça)</option></select></div>
       <div class="field" hidden><label for="f-ativ">Atividade</label><input id="f-ativ" placeholder="Ex.: agricultora, pescadora, doméstica" list="ativ-list"><datalist id="ativ-list"><option value="Agricultora"><option value="Pescadora artesanal"><option value="Extrativista"><option value="Doméstica"><option value="Comerciária"><option value="Autônoma"></datalist></div>
       <div class="field full"><label for="f-resp">Parceiro</label><select id="f-resp"><option value="">Sem parceiro</option></select><span class="hint">Quem trouxe a cliente. É ele quem vê a cliente no aplicativo e cuida do aviso da audiência.</span></div>
@@ -5898,6 +5912,47 @@ td,.row{font-size:13px}
     }).join('');
   }
   // compacto: editar pelo Cadastro mostra só os campos do cadastro (como o Novo cliente); comPasta: mostra também a pasta (Analisar com IA)
+  /* ---------- estado e cidade com bandeiras (igual ao aplicativo) ---------- */
+  var ESTADOS_BI = { AC: 'Acre', AL: 'Alagoas', AP: 'Amapá', AM: 'Amazonas', BA: 'Bahia', CE: 'Ceará', DF: 'Distrito Federal', ES: 'Espírito Santo', GO: 'Goiás', MA: 'Maranhão', MT: 'Mato Grosso', MS: 'Mato Grosso do Sul', MG: 'Minas Gerais', PA: 'Pará', PB: 'Paraíba', PR: 'Paraná', PE: 'Pernambuco', PI: 'Piauí', RJ: 'Rio de Janeiro', RN: 'Rio Grande do Norte', RS: 'Rio Grande do Sul', RO: 'Rondônia', RR: 'Roraima', SC: 'Santa Catarina', SP: 'São Paulo', SE: 'Sergipe', TO: 'Tocantins' };
+  var UFS_ATUACAO = ['AM', 'PA', 'AP'];
+  function ufsForm(){ var l = state.regioes.map(function(g){ return String(g.uf || g.id).toUpperCase(); }); UFS_ATUACAO.forEach(function(u){ if (l.indexOf(u) < 0) l.push(u); }); return l; }
+  function flagUfImg(uf){ return uf ? '<img src="img/flags/' + esc(uf) + '.svg" alt="" onerror="this.remove()">' : ''; }
+  function preencherUfForm(sel){ $('f-uf').innerHTML = '<option value="">Escolher o estado</option>' + ufsForm().map(function(u){ return '<option value="' + u + '"' + (u === sel ? ' selected' : '') + '>' + esc(ESTADOS_BI[u] || u) + '</option>'; }).join(''); $('f-uf').value = sel || ''; $('f-uf-flag').innerHTML = flagUfImg(sel); }
+  function cidadesDoUf(uf, cb){
+    var c = lerLS('nascer-cid2-' + uf); if (c && c.length) return cb(c);
+    fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados/' + uf + '/municipios?orderBy=nome').then(function(r){ return r.json(); }).then(function(l){
+      var n = (l || []).map(function(m){ return { i: String(m.id), n: m.nome }; });
+      if (n.length){ try { localStorage.setItem('nascer-cid2-' + uf, JSON.stringify(n)); } catch(e){} }
+      cb(n);
+    }).catch(function(){ cb([]); });
+  }
+  function bandeiraDaCidade(uf, nome){
+    var l = lerLS('nascer-cid2-' + uf) || [], m = lerLS('nascer-flag-' + uf) || {}, alvo = semAcento(nome), it = l.filter(function(x){ return semAcento(x.n) === alvo; })[0];
+    var id6 = it ? it.i.slice(0, 6) : '';
+    return it ? ((cidLocal && cidLocal[id6] ? 'img/cidades/' + cidLocal[id6] : '') || m[id6] || '') : '';
+  }
+  function pintarBandeiraCidade(){ var uf = $('f-uf').value, n = $('f-cidade').value, u = uf && n ? bandeiraDaCidade(uf, n) : ''; $('f-cid-flag').innerHTML = u ? '<img src="' + esc(u) + '" alt="" onerror="this.remove()">' : flagUfImg(uf); }
+  function escolherCidadeForm(){
+    var uf = $('f-uf').value; if (!uf){ toast('Escolha o estado primeiro.'); $('f-uf').focus(); return; }
+    var atual = $('f-cidade').value, f = document.createElement('div'); f.className = 'cid-sheet';
+    f.innerHTML = '<div><h3>Cidade</h3><p>' + esc(ESTADOS_BI[uf] || uf) + ' · escolha na lista ou pesquise</p><input type="search" placeholder="Pesquisar cidade" autocomplete="off" spellcheck="false"><div class="lista"><span class="mini">Carregando as cidades…</span></div><div style="text-align:right;margin-top:10px"><button type="button" class="btn" data-x>Cancelar</button></div></div>';
+    ($('form').closest('dialog') || document.body).appendChild(f);   // dentro da janela aberta, para ficar por cima
+    var lista = [], busca = f.querySelector('input'), box = f.querySelector('.lista');
+    function pintar(){
+      var q = semAcento(busca.value), m = lerLS('nascer-flag-' + uf) || {};
+      var v = lista.filter(function(x){ return !q || semAcento(x.n).indexOf(q) >= 0; }).slice(0, 400);
+      box.innerHTML = v.length ? v.map(function(x){ var u = (cidLocal && cidLocal[x.i.slice(0, 6)] ? 'img/cidades/' + cidLocal[x.i.slice(0, 6)] : '') || m[x.i.slice(0, 6)] || '';
+        return '<button type="button" data-n="' + esc(x.n) + '"' + (semAcento(x.n) === semAcento(atual) ? ' class="atual"' : '') + '>' + (u ? '<img loading="lazy" alt="" src="' + esc(u) + '">' : '<span class="vazio"></span>') + '<span>' + esc(x.n) + '</span></button>'; }).join('') : '<span class="mini">Nenhuma cidade com esse nome.</span>';
+    }
+    cidadesDoUf(uf, function(l){ lista = l; pintar(); if (!l.length) box.innerHTML = '<span class="mini">Sem internet para carregar as cidades.</span>'; carregarBandeiras(uf); setTimeout(pintar, 2500); setTimeout(pintar, 6000); });
+    busca.addEventListener('input', pintar); setTimeout(function(){ busca.focus(); }, 50);
+    box.addEventListener('click', function(e){ var b = e.target.closest('button[data-n]'); if (!b) return; $('f-cidade').value = b.dataset.n; f.remove(); pintarBandeiraCidade(); });
+    f.querySelector('[data-x]').onclick = function(){ f.remove(); };
+    f.addEventListener('click', function(e){ if (e.target === f) f.remove(); });
+  }
+  $('f-uf').addEventListener('change', function(){ $('f-uf-flag').innerHTML = flagUfImg(this.value); if (this.dataset.ant && this.dataset.ant !== this.value) $('f-cidade').value = ''; this.dataset.ant = this.value; pintarBandeiraCidade(); if (this.value) carregarBandeiras(this.value); });
+  $('f-cidade').addEventListener('click', escolherCidadeForm);
+  $('f-cidade').addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); escolherCidadeForm(); } });
   function syncSeg(){ var v = $('f-fato').value === 'gestante' ? 'gestante' : 'parto'; Array.prototype.forEach.call($('f-seg').querySelectorAll('button'), function(b){ b.setAttribute('aria-pressed', String(b.dataset.v === v)); }); }
   $('f-seg').addEventListener('click', function(e){ var b = e.target.closest('button[data-v]'); if (!b) return; $('f-fato').value = b.dataset.v; $('f-fato').dispatchEvent(new Event('change')); syncSeg(); });
   function openForm(r, embutido, compacto, comPasta){
@@ -5912,6 +5967,7 @@ td,.row{font-size:13px}
     $('f-rg').value = r ? r.rg || '' : '';
     $('f-end').value = r ? r.endereco || '' : '';
     $('f-cidade').value = r ? r.cidade || '' : '';
+    (function(){ var par = r && r.responsavelId ? prospById(r.responsavelId) : null; var uf = String((r && r.cidadeUf) || (par && par.regiaoId) || '').slice(0, 2).toUpperCase(); preencherUfForm(uf); $('f-uf').dataset.ant = uf; pintarBandeiraCidade(); if (uf) carregarBandeiras(uf); })();
     $('f-contato').value = r ? r.contato || '' : '';
     // clients still without a phone start unchecked: a number filled in now stays out of the régua until released
     $('f-regua').checked = r ? (temContato(r) && !r.foraDaRegua) : true;
@@ -6036,7 +6092,7 @@ td,.row{font-size:13px}
     var situacao = $('f-situacao').value, avisado = situacao === 'avisado';
     var avisoEm = $('f-avisoem').value || (avisado ? iso(new Date()) : '');
     var data = Object.assign({}, prev, {
-      nome: nome, cpf: $('f-cpf').value.trim(), rg: formatarRG($('f-rg').value), endereco: $('f-end').value.trim(), cidade: nomeProprio($('f-cidade').value.trim()),
+      nome: nome, cpf: $('f-cpf').value.trim(), rg: formatarRG($('f-rg').value), endereco: $('f-end').value.trim(), cidade: nomeProprio($('f-cidade').value.trim()), cidadeUf: $('f-uf').value || prev.cidadeUf || '',
       contato: $('f-contato').value.trim(), foraDaRegua: !$('f-regua').checked,
       contatoVia: $('f-via-box').dataset.tirar ? null : (prev.contatoVia || null),
       telefoneAdicionadoEm: !prev.contato && $('f-contato').value.trim() ? new Date().toISOString() : (prev.telefoneAdicionadoEm || ''),
