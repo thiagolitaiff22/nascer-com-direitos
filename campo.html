@@ -898,7 +898,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 55;
+  var APP_VERSAO = 56;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -2524,10 +2524,13 @@ button,a,label,[role=button]{touch-action:manipulation}
   }
   function montar(falta){
     var t = tela('<svg viewBox="0 0 24 24" style="stroke:var(--ok)"><use href="#i-nuvem"/></svg><b>Preparando…</b><p id="t-prep">Montando os documentos</p>');
-    // arquivos que vão para a pasta (ESPECIFICACAO §5): procuração separada; RG + CPF + comprovante de residência juntos em DOCUMENTOS PESSOAIS
+    // arquivos que vão para a pasta (ESPECIFICACAO §5): um PDF para cada documento, com o nome dele: RG, CPF, TÍTULO DE ELEITOR, COMPROVANTE DE RESIDÊNCIA
     var GRUPOS_ARQ = [
       { nome: 'CONTRATO E PROCURAÇÃO', ks: ['procuracao'] },
-      { nome: 'DOCUMENTOS PESSOAIS', ks: ['rg_frente', 'rg_verso', 'cpf', 'titulo', 'titulo_verso', 'residencia'] },
+      { nome: 'RG', ks: ['rg_frente', 'rg_verso'] },
+      { nome: 'CPF', ks: ['cpf'] },
+      { nome: 'TÍTULO DE ELEITOR', ks: ['titulo', 'titulo_verso'] },
+      { nome: 'COMPROVANTE DE RESIDÊNCIA', ks: ['residencia'] },
       { nome: 'OUTROS DOCUMENTOS', ks: ['outro'] }
     ];
     var nDocs = GRUPOS_ARQ.filter(function(g){ return g.ks.some(function(k){ return fotos[k]; }); }).length, nFeito = 0;
