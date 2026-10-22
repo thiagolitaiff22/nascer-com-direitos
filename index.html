@@ -1292,9 +1292,13 @@ section.vw-dash{gap:10px!important}
 #form.novo .f-body > .field:has(#f-contato){display:flex!important;order:3}
 #form.novo .f-body > .field:has(#f-cidade){display:flex!important;order:4}
 #form.novo .f-body > .field:has(#f-resp){display:flex!important;order:6;grid-column:auto!important}
-#form.novo .f-body > .field:has(#f-fato){display:flex!important;order:7}
-#form.novo .f-body > .field:has(#f-crianca){display:flex!important;order:8}
+#form.novo .f-body > .field:has(#f-fato){display:none!important}
+#form.novo .f-body > #f-seg-box{display:flex!important;order:7;grid-column:1/-1;flex-direction:column;gap:6px}
+#f-seg-box{display:none}
+.seg-bi{display:flex;gap:8px}.seg-bi button{flex:1;padding:12px 10px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--panel,#fff);color:var(--ink-2,#5a4a38);font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.seg-bi button[aria-pressed="true"]{background:var(--gold,#a07a45);color:#fff;border-color:transparent}
 #form.novo .f-body > .field:has(#f-cnasc){display:flex!important;order:9}
+#form.novo.gest .f-body > .field:has(#f-cnasc){display:none!important}
 #form.novo .f-body > .field:has(#f-dpp):not([hidden]){display:flex!important;order:10}
 #form.novo.com-pasta .f-body > .field:has(#f-pasta){display:flex!important;order:1}
 #form.novo .field:has(#f-resp) .hint{display:none}
@@ -2539,11 +2543,11 @@ td,.row{font-size:13px}
     <div class="f-head"><div class="ph-tile" style="margin:0"><svg class="i"><use href="#i-users"/></svg></div><h2 id="f-title">Novo cadastro (orgânico)</h2></div>
     <div class="f-body">
       <div class="section-lbl">Dados da cliente (mãe)</div>
-      <div class="field full"><label for="f-nome">Nome completo da mãe</label><input id="f-nome" required autocomplete="off"></div>
+      <div class="field full"><label for="f-nome">Nome completo da mãe</label><input id="f-nome" required autocomplete="off" placeholder="Nome completo da mãe"></div>
       <div class="field full"><label>Pasta da cliente</label><div class="folder-box" id="f-pasta"></div></div>
       <div class="field"><label for="f-cpf">CPF</label><input id="f-cpf" inputmode="numeric" placeholder="000.000.000-00" class="tnum"><span class="hint" id="h-cpf"></span></div>
       <div class="field"><label for="f-contato">Contato (telefone / WhatsApp)</label><input id="f-contato" inputmode="tel" placeholder="(97) 00000-0000" class="tnum"></div>
-      <div class="field"><label for="f-cidade">Cidade</label><input id="f-cidade" autocomplete="off" placeholder="Ex.: Manaus"></div>
+      <div class="field"><label for="f-cidade">Cidade</label><input id="f-cidade" autocomplete="off" placeholder="Cidade da mãe"></div>
       <div class="field"><label for="f-tipo">Tipo de segurada</label><select id="f-tipo"><option value="">Não informado</option><option value="especial">Segurada especial (rural / pescadora)</option><option value="urbana">Empregada / urbana</option><option value="individual">Contribuinte individual / MEI / facultativa</option><option value="desempregada">Desempregada (período de graça)</option></select></div>
       <div class="field"><label for="f-ativ">Atividade</label><input id="f-ativ" placeholder="Ex.: agricultora, pescadora, doméstica" list="ativ-list"><datalist id="ativ-list"><option value="Agricultora"><option value="Pescadora artesanal"><option value="Extrativista"><option value="Doméstica"><option value="Comerciária"><option value="Autônoma"></datalist></div>
       <div class="field full"><label for="f-resp">Parceiro</label><select id="f-resp"><option value="">Sem parceiro</option></select><span class="hint">Quem trouxe a cliente. É ele quem vê a cliente no aplicativo e cuida do aviso da audiência.</span></div>
@@ -2558,8 +2562,9 @@ td,.row{font-size:13px}
       </div></details>
 
       <div class="section-lbl">Criança</div>
+      <div class="field full" id="f-seg-box"><label>A criança</label><div class="seg-bi" id="f-seg"><button type="button" data-v="gestante" aria-pressed="false">Ainda gestante</button><button type="button" data-v="parto" aria-pressed="true">Já nasceu</button></div></div>
       <div class="field"><label for="f-fato">Fato gerador</label><select id="f-fato"><option value="parto">Parto</option><option value="gestante">Ainda gestante</option><option value="adocao">Adoção</option><option value="guarda">Guarda para adoção</option><option value="natimorto">Natimorto</option><option value="aborto">Aborto não criminoso</option></select></div>
-      <div class="field"><label for="f-crianca">Nome da criança</label><input id="f-crianca" autocomplete="off"></div>
+      <div class="field"><label for="f-crianca">Nome da criança</label><input id="f-crianca" autocomplete="off" placeholder="Nome do bebê (se já tiver)"></div>
       <div class="field"><label for="f-cnasc" id="f-cnasc-lbl">Data de nascimento da criança</label><input id="f-cnasc" type="date"><span class="hint" id="h-prazo"></span></div>
       <div class="field" id="f-dpp-box" hidden><label for="f-dpp">Data prevista do parto</label><input id="f-dpp" type="date"><span class="hint">A gestante pode pedir a partir de 28 dias antes do parto.</span></div>
       <div class="field full"><label for="f-test">Testemunhas da atividade rural</label><input id="f-test" placeholder="Nome e telefone de 2 ou 3 pessoas que conhecem o trabalho dela"></div>
@@ -5893,6 +5898,8 @@ td,.row{font-size:13px}
     }).join('');
   }
   // compacto: editar pelo Cadastro mostra só os campos do cadastro (como o Novo cliente); comPasta: mostra também a pasta (Analisar com IA)
+  function syncSeg(){ var v = $('f-fato').value === 'gestante' ? 'gestante' : 'parto'; Array.prototype.forEach.call($('f-seg').querySelectorAll('button'), function(b){ b.setAttribute('aria-pressed', String(b.dataset.v === v)); }); }
+  $('f-seg').addEventListener('click', function(e){ var b = e.target.closest('button[data-v]'); if (!b) return; $('f-fato').value = b.dataset.v; $('f-fato').dispatchEvent(new Event('change')); syncSeg(); });
   function openForm(r, embutido, compacto, comPasta){
     var lugar = embutido ? $('cad-box') : dlg;
     if ($('form').parentElement !== lugar) lugar.appendChild($('form'));
@@ -5926,7 +5933,7 @@ td,.row{font-size:13px}
     $('f-nit').value = r ? r.nit || '' : '';
     $('f-tipo').value = r ? r.tipoSegurada || '' : '';
     $('f-ativ').value = r ? r.atividade || '' : '';
-    $('f-fato').value = r && FATOS[r.fatoGerador] ? r.fatoGerador : 'parto';
+    $('f-fato').value = r && FATOS[r.fatoGerador] ? r.fatoGerador : (r ? 'parto' : 'gestante'); syncSeg();
     $('f-crianca').value = r ? r.crianca || '' : '';
     $('f-cnasc').value = r ? r.criancaNasc || '' : '';
     $('f-dpp').value = r ? r.dpp || '' : '';
@@ -5981,7 +5988,7 @@ td,.row{font-size:13px}
   }
   function fatoUI(){
     var g = $('f-fato').value === 'gestante', f = $('f-fato').value;
-    $('f-dpp-box').hidden = !g;
+    $('f-dpp-box').hidden = !g; $('form').classList.toggle('gest', g);
     $('f-cnasc-lbl').textContent = g ? 'Data de nascimento (depois do parto)' : f === 'adocao' ? 'Data da adoção' : f === 'guarda' ? 'Data da guarda' : f === 'natimorto' || f === 'aborto' ? 'Data do parto / ocorrido' : 'Data de nascimento da criança';
     protHint();
   }
