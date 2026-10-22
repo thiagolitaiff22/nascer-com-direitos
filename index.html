@@ -1321,6 +1321,12 @@ section.vw-dash{gap:10px!important}
 .ficha-foto span{font-size:12.5px;color:var(--ink-3)}
 .av-foto{flex:none;width:28px;height:28px;border-radius:50%;object-fit:cover;border:1px solid var(--line)}
 .falta-tag{flex:none;font-size:11px;font-weight:700;color:var(--red);background:var(--red-soft);border:1px solid currentColor;border-radius:4px;padding:0 6px;white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.docs-app{margin:14px 0 0}.docs-app>b{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-bottom:8px}
+.docs-chips{display:flex;flex-wrap:wrap;gap:8px}
+.doc-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;font-size:13px;font-weight:600;border:1px solid var(--line-2,#ddd)}
+.doc-chip.ok{background:rgba(34,139,84,.14);color:#1f8a54;border-color:rgba(34,139,84,.35)}
+.doc-chip.no{background:var(--red-soft);color:var(--red);border-color:var(--red)}
+.docs-recebi{margin-top:10px}.docs-recebi>span{display:block;font-size:12.5px;color:var(--ink-2);margin-bottom:6px}.docs-recebi>div{display:flex;flex-wrap:wrap;gap:8px}
 .falta-docs{margin:12px 0 0;padding:10px 12px;border:1px solid var(--red);background:var(--red-soft);border-radius:4px}
 .falta-docs b{display:block;color:var(--red);font-size:13px}
 .falta-docs span{display:block;font-size:12.5px;color:var(--ink-2);margin:2px 0 8px}
@@ -3197,8 +3203,17 @@ td,.row{font-size:13px}
   function rgDoc(r){ return String(r.rg || '').trim() || String(r.cpf || '').trim(); }
   document.addEventListener('blur', function(e){ if (e.target && e.target.id === 'f-rg' && e.target.value.trim()) e.target.value = formatarRG(e.target.value); }, true);
   // documentos que o parceiro não fotografou (o aplicativo grava em faltaDocs)
-  var DOC_FALTA = { procuracao: 'Procuração', rg_frente: 'RG', cpf: 'CPF', certidao: 'Certidão de nascimento', residencia: 'Comprovante de residência', autodeclaracao: 'Autodeclaração rural', rural: 'Provas de atividade rural', ctps: 'CTPS / contribuições', cliente: 'Foto da cliente' };
-  function faltaDocs(r){ return (Array.isArray(r.faltaDocs) ? r.faltaDocs : []).filter(function(k){ return DOC_FALTA[k]; }); }
+  var DOC_FALTA = { procuracao: 'Procuração', rg_frente: 'RG', cpf: 'CPF', titulo: 'Título de eleitor', certidao: 'Certidão de nascimento', residencia: 'Comprovante de residência', autodeclaracao: 'Autodeclaração rural', rural: 'Provas de atividade rural', ctps: 'CTPS / contribuições', cliente: 'Foto da cliente' };
+  // documentos que o aplicativo pede e o que veio de cada um (campoDocs = fotos enviadas pelo app)
+  var DOCS_APP = [['rg_frente', 'RG'], ['cpf', 'CPF'], ['titulo', 'Título de eleitor'], ['residencia', 'Comprovante de residência']];
+  function docsApp(r){
+    var campo = Array.isArray(r.campoDocs) ? r.campoDocs : null, antigo = Array.isArray(r.faltaDocs) ? r.faltaDocs : null;
+    return DOCS_APP.map(function(d){
+      var ok = campo ? campo.indexOf(d[0]) >= 0 : (r.docsCompletos === true || (r.origem === 'campo' && antigo && antigo.indexOf(d[0]) < 0));   // cadastro antigo do app: vale o que não estava na lista de faltantes
+      return { k: d[0], n: d[1], ok: !!ok };
+    });
+  }
+  function faltaDocs(r){ return docsApp(r).filter(function(x){ return !x.ok; }).map(function(x){ return x.k; }); }
   // documentos que a IA confere, conforme o tipo de segurada: [chave que a IA devolve, chave do faltaDocs]
   function docsExigidos(r){
     var l = [['procuracao', 'procuracao'], ['rg', 'rg_frente'], ['cpf', 'cpf'], ['residencia', 'residencia']];
@@ -3213,13 +3228,13 @@ td,.row{font-size:13px}
   }
   // coluna Documentos do Cadastro: o que o parceiro ainda precisa mandar, um por etiqueta
   // "completa" só com prova: o aplicativo mandou tudo, ou o escritório conferiu a pasta e marcou na ficha
-  function docsConferidos(r){ return !faltaDocs(r).length && (r.docsCompletos === true || (r.origem === 'campo' && Array.isArray(r.faltaDocs))); }
+  function docsConferidos(r){ return !faltaDocs(r).length; }
   function docsPendentes(r){ return !docsConferidos(r); }
   function docsCell(r){
     var f = faltaDocs(r);
     if (f.length) return '<span class="cad-sit crit docs-pend" tabindex="0">Documentos pendentes<span class="docs-tip">Faltam: ' + esc(faltaTexto(r)) + '</span></span>';
     if (docsConferidos(r)) return '<span class="cad-sit ok">Documentação completa</span>';
-    return '<span class="cad-sit crit docs-pend" tabindex="0">Documentos pendentes<span class="docs-tip">Ninguém conferiu a pasta ainda. Quando estiver tudo lá, marque na ficha.</span></span>';
+    return '<span class="cad-sit crit docs-pend" tabindex="0">Documentos pendentes</span>';
   }
   document.addEventListener('click', async function(e){
     var b = e.target.closest('[data-act="docs-ok"]'); if (!b) return;
@@ -3297,7 +3312,7 @@ td,.row{font-size:13px}
     var b = e.target.closest('[data-act="recebido"]'); if (!b) return;
     var r = state.rows.filter(function(x){ return x.id === b.dataset.id; })[0]; if (!r) return;
     var resta = faltaDocs(r).filter(function(k){ return k !== b.dataset.doc; });
-    try { await patchRow(r.id, { faltaDocs: resta, atualizadoEm: new Date().toISOString() }); toast(DOC_FALTA[b.dataset.doc] + ' marcado como recebido'); }
+    try { await patchRow(r.id, { faltaDocs: resta, campoDocs: (Array.isArray(r.campoDocs) ? r.campoDocs : []).concat([b.dataset.doc]), atualizadoEm: new Date().toISOString() }); toast(DOC_FALTA[b.dataset.doc] + ' marcado como recebido'); }
     catch(err){ toast(errMsg(err)); }
   });
   // "Analisar com IA" na ficha: lê a pasta e grava direto CPF, RG, endereço, NIT e dados da criança que estiverem vazios (sem abrir o formulário)
@@ -3367,12 +3382,11 @@ td,.row{font-size:13px}
       var v = c[1] == null ? '' : String(c[1]).trim();
       return '<div class="ficha-i">' + (v ? ok : nada) + '<div><span>' + c[0] + '</span><b>' + (v ? esc(v) : '—') + '</b></div></div>';
     }).join('') + '</div>' +
-      (fl.length ? '<div class="falta-docs"><b>Faltam documentos</b><span>O parceiro ainda precisa mandar: ' + esc(faltaTexto(r)) + '. Ele vê esta lista no aplicativo e completa por lá. Se chegou por outro meio, marque como recebido:</span><div>' +
-        fl.map(function(k){ return '<button type="button" class="btn" data-act="recebido" data-id="' + esc(r.id) + '" data-doc="' + k + '"><svg class="i"><use href="#i-check"/></svg>Recebi ' + DOC_FALTA[k] + '</button>'; }).join('') + '</div></div>' :
-        compacto && !docsConferidos(r) ? '<div class="falta-docs"><b>Documentação não conferida</b><span>Clique em Conferir documentos (a IA olha a pasta) ou abra a pasta no Drive e, se estiver tudo, marque:</span><div><button type="button" class="btn" data-act="docs-ok" data-id="' + esc(r.id) + '"><svg class="i"><use href="#i-check"/></svg>Documentação completa</button></div></div>' : '') +
+      '<div class="docs-app"><b>Documentos juntados no app</b><div class="docs-chips">' + docsApp(r).map(function(x){ return '<span class="doc-chip ' + (x.ok ? 'ok' : 'no') + '">' + (x.ok ? '✓' : '–') + ' ' + esc(x.n) + '</span>'; }).join('') + '</div>' +
+        (fl.length ? '<div class="docs-recebi"><span>Faltam: ' + esc(faltaTexto(r)) + '. Se chegou por outro meio, marque como recebido:</span><div>' + fl.map(function(k){ return '<button type="button" class="btn" data-act="recebido" data-id="' + esc(r.id) + '" data-doc="' + k + '"><svg class="i"><use href="#i-check"/></svg>Recebi ' + DOC_FALTA[k] + '</button>'; }).join('') + '</div></div>' : '') + '</div>' +
       '<div class="ficha-acoes"><button type="button" class="btn" data-act="edit" data-id="' + esc(r.id) + '"><svg class="i"><use href="#i-pencil"/></svg>Editar cadastro</button>' +
       (r.pastaUrl ? '<a class="btn" href="' + esc(r.pastaUrl) + '" target="_blank" rel="noopener"><svg class="i"><use href="#i-folder"/></svg>Pasta no Drive</a>' : '') +
-      (compacto && r.pastaId ? '<button type="button" class="btn primary" data-act="docs-ia" data-id="' + esc(r.id) + '" title="A IA olha a pasta e diz quais documentos estão lá (não preenche nada)">Conferir documentos</button>' : '') + '</div></div>';
+      '</div></div>';
   }
   function avisoCell(r){
     var n = daysUntil(r.audData), s = sit(r);
