@@ -1288,21 +1288,16 @@ section.vw-dash{gap:10px!important}
 #form.novo .f-body > *{display:none!important}
 #form.novo .f-body > .section-lbl:first-child{display:block!important;order:0}
 #form.novo .f-body > .field:has(#f-nome){display:flex!important;order:1}
-#form.novo .f-body > .field:has(#f-rg){display:flex!important;order:2}
-#form.novo .f-body > .field:has(#f-cpf){display:flex!important;order:3}
-/* no cadastro inicial só vale a data da criança; a da mãe fica na edição da ficha */
-#form.novo .f-body > .field:has(#f-nit){display:flex!important;order:5}
-#form.novo .f-body > .field:has(#f-end){display:flex!important;order:6}
-#form.novo .f-body > .field:has(#f-contato){display:flex!important;order:7}
-#form.novo .f-body > .field:has(#f-tipo){display:flex!important;order:8}
-#form.novo .f-body > .field:has(#f-ativ){display:flex!important;order:9}
-#form.novo .f-body > .field:has(#f-fato){display:flex!important;order:10}
-#form.novo .f-body > .field:has(#f-crianca){display:flex!important;order:11}
-#form.novo .f-body > .field:has(#f-cnasc){display:flex!important;order:12}
-#form.novo .f-body > .field:has(#f-dpp):not([hidden]){display:flex!important;order:13}
-#form.novo .f-body > .field:has(#f-dtcad){display:flex!important;order:14}
+#form.novo .f-body > .field:has(#f-cpf){display:flex!important;order:2}
+#form.novo .f-body > .field:has(#f-contato){display:flex!important;order:3}
+#form.novo .f-body > .field:has(#f-cidade){display:flex!important;order:4}
+#form.novo .f-body > .field:has(#f-tipo){display:flex!important;order:5}
+#form.novo .f-body > .field:has(#f-resp){display:flex!important;order:6;grid-column:auto!important}
+#form.novo .f-body > .field:has(#f-fato){display:flex!important;order:7}
+#form.novo .f-body > .field:has(#f-crianca){display:flex!important;order:8}
+#form.novo .f-body > .field:has(#f-cnasc){display:flex!important;order:9}
+#form.novo .f-body > .field:has(#f-dpp):not([hidden]){display:flex!important;order:10}
 #form.novo.com-pasta .f-body > .field:has(#f-pasta){display:flex!important;order:1}
-#form.novo .f-body > .field:has(#f-resp){display:flex!important;order:15;grid-column:auto!important}
 #form.novo .field:has(#f-resp) .hint{display:none}
 .ficha-foto{display:flex;align-items:center;gap:12px;margin:8px 0 12px}
 .ficha-foto img{width:96px;height:96px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
@@ -6021,6 +6016,18 @@ td,.row{font-size:13px}
     var nome = $('f-nome').value.trim();
     nome = nomeProprio(nome);   // padrão do escritório: primeira letra maiúscula, o resto minúsculo
     if (!nome){ $('f-nome').focus(); toast('Informe o nome da cliente'); return; }
+    if (!state.editing){
+      // cadastro novo: mesmos dados obrigatórios do aplicativo
+      var gest = $('f-fato').value === 'gestante', faltaN = [], primeiroN = null;
+      var exige = function(ok, rot, id){ if (!ok){ faltaN.push(rot); if (!primeiroN) primeiroN = id; } };
+      exige(nome.length >= 3, 'nome completo', 'f-nome');
+      exige(cpfValido($('f-cpf').value), 'CPF válido', 'f-cpf');
+      exige(String($('f-contato').value || '').replace(/\D/g, '').length >= 10, 'telefone com DDD', 'f-contato');
+      exige($('f-cidade').value.trim().length >= 2, 'cidade', 'f-cidade');
+      exige(!!$('f-tipo').value, 'tipo de segurada', 'f-tipo');
+      exige(gest ? !!$('f-dpp').value : !!$('f-cnasc').value, gest ? 'data prevista do parto' : 'data de nascimento da criança', gest ? 'f-dpp' : 'f-cnasc');
+      if (faltaN.length){ toast('Falta preencher: ' + faltaN.join(', ') + '.'); if ($(primeiroN)) $(primeiroN).focus(); return; }
+    }
     var prev = state.rows.find(function(r){ return r.id === state.editing; }) || {};
     var situacao = $('f-situacao').value, avisado = situacao === 'avisado';
     var avisoEm = $('f-avisoem').value || (avisado ? iso(new Date()) : '');
