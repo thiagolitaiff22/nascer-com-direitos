@@ -2339,7 +2339,7 @@ grant execute on function public.equipe_solicitar(text, text, text, text, text) 
 select 'ok' as cargo_posvenda;
 
 
--- ===== 47_cadastro_exige_dados.sql =====
+-- ===== 47_cadastro_exige_campos.sql =====
 -- O cadastro vindo do aplicativo só é aceito com nome, telefone, cidade e CPF. Versão antiga do app (sem CPF/cidade) é recusada e fica na fila do celular até atualizar. Pode rodar de novo.
 create or replace function public.campo_cadastrar(p_token text, p_envio text, p_dados jsonb)
 returns text language plpgsql security definer set search_path = public as $$
