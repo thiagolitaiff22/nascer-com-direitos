@@ -3141,7 +3141,7 @@ td,.row{font-size:13px}
     var g = (r.cidadeUf && regiaoPorId(r.cidadeUf)) || regiaoDe(par);
     var cidade = r.cidade || (par && par.regiao) || '';
     var partes = [];
-    if (cidade) partes.push('<span class="cad-bnd">' + (g ? bandeiraCidade(g, cidade) : '') + '</span><b>' + esc(cidade) + '</b>');
+    if (cidade) partes.push('<span class="cad-bnd">' + (g ? bandeiraCidade(g, cidade) : '') + '</span><b>' + esc(cidade) + (g ? '/' + esc(String(g.uf || g.id).toUpperCase()) : '') + '</b>');
     partes.push(par ? 'indicação de <b>' + esc(parNome) + '</b>' : r.criadoPorNome ? 'cadastro de <b>' + esc(r.criadoPorNome) + '</b>' : esc(r.origem === 'organico' ? 'Orgânico' : 'Sem parceiro'));
     if (quando) partes.push(esc(quando));
     var dcad = String(r.dataCadastro || r.criadoEm || '').slice(0, 10), nd2 = dcad ? -daysUntil(dcad) : null;
@@ -3777,7 +3777,7 @@ td,.row{font-size:13px}
   /* Cadastro: clientes ainda sem protocolo */
   var cadQ = '', cadSit = '', cadAberto = {};
   // o que falta preencher para requerer: CPF válido, endereço, tipo de segurada e a data do nascimento (ou a data prevista do parto)
-  function cidadeCli(r){ var p = r.responsavelId && prospById(r.responsavelId); return String(r.cidade || (p && p.regiao) || '').trim(); }
+  function cidadeCli(r){ var p = r.responsavelId && prospById(r.responsavelId), n = String(r.cidade || (p && p.regiao) || '').trim(), uf = String(r.cidadeUf || (p && p.regiaoId) || '').slice(0, 2).toUpperCase(); return n && uf ? n + '/' + uf : n; }
   function dadosFaltando(r){
     var f = [];
     if (!String(r.cpf || '').trim() || !cpfValido(r.cpf)) f.push('CPF');
