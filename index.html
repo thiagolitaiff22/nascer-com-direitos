@@ -4130,14 +4130,15 @@ td,.row{font-size:13px}
   function editBtn(r){ return '<button type="button" class="ico-btn" data-act="edit" data-id="' + esc(r.id) + '" title="Editar cadastro" aria-label="Editar ' + esc(r.nome) + '"><svg class="i"><use href="#i-pencil"/></svg></button>'; }
   /* ---------- Pós-venda (Kanban): regulariza a documentação de quem fechou contrato ---------- */
   var POS_COLS = {
-    gest: [['recem', 'Recém-chegada'], ['falta_doc', 'Falta documento'], ['falta_gov', 'Falta senha gov.br'], ['regularizada', 'Regularizada']],
-    nasc: [['recem', 'Recém-chegada'], ['rural', 'Documentação rural'], ['falta_gov', 'Falta senha gov.br'], ['regularizada', 'Regularizada']]
+    gest: [['falta_doc', 'Falta documento'], ['falta_gov', 'Regularizar senha gov.br'], ['regularizada', 'Regularizada']],
+    nasc: [['rural', 'Documentação rural'], ['falta_gov', 'Regularizar senha gov.br'], ['regularizada', 'Regularizada']]
   };
   function posLane(r){ return r.fatoGerador === 'gestante' ? 'gest' : 'nasc'; }
   function posEtapaDe(r){
     var cols = POS_COLS[posLane(r)].map(function(c){ return c[0]; });
+    if (r.posEtapa === 'recem') return 'falta_gov';
     if (r.posEtapa && cols.indexOf(r.posEtapa) >= 0 && r.posEtapa !== 'regularizada') return r.posEtapa;
-    return posLane(r) === 'nasc' ? 'rural' : (docsPendentes(r) ? 'falta_doc' : 'recem');
+    return posLane(r) === 'nasc' ? 'rural' : (docsPendentes(r) ? 'falta_doc' : 'falta_gov');
   }
   var ctrQ2 = '', pvLane = 'gest', pvAtr = false;
   var PV_DIAS_ATRASO = 7;
