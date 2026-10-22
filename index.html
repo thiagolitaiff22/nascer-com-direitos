@@ -2548,17 +2548,20 @@ td,.row{font-size:13px}
       <div class="field full"><label for="f-nome">Nome completo da mãe</label><input id="f-nome" required autocomplete="off"></div>
       <div class="field full"><label>Pasta da cliente</label><div class="folder-box" id="f-pasta"></div></div>
       <div class="field"><label for="f-cpf">CPF</label><input id="f-cpf" inputmode="numeric" placeholder="000.000.000-00" class="tnum"><span class="hint" id="h-cpf"></span></div>
-      <div class="field"><label for="f-rg">RG</label><input id="f-rg" class="tnum" inputmode="numeric" placeholder="2960881-3"><span class="hint">Sem RG? Deixe em branco: nos documentos vale o número do CPF.</span></div>
-      <div class="field" hidden><label for="f-nasc">Data de nascimento da mãe</label><input id="f-nasc" type="date"></div>
-      <div class="field"><label for="f-nit">NIT / PIS / NIS</label><input id="f-nit" class="tnum" inputmode="numeric" placeholder="000.00000.00-0"></div>
+      <div class="field"><label for="f-contato">Contato (telefone / WhatsApp)</label><input id="f-contato" inputmode="tel" placeholder="(97) 00000-0000" class="tnum"></div>
       <div class="field"><label for="f-cidade">Cidade</label><input id="f-cidade" autocomplete="off" placeholder="Ex.: Manaus"></div>
-      <div class="field full"><label for="f-end">Endereço</label><input id="f-end" placeholder="Rua ou comunidade, número, bairro, cidade/UF"></div>
-      <div class="field full"><label for="f-contato">Contato (telefone / WhatsApp)</label><input id="f-contato" inputmode="tel" placeholder="(97) 00000-0000" class="tnum"></div>
       <div class="field"><label for="f-tipo">Tipo de segurada</label><select id="f-tipo"><option value="">Não informado</option><option value="especial">Segurada especial (rural / pescadora)</option><option value="urbana">Empregada / urbana</option><option value="individual">Contribuinte individual / MEI / facultativa</option><option value="desempregada">Desempregada (período de graça)</option></select></div>
       <div class="field"><label for="f-ativ">Atividade</label><input id="f-ativ" placeholder="Ex.: agricultora, pescadora, doméstica" list="ativ-list"><datalist id="ativ-list"><option value="Agricultora"><option value="Pescadora artesanal"><option value="Extrativista"><option value="Doméstica"><option value="Comerciária"><option value="Autônoma"></datalist></div>
       <div class="field full"><label for="f-resp">Parceiro</label><select id="f-resp"><option value="">Sem parceiro</option></select><span class="hint">Quem trouxe a cliente. É ele quem vê a cliente no aplicativo e cuida do aviso da audiência.</span></div>
       <div class="field full" id="f-via-box" hidden><label>Avisada via outro cliente</label><div class="integ-row"><span id="f-via-nome" class="val"></span><button type="button" class="btn" id="f-via-tirar" style="padding:5px 10px;font-size:12.5px">Desfazer vínculo</button></div></div>
       <div class="field full"><label class="chk"><input id="f-regua" type="checkbox"> Enviar avisos automáticos por WhatsApp para esta cliente</label><span class="hint">Telefones preenchidos agora ficam fora da régua até você marcar aqui.</span></div>
+
+      <details class="field full" style="margin:2px 0 6px"><summary style="cursor:pointer;font-weight:600;font-size:13px;color:var(--ink-2)">Outros dados da mãe (opcional: o aplicativo não pede)</summary><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px">
+      <div class="field"><label for="f-rg">RG</label><input id="f-rg" class="tnum" inputmode="numeric" placeholder="2960881-3"><span class="hint">Sem RG? Deixe em branco: nos documentos vale o número do CPF.</span></div>
+      <div class="field"><label for="f-nit">NIT / PIS / NIS</label><input id="f-nit" class="tnum" inputmode="numeric" placeholder="000.00000.00-0"></div>
+      <div class="field full" style="grid-column:1/-1"><label for="f-end">Endereço</label><input id="f-end" placeholder="Rua ou comunidade, número, bairro, cidade/UF"></div>
+      <div class="field" hidden><label for="f-nasc">Data de nascimento da mãe</label><input id="f-nasc" type="date"></div>
+      </div></details>
 
       <div class="section-lbl">Criança</div>
       <div class="field"><label for="f-fato">Fato gerador</label><select id="f-fato"><option value="parto">Parto</option><option value="gestante">Ainda gestante</option><option value="adocao">Adoção</option><option value="guarda">Guarda para adoção</option><option value="natimorto">Natimorto</option><option value="aborto">Aborto não criminoso</option></select></div>
