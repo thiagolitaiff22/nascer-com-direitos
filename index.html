@@ -1235,6 +1235,8 @@ section.vw-dash{gap:10px!important}
 .pv-ic{display:flex;align-items:center;gap:8px}.pv-ic .i{width:18px;height:18px;stroke:var(--ink-2)}
 .pv-pend .i{stroke:var(--red)}
 .pv-ic select{max-width:120px;padding:4px 6px;border-radius:8px;border:1px solid var(--line-2);background:var(--soft);color:inherit;font:inherit;font-size:12px}
+.cd-timer{display:inline-block;margin-left:8px;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums;background:rgba(120,140,200,.18);color:#4a66c4;border:1px solid rgba(120,140,200,.45);white-space:nowrap}
+.cd-timer.crit{background:rgba(220,60,50,.16);color:#c0362c;border-color:rgba(220,60,50,.5)}
 .prio-tag{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:800;letter-spacing:.02em;background:rgba(224,160,40,.2);color:#9a6a00;border:1px solid rgba(224,160,40,.5)}
 .prio-tag.crit{background:rgba(220,60,50,.16);color:#c0362c;border-color:rgba(220,60,50,.5)}
 @media (max-width:900px){ .cad-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important} }
@@ -3298,7 +3300,7 @@ td,.row{font-size:13px}
     var n = (r.tentativas || 0) + 1, ag = new Date().toISOString();
     var sem = n >= LEAD_TENTATIVAS;
     try {
-      await patchRow(r.id, { tentativas: n, leadStatus: sem ? 'sem_resposta' : 'contato', ultimoContatoEm: ag, leadMudouEm: ag, atualizadoEm: ag });
+      await patchRow(r.id, { tentativas: n, leadStatus: sem ? 'sem_resposta' : 'contato', ultimoContatoEm: ag, leadMudouEm: ag, atualizadoEm: ag, contatoPrazoEm: '' });
       toast('Tentativa ' + n + ' de ' + LEAD_TENTATIVAS + ': ' + r.nome + (sem ? ' · virou Sem resposta' : ''));
     } catch(err){ toast(errMsg(err)); }
   }, true);
@@ -3309,7 +3311,7 @@ td,.row{font-size:13px}
       await copiarTexto(b.dataset.copiarTel); b.classList.add('ok'); setTimeout(function(){ b.classList.remove('ok'); }, 1500);
       var rc = b.dataset.id ? acharRow(b.dataset.id) : null, msg = 'Telefone copiado: ' + b.dataset.copiarTel;
       // quem copia o telefone vai ligar: o lead novo passa para "Em contato" sozinho
-      if (rc && leadDe(rc) === 'novo'){ var ag = new Date().toISOString(); patchRow(rc.id, { leadStatus: 'contato', leadMudouEm: ag, ultimoContatoEm: ag, atualizadoEm: ag }).catch(function(){}); msg += ' · marcado como Em contato'; }
+      if (rc && leadDe(rc) === 'novo'){ var ag = new Date().toISOString(); patchRow(rc.id, Object.assign({ leadStatus: 'contato', leadMudouEm: ag, ultimoContatoEm: ag, atualizadoEm: ag }, prazoContato())).catch(function(){}); msg += ' · marcado como Em contato'; }
       toast(msg);
     }
     catch(err){ toast('Não foi possível copiar. Selecione o número e use Ctrl+C.'); }
@@ -3385,6 +3387,10 @@ td,.row{font-size:13px}
   });
   // compacto (aba Cadastro): só os dados do cadastro, sem processo, audiência, aviso e pagamento
   // observações escritas pela equipe: o texto automático do envio pelo app (quem cadastrou, o que não foi fotografado) fica de fora
+  function penalidadesTxt(r){
+    var l = Array.isArray(r.penalidades) ? r.penalidades : []; if (!l.length) return null;
+    return l.map(function(p){ return (p.percentual || 50) + '% · ' + (p.tipo === 'contato_expirado' ? 'prazo de contato estourado' + (p.closer ? ' (closer ' + p.closer + ')' : '') : 'pasta incompleta' + (p.pos ? ' (Pós-venda ' + p.pos + ')' : '')) + ' · ' + fmtDate(String(p.em || '').slice(0, 10)); }).join('\n');
+  }
   function obsDaEquipe(r){
     return String(r.obs || '').split('\n').filter(function(l){ return l.trim() && !/^(Cadastrada pelo celular|Não foi fotografado|Nome nos documentos|CPF lido|Localização da casa)/i.test(l.trim()); }).join('\n');
   }
@@ -3409,9 +3415,9 @@ td,.row{font-size:13px}
       ['Processo', proc], ['Ajuizado em', r.protocolo ? fmtDate(r.protocolo) : ''],
       ['Teses da contestação', teses], ['Audiência', aud],
       ['Aviso', aviso], ['Resultado', res],
-      ['Pagamento', r.pagamento && PAG[r.pagamento] ? PAG[r.pagamento][0] : ''], ['Observações', obsDaEquipe(r)]
+      ['Pagamento', r.pagamento && PAG[r.pagamento] ? PAG[r.pagamento][0] : ''], ['Penalidades', penalidadesTxt(r)], ['Observações', obsDaEquipe(r)]
     ].filter(function(c){ return c[1] !== null; });
-    if (compacto) campos = campos.filter(function(c){ return ['Nome completo', 'CPF', 'RG', 'Nascimento', 'NIT / PIS', 'Telefone', 'Cidade', 'Endereço', 'Parceiro', 'Criança', 'Testemunhas', 'Observações'].indexOf(c[0]) >= 0; });
+    if (compacto) campos = campos.filter(function(c){ return ['Nome completo', 'CPF', 'RG', 'Nascimento', 'NIT / PIS', 'Telefone', 'Cidade', 'Endereço', 'Parceiro', 'Criança', 'Testemunhas', 'Penalidades', 'Observações'].indexOf(c[0]) >= 0; });
     var fl = faltaDocs(r);
     var ok = '<i class="fc-ok"><svg class="i"><use href="#i-check"/></svg></i>', nada = '<i class="fc-nao">–</i>';
     var fotoOk = /^data:image\/(jpeg|png);base64,/.test(r.fotoCliente || '');
@@ -4086,6 +4092,23 @@ td,.row{font-size:13px}
   // regras automáticas: 3 tentativas sem atender = sem resposta; em contato há mais de 3 dias = sem resposta;
   // sem resposta há mais de 15 dias = perdido; "retornar depois" volta para "novo lead" na data marcada
   var LEAD_TENTATIVAS = 3, LEAD_DIAS_CONTATO = 3, LEAD_DIAS_PERDIDO = 15;
+  // Em contato: o closer tem 10 minutos para mudar a situação; senão volta ao Novo lead (fila) e leva penalidade de 50% (o servidor faz a volta a cada minuto)
+  var CONTATO_PRAZO_MIN = 10;
+  function prazoContato(){
+    var email = (state.me && state.me.email) || '', u = (state.equipe || []).filter(function(x){ return String(x.email).toLowerCase() === String(email).toLowerCase(); })[0];
+    return { contatoPrazoEm: new Date(Date.now() + CONTATO_PRAZO_MIN * 60000).toISOString(), contatoCloser: (u && u.nome) || email, contatoCloserEmail: email };
+  }
+  function contadorContato(r){
+    if (r.leadStatus !== 'contato' || !r.contatoPrazoEm) return '';
+    var ms = new Date(r.contatoPrazoEm).getTime() - Date.now(); if (isNaN(ms)) return '';
+    return '<span class="cd-timer' + (ms < 120000 ? ' crit' : '') + '" data-ate="' + esc(r.contatoPrazoEm) + '" title="Se a situação não mudar até o fim do prazo, a cliente volta para a fila e o closer leva penalidade de 50%">' + fmtContador(ms) + '</span>';
+  }
+  function fmtContador(ms){ if (ms <= 0) return 'voltando à fila…'; var s = Math.ceil(ms / 1000), m = Math.floor(s / 60); s = s % 60; return m + ':' + (s < 10 ? '0' : '') + s; }
+  setInterval(function(){
+    Array.prototype.forEach.call(document.querySelectorAll('.cd-timer[data-ate]'), function(el){
+      var ms = new Date(el.dataset.ate).getTime() - Date.now(); el.textContent = fmtContador(ms); el.classList.toggle('crit', ms < 120000);
+    });
+  }, 1000);
   function diasDesdeIso(s){ if (!s) return null; var d = new Date(s); if (isNaN(d.getTime())) return null; return Math.floor((Date.now() - d.getTime()) / 86400000); }
   function leadDe(r){
     var k = LEAD[r.leadStatus] ? r.leadStatus : 'novo';
@@ -4103,7 +4126,7 @@ td,.row{font-size:13px}
   function leadSelect(r){
     var k = leadDe(r);
     return '<select class="inss-sel lead-sel lead-' + k + '" data-lead="' + esc(r.id) + '" aria-label="Situação do contato com ' + esc(r.nome) + '">' +
-      Object.keys(LEAD).map(function(x){ return '<option value="' + x + '"' + (x === k ? ' selected' : '') + '>' + LEAD[x] + '</option>'; }).join('') + '</select>';
+      Object.keys(LEAD).map(function(x){ return '<option value="' + x + '"' + (x === k ? ' selected' : '') + '>' + LEAD[x] + '</option>'; }).join('') + '</select>' + contadorContato(r);
   }
   var CTR_ETAPAS = { regularizar: ['Regularizar documentos', 'crit'] };
   function fechado(r){ return !!r.contratoEm && !r.arquivado && !String(r.processo || '').trim() && !requerido(r); }
@@ -4194,9 +4217,18 @@ td,.row{font-size:13px}
   $('pv-atr').addEventListener('click', function(){ pvAtr = !pvAtr; renderContratos(); });
   async function moverPos(id, etapa){
     var r = acharRow(id); if (!r) return;
-    var antes = { posEtapa: r.posEtapa || '' };
+    var antes = { posEtapa: r.posEtapa || '', penalidades: Array.isArray(r.penalidades) ? r.penalidades : [] };
+    var mudanca = { posEtapa: etapa, posMudouEm: new Date().toISOString(), atualizadoEm: new Date().toISOString() };
+    if (etapa === 'regularizada'){
+      var faltam = docsApp(r).filter(function(x){ return !x.ok; });
+      if (faltam.length){
+        var eu = (state.me && state.me.email) || '', ue = (state.equipe || []).filter(function(x){ return String(x.email).toLowerCase() === String(eu).toLowerCase(); })[0];
+        if (!window.confirm('A pasta está INCOMPLETA (faltam: ' + faltam.map(function(x){ return x.n; }).join(', ') + ').\n\nFechar a pasta incompleta gera penalidade de 50% para o Pós-venda (' + ((ue && ue.nome) || eu) + ').\n\nRegularizar mesmo assim?')){ render(); return; }
+        mudanca.penalidades = (Array.isArray(r.penalidades) ? r.penalidades : []).concat([{ tipo: 'pasta_incompleta', percentual: 50, pos: (ue && ue.nome) || eu, email: eu, faltavam: faltam.map(function(x){ return x.n; }), em: new Date().toISOString() }]);
+      }
+    }
     try {
-      await patchRow(id, { posEtapa: etapa, posMudouEm: new Date().toISOString(), atualizadoEm: new Date().toISOString() });
+      await patchRow(id, mudanca);
       var nome = (POS_COLS[posLane(r)].filter(function(c){ return c[0] === etapa; })[0] || [0, etapa])[1];
       toast(etapa === 'regularizada' ? r.nome + ' regularizada: ' + (posLane(r) === 'gest' ? 'foi para Aguardando nascimento' : 'foi para a certidão') : r.nome + ': ' + nome, 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
     } catch(err){ toast(errMsg(err)); render(); }
@@ -4329,10 +4361,11 @@ td,.row{font-size:13px}
         await patchRow(r.id, { ctrEtapa: sl.value, atualizadoEm: new Date().toISOString() });
         toast(CTR_ETAPAS[sl.value][0] + ': ' + r.nome, 'Desfazer', function(){ patchRow(r.id, antesC).catch(function(e2){ toast(errMsg(e2)); }); });
       } else {
-        var antesL = { leadStatus: r.leadStatus || '', arquivado: !!r.arquivado, arquivadoEm: r.arquivadoEm || '', desqualMotivo: r.desqualMotivo || '', desqualEm: r.desqualEm || '' };
+        var antesL = { leadStatus: r.leadStatus || '', arquivado: !!r.arquivado, arquivadoEm: r.arquivadoEm || '', desqualMotivo: r.desqualMotivo || '', desqualEm: r.desqualEm || '', contatoPrazoEm: r.contatoPrazoEm || '' };
         var agoraL = new Date().toISOString();
         var p = { leadStatus: sl.value, leadMudouEm: agoraL, atualizadoEm: agoraL };
         if (sl.value === 'contato' || sl.value === 'sem_resposta') p.ultimoContatoEm = agoraL;
+        p.contatoPrazoEm = ''; if (sl.value === 'contato') Object.assign(p, prazoContato());
         if (sl.value === 'novo'){ p.tentativas = 0; p.retornarEm = ''; }
         if (sl.value === 'desqualificado'){
           var motivo = String(window.prompt('Desqualificado: descreva o motivo (obrigatório).', r.desqualMotivo || '') || '').trim();
@@ -4378,7 +4411,7 @@ td,.row{font-size:13px}
       var antes = { contratoEm: r.contratoEm || '', leadStatus: r.leadStatus || '', contratoPor: r.contratoPor || '', contratoPorEmail: r.contratoPorEmail || '', fatoGerador: r.fatoGerador || '', posEtapa: r.posEtapa || '' };
       this.disabled = true;
       try {
-        await patchRow(r.id, { contratoEm: data, leadStatus: 'fechado', contratoPor: (u && u.nome) || sel.value, contratoPorEmail: sel.value, fatoGerador: fatoNovo, posEtapa: '', atualizadoEm: new Date().toISOString() });
+        await patchRow(r.id, { contratoEm: data, leadStatus: 'fechado', contratoPor: (u && u.nome) || sel.value, contratoPorEmail: sel.value, fatoGerador: fatoNovo, posEtapa: '', contatoPrazoEm: '', atualizadoEm: new Date().toISOString() });
         f.remove();
         toast('Contrato fechado por ' + ((u && u.nome) || sel.value) + ': ' + r.nome + ' · foi para o Pós-venda', 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
       } catch(err){ this.disabled = false; toast(errMsg(err)); }
