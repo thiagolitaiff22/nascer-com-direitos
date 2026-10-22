@@ -1,11 +1,11 @@
-// O aplicativo Android abre a página publicada (https://thiagolitaiff22.github.io/nascer-com-direitos/campo.html):
+// O aplicativo Android abre a página publicada (https://www.nascercomdireitos.com.br/campo.html):
 // assim TODA atualização do campo.html chega sozinha aos celulares, sem mandar link nem reinstalar.
 // Aqui só montamos a tela de "sem conexão" que aparece se o celular nunca conseguiu abrir a página.
 const fs = require('fs'), path = require('path');
 const R = path.join(__dirname, '..'), W = path.join(__dirname, 'www');
 fs.rmSync(W, { recursive: true, force: true });
 fs.mkdirSync(W, { recursive: true });
-const LIVE = 'https://thiagolitaiff22.github.io/nascer-com-direitos/campo.html';
+const LIVE = 'https://www.nascercomdireitos.com.br/campo.html';
 const pagina = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Nascer com Direitos</title>
 <style>html,body{height:100%;margin:0;background:#faf6ef;font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;color:#2a2318}

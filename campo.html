@@ -898,7 +898,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 56;
+  var APP_VERSAO = 57;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1172,7 +1172,7 @@ button,a,label,[role=button]{touch-action:manipulation}
   window.addEventListener('online', sincronia); window.addEventListener('offline', sincronia);
 
   /* ---------- prospectador: cria o login dos parceiros e vê os números deles ---------- */
-  var SITE = 'https://thiagolitaiff22.github.io/nascer-com-direitos/';
+  var SITE = 'https://www.nascercomdireitos.com.br/';
   var pp = null;   // { parceiros: [...], atualizado }
   // prospectador que também é parceiro (configuração no sistema) pode alternar entre os dois modos
   // parceiro marcado como "sem ganhos": não vê Meus ganhos nem os marcos de pagamento
@@ -2820,7 +2820,7 @@ button,a,label,[role=button]{touch-action:manipulation}
         return fetch(CFG.url + '/rest/v1/rpc/minha_funcao', { method: 'POST', headers: { apikey: CFG.key, Authorization: 'Bearer ' + s.access_token, 'Content-Type': 'application/json' }, body: '{}' })
           .then(function(r){ return r.json(); })
           .then(function(f){
-            var GESTOR = 'https://thiagolitaiff22.github.io/nascer-com-direitos/' + (f === 'admin' ? 'gestor.html' : 'index.html');
+            var GESTOR = 'https://www.nascercomdireitos.com.br/' + (f === 'admin' ? 'gestor.html' : 'index.html');
             var DEST = f === 'admin' ? 'gestor.html' : 'index.html';
             if (!APP){
               try { var ref = CFG.url.replace(/^https?:\/\//, '').split('.')[0]; s.expires_at = Math.floor(Date.now() / 1000) + (s.expires_in || 3600); localStorage.setItem('sb-' + ref + '-auth-token', JSON.stringify(s)); } catch(x){}
@@ -2914,7 +2914,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     if (Pl.App) Pl.App.addListener('resume', function(){ proximo(); carregarPainel(); sincronia(); verificarAtualizacao(); });
   }
   /* ---------- aviso de versão nova: aparece em todos os celulares (Android, iPhone e navegador) ---------- */
-  var SITE_VERSAO = 'https://thiagolitaiff22.github.io/nascer-com-direitos/app/versao.json';
+  var SITE_VERSAO = 'https://www.nascercomdireitos.com.br/app/versao.json';
   var avisoAtu = null, ultimaChecagem = 0, bloqueioEl = null;
   // versão mínima para enviar cadastros (versao.json › minima): app mais antigo que isso não envia, só atualiza
   function versaoMinima(){ return +lsGet('campo_minima') || 0; }

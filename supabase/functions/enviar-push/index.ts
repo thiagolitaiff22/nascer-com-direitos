@@ -9,7 +9,7 @@ import { SignJWT, importPKCS8 } from 'npm:jose@5';
 
 const adm = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } });
 const VAPID_PUBLICA = 'BESx_bCvncjwXN3sNTHSS4cuAzzSG-zRhBFHDL35ipgNP4lAvl6AQ0xkyuhNXckkraHGi9b0MD-P56F6vlMTyaA';
-const SITE = 'https://thiagolitaiff22.github.io/nascer-com-direitos/campo.html';
+const SITE = 'https://www.nascercomdireitos.com.br/campo.html';
 const json = (b: unknown, status = 200) => new Response(JSON.stringify(b), { status, headers: { 'Content-Type': 'application/json' } });
 
 async function segredo(nome: string): Promise<string> {
