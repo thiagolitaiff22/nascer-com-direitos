@@ -898,7 +898,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 53;
+  var APP_VERSAO = 54;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -2648,7 +2648,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     return p.then(function(){
         barraEnvio({ nome: envio.cliente, pct: 0.99, passo: 'registrando no sistema' });
         if (envio.completar) return post({ acao: 'completar', token: envio.token, envio: envio.id, completar: envio.completar, docs: envio.docs });
-        return post({ acao: 'fechar', token: envio.token, envio: envio.id, cliente: envio.cliente || '', contato: envio.contato, local: envio.local, docs: envio.docs, faltam: envio.faltam, foto: envio.foto || '',
+        return post({ acao: 'fechar', token: envio.token, envio: envio.id, cliente: envio.cliente || '', contato: envio.contato, cpf: envio.cpf || '', cidade: envio.cidade || '', cidadeUf: envio.cidadeUf || '', local: envio.local, docs: envio.docs, faltam: envio.faltam, foto: envio.foto || '',
           // cadastro guardado antes desta versão (sem tipo): segurada especial
           tipoSegurada: envio.tipoSegurada || 'especial', crianca: envio.crianca || '', criancaNasc: envio.criancaNasc || '', fatoGerador: envio.fatoGerador || 'parto', dpp: envio.dpp || '' }); })
       .then(function(d){
