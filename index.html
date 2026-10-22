@@ -3350,7 +3350,7 @@ td,.row{font-size:13px}
       // os mesmos dados que o aplicativo coleta; RG, NIT, nascimento da mãe e endereço só aparecem se alguém preencheu
       ['Nome completo', r.nome], ['CPF', r.cpf], ['Telefone', contato], ['Cidade', cidadeCli(r)], ['Parceiro', prospName(r.responsavelId)],
       ['RG', r.rg ? r.rg : null], ['Nascimento', r.nascimento ? fmtDate(r.nascimento) : null], ['NIT / PIS', r.nit ? r.nit : null], ['Endereço', r.endereco ? r.endereco : null],
-      ['Tipo de segurada', (TIPOS[r.tipoSegurada] || '') + (r.atividade ? (r.tipoSegurada ? ' · ' : '') + r.atividade : '')], ['Criança', crianca],
+      ['Criança', crianca],
       ['Testemunhas', r.tipoSegurada === 'especial' || r.testemunhas ? r.testemunhas : null],
       ['INSS', inss], ['Exigência', r.inssStatus === 'exigencia' ? (r.exigenciaObs || 'sem descrição') + (r.exigenciaPrazo ? ' · prazo ' + fmtDate(r.exigenciaPrazo) : '') : null],
       ['Motivo do indeferimento', r.inssStatus === 'indeferido' ? r.motivoIndeferimento : null],
@@ -3359,7 +3359,7 @@ td,.row{font-size:13px}
       ['Aviso', aviso], ['Resultado', res],
       ['Pagamento', r.pagamento && PAG[r.pagamento] ? PAG[r.pagamento][0] : ''], ['Observações', r.obs]
     ].filter(function(c){ return c[1] !== null; });
-    if (compacto) campos = campos.filter(function(c){ return ['Nome completo', 'CPF', 'RG', 'Nascimento', 'NIT / PIS', 'Telefone', 'Cidade', 'Endereço', 'Parceiro', 'Tipo de segurada', 'Criança', 'Testemunhas', 'Observações'].indexOf(c[0]) >= 0; });
+    if (compacto) campos = campos.filter(function(c){ return ['Nome completo', 'CPF', 'RG', 'Nascimento', 'NIT / PIS', 'Telefone', 'Cidade', 'Endereço', 'Parceiro', 'Criança', 'Testemunhas', 'Observações'].indexOf(c[0]) >= 0; });
     var fl = faltaDocs(r);
     var ok = '<i class="fc-ok"><svg class="i"><use href="#i-check"/></svg></i>', nada = '<i class="fc-nao">–</i>';
     var fotoOk = /^data:image\/(jpeg|png);base64,/.test(r.fotoCliente || '');
