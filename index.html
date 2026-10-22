@@ -1327,6 +1327,7 @@ section.vw-dash{gap:10px!important}
 .fc-nome{font-size:18px;font-weight:700}
 .fc-corpo{overflow:auto;padding:4px 18px 18px}
 .fc-corpo .ficha{border:0!important;background:none!important;box-shadow:none!important;padding:0!important;margin:0!important}
+.ficha-acoes a.btn,.ficha-acoes a.btn:hover{text-decoration:none!important}
 .docs-app{margin:14px 0 0}.docs-app>b{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-bottom:8px}
 .docs-chips{display:flex;flex-wrap:wrap;gap:8px}
 .doc-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;font-size:13px;font-weight:600;border:1px solid var(--line-2,#ddd)}
@@ -3395,6 +3396,7 @@ td,.row{font-size:13px}
       '<div class="docs-app"><b>Documentos juntados no app</b><div class="docs-chips">' + docsApp(r).map(function(x){ return '<span class="doc-chip ' + (x.ok ? 'ok' : 'no') + '">' + (x.ok ? '✓' : '–') + ' ' + esc(x.n) + '</span>'; }).join('') + '</div>' +
         (fl.length ? '<div class="docs-recebi"><span>Faltam: ' + esc(faltaTexto(r)) + '. Se chegou por outro meio, marque como recebido:</span><div>' + fl.map(function(k){ return '<button type="button" class="btn" data-act="recebido" data-id="' + esc(r.id) + '" data-doc="' + k + '"><svg class="i"><use href="#i-check"/></svg>Recebi ' + DOC_FALTA[k] + '</button>'; }).join('') + '</div></div>' : '') + '</div>' +
       '<div class="ficha-acoes"><button type="button" class="btn" data-act="edit" data-id="' + esc(r.id) + '"><svg class="i"><use href="#i-pencil"/></svg>Editar cadastro</button>' +
+      (r.pastaUrl ? '<a class="btn" style="text-decoration:none" href="' + esc(r.pastaUrl) + '" target="_blank" rel="noopener"><svg class="i"><use href="#i-folder"/></svg>Pasta no Drive</a>' : '') +
       '</div></div>';
   }
   /* ---------- card com os dados do cliente (abre ao clicar na linha) ---------- */
