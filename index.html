@@ -3395,7 +3395,6 @@ td,.row{font-size:13px}
       '<div class="docs-app"><b>Documentos juntados no app</b><div class="docs-chips">' + docsApp(r).map(function(x){ return '<span class="doc-chip ' + (x.ok ? 'ok' : 'no') + '">' + (x.ok ? '✓' : '–') + ' ' + esc(x.n) + '</span>'; }).join('') + '</div>' +
         (fl.length ? '<div class="docs-recebi"><span>Faltam: ' + esc(faltaTexto(r)) + '. Se chegou por outro meio, marque como recebido:</span><div>' + fl.map(function(k){ return '<button type="button" class="btn" data-act="recebido" data-id="' + esc(r.id) + '" data-doc="' + k + '"><svg class="i"><use href="#i-check"/></svg>Recebi ' + DOC_FALTA[k] + '</button>'; }).join('') + '</div></div>' : '') + '</div>' +
       '<div class="ficha-acoes"><button type="button" class="btn" data-act="edit" data-id="' + esc(r.id) + '"><svg class="i"><use href="#i-pencil"/></svg>Editar cadastro</button>' +
-      (r.pastaUrl ? '<a class="btn" href="' + esc(r.pastaUrl) + '" target="_blank" rel="noopener"><svg class="i"><use href="#i-folder"/></svg>Pasta no Drive</a>' : '') +
       '</div></div>';
   }
   /* ---------- card com os dados do cliente (abre ao clicar na linha) ---------- */
@@ -4116,7 +4115,7 @@ td,.row{font-size:13px}
       if (!ctrSit && k !== ultimo){ ultimo = k; html += '<div class="grp-head ' + CTR_ETAPAS[k][1] + '">' + CTR_ETAPAS[k][0] + ' <span class="tnum">' + c[k] + '</span></div>'; }
       html += '<div class="row' + (ctrAberto[r.id] ? ' aberto' : '') + '" data-linha="' + esc(r.id) + '">' + nomeCell(r) +
         '<div><span class="lbl">Contato</span>' + telCell(r, true) + '</div>' +
-        '<div><span class="lbl">Contrato</span><div class="val">' + fmtDate(String(r.contratoEm).slice(0, 10)) + '</div><div class="mini">' + esc(prospName(r.responsavelId) || '') + '</div></div>' +
+        '<div><span class="lbl">Contrato</span><div class="val">' + fmtDate(String(r.contratoEm).slice(0, 10)) + '</div><div class="mini">' + (r.contratoPor ? 'fechado por ' + esc(r.contratoPor) + ' · ' : '') + esc(prospName(r.responsavelId) || '') + '</div></div>' +
         '<div><span class="lbl">Documentos</span>' + docsCell(r) + '</div>' +
         '<div><span class="lbl">Etapa</span><select class="inss-sel ' + CTR_ETAPAS[k][1] + '" data-ctr="' + esc(r.id) + '" aria-label="Etapa de ' + esc(r.nome) + '">' +
           Object.keys(CTR_ETAPAS).map(function(x){ return '<option value="' + x + '"' + (x === k ? ' selected' : '') + '>' + CTR_ETAPAS[x][0] + '</option>'; }).join('') + '</select>' +
@@ -4264,11 +4263,35 @@ td,.row{font-size:13px}
   $('cad-list').addEventListener('click', async function(e){
     var b = e.target.closest('[data-act="fechar"]'); if (!b) return;
     var r = acharRow(b.dataset.id); if (!r) return;
-    try {
-      await patchRow(r.id, { contratoEm: iso(new Date()), leadStatus: 'fechado', atualizadoEm: new Date().toISOString() });
-      toast('Contrato fechado: ' + r.nome + ' foi para Contratos fechados', 'Desfazer', function(){ patchRow(r.id, { contratoEm: '', leadStatus: r.leadStatus || '' }).catch(function(e2){ toast(errMsg(e2)); }); });
-    } catch(err){ toast(errMsg(err)); }
+    confirmarFechamento(r);
   });
+  /* Fechar contrato pede confirmação: quem fechou e a data */
+  function confirmarFechamento(r){
+    var meu = String((state.me && state.me.email) || '').toLowerCase();
+    var quem = (state.equipe || []).filter(function(u){ return u.ativo !== false && (u.cargo === 'closer' || u.cargo === 'admin'); }).sort(function(a, b){ return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
+    var f = document.createElement('div'); f.className = 'cid-sheet';
+    f.innerHTML = '<div><h3>Fechar contrato</h3><p>' + esc(r.nome) + '</p>' +
+      '<label class="mini" style="display:block;margin:6px 0 4px">Quem fechou o contrato?</label><select id="fc-quem" style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;margin-bottom:10px"><option value="">Escolha quem fechou</option>' +
+      quem.map(function(u){ return '<option value="' + esc(u.email) + '"' + (String(u.email).toLowerCase() === meu ? ' selected' : '') + '>' + esc(u.nome || u.email) + '</option>'; }).join('') + '</select>' +
+      '<label class="mini" style="display:block;margin:0 0 4px">Data do fechamento</label><input type="date" id="fc-data" value="' + iso(new Date()) + '">' +
+      '<p style="margin:0 0 10px">A cliente vai para <b>Contratos fechados</b>.</p>' +
+      '<div style="display:flex;gap:8px;justify-content:flex-end"><button type="button" class="btn" data-x>Cancelar</button><button type="button" class="btn primary" data-ok>Confirmar fechamento</button></div></div>';
+    ($('dlg').open ? $('dlg') : document.body).appendChild(f);
+    f.querySelector('[data-x]').onclick = function(){ f.remove(); };
+    f.addEventListener('click', function(e){ if (e.target === f) f.remove(); });
+    f.querySelector('[data-ok]').onclick = async function(){
+      var sel = f.querySelector('#fc-quem'), data = f.querySelector('#fc-data').value || iso(new Date());
+      if (!sel.value){ toast('Escolha quem fechou o contrato.'); sel.focus(); return; }
+      var u = (state.equipe || []).filter(function(x){ return x.email === sel.value; })[0];
+      var antes = { contratoEm: r.contratoEm || '', leadStatus: r.leadStatus || '', contratoPor: r.contratoPor || '', contratoPorEmail: r.contratoPorEmail || '' };
+      this.disabled = true;
+      try {
+        await patchRow(r.id, { contratoEm: data, leadStatus: 'fechado', contratoPor: (u && u.nome) || sel.value, contratoPorEmail: sel.value, atualizadoEm: new Date().toISOString() });
+        f.remove();
+        toast('Contrato fechado por ' + ((u && u.nome) || sel.value) + ': ' + r.nome, 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
+      } catch(err){ this.disabled = false; toast(errMsg(err)); }
+    };
+  }
   /* ---------- esconder / mostrar o menu lateral ---------- */
   (function(){
     var app = $('app'), b = $('btn-side'); if (!app || !b) return;
