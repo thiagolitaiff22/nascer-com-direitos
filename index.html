@@ -1291,7 +1291,6 @@ section.vw-dash{gap:10px!important}
 #form.novo .f-body > .field:has(#f-cpf){display:flex!important;order:2}
 #form.novo .f-body > .field:has(#f-contato){display:flex!important;order:3}
 #form.novo .f-body > .field:has(#f-cidade){display:flex!important;order:4}
-#form.novo .f-body > .field:has(#f-tipo){display:flex!important;order:5}
 #form.novo .f-body > .field:has(#f-resp){display:flex!important;order:6;grid-column:auto!important}
 #form.novo .f-body > .field:has(#f-fato){display:flex!important;order:7}
 #form.novo .f-body > .field:has(#f-crianca){display:flex!important;order:8}
@@ -3765,7 +3764,6 @@ td,.row{font-size:13px}
     if (!String(r.cpf || '').trim() || !cpfValido(r.cpf)) f.push('CPF');
     if (String(r.contato || '').replace(/\D/g, '').length < 10 && !clienteVia(r)) f.push('telefone');
     if (!cidadeCli(r)) f.push('cidade');
-    if (!r.tipoSegurada) f.push('tipo de segurada');
     if (r.fatoGerador === 'gestante' ? !r.dpp : !r.criancaNasc) f.push(r.fatoGerador === 'gestante' ? 'data prevista do parto' : 'data de nascimento da criança');
     return f;
   }
@@ -6024,7 +6022,6 @@ td,.row{font-size:13px}
       exige(cpfValido($('f-cpf').value), 'CPF válido', 'f-cpf');
       exige(String($('f-contato').value || '').replace(/\D/g, '').length >= 10, 'telefone com DDD', 'f-contato');
       exige($('f-cidade').value.trim().length >= 2, 'cidade', 'f-cidade');
-      exige(!!$('f-tipo').value, 'tipo de segurada', 'f-tipo');
       exige(gest ? !!$('f-dpp').value : !!$('f-cnasc').value, gest ? 'data prevista do parto' : 'data de nascimento da criança', gest ? 'f-dpp' : 'f-cnasc');
       if (faltaN.length){ toast('Falta preencher: ' + faltaN.join(', ') + '.'); if ($(primeiroN)) $(primeiroN).focus(); return; }
     }
