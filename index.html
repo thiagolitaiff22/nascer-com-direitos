@@ -5950,6 +5950,24 @@ td,.row{font-size:13px}
     f.querySelector('[data-x]').onclick = function(){ f.remove(); };
     f.addEventListener('click', function(e){ if (e.target === f) f.remove(); });
   }
+  /* Parceiro com pesquisa: o seletor abre uma lista com busca (a lista é grande) */
+  function escolherParceiroForm(){
+    var sel = $('f-resp'), f = document.createElement('div'); f.className = 'cid-sheet';
+    f.innerHTML = '<div><h3>Parceiro</h3><p>Quem trouxe a cliente · parceiros e prospectadores</p><input type="search" placeholder="Pesquisar pelo nome" autocomplete="off" spellcheck="false"><div class="lista"></div><div style="text-align:right;margin-top:10px"><button type="button" class="btn" data-x>Cancelar</button></div></div>';
+    (sel.closest('dialog') || document.body).appendChild(f);
+    var busca = f.querySelector('input'), box = f.querySelector('.lista');
+    var itens = [].map.call(sel.options, function(o){ return { v: o.value, n: o.textContent }; });
+    function pintar(){
+      var q = semAcento(busca.value), v = itens.filter(function(x){ return !q || !x.v || semAcento(x.n).indexOf(q) >= 0; });
+      box.innerHTML = v.length ? v.map(function(x){ return '<button type="button" data-v="' + esc(x.v) + '"' + (x.v === sel.value ? ' class="atual"' : '') + '><span>' + esc(x.n) + '</span></button>'; }).join('') : '<span class="mini">Ninguém com esse nome.</span>';
+    }
+    pintar(); setTimeout(function(){ busca.focus(); }, 50); busca.addEventListener('input', pintar);
+    box.addEventListener('click', function(e){ var b = e.target.closest('button[data-v]'); if (!b) return; sel.value = b.dataset.v; sel.dispatchEvent(new Event('change')); f.remove(); });
+    f.querySelector('[data-x]').onclick = function(){ f.remove(); };
+    f.addEventListener('click', function(e){ if (e.target === f) f.remove(); });
+  }
+  $('f-resp').addEventListener('mousedown', function(e){ e.preventDefault(); escolherParceiroForm(); });
+  $('f-resp').addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown'){ e.preventDefault(); escolherParceiroForm(); } });
   $('f-uf').addEventListener('change', function(){ $('f-uf-flag').innerHTML = flagUfImg(this.value); if (this.dataset.ant && this.dataset.ant !== this.value) $('f-cidade').value = ''; this.dataset.ant = this.value; pintarBandeiraCidade(); if (this.value) carregarBandeiras(this.value); });
   $('f-cidade').addEventListener('click', escolherCidadeForm);
   $('f-cidade').addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); escolherCidadeForm(); } });
