@@ -3330,8 +3330,9 @@ td,.row{font-size:13px}
     var crianca = r.fatoGerador === 'gestante' ? 'Gestante' + (r.dpp ? ' · parto previsto para ' + fmtDate(r.dpp) : '') : [r.crianca, r.criancaNasc ? (r.fatoGerador && r.fatoGerador !== 'parto' ? (FATOS[r.fatoGerador] || '') + ' em ' : 'nasceu em ') + fmtDate(r.criancaNasc) : ''].filter(Boolean).join(' · ');
     var inss = [r.inssStatus && INSS[r.inssStatus] ? INSS[r.inssStatus][0] : '', r.der ? 'DER ' + fmtDate(r.der) : '', r.protocoloInss ? 'protocolo ' + r.protocoloInss : '', r.nb ? 'NB ' + r.nb : ''].filter(Boolean).join(' · ');
     var campos = [
-      ['Nome completo', r.nome], ['CPF', r.cpf], ['RG', r.rg || (r.cpf ? r.cpf + ' (mesmo número do CPF)' : '')], ['Nascimento', r.nascimento ? fmtDate(r.nascimento) : ''],
-      ['NIT / PIS', r.nit], ['Telefone', contato], ['Endereço', r.endereco], ['Parceiro', prospName(r.responsavelId)],
+      // os mesmos dados que o aplicativo coleta; RG, NIT, nascimento da mãe e endereço só aparecem se alguém preencheu
+      ['Nome completo', r.nome], ['CPF', r.cpf], ['Telefone', contato], ['Cidade', cidadeCli(r)], ['Parceiro', prospName(r.responsavelId)],
+      ['RG', r.rg ? r.rg : null], ['Nascimento', r.nascimento ? fmtDate(r.nascimento) : null], ['NIT / PIS', r.nit ? r.nit : null], ['Endereço', r.endereco ? r.endereco : null],
       ['Tipo de segurada', (TIPOS[r.tipoSegurada] || '') + (r.atividade ? (r.tipoSegurada ? ' · ' : '') + r.atividade : '')], ['Criança', crianca],
       ['Testemunhas', r.tipoSegurada === 'especial' || r.testemunhas ? r.testemunhas : null],
       ['INSS', inss], ['Exigência', r.inssStatus === 'exigencia' ? (r.exigenciaObs || 'sem descrição') + (r.exigenciaPrazo ? ' · prazo ' + fmtDate(r.exigenciaPrazo) : '') : null],
@@ -3341,7 +3342,7 @@ td,.row{font-size:13px}
       ['Aviso', aviso], ['Resultado', res],
       ['Pagamento', r.pagamento && PAG[r.pagamento] ? PAG[r.pagamento][0] : ''], ['Observações', r.obs]
     ].filter(function(c){ return c[1] !== null; });
-    if (compacto) campos = campos.filter(function(c){ return ['Nome completo', 'CPF', 'RG', 'Nascimento', 'NIT / PIS', 'Telefone', 'Endereço', 'Parceiro', 'Tipo de segurada', 'Criança', 'Testemunhas', 'Observações'].indexOf(c[0]) >= 0; });
+    if (compacto) campos = campos.filter(function(c){ return ['Nome completo', 'CPF', 'RG', 'Nascimento', 'NIT / PIS', 'Telefone', 'Cidade', 'Endereço', 'Parceiro', 'Tipo de segurada', 'Criança', 'Testemunhas', 'Observações'].indexOf(c[0]) >= 0; });
     var fl = faltaDocs(r);
     var ok = '<i class="fc-ok"><svg class="i"><use href="#i-check"/></svg></i>', nada = '<i class="fc-nao">–</i>';
     var fotoOk = /^data:image\/(jpeg|png);base64,/.test(r.fotoCliente || '');
@@ -3760,10 +3761,12 @@ td,.row{font-size:13px}
   /* Cadastro: clientes ainda sem protocolo */
   var cadQ = '', cadSit = '', cadAberto = {};
   // o que falta preencher para requerer: CPF válido, endereço, tipo de segurada e a data do nascimento (ou a data prevista do parto)
+  function cidadeCli(r){ var p = r.responsavelId && prospById(r.responsavelId); return String(r.cidade || (p && p.regiao) || '').trim(); }
   function dadosFaltando(r){
     var f = [];
     if (!String(r.cpf || '').trim() || !cpfValido(r.cpf)) f.push('CPF');
-    if (!String(r.endereco || '').trim()) f.push('endereço');
+    if (String(r.contato || '').replace(/\D/g, '').length < 10 && !clienteVia(r)) f.push('telefone');
+    if (!cidadeCli(r)) f.push('cidade');
     if (!r.tipoSegurada) f.push('tipo de segurada');
     if (r.fatoGerador === 'gestante' ? !r.dpp : !r.criancaNasc) f.push(r.fatoGerador === 'gestante' ? 'data prevista do parto' : 'data de nascimento da criança');
     return f;
