@@ -5977,7 +5977,8 @@ td,.row{font-size:13px}
     $('f-hora').value = r ? r.audHora || '' : '';
     $('f-online').checked = !!(r && r.online);
     $('f-situacao').value = r ? sit(r) : 'pendente';
-    $('f-resp').innerHTML = '<option value="">Sem parceiro</option>' + soParceiros().map(function(p){ return '<option value="' + esc(p.id) + '">' + esc(p.nome) + '</option>'; }).join('');
+    // parceiros e prospectadores (função híbrida: o prospectador também cadastra mães)
+    $('f-resp').innerHTML = '<option value="">Sem parceiro</option>' + state.prosp.filter(function(p){ return p.ativo !== false; }).slice().sort(function(x, y){ return String(x.nome || '').localeCompare(String(y.nome || ''), 'pt'); }).map(function(p){ return '<option value="' + esc(p.id) + '">' + esc(p.nome) + (ehProspectador(p) ? ' (prospectador)' : '') + '</option>'; }).join('');
     $('f-resp').value = r && prospById(r.responsavelId) ? r.responsavelId : '';
     $('f-aviso-resp').innerHTML = '<option value="">O próprio parceiro</option>' + soParceiros().map(function(p){ return '<option value="' + esc(p.id) + '">' + esc(p.nome) + '</option>'; }).join('');
     $('f-aviso-resp').value = r && prospById(r.avisoRespId) ? r.avisoRespId : '';
