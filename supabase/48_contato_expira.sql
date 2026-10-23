@@ -1,4 +1,4 @@
--- Prazo de 10 minutos para o closer: cliente "Em contato" que não muda de situação volta ao Novo lead (fila),
+-- Prazo (15 minutos, definido pelo BI em contatoPrazoEm) para o closer: cliente "Em contato" que não muda de situação volta ao Novo lead (fila),
 -- e o closer recebe uma penalidade de 50% registrada na própria cliente (campo "penalidades"). Roda a cada minuto. Pode rodar de novo.
 create extension if not exists pg_cron with schema pg_catalog;
 

@@ -3408,7 +3408,7 @@ td,.row{font-size:13px}
       // os mesmos dados que o aplicativo coleta; RG, NIT, nascimento da mãe e endereço só aparecem se alguém preencheu
       ['Nome completo', r.nome], ['CPF', r.cpf], ['Telefone', contato], ['Cidade', cidadeCli(r)], ['Parceiro', prospName(r.responsavelId)],
       ['RG', r.rg ? r.rg : null], ['Nascimento', r.nascimento ? fmtDate(r.nascimento) : null], ['NIT / PIS', r.nit ? r.nit : null], ['Endereço', r.endereco ? r.endereco : null],
-      ['Criança', crianca],
+      ['Fechamento', r.contratoEm ? 'fechado' + (r.contratoPor ? ' por ' + r.contratoPor : '') + ' em ' + fmtDate(String(r.contratoEm).slice(0, 10)) + (r.propostaAceita ? ' · proposta aceita' + (r.propostaObs ? ' (' + r.propostaObs + ')' : '') : '') : null], ['Criança', crianca],
       ['Testemunhas', r.tipoSegurada === 'especial' || r.testemunhas ? r.testemunhas : null],
       ['INSS', inss], ['Exigência', r.inssStatus === 'exigencia' ? (r.exigenciaObs || 'sem descrição') + (r.exigenciaPrazo ? ' · prazo ' + fmtDate(r.exigenciaPrazo) : '') : null],
       ['Motivo do indeferimento', r.inssStatus === 'indeferido' ? r.motivoIndeferimento : null],
@@ -3417,7 +3417,7 @@ td,.row{font-size:13px}
       ['Aviso', aviso], ['Resultado', res],
       ['Pagamento', r.pagamento && PAG[r.pagamento] ? PAG[r.pagamento][0] : ''], ['Penalidades', penalidadesTxt(r)], ['Observações', obsDaEquipe(r)]
     ].filter(function(c){ return c[1] !== null; });
-    if (compacto) campos = campos.filter(function(c){ return ['Nome completo', 'CPF', 'RG', 'Nascimento', 'NIT / PIS', 'Telefone', 'Cidade', 'Endereço', 'Parceiro', 'Criança', 'Testemunhas', 'Penalidades', 'Observações'].indexOf(c[0]) >= 0; });
+    if (compacto) campos = campos.filter(function(c){ return ['Nome completo', 'CPF', 'RG', 'Nascimento', 'NIT / PIS', 'Telefone', 'Cidade', 'Endereço', 'Parceiro', 'Fechamento', 'Criança', 'Testemunhas', 'Penalidades', 'Observações'].indexOf(c[0]) >= 0; });
     var fl = faltaDocs(r);
     var ok = '<i class="fc-ok"><svg class="i"><use href="#i-check"/></svg></i>', nada = '<i class="fc-nao">–</i>';
     var fotoOk = /^data:image\/(jpeg|png);base64,/.test(r.fotoCliente || '');
@@ -4092,8 +4092,8 @@ td,.row{font-size:13px}
   // regras automáticas: 3 tentativas sem atender = sem resposta; em contato há mais de 3 dias = sem resposta;
   // sem resposta há mais de 15 dias = perdido; "retornar depois" volta para "novo lead" na data marcada
   var LEAD_TENTATIVAS = 3, LEAD_DIAS_CONTATO = 3, LEAD_DIAS_PERDIDO = 15;
-  // Em contato: o closer tem 10 minutos para mudar a situação; senão volta ao Novo lead (fila) e leva penalidade de 50% (o servidor faz a volta a cada minuto)
-  var CONTATO_PRAZO_MIN = 10;
+  // Em contato: o closer tem 15 minutos para mudar a situação; senão volta ao Novo lead (fila) e leva penalidade de 50% (o servidor faz a volta a cada minuto)
+  var CONTATO_PRAZO_MIN = 15;
   function prazoContato(){
     var email = (state.me && state.me.email) || '', u = (state.equipe || []).filter(function(x){ return String(x.email).toLowerCase() === String(email).toLowerCase(); })[0];
     return { contatoPrazoEm: new Date(Date.now() + CONTATO_PRAZO_MIN * 60000).toISOString(), contatoCloser: (u && u.nome) || email, contatoCloserEmail: email };
@@ -4101,7 +4101,7 @@ td,.row{font-size:13px}
   function contadorContato(r){
     if (r.leadStatus !== 'contato' || !r.contatoPrazoEm) return '';
     var ms = new Date(r.contatoPrazoEm).getTime() - Date.now(); if (isNaN(ms)) return '';
-    return '<span class="cd-timer' + (ms < 120000 ? ' crit' : '') + '" data-ate="' + esc(r.contatoPrazoEm) + '" title="Se a situação não mudar até o fim do prazo, a cliente volta para a fila e o closer leva penalidade de 50%">' + fmtContador(ms) + '</span>';
+    return '<span class="cd-timer' + (ms < 120000 ? ' crit' : '') + '" data-ate="' + esc(r.contatoPrazoEm) + '" title="Se a situação não mudar até o fim do prazo (15 minutos), a cliente volta para a fila e o closer leva penalidade de 50%">' + fmtContador(ms) + '</span>';
   }
   function fmtContador(ms){ if (ms <= 0) return 'voltando à fila…'; var s = Math.ceil(ms / 1000), m = Math.floor(s / 60); s = s % 60; return m + ':' + (s < 10 ? '0' : '') + s; }
   setInterval(function(){
@@ -4391,29 +4391,37 @@ td,.row{font-size:13px}
   /* Fechar contrato pede confirmação: quem fechou e a data */
   function confirmarFechamento(r){
     var meu = String((state.me && state.me.email) || '').toLowerCase();
-    var quem = (state.equipe || []).filter(function(u){ return u.ativo !== false && (u.cargo === 'closer' || u.cargo === 'admin'); }).sort(function(a, b){ return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
+    var quem = (state.equipe || []).filter(function(u){ return u.ativo !== false && u.email; }).sort(function(a, b){ return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
     var f = document.createElement('div'); f.className = 'cid-sheet';
     f.innerHTML = '<div><h3>Fechar contrato</h3><p>' + esc(r.nome) + '</p>' +
-      '<label class="mini" style="display:block;margin:6px 0 4px">Quem fechou o contrato?</label><select id="fc-quem" style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;margin-bottom:10px"><option value="">Escolha quem fechou</option>' +
-      quem.map(function(u){ return '<option value="' + esc(u.email) + '"' + (String(u.email).toLowerCase() === meu ? ' selected' : '') + '>' + esc(u.nome || u.email) + '</option>'; }).join('') + '</select>' +
+      '<label class="mini" style="display:block;margin:6px 0 4px">Atendente que fez o fechamento</label><select id="fc-quem" style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;margin-bottom:10px"><option value="">Escolha a atendente</option>' +
+      quem.map(function(u){ return '<option value="' + esc(u.email) + '"' + (String(u.email).toLowerCase() === meu ? ' selected' : '') + '>' + esc(u.nome || u.email) + '</option>'; }).join('') + '<option value="__outra">Outra atendente (digitar o nome)</option></select>' +
+      '<input id="fc-outra" placeholder="Nome da atendente" hidden style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;margin:-4px 0 10px">' +
       '<label class="mini" style="display:block;margin:0 0 4px">A criança</label><select id="fc-fato" style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;margin-bottom:10px"><option value="gestante"' + (r.fatoGerador === 'gestante' ? ' selected' : '') + '>Ainda gestante</option><option value="parto"' + (r.fatoGerador !== 'gestante' ? ' selected' : '') + '>Já nasceu (cobrar documentação rural)</option></select>' +
       '<label class="mini" style="display:block;margin:0 0 4px">Data do fechamento</label><input type="date" id="fc-data" value="' + iso(new Date()) + '">' +
-      '<p style="margin:0 0 10px">A cliente vai para <b>Contratos fechados</b>.</p>' +
+      '<label style="display:flex;gap:10px;align-items:flex-start;margin:0 0 6px;font-size:14px;line-height:1.35"><input type="checkbox" id="fc-aceita" style="margin-top:3px;width:18px;height:18px;flex:none"><span><b>A cliente aceitou a proposta</b><br><span class="mini">Marque somente se ela aceitou a proposta na ligação.</span></span></label>' +
+      '<input id="fc-prop" placeholder="Detalhe da proposta aceita (opcional)" style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;margin:0 0 12px">' +
+      '<p style="margin:0 0 10px">A cliente vai para o <b>Pós-venda</b>.</p>' +
       '<div style="display:flex;gap:8px;justify-content:flex-end"><button type="button" class="btn" data-x>Cancelar</button><button type="button" class="btn primary" data-ok>Confirmar fechamento</button></div></div>';
     ($('dlg').open ? $('dlg') : document.body).appendChild(f);
     f.querySelector('[data-x]').onclick = function(){ f.remove(); };
     f.addEventListener('click', function(e){ if (e.target === f) f.remove(); });
+    f.querySelector('#fc-quem').addEventListener('change', function(){ var o = f.querySelector('#fc-outra'); o.hidden = this.value !== '__outra'; if (!o.hidden) o.focus(); });
     f.querySelector('[data-ok]').onclick = async function(){
       var sel = f.querySelector('#fc-quem'), data = f.querySelector('#fc-data').value || iso(new Date());
-      if (!sel.value){ toast('Escolha quem fechou o contrato.'); sel.focus(); return; }
+      if (!sel.value){ toast('Escolha a atendente que fez o fechamento.'); sel.focus(); return; }
+      var nomeOutra = f.querySelector('#fc-outra').value.trim();
+      if (sel.value === '__outra' && nomeOutra.length < 3){ toast('Digite o nome da atendente.'); f.querySelector('#fc-outra').focus(); return; }
+      if (!f.querySelector('#fc-aceita').checked){ toast('Marque que a cliente aceitou a proposta para fechar o contrato.'); return; }
       var u = (state.equipe || []).filter(function(x){ return x.email === sel.value; })[0];
+      var atendente = sel.value === '__outra' ? nomeOutra : ((u && u.nome) || sel.value), atendenteEmail = sel.value === '__outra' ? '' : sel.value;
       var fatoNovo = f.querySelector('#fc-fato').value === 'gestante' ? 'gestante' : (r.fatoGerador && r.fatoGerador !== 'gestante' ? r.fatoGerador : 'parto');
-      var antes = { contratoEm: r.contratoEm || '', leadStatus: r.leadStatus || '', contratoPor: r.contratoPor || '', contratoPorEmail: r.contratoPorEmail || '', fatoGerador: r.fatoGerador || '', posEtapa: r.posEtapa || '' };
+      var antes = { contratoEm: r.contratoEm || '', leadStatus: r.leadStatus || '', contratoPor: r.contratoPor || '', contratoPorEmail: r.contratoPorEmail || '', fatoGerador: r.fatoGerador || '', posEtapa: r.posEtapa || '', propostaAceita: !!r.propostaAceita, propostaObs: r.propostaObs || '' };
       this.disabled = true;
       try {
-        await patchRow(r.id, { contratoEm: data, leadStatus: 'fechado', contratoPor: (u && u.nome) || sel.value, contratoPorEmail: sel.value, fatoGerador: fatoNovo, posEtapa: '', contatoPrazoEm: '', atualizadoEm: new Date().toISOString() });
+        await patchRow(r.id, { contratoEm: data, leadStatus: 'fechado', contratoPor: atendente, contratoPorEmail: atendenteEmail, propostaAceita: true, propostaObs: f.querySelector('#fc-prop').value.trim(), fatoGerador: fatoNovo, posEtapa: '', contatoPrazoEm: '', atualizadoEm: new Date().toISOString() });
         f.remove();
-        toast('Contrato fechado por ' + ((u && u.nome) || sel.value) + ': ' + r.nome + ' · foi para o Pós-venda', 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
+        toast('Contrato fechado por ' + atendente + ': ' + r.nome + ' · foi para o Pós-venda', 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
       } catch(err){ this.disabled = false; toast(errMsg(err)); }
     };
   }
