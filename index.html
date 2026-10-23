@@ -1237,6 +1237,7 @@ section.vw-dash{gap:10px!important}
 .pv-ic select{max-width:120px;padding:4px 6px;border-radius:8px;border:1px solid var(--line-2);background:var(--soft);color:inherit;font:inherit;font-size:12px}
 .cd-timer{display:inline-block;margin-left:8px;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums;background:rgba(120,140,200,.18);color:#4a66c4;border:1px solid rgba(120,140,200,.45);white-space:nowrap}
 .cd-timer.crit{background:rgba(220,60,50,.16);color:#c0362c;border-color:rgba(220,60,50,.5)}
+.nasc-tag{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:700;background:var(--hover);color:var(--ink-2);border:1px solid var(--line-2)}
 .prio-tag{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:800;letter-spacing:.02em;background:rgba(224,160,40,.2);color:#9a6a00;border:1px solid rgba(224,160,40,.5)}
 .prio-tag.crit{background:rgba(220,60,50,.16);color:#c0362c;border-color:rgba(220,60,50,.5)}
 @media (max-width:900px){ .cad-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important} }
@@ -4137,8 +4138,8 @@ td,.row{font-size:13px}
   function noContratos(r){ return fechado(r) && !regularizada(r); }
   // prioridade do closer: gestante com parto até 30 dias (ou que já passou): depois de nascer a mãe perde a chance
   var PRIORIDADE_DIAS = 30;
-  function prioridadeNasc(r){ if (r.fatoGerador !== 'gestante' || r.criancaNasc || !r.dpp) return null; var n = daysUntil(r.dpp); return n != null && n <= PRIORIDADE_DIAS ? n : null; }
-  function tagPrioridade(r){ var n = prioridadeNasc(r); if (n == null) return ''; return '<span class="prio-tag' + (n <= 7 ? ' crit' : '') + '" title="Fechar o contrato antes de o bebê nascer">' + (n < 0 ? 'PRIORIDADE · parto previsto passou há ' + (-n) + ' dias' : n === 0 ? 'PRIORIDADE · parto previsto é hoje' : 'PRIORIDADE · parto em ' + n + (n === 1 ? ' dia' : ' dias')) + '</span>'; }
+  function prioridadeNasc(r){ if (r.fatoGerador !== 'gestante' || r.criancaNasc || !r.dpp) return null; var n = daysUntil(r.dpp); return n != null && n >= 0 && n <= PRIORIDADE_DIAS ? n : null; }   // só parto que ainda vai acontecer; depois de nascer não é prioridade
+  function tagPrioridade(r){ var n = prioridadeNasc(r); if (n == null){ var d = (r.fatoGerador === 'gestante' && !r.criancaNasc && r.dpp) ? daysUntil(r.dpp) : null; return d != null && d < 0 ? '<span class="nasc-tag" title="A data prevista do parto passou: confirmar se o bebê já nasceu e atualizar o cadastro">Parto previsto passou há ' + (-d) + (d === -1 ? ' dia' : ' dias') + ' · bebê já nasceu?</span>' : ''; } return '<span class="prio-tag' + (n <= 7 ? ' crit' : '') + '" title="Fechar o contrato antes de o bebê nascer">' + (n < 0 ? 'PRIORIDADE · parto previsto passou há ' + (-n) + ' dias' : n === 0 ? 'PRIORIDADE · parto previsto é hoje' : 'PRIORIDADE · parto em ' + n + (n === 1 ? ' dia' : ' dias')) + '</span>'; }
   function etapaCtr(r){ return 'regularizar'; }
   // guia da contribuição: aguardando pagamento ou paga (controle em Contratos fechados)
   function guiaDe(r){ return r.guiaStatus === 'paga' ? 'paga' : 'aguardando'; }
