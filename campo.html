@@ -898,7 +898,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 57;
+  var APP_VERSAO = 58;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1217,16 +1217,19 @@ button,a,label,[role=button]{touch-action:manipulation}
       '<div class="pm-rot">Suas captações</div>' +
       '<div class="gn-res"><span><b>' + r.total + '</b>mães enviadas</span><span><b>' + r.and + '</b>em andamento</span><span><b>' + r.ok + '</b>deram certo</span></div>' +
       '<div class="pm-acoes"><button type="button" class="pm-btn" data-ir="novo">+&nbsp; Cadastrar uma mãe</button>' + (r.total ? '<button type="button" class="pm-btn pm-ghost" data-ir="maes">Ver minhas mães</button>' : '') + '</div>' +
+      (maesDaRede().length ? '<button type="button" class="pm-btn pm-ghost" data-maes-rede style="margin-top:10px;width:100%">Ver as mães dos meus parceiros · ' + maesDaRede().length + '</button>' : '') +
       '<div class="pm-rot">Seus parceiros' + (l.length ? ' · ' + l.length : '') + '</div>' +
       (l.length ? '<div class="pm-lista">' + l.slice(0, 6).map(linhaParc).join('') + '</div>' + (l.length > 6 ? '<button type="button" class="pm-mais" data-ir="clientes">Ver todos os ' + l.length + ' parceiros</button>' : '')
                 : '<div class="pm-vazio"><b>Sua rede começa aqui</b>Toque no <b style="display:inline;font-size:inherit">+</b> para cadastrar o primeiro parceiro.</div>');
     $('vista').onclick = function(e){
+      if (e.target.closest('[data-maes-rede]')) return telaMaesRede();
       var ir = e.target.closest('[data-ir]'); if (ir) return irPara(ir.dataset.ir);
       var p = e.target.closest('[data-parc]'); if (p) return fichaParceiro(p.dataset.parc);
     };
     avisoFila(); depoisDoInicio();
   }
   var buscaParc = '';
+  (function(){ var s = document.createElement('style'); s.textContent = '.mr-rot{margin:14px 0 6px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}.mr-lista{max-height:42vh;overflow-y:auto;display:flex;flex-direction:column;gap:6px;text-align:left}.mr-lin{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;background:var(--card);border:1px solid var(--line2)}.mr-n{display:flex;flex-direction:column;min-width:0}.mr-n b{font-size:14.5px}.mr-n small{font-size:12px;color:var(--ink2)}.mr-s{flex:none;font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:999px;background:var(--line2);color:var(--ink2)}.mr-s.ok{background:rgba(34,139,84,.16);color:#1f8a54}.mr-s.an{background:rgba(201,164,104,.22);color:#8c6a38}.mr-s.no{background:rgba(160,160,160,.2)}.mr-busca{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--line2);background:var(--card);color:var(--ink);font:inherit;margin:8px 0 10px}.mr-vazio{text-align:center;color:var(--ink2)}'; document.head.appendChild(s); })();
   function vistaProspLista(){
     var l = listaProsp();
     $('vista').innerHTML =
@@ -1478,12 +1481,27 @@ button,a,label,[role=button]{touch-action:manipulation}
       }).catch(function(){ b.disabled = false; b.textContent = 'Salvar'; alert('Sem internet agora. Tente de novo.'); });
     };
   }
+  function etapaMae(m){ return m.desqualificada ? ['Não seguiu', 'no'] : m.liberada ? ['Benefício liberado', 'ok'] : m.confirmada ? ['Mãe confirmada', 'ok'] : ['Em análise', 'an']; }
+  function linhaMae(m, comParceiro){
+    var e = etapaMae(m), falta = Array.isArray(m.faltaDocs) && m.faltaDocs.length;
+    return '<div class="mr-lin"><div class="mr-n"><b>' + esc(bonito(m.nome || 'Sem nome')) + '</b><small>' + (comParceiro && m.parceiro ? 'indicada por ' + esc(bonito(m.parceiro)) + ' · ' : '') + (m.cadastro ? 'cadastrada em ' + esc(isoParaBr(m.cadastro)) : '') + (falta ? ' · falta documento' : '') + '</small></div><span class="mr-s ' + e[1] + '">' + e[0] + '</span></div>';
+  }
+  function maesDaRede(){ var l = []; listaProsp().forEach(function(p){ (p.maes || []).forEach(function(m){ l.push(Object.assign({ parceiro: nomeParc(p) }, m)); }); }); l.sort(function(a, b){ return String(b.cadastro || '').localeCompare(String(a.cadastro || '')); }); return l; }
+  function telaMaesRede(){
+    var todas = maesDaRede();
+    var t = tela('<b>Mães dos seus parceiros</b><p>' + todas.length + (todas.length === 1 ? ' mãe indicada' : ' mães indicadas') + '</p><input class="mr-busca" type="search" placeholder="Buscar pelo nome" autocomplete="off"><div class="mr-lista"></div><button class="sec2" id="t-fecha">Fechar</button>');
+    var box = t.querySelector('.mr-lista'), q = t.querySelector('.mr-busca');
+    function pintar(){ var s = semAcento(q.value), v = todas.filter(function(m){ return !s || semAcento((m.nome || '') + ' ' + (m.parceiro || '')).indexOf(s) >= 0; }); box.innerHTML = v.length ? v.map(function(m){ return linhaMae(m, true); }).join('') : '<p class="mr-vazio">Nenhuma mãe encontrada.</p>'; }
+    pintar(); q.addEventListener('input', pintar);
+    t.querySelector('#t-fecha').onclick = function(){ t.remove(); };
+  }
   function fichaParceiro(id){
     var x = listaProsp().filter(function(p){ return p.id === id; })[0]; if (!x) return;
     var t = tela('<b>' + esc(nomeParc(x)) + '</b><p>' + esc(x.tipo === 'clinica' ? 'Clínica · ' + bonito(x.nome) : 'Parceiro') + (x.cidade ? ' · <img class="cid-flag mini" data-cid="' + esc(bonito(x.cidade)) + '" alt="" hidden> ' + esc(bonito(x.cidade)) : '') + '</p>' +
       '<div class="acesso-caixa"><span>Usuário</span><b>' + esc(x.usuario || '—') + '</b><span>Situação</span><b>' + (x.ativo === false ? 'Acesso bloqueado' : 'Ativo') + '</b>' +
       '<span>Ganhos</span><b>' + (x.ganho === false ? 'Sem ganhos' : (Number(x.comConf) || Number(x.comLib) ? reaisCurto(x.comConf) + ' + ' + reaisCurto(x.comLib) : 'sem valor definido')) + '</b>' +
       '<span>Indicações</span><b>' + (+x.indicacoes || 0) + '</b><span>Contratos</span><b>' + (+x.contratos || 0) + '</b><span>Concedidos</span><b>' + (+x.concedidos || 0) + '</b></div>' +
+      ((x.maes || []).length ? '<div class="mr-rot">Mães indicadas</div><div class="mr-lista">' + x.maes.map(function(m){ return linhaMae(m, false); }).join('') + '</div>' : '') +
       '<button id="t-ganho">Editar os ganhos deste parceiro</button><button class="sec2" id="t-senha">Gerar nova senha e mandar</button>' + (x.telefone ? '<button class="sec2" id="t-ligar">Ligar para o parceiro</button>' : '') +
       '<button class="sec2" id="t-ativo">' + (x.ativo === false ? 'Liberar o acesso' : 'Bloquear o acesso') + '</button><button class="sec2" id="t-fecha">Fechar</button>');
     t.querySelector('#t-fecha').onclick = function(){ t.remove(); };
