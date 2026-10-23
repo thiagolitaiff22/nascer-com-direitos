@@ -313,15 +313,8 @@ function tentarParceiro(cpf, senha){
       S.prosp = r[0]; S.cli = r[1];
       var l = r[2] && r[2].data && r[2].data.data && r[2].data.data.lista;
       S.regioes = Array.isArray(l) && l.length ? l : ESTADOS_PADRAO;
-      // gestor de um estado (ou mais): vê e gere só a região dele; os outros estados ficam no sistema completo (BI)
-      if (S.estados && S.estados.length){
-        S.regioes = S.regioes.filter(function(g){ return S.estados.indexOf(g.id) >= 0; });
-        S.prosp = S.prosp.filter(function(p){ return S.estados.indexOf(p.regiaoId) >= 0; });
-        var idsReg = {}; S.prosp.forEach(function(p){ idsReg[p.id] = 1; });
-        S.cli = S.cli.filter(function(c){ return idsReg[c.responsavelId]; });
-        var nomesEst = S.regioes.map(function(g){ return g.nome; }).join(', ');
-        $('q-nome').title = 'Gestor de ' + nomesEst;
-      }
+      // o gestor de qualquer estado vê e cadastra prospectador e parceiro em qualquer estado e cidade (sem trava por estado)
+      if (S.estados && S.estados.length){ $('q-nome').title = 'Gestor de ' + S.regioes.filter(function(g){ return S.estados.indexOf(g.id) >= 0; }).map(function(g){ return g.nome; }).join(', '); }
       desenhar();
     } catch(e){ toast('Não foi possível carregar agora.'); }
     $('b-atualizar').disabled = false;
@@ -352,7 +345,7 @@ function tentarParceiro(cpf, senha){
   function desenhar(){
     Array.prototype.forEach.call($('abas').children, function(b){ b.setAttribute('aria-selected', b.dataset.aba === S.aba ? 'true' : 'false'); });
     $('fab').classList.toggle('hidden', S.aba === 'docs' || S.aba === 'painel');
-    var rotEst = S.estados && S.estados.length ? ' · ' + S.regioes.map(function(g){ return g.nome; }).join(', ') : '';
+    var rotEst = '';
     $('q-sub').textContent = (S.aba === 'painel' ? 'Desempenho da rede' : S.aba === 'rede' ? 'Rede de indicação' : S.aba === 'parceiros' ? 'Parceiros e prospectadores' : 'Documentação dos clientes') + rotEst;
     if (S.aba === 'painel') return telaPainel();
     if (S.aba === 'rede') return telaRede();
