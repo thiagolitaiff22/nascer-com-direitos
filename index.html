@@ -3429,6 +3429,7 @@ td,.row{font-size:13px}
       '<div class="docs-app"><b>Documentos juntados no app</b><div class="docs-chips">' + docsApp(r).map(function(x){ return '<span class="doc-chip ' + (x.ok ? 'ok' : 'no') + '">' + (x.ok ? '✓' : '–') + ' ' + esc(x.n) + '</span>'; }).join('') + '</div>' +
         (fl.length ? '<div class="docs-recebi"><span>Faltam: ' + esc(faltaTexto(r)) + '. Se chegou por outro meio, marque como recebido:</span><div>' + fl.map(function(k){ return '<button type="button" class="btn" data-act="recebido" data-id="' + esc(r.id) + '" data-doc="' + k + '"><svg class="i"><use href="#i-check"/></svg>Recebi ' + DOC_FALTA[k] + '</button>'; }).join('') + '</div></div>' : '') + '</div>' +
       '<div class="ficha-acoes"><button type="button" class="btn" data-act="edit" data-id="' + esc(r.id) + '"><svg class="i"><use href="#i-pencil"/></svg>Editar cadastro</button>' +
+      (fechado(r) ? '<button type="button" class="btn" data-act="voltar-cad" data-id="' + esc(r.id) + '" title="Desfaz o fechamento do contrato">↩ Voltar ao Cadastro</button>' : '') +
       (r.pastaUrl ? '<a class="btn" style="text-decoration:none" href="' + esc(r.pastaUrl) + '" target="_blank" rel="noopener"><svg class="i"><use href="#i-folder"/></svg>Pasta no Drive</a>' : '') +
       '</div></div>';
   }
@@ -3451,6 +3452,8 @@ td,.row{font-size:13px}
     pintarCard();
     el.addEventListener('click', function(e){
       if (e.target === el || e.target.closest('[data-fc-x]')){ fecharCard(); return; }
+      var bv = e.target.closest('[data-act="voltar-cad"]');
+      if (bv){ var idv = cardAberto.id; fecharCard(); voltarCadastro(idv); return; }
       var b = e.target.closest('[data-act="edit"]');
       if (b){ var rr = acharRow(cardAberto.id); var cp = cardAberto.compacto; fecharCard(); if (rr) openForm(rr, false, cp); }
     });
@@ -4184,7 +4187,7 @@ td,.row{font-size:13px}
       '<div class="pv-pe"><span class="pv-av" title="' + esc(r.contratoPor ? 'Fechou: ' + r.contratoPor : 'Sem closer registrado') + '">' + esc(iniciais(r.contratoPor || prospName(r.responsavelId))) + '</span>' +
       '<span class="pv-ic">' + (r.pastaUrl ? '<a href="' + esc(r.pastaUrl) + '" target="_blank" rel="noopener" title="Pasta no Drive" onclick="event.stopPropagation()"><svg class="i"><use href="#i-folder"/></svg></a>' : '') +
       (docs.length - ok ? '<span class="pv-pend" title="Faltam: ' + esc(docs.filter(function(x){ return !x.ok; }).map(function(x){ return x.n; }).join(', ')) + '"><svg class="i"><use href="#i-bellx"/></svg></span>' : '') +
-      '<select data-pos="' + esc(r.id) + '" aria-label="Mover ' + esc(r.nome) + '" title="Mover para outra coluna">' + cols.map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === et ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '</select></span></div></div>';
+      '<select data-pos="' + esc(r.id) + '" aria-label="Mover ' + esc(r.nome) + '" title="Mover para outra coluna">' + cols.map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === et ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '<option value="__cad">↩ Voltar ao Cadastro</option></select></span></div></div>';
   }
   function renderContratos(){
     var box = $('ctr-list'); if (!box) return;
@@ -4216,7 +4219,18 @@ td,.row{font-size:13px}
   }
   $('pv-lane').addEventListener('click', function(e){ var bt = e.target.closest('button[data-l]'); if (!bt) return; pvLane = bt.dataset.l; renderContratos(); });
   $('pv-atr').addEventListener('click', function(){ pvAtr = !pvAtr; renderContratos(); });
+  async function voltarCadastro(id){
+    var r = acharRow(id); if (!r) return;
+    if (!window.confirm('Voltar ' + (r.nome || 'a cliente') + ' para o Cadastro?\n\nO fechamento do contrato será desfeito e ela volta como Novo lead.')) return;
+    var antes = { contratoEm: r.contratoEm || '', leadStatus: r.leadStatus || '', posEtapa: r.posEtapa || '', propostaAceita: !!r.propostaAceita, propostaObs: r.propostaObs || '', contratoPor: r.contratoPor || '', contratoPorEmail: r.contratoPorEmail || '', certidaoRecebida: !!r.certidaoRecebida };
+    var ag = new Date().toISOString();
+    try {
+      await patchRow(id, { contratoEm: '', leadStatus: 'novo', posEtapa: '', propostaAceita: false, propostaObs: '', contratoPor: '', contratoPorEmail: '', certidaoRecebida: false, contatoPrazoEm: '', tentativas: 0, leadMudouEm: ag, voltouAoCadastroEm: ag, atualizadoEm: ag });
+      toast((r.nome || 'Cliente') + ' voltou para o Cadastro', 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
+    } catch(err){ toast(errMsg(err)); render(); }
+  }
   async function moverPos(id, etapa){
+    if (etapa === '__cad'){ voltarCadastro(id); render(); return; }
     var r = acharRow(id); if (!r) return;
     var antes = { posEtapa: r.posEtapa || '', penalidades: Array.isArray(r.penalidades) ? r.penalidades : [] };
     var mudanca = { posEtapa: etapa, posMudouEm: new Date().toISOString(), atualizadoEm: new Date().toISOString() };
