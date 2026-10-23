@@ -3918,7 +3918,7 @@ td,.row{font-size:13px}
       var aviso = !docsOk || incompleto ? '<span class="cad-ponto" title="' + esc((!docsOk ? 'Documentos pendentes' : '') + (!docsOk && incompleto ? ' · ' : '') + (incompleto ? 'Dados incompletos' : '')) + '"></span>' : '';
       var ini2 = String(r.nome || '?').trim().charAt(0).toUpperCase();
       html += '<div class="row cad-closer' + (cadAberto[r.id] ? ' aberto' : '') + '" data-linha="' + esc(r.id) + '">' +
-        '<div class="c-name"><span class="cad-av">' + esc(ini2) + '</span><div class="cad-nome"><div class="name"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome) + '</button>' + aviso + '</div>' +
+        '<div class="c-name"><div class="cad-nome"><div class="name"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome) + '</button>' + aviso + '</div>' +
           '<div class="addr cad-origem">' + origemLead(r, par, parNome, quando) + '</div></div></div>' +
         '<div class="cad-contato">' + contatoCloser(r) + '</div>' +
         '<div class="cad-atend">' + leadSelect(r) + '<button type="button" class="btn tent" data-act="tentativa" data-id="' + esc(r.id) + '" title="Ligou e não atendeu: conta uma tentativa. Com ' + LEAD_TENTATIVAS + ' vira Sem resposta">Não atendeu' + (r.tentativas > 0 ? ' · ' + r.tentativas + '/' + LEAD_TENTATIVAS : '') + '</button></div>' +
