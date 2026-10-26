@@ -2216,17 +2216,25 @@ section.vw-dash{gap:16px!important}
 .rel-tab .n{text-align:right}.rel-tab .vz{text-align:center;color:var(--ink-3)}
 #rel-per button{padding:7px 14px;font-size:12.5px;white-space:nowrap;flex:none;height:auto}
 /* Cadastro: colunas fixas para tudo ficar alinhado, linha a linha */
-#cad-list .row.cad-closer{display:grid!important;grid-template-columns:minmax(0,1fr) 168px 300px 128px 34px!important;column-gap:14px!important;align-items:center!important}
+#cad-list .row.cad-closer{display:grid!important;grid-template-columns:minmax(0,1fr) 168px 312px 128px 34px!important;column-gap:14px!important;align-items:center!important}
 #cad-list .row.cad-closer > *{min-width:0}
 #cad-list .row.cad-closer .cad-contato{justify-content:flex-start!important;width:auto!important}
-#cad-list .row.cad-closer .cad-atend{display:grid!important;grid-template-columns:160px 128px;column-gap:10px;row-gap:4px;align-items:center;justify-items:start;width:auto!important}
-#cad-list .row.cad-closer .cad-atend .lead-sel{width:160px!important;max-width:160px!important}
+#cad-list .row.cad-closer .cad-atend{display:grid!important;grid-template-columns:172px 128px;column-gap:10px;row-gap:4px;align-items:center;justify-items:start;width:auto!important}
+#cad-list .row.cad-closer .cad-atend .lead-sel{width:172px!important;max-width:172px!important}
 #cad-list .row.cad-closer .cad-atend .tent{width:128px!important;justify-content:center;white-space:nowrap;grid-column:2;grid-row:1}#cad-list .row.cad-closer .cad-atend .lead-sel{grid-column:1;grid-row:1}
 #cad-list .row.cad-closer .cad-atend .cd-timer{grid-column:1;grid-row:2;margin-left:0}
 #cad-list .row.cad-closer .cad-fechar{justify-self:stretch}#cad-list .row.cad-closer .cad-fechar .btn{width:100%;justify-content:center}
 #cad-list .row.cad-closer .c-act{justify-self:end}
 #cad-list .row.head{display:none!important}
 @media (max-width:1180px){#cad-list .row.cad-closer{grid-template-columns:minmax(0,1fr) 300px 128px 34px!important}#cad-list .row.cad-closer .cad-contato{grid-column:1;grid-row:2}}
+/* Cadastro como tabela: cabeçalho, colunas e botões iguais em todas as linhas */
+#cad-list .row.head.cad-closer{display:grid!important;padding-top:10px!important;padding-bottom:10px!important;font-size:11px!important;font-weight:700!important;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)!important;background:var(--soft)!important;border-bottom:1px solid var(--line)}
+#cad-list .row.head .cab-at{display:grid;grid-template-columns:172px 128px;column-gap:10px}
+#cad-list .row.cad-closer .cad-nome .name{flex-wrap:wrap;row-gap:4px}
+#cad-list .row.cad-closer .cad-nome .name .prio-tag,#cad-list .row.cad-closer .cad-nome .name .nasc-tag{font-size:10.5px;padding:2px 8px}
+#cad-list .row.cad-closer .cad-atend .tent{border:1px solid var(--line-2)!important;border-radius:8px!important;background:transparent!important;font-weight:600!important;color:var(--ink-2)!important}
+#cad-list .row.cad-closer .cad-atend .tent:hover{border-color:var(--gold,#a07a45)!important;color:var(--ink)!important}
+#cad-list .row.cad-closer .cad-origem{display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -3293,7 +3301,6 @@ section.vw-dash{gap:16px!important}
     var partes = [];
     if (cidade) partes.push('<span class="cad-bnd">' + (g ? bandeiraCidade(g, cidade) : '') + '</span><b>' + esc(cidade) + (g ? '/' + esc(String(g.uf || g.id).toUpperCase()) : '') + '</b>');
     partes.push(par ? 'indicação de <b>' + esc(parNome) + '</b>' : r.criadoPorNome ? 'cadastro de <b>' + esc(r.criadoPorNome) + '</b>' : esc(r.origem === 'organico' ? 'Orgânico' : 'Sem parceiro'));
-    if (tagPrioridade(r)) partes.unshift(tagPrioridade(r));
     if (quando) partes.push(esc(quando));
     var dcad = String(r.dataCadastro || r.criadoEm || '').slice(0, 10), nd2 = dcad ? -daysUntil(dcad) : null;
     if (leadDe(r) === 'novo' && nd2 != null && nd2 >= 2) partes.push('<span class="cad-atraso">sem ligação há ' + nd2 + ' dias</span>');
@@ -4018,7 +4025,7 @@ section.vw-dash{gap:16px!important}
       .sort(function(a, b){ var da = String(a.dataCadastro || a.criadoEm || '').slice(0, 10), db = String(b.dataCadastro || b.criadoEm || '').slice(0, 10); var pa = prioridadeNasc(a), pb = prioridadeNasc(b); if (pa != null || pb != null){ if (pa == null) return 1; if (pb == null) return -1; if (pa !== pb) return pa - pb; } return (LEAD_ORDEM[leadDe(a)] - LEAD_ORDEM[leadDe(b)]) || db.localeCompare(da) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); });
     var nParaLigar = todos.filter(function(r){ return leadDe(r) === 'novo'; }).length;
     $('cad-count').textContent = lista.length + (lista.length === 1 ? ' cliente' : ' clientes') + (nParaLigar ? ' · ' + nParaLigar + ' para ligar' : '');
-    var html = '<div class="row head"><div>Cliente</div><div>Telefone</div><div>Atendimento</div><div></div><div></div></div>';
+    var html = '<div class="row head cad-closer"><div>Cliente</div><div>Telefone</div><div class="cab-at"><span>Situação</span><span>Tentativas</span></div><div></div><div></div></div>';
     if (!lista.length) html += '<div class="empty">' + (todos.length ? 'Nenhum cliente neste filtro.' : 'Nenhum cliente em cadastro. Clique em <b>Novo cadastro</b> para começar.') + '</div>';
     lista.slice(0, 300).forEach(function(r){
       var st = situacaoCad(r);
@@ -4031,7 +4038,7 @@ section.vw-dash{gap:16px!important}
       var aviso = !docsOk || incompleto ? '<span class="cad-ponto" title="' + esc((!docsOk ? 'Documentos pendentes' : '') + (!docsOk && incompleto ? ' · ' : '') + (incompleto ? 'Dados incompletos' : '')) + '"></span>' : '';
       var ini2 = String(r.nome || '?').trim().charAt(0).toUpperCase();
       html += '<div class="row cad-closer' + (cadAberto[r.id] ? ' aberto' : '') + '" data-linha="' + esc(r.id) + '">' +
-        '<div class="c-name"><div class="cad-nome"><div class="name"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome) + '</button>' + aviso + '</div>' +
+        '<div class="c-name"><div class="cad-nome"><div class="name"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome) + '</button>' + aviso + tagPrioridade(r) + '</div>' +
           '<div class="addr cad-origem">' + origemLead(r, par, parNome, quando) + '</div></div></div>' +
         '<div class="cad-contato">' + contatoCloser(r) + '</div>' +
         '<div class="cad-atend">' + leadSelect(r) + '<button type="button" class="btn tent" data-act="tentativa" data-id="' + esc(r.id) + '" title="Ligou e não atendeu: conta uma tentativa. Com ' + LEAD_TENTATIVAS + ' vira Sem resposta">Não atendeu' + (r.tentativas > 0 ? ' · ' + r.tentativas + '/' + LEAD_TENTATIVAS : '') + '</button></div>' +
