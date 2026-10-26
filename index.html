@@ -4861,10 +4861,11 @@ section.vw-dash{gap:16px!important}
   function avisosLista(){
     var a = [], hoje = iso(new Date());
     var add = function(tipo, r, txt){ a.push({ tipo: tipo, id: r.id, nome: r.nome || 'Sem nome', txt: txt }); };
-    var cpfs = {};
+    var cpfs = {}, tels = {};
     state.rows.forEach(function(r){
       if (r.arquivado) return;
       var d = String(r.cpf || '').replace(/\D/g, ''); if (d.length === 11){ (cpfs[d] = cpfs[d] || []).push(r); }
+      var tl = String(r.contato || '').replace(/\D/g, '').slice(-9); if (tl.length === 9){ (tels[tl] = tels[tl] || []).push(r); }
       if (noCadastro(r) && prioridadeNasc(r) != null) add('Parto perto e sem contrato', r, 'parto em ' + prioridadeNasc(r) + ' dias');
       if (fechado(r) && regularizada(r) && r.fatoGerador === 'gestante' && !r.criancaNasc && jaPodeRequerer(r) && !requerido(r)) add('Já pode protocolar no INSS', r, 'a partir de ' + fmtDate(pedeRequerer(r)) + ' (28 dias antes do parto)');
       if (r.inssStatus === 'exigencia' && r.exigenciaPrazo){ var n = daysUntil(r.exigenciaPrazo); if (n != null && n <= 5) add('Exigência do INSS vencendo', r, n < 0 ? 'prazo venceu há ' + (-n) + ' dias' : 'faltam ' + n + ' dias'); }
@@ -4872,14 +4873,16 @@ section.vw-dash{gap:16px!important}
       if (r.fatoGerador === 'gestante' && !r.criancaNasc && r.dpp){ var p = daysUntil(r.dpp); if (p != null && (p < -45 || p > 300)) add('Data para conferir', r, 'parto previsto ' + fmtDate(r.dpp) + (p < 0 ? ' (já passou: o bebê nasceu?)' : ' (muito distante)')); }
       if (r.criancaNasc && r.criancaNasc > hoje) add('Data para conferir', r, 'nascimento no futuro: ' + fmtDate(r.criancaNasc));
     });
-    Object.keys(cpfs).forEach(function(k){ if (cpfs[k].length > 1) cpfs[k].forEach(function(r){ add('CPF repetido', r, 'mesmo CPF em ' + cpfs[k].length + ' cadastros'); }); });
+    var jaDup = {};
+    Object.keys(cpfs).forEach(function(k){ if (cpfs[k].length > 1) cpfs[k].forEach(function(r){ jaDup[r.id] = 1; add('Cadastro repetido', r, 'mesmo CPF em ' + cpfs[k].length + ' cadastros'); }); });
+    Object.keys(tels).forEach(function(k){ if (tels[k].length > 1) tels[k].forEach(function(r){ if (!jaDup[r.id]) add('Cadastro repetido', r, 'mesmo telefone em ' + tels[k].length + ' cadastros'); }); });
     return a;
   }
   function pintarAvisosBtn(){ var b = $('btn-avisos'); if (!b) return; var n = avisosLista().length; $('avisos-n').textContent = n || ''; $('avisos-n').hidden = !n; }
   function abrirAvisos(){
     var l = avisosLista(), grupos = {};
     l.forEach(function(x){ (grupos[x.tipo] = grupos[x.tipo] || []).push(x); });
-    var ordem = ['Parto perto e sem contrato', 'Já pode protocolar no INSS', 'Exigência do INSS vencendo', 'Parada além do prazo', 'CPF repetido', 'Data para conferir'];
+    var ordem = ['Parto perto e sem contrato', 'Já pode protocolar no INSS', 'Exigência do INSS vencendo', 'Parada além do prazo', 'Cadastro repetido', 'Data para conferir'];
     var f = document.createElement('div'); f.className = 'cid-sheet';
     f.innerHTML = '<div style="width:min(620px,100%)"><h3>Avisos</h3><p>' + (l.length ? l.length + (l.length === 1 ? ' ponto para olhar' : ' pontos para olhar') : 'Nada pendente agora.') + '</p><div class="lista av-lista">' +
       ordem.filter(function(k){ return grupos[k]; }).map(function(k){ return '<div class="av-g"><b>' + esc(k) + ' <span class="tnum">' + grupos[k].length + '</span></b>' + grupos[k].map(function(x){ return '<button type="button" data-av="' + esc(x.id) + '"><span>' + esc(x.nome) + '</span><small>' + esc(x.txt) + '</small></button>'; }).join('') + '</div>'; }).join('') +
@@ -6547,6 +6550,11 @@ section.vw-dash{gap:16px!important}
     // datas que não fazem sentido (erro de digitação)
     if ($('f-fato').value === 'gestante' && $('f-dpp').value){ var ndpp = daysUntil($('f-dpp').value); if (ndpp != null && ndpp < -45){ toast('A data prevista do parto já passou há ' + (-ndpp) + ' dias. Se o bebê nasceu, marque "Já nasceu" e informe a data de nascimento.'); $('f-dpp').focus(); return; } if (ndpp != null && ndpp > 300){ toast('Data prevista do parto muito distante. Confira o ano.'); $('f-dpp').focus(); return; } }
     if ($('f-cnasc').value && $('f-fato').value !== 'gestante'){ var nn = daysUntil($('f-cnasc').value); if (nn != null && nn > 0){ toast('A data de nascimento está no futuro. Confira a data.'); $('f-cnasc').focus(); return; } }
+    if (!state.editing){
+      var cpfN = String($('f-cpf').value || '').replace(/\D/g, ''), telN = String($('f-contato').value || '').replace(/\D/g, '').slice(-9);
+      var igual = state.rows.filter(function(x){ return !x.arquivado && ((cpfN.length === 11 && String(x.cpf || '').replace(/\D/g, '') === cpfN) || (telN.length === 9 && String(x.contato || '').replace(/\D/g, '').slice(-9) === telN)); })[0];
+      if (igual && !window.confirm('Já existe um cadastro com este ' + (cpfN.length === 11 && String(igual.cpf || '').replace(/\D/g, '') === cpfN ? 'CPF' : 'telefone') + ': ' + (igual.nome || '') + '.\n\nSalvar outro cadastro mesmo assim?')) return;
+    }
     var prev = state.rows.find(function(r){ return r.id === state.editing; }) || {};
     var situacao = $('f-situacao').value, avisado = situacao === 'avisado';
     var avisoEm = $('f-avisoem').value || (avisado ? iso(new Date()) : '');
