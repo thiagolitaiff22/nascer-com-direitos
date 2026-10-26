@@ -2131,6 +2131,36 @@ td,.row{font-size:13px}
 .eq-nome small{display:block;font-size:12px;color:var(--ink-3);margin-top:1px}
 .eq-row .btn{padding:6px 14px;font-size:12.5px}
 @media (max-width:560px){.eq-row{grid-template-columns:36px minmax(0,1fr) auto;row-gap:8px}.eq-row .btn{grid-column:2 / 4;justify-self:start}}
+/* ===== tema painel: menu por seções, cabeçalho em trilha, cartões compactos (paleta dourada do projeto) ===== */
+.topnav .nav-lbl{display:block!important;padding:18px 12px 6px!important;font-size:10.5px!important;font-weight:700!important;letter-spacing:.14em!important;text-transform:uppercase;color:var(--ink-3)!important;opacity:.9}
+.topnav .nav-lbl:first-child{padding-top:6px!important}
+.topnav .tab{min-height:0!important;height:34px!important;padding:0 11px!important;font-size:13px!important;font-weight:500!important;border-radius:8px!important;gap:10px!important}
+.topnav .tab .i{width:16px!important;height:16px!important}
+.topnav .tab[aria-selected="true"]{background:color-mix(in srgb,var(--gold,#a07a45) 16%,transparent)!important;color:var(--ink)!important;font-weight:600!important}
+:root[data-theme="dark"] .topnav .tab[aria-selected="true"]{background:rgba(201,164,106,.16)!important;color:#f1e3c8!important}
+.ph{align-items:center!important;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.ph h1{font-size:13.5px!important;font-weight:600!important;display:flex;align-items:center;gap:8px;letter-spacing:0}
+.ph h1 .bc-sec{color:var(--ink-3);font-weight:500}.ph h1 .bc-sep{color:var(--ink-3)}.ph h1 .bc-pg{color:var(--ink)}
+.ph p{display:none!important}
+.card{border-radius:10px!important;box-shadow:none!important}
+.stat.card,.card.stat{padding:14px 16px!important;min-height:0!important;border-radius:10px!important}
+.stat-h{font-size:12.5px!important;font-weight:600!important;gap:8px!important;color:var(--ink-2)}
+.stat-v{font-size:26px!important;line-height:1.1!important;margin-top:6px!important}
+.stat-c{font-size:12px!important;color:var(--ink-3)!important;margin-top:4px!important}
+.sec-rot{font-size:13.5px!important;font-weight:700!important;letter-spacing:0!important;text-transform:none!important;color:var(--ink)!important;margin:2px 0 -4px}
+.dash-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.dash-range{font-size:12.5px;color:var(--ink-3)}
+.dash-bar .seg-bi button{padding:7px 14px;font-size:12.5px;white-space:nowrap;flex:none;height:auto}
+.dash-kpis{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:1100px){.dash-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.dash-graf{padding:16px 18px 10px}
+.dg-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.dg-top b{display:block;font-size:14px}.dg-top small{color:var(--ink-3);font-size:12px}
+.dg-leg{display:flex;gap:18px;font-size:12.5px;color:var(--ink-2)}.dg-leg span{display:inline-flex;align-items:center;gap:7px}.dg-leg i{width:8px;height:8px;border-radius:50%;display:inline-block}.dg-leg b{font-size:18px;color:var(--ink)}
+.dash-graf svg{width:100%;height:240px;display:block}
+.dash-graf .gr{stroke:var(--line);stroke-width:1}.dash-graf .gt{fill:var(--ink-3);font-size:11px;font-family:inherit}
+.dash-graf .ln{fill:none;stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.dash-graf .l1{stroke:var(--gold,#a07a45)}.dash-graf .l2{stroke:#3fa16b}
+.dash-graf .ar{fill:var(--gold,#a07a45);opacity:.12;stroke:none}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2168,6 +2198,7 @@ td,.row{font-size:13px}
   <symbol id="i-gavel" viewBox="0 0 24 24"><path d="m14 13-7.5 7.5a2.12 2.12 0 0 1-3-3L11 10M16 16l6-6M8 8l6-6M9 7l8 8M21 11l-8-8"/></symbol>
   <symbol id="i-repeat" viewBox="0 0 24 24"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></symbol>
   <symbol id="i-cash" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V11M10 20V4M16 20v-7M22 20H2"/></symbol>
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
   <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
   <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></symbol>
@@ -2202,15 +2233,22 @@ td,.row{font-size:13px}
   <header class="topnav">
     <div class="brand"><div class="logo"><img src="img/logo-nascer-t.png" alt="Nascer com Direitos"></div><div><b>Nascer com Direitos</b><span>Salário-maternidade</span></div></div>
     <nav class="nav" role="tablist" aria-orientation="horizontal">
-      <div class="nav-lbl" aria-hidden="true">Comercial</div><button class="tab" role="tab" id="tab-cad" aria-selected="false" type="button" title="Cadastro"><svg class="i"><use href="#i-phone"/></svg><span>Cadastro</span></button>
-      <button class="tab" role="tab" id="tab-ctr" aria-selected="false" type="button" title="Pós-venda"><svg class="i"><use href="#i-check"/></svg><span>Pós-venda</span></button>
+      <div class="nav-lbl" aria-hidden="true">Comercial</div>
+      <button class="tab" role="tab" id="tab-dash" aria-selected="false" type="button" title="Dashboard"><svg class="i"><use href="#i-chart"/></svg><span>Dashboard</span></button>
+      <button class="tab" role="tab" id="tab-cad" aria-selected="false" type="button" title="Cadastro"><svg class="i"><use href="#i-phone"/></svg><span>Cadastro</span></button>
       <button class="tab" role="tab" id="tab-desq" aria-selected="false" type="button" title="Leads desqualificados"><svg class="i"><use href="#i-bellx"/></svg><span>Leads desqualificados</span></button>
-      <div class="nav-lbl" aria-hidden="true">Processos</div><button class="tab" role="tab" id="tab-nasc" aria-selected="false" type="button" title="Aguardando nascimento"><svg class="i"><use href="#i-clock"/></svg><span>Aguardando nascimento</span></button>
+      <div class="nav-lbl" aria-hidden="true">Pós-venda</div>
+      <button class="tab" role="tab" id="tab-ctr" aria-selected="false" type="button" title="Pós-venda"><svg class="i"><use href="#i-check"/></svg><span>Pós-venda</span></button>
+      <button class="tab" role="tab" id="tab-nasc" aria-selected="false" type="button" title="Aguardando nascimento"><svg class="i"><use href="#i-clock"/></svg><span>Aguardando nascimento</span></button>
+      <div class="nav-lbl" aria-hidden="true">Operacional</div>
       <button class="tab" role="tab" id="tab-inss" aria-selected="false" type="button" title="INSS"><svg class="i"><use href="#i-inss"/></svg><span>INSS</span></button>
-      <button class="tab" role="tab" id="tab-clientes" aria-selected="true" type="button" title="Judicial"><svg class="i"><use href="#i-gavel"/></svg><span>Judicial</span></button>
-      <div class="nav-lbl" aria-hidden="true">Gestão</div><button class="tab admin-only" role="tab" id="tab-fin" aria-selected="false" type="button" title="Financeiro"><svg class="i"><use href="#i-cash"/></svg><span>Financeiro</span></button>
+      <button class="tab" role="tab" id="tab-clientes" aria-selected="false" type="button" title="Judicial"><svg class="i"><use href="#i-gavel"/></svg><span>Judicial</span></button>
+      <div class="nav-lbl" aria-hidden="true">Financeiro</div>
+      <button class="tab admin-only" role="tab" id="tab-fin" aria-selected="false" type="button" title="Financeiro"><svg class="i"><use href="#i-cash"/></svg><span>Financeiro</span></button>
+      <div class="nav-lbl" aria-hidden="true">Gestão</div>
       <button class="tab" role="tab" id="tab-ret" aria-selected="false" type="button" title="Arquivados"><svg class="i"><use href="#i-file"/></svg><span>Arquivados</span></button>
-      <button class="tab" role="tab" id="tab-parc" aria-selected="false" type="button" title="Parceiros"><svg class="i"><use href="#i-users"/></svg><span>Parceiros</span></button><button class="tab admin-only" role="tab" id="tab-equipe" aria-selected="false" type="button" title="Configurações"><svg class="i"><use href="#i-gear"/></svg><span>Configurações</span></button>
+      <button class="tab" role="tab" id="tab-parc" aria-selected="false" type="button" title="Parceiros"><svg class="i"><use href="#i-users"/></svg><span>Parceiros</span></button>
+      <button class="tab admin-only" role="tab" id="tab-equipe" aria-selected="false" type="button" title="Configurações"><svg class="i"><use href="#i-gear"/></svg><span>Configurações</span></button>
     </nav>
     <div class="side-acts"><button type="button" class="side-toggle" id="btn-side" title="Esconder o menu" aria-label="Esconder o menu" aria-expanded="true"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9.5 4v16"/></svg></button><button class="icon-btn theme-btn" id="btn-theme" type="button" aria-label="Modo escuro" title="Modo escuro"><svg class="i"><use id="theme-ico" href="#i-moon"/></svg></button></div>
     <div class="top-right">
@@ -2235,6 +2273,19 @@ td,.row{font-size:13px}
           <span class="fb-count tnum" id="cl-count"></span>
         </div></div>
         <div class="card list" id="cl-list"></div>
+      </section>
+
+      <section id="view-dash" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
+        <div class="dash-bar">
+          <div class="seg-bi" id="dash-per" style="flex:none"><button type="button" data-d="7" aria-pressed="false">7 dias</button><button type="button" data-d="30" aria-pressed="false">30 dias</button><button type="button" data-d="mes" aria-pressed="true">Este mês</button><button type="button" data-d="0" aria-pressed="false">Tudo</button></div>
+          <span class="dash-range" id="dash-range"></span>
+        </div>
+        <div class="sec-rot">Funil de cadastro</div>
+        <div class="stats dash-kpis" id="dash-funil"></div>
+        <div class="sec-rot">Perdas e situação atual</div>
+        <div class="stats dash-kpis" id="dash-perdas"></div>
+        <div class="sec-rot">Evolução no período</div>
+        <div class="card dash-graf" id="dash-graf"></div>
       </section>
 
       <section id="view-cad" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
@@ -4729,7 +4780,54 @@ td,.row{font-size:13px}
     var els = document.querySelectorAll('.cron[data-fim]'), t = Date.now();
     for (var i = 0; i < els.length; i++) els[i].textContent = cronTexto(+els[i].getAttribute('data-fim') - t);
   }, 1000);
-  function render(){ pintarCard(); renderEstadosCfg(); renderRegioes(); renderContratos(); renderDesq(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
+  /* ---------- Dashboard ---------- */
+  var dashDias = 'mes';
+  function diaDe(r){ return String(r.dataCadastro || r.criadoEm || '').slice(0, 10); }
+  function intervaloDash(){
+    var hoje = new Date(), fim = iso(hoje), ini;
+    if (dashDias === 'mes') ini = fim.slice(0, 8) + '01';
+    else if (dashDias === '0') ini = '0000-01-01';
+    else { var d = new Date(); d.setDate(d.getDate() - (parseInt(dashDias, 10) - 1)); ini = iso(d); }
+    return { ini: ini, fim: fim };
+  }
+  function kpi(ico, rot, n, cap, cor){ return '<div class="card stat"' + (cor ? ' style="--cor-linha:var(' + cor + ')" data-cor-fixa="1"' : '') + '><div class="stat-h"><svg class="i"><use href="#' + ico + '"/></svg>' + rot + '</div><div class="stat-v tnum">' + n + '</div><div class="stat-c">' + cap + '</div></div>'; }
+  function pct(a, b){ return b ? Math.round(a / b * 100) + '%' : '0%'; }
+  function renderDash(){
+    var box = $('dash-funil'); if (!box) return;
+    Array.prototype.forEach.call($('dash-per').querySelectorAll('button'), function(b){ b.setAttribute('aria-pressed', String(b.dataset.d === dashDias)); });
+    var iv = intervaloDash(), dentro = function(s){ s = String(s || '').slice(0, 10); return !!s && s >= iv.ini && s <= iv.fim; };
+    $('dash-range').textContent = dashDias === '0' ? 'desde o início' : fmtDate(iv.ini) + ' – ' + fmtDate(iv.fim);
+    var leads = state.rows.filter(function(r){ return dentro(diaDe(r)); });
+    var contratos = state.rows.filter(function(r){ return dentro(r.contratoEm); });
+    var trabalhados = leads.filter(function(r){ return r.leadStatus && r.leadStatus !== 'novo'; });
+    var desq = state.rows.filter(function(r){ return r.leadStatus === 'desqualificado' && dentro(r.desqualEm || r.leadMudouEm); });
+    var perdidos = leads.filter(function(r){ var l = leadDe(r); return l === 'perdido' || l === 'sem_resposta'; });
+    var prio = state.rows.filter(function(r){ return noCadastro(r) && prioridadeNasc(r) != null; });
+    var pos = state.rows.filter(noContratos), regs = state.rows.filter(function(r){ return fechado(r) && regularizada(r); });
+    box.innerHTML = kpi('i-users', 'Leads', leads.length, 'chegaram no período') +
+      kpi('i-phone', 'Leads trabalhados', trabalhados.length, pct(trabalhados.length, leads.length) + ' dos leads') +
+      kpi('i-check', 'Contratos fechados', contratos.length, pct(contratos.length, leads.length) + ' dos leads', '--green') +
+      kpi('i-clock', 'Taxa de fechamento', pct(contratos.length, leads.length), contratos.length + ' contratos de ' + leads.length + ' leads');
+    $('dash-perdas').innerHTML = kpi('i-bellx', 'Desqualificados', desq.length, pct(desq.length, leads.length) + ' dos leads · ver lista', '--amber') +
+      kpi('i-clock', 'Sem resposta / perdidos', perdidos.length, 'leads do período sem retorno', '--red') +
+      kpi('i-bellx', 'Parto perto', prio.length, 'gestantes com parto em até ' + PRIORIDADE_DIAS + ' dias', '--red') +
+      kpi('i-file', 'No Pós-venda', pos.length, regs.length + ' regularizadas');
+    // gráfico: leads e contratos por dia
+    var dias = [], d0 = new Date(iv.ini === '0000-01-01' ? (leads.map(diaDe).sort()[0] || iv.fim) : iv.ini + 'T12:00:00'), dF = new Date(iv.fim + 'T12:00:00');
+    for (var d = new Date(d0); d <= dF && dias.length < 400; d.setDate(d.getDate() + 1)) dias.push(iso(d));
+    var cl = {}, cc = {}; leads.forEach(function(r){ var k = diaDe(r); cl[k] = (cl[k] || 0) + 1; }); contratos.forEach(function(r){ var k = String(r.contratoEm).slice(0, 10); cc[k] = (cc[k] || 0) + 1; });
+    var sl = dias.map(function(k){ return cl[k] || 0; }), sc = dias.map(function(k){ return cc[k] || 0; });
+    var max = Math.max.apply(null, sl.concat(sc).concat([4])), W = 1000, H = 230, L = 36, R = 10, T = 12, B = 26, gw = W - L - R, gh = H - T - B;
+    var x = function(i){ return L + (dias.length > 1 ? i / (dias.length - 1) : 0.5) * gw; }, y = function(v){ return T + gh - v / max * gh; };
+    var linha = function(s){ return s.map(function(v, i){ return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1); }).join(' '); };
+    var grade = ''; for (var g = 0; g <= 4; g++){ var v = Math.round(max * g / 4), yy = y(v); grade += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + yy + '" y2="' + yy + '" class="gr"/><text x="' + (L - 6) + '" y="' + (yy + 4) + '" text-anchor="end" class="gt">' + v + '</text>'; }
+    var passo = Math.max(1, Math.ceil(dias.length / 10)), eixo = dias.map(function(k, i){ return i % passo === 0 ? '<text x="' + x(i).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle" class="gt">' + k.slice(8, 10) + '/' + k.slice(5, 7) + '</text>' : ''; }).join('');
+    var area = linha(sl) + ' L' + x(dias.length - 1).toFixed(1) + ' ' + (T + gh) + ' L' + x(0).toFixed(1) + ' ' + (T + gh) + ' Z';
+    $('dash-graf').innerHTML = '<div class="dg-top"><div><b>Leads e fechamentos por dia</b><small>cadastros e contratos fechados</small></div><div class="dg-leg"><span><i style="background:var(--gold,#a07a45)"></i>Leads <b class="tnum">' + leads.length + '</b></span><span><i style="background:#3fa16b"></i>Fechamentos <b class="tnum">' + contratos.length + '</b></span></div></div>' +
+      '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" role="img" aria-label="Leads e fechamentos por dia">' + grade + eixo + '<path d="' + area + '" class="ar"/><path d="' + linha(sl) + '" class="ln l1"/><path d="' + linha(sc) + '" class="ln l2"/></svg>';
+  }
+  $('dash-per').addEventListener('click', function(e){ var b = e.target.closest('button[data-d]'); if (!b) return; dashDias = b.dataset.d; renderDash(); });
+  function render(){ renderDash(); pintarCard(); renderEstadosCfg(); renderRegioes(); renderContratos(); renderDesq(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
   var clQ = '';
   // stage of each process, derived from what is already recorded (no extra typing)
   var ETAPAS = [
@@ -6602,8 +6700,9 @@ td,.row{font-size:13px}
     } catch(err){ toast(errMsg(err)); }
     finally { $('av-save').disabled = false; }
   });
-  var VIEWS = { d: ['tab-cad', 'view-cad'], i: ['tab-inss', 'view-inss'], k: ['tab-ctr', 'view-ctr'], q: ['tab-desq', 'view-desq'], n: ['tab-nasc', 'view-nasc'], c: ['tab-clientes', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-ret', 'view-ret'], g: ['tab-parc', 'view-parc'], e: ['tab-equipe', 'view-equipe'] };
+  var VIEWS = { b: ['tab-dash', 'view-dash'], d: ['tab-cad', 'view-cad'], i: ['tab-inss', 'view-inss'], k: ['tab-ctr', 'view-ctr'], q: ['tab-desq', 'view-desq'], n: ['tab-nasc', 'view-nasc'], c: ['tab-clientes', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-ret', 'view-ret'], g: ['tab-parc', 'view-parc'], e: ['tab-equipe', 'view-equipe'] };
   var TITULOS = {
+    b: ['Dashboard', 'Funil de cadastro, perdas e evolução'],
     d: ['Cadastro', 'Clientes ainda sem requerimento no INSS: dados, documentos e prazo'],
     i: ['INSS', 'Requerimentos administrativos: análise, exigências, concessões e indeferimentos'],
     c: ['Judicial', 'Ações judiciais: acompanhamento do processo até a sentença e o pagamento'],
@@ -6622,14 +6721,18 @@ td,.row{font-size:13px}
   function showTab(which){
     state.view = which;
     if ((which === 'e' || which === 'f') && !isAdmin()) which = 'c';
-    if (TITULOS[which]){ $('pg-tit').textContent = TITULOS[which][0]; $('pg-sub').textContent = TITULOS[which][1]; }
+    if (TITULOS[which]){
+      var bt = $(VIEWS[which] ? VIEWS[which][0] : ''), sec = '';
+      if (bt){ var p = bt.previousElementSibling; while (p && !p.classList.contains('nav-lbl')) p = p.previousElementSibling; sec = p ? p.textContent : ''; }
+      $('pg-tit').innerHTML = (sec ? '<span class="bc-sec">' + esc(sec) + '</span><span class="bc-sep">›</span>' : '') + '<span class="bc-pg">' + esc(TITULOS[which][0]) + '</span>'; $('pg-sub').textContent = TITULOS[which][1];
+    }
     $('btn-novo').hidden = which === 'e';
     Object.keys(VIEWS).forEach(function(k){ $(VIEWS[k][0]).setAttribute('aria-selected', k === which ? 'true' : 'false'); $(VIEWS[k][1]).hidden = k !== which; });
     try { sessionStorage.setItem('qe-view', which); } catch(e){}
   }
   Object.keys(VIEWS).forEach(function(k){ $(VIEWS[k][0]).addEventListener('click', function(){ showTab(k); }); });
 
-  try { var sv = sessionStorage.getItem('qe-view'); if (sv && VIEWS[sv]) showTab(sv); } catch(e){}
+  try { var sv = sessionStorage.getItem('qe-view'); showTab(sv && VIEWS[sv] ? sv : 'b'); } catch(e){ showTab('b'); }
 
   $('p-res').innerHTML = opts(RES, 'Todos os resultados') + '<option value="-">Sem resultado lançado</option>';
   $('p-rec').innerHTML = opts(REC, 'Embargos: todos');
