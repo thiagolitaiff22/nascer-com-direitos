@@ -2161,6 +2161,28 @@ td,.row{font-size:13px}
 .dash-graf .ln{fill:none;stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
 .dash-graf .l1{stroke:var(--gold,#a07a45)}.dash-graf .l2{stroke:#3fa16b}
 .dash-graf .ar{fill:var(--gold,#a07a45);opacity:.12;stroke:none}
+/* ===== balõezinhos: todas as telas na mesma ordem e no mesmo formato ===== */
+section.vw-dash{gap:16px!important}
+/* ordem padrão: abas da tela → resumo (cartões) → barra de busca → lista */
+#view-ret > .r-stats,#view-fin > .fin-stats{order:-1}
+#view-fin > .fin-sub{order:-2}
+/* resumo: todos os cartões numa linha só quando couber */
+.stats:not(.dash-kpis):not(.eq-cont){display:grid!important;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))!important;gap:12px!important}
+/* barra de busca e filtros num balão */
+.fbar{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 10px!important;gap:8px!important;align-items:center}
+.fbar .search,.fbar .tb-busca{border:0!important;background:var(--soft)!important;border-radius:9px!important;box-shadow:none!important}
+.fbar .tb-sel{border-radius:9px!important}
+/* listas sempre dentro de um balão, com rolagem lateral quando a tabela for larga */
+.card.list,.card.ct-tab{border:1px solid var(--line)!important;border-radius:12px!important;overflow:hidden;overflow-x:auto}
+.card.list .row.head{background:var(--soft)!important}
+/* textos de ajuda e regras viram um balão discreto */
+.fin-regra,.foot-note{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:10px 14px!important;font-size:12.5px!important;line-height:1.5;color:var(--ink-2)!important;margin:0!important}
+/* abas internas (Financeiro, Configurações) em pílula */
+.res-rap,.fin-sub,.eq-abas{border-radius:12px!important}
+/* cartões de lista da equipe, regiões e afins */
+.eq-row,.reg-card,.est-card{border-radius:12px!important}
+:root[data-theme="dark"] .fbar{background:var(--panel)}
+#inss-stats,#ctr-stats,#nasc-stats,#cad-stats,#desq-stats,#fin-stats,.r-stats,.stats.three{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2234,7 +2256,6 @@ td,.row{font-size:13px}
     <div class="brand"><div class="logo"><img src="img/logo-nascer-t.png" alt="Nascer com Direitos"></div><div><b>Nascer com Direitos</b><span>Salário-maternidade</span></div></div>
     <nav class="nav" role="tablist" aria-orientation="horizontal">
       <div class="nav-lbl" aria-hidden="true">Comercial</div>
-      <button class="tab" role="tab" id="tab-dash" aria-selected="false" type="button" title="Dashboard"><svg class="i"><use href="#i-chart"/></svg><span>Dashboard</span></button>
       <button class="tab" role="tab" id="tab-cad" aria-selected="false" type="button" title="Cadastro"><svg class="i"><use href="#i-phone"/></svg><span>Cadastro</span></button>
       <button class="tab" role="tab" id="tab-desq" aria-selected="false" type="button" title="Leads desqualificados"><svg class="i"><use href="#i-bellx"/></svg><span>Leads desqualificados</span></button>
       <div class="nav-lbl" aria-hidden="true">Pós-venda</div>
@@ -2273,19 +2294,6 @@ td,.row{font-size:13px}
           <span class="fb-count tnum" id="cl-count"></span>
         </div></div>
         <div class="card list" id="cl-list"></div>
-      </section>
-
-      <section id="view-dash" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
-        <div class="dash-bar">
-          <div class="seg-bi" id="dash-per" style="flex:none"><button type="button" data-d="7" aria-pressed="false">7 dias</button><button type="button" data-d="30" aria-pressed="false">30 dias</button><button type="button" data-d="mes" aria-pressed="true">Este mês</button><button type="button" data-d="0" aria-pressed="false">Tudo</button></div>
-          <span class="dash-range" id="dash-range"></span>
-        </div>
-        <div class="sec-rot">Funil de cadastro</div>
-        <div class="stats dash-kpis" id="dash-funil"></div>
-        <div class="sec-rot">Perdas e situação atual</div>
-        <div class="stats dash-kpis" id="dash-perdas"></div>
-        <div class="sec-rot">Evolução no período</div>
-        <div class="card dash-graf" id="dash-graf"></div>
       </section>
 
       <section id="view-cad" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
@@ -4780,54 +4788,7 @@ td,.row{font-size:13px}
     var els = document.querySelectorAll('.cron[data-fim]'), t = Date.now();
     for (var i = 0; i < els.length; i++) els[i].textContent = cronTexto(+els[i].getAttribute('data-fim') - t);
   }, 1000);
-  /* ---------- Dashboard ---------- */
-  var dashDias = 'mes';
-  function diaDe(r){ return String(r.dataCadastro || r.criadoEm || '').slice(0, 10); }
-  function intervaloDash(){
-    var hoje = new Date(), fim = iso(hoje), ini;
-    if (dashDias === 'mes') ini = fim.slice(0, 8) + '01';
-    else if (dashDias === '0') ini = '0000-01-01';
-    else { var d = new Date(); d.setDate(d.getDate() - (parseInt(dashDias, 10) - 1)); ini = iso(d); }
-    return { ini: ini, fim: fim };
-  }
-  function kpi(ico, rot, n, cap, cor){ return '<div class="card stat"' + (cor ? ' style="--cor-linha:var(' + cor + ')" data-cor-fixa="1"' : '') + '><div class="stat-h"><svg class="i"><use href="#' + ico + '"/></svg>' + rot + '</div><div class="stat-v tnum">' + n + '</div><div class="stat-c">' + cap + '</div></div>'; }
-  function pct(a, b){ return b ? Math.round(a / b * 100) + '%' : '0%'; }
-  function renderDash(){
-    var box = $('dash-funil'); if (!box) return;
-    Array.prototype.forEach.call($('dash-per').querySelectorAll('button'), function(b){ b.setAttribute('aria-pressed', String(b.dataset.d === dashDias)); });
-    var iv = intervaloDash(), dentro = function(s){ s = String(s || '').slice(0, 10); return !!s && s >= iv.ini && s <= iv.fim; };
-    $('dash-range').textContent = dashDias === '0' ? 'desde o início' : fmtDate(iv.ini) + ' – ' + fmtDate(iv.fim);
-    var leads = state.rows.filter(function(r){ return dentro(diaDe(r)); });
-    var contratos = state.rows.filter(function(r){ return dentro(r.contratoEm); });
-    var trabalhados = leads.filter(function(r){ return r.leadStatus && r.leadStatus !== 'novo'; });
-    var desq = state.rows.filter(function(r){ return r.leadStatus === 'desqualificado' && dentro(r.desqualEm || r.leadMudouEm); });
-    var perdidos = leads.filter(function(r){ var l = leadDe(r); return l === 'perdido' || l === 'sem_resposta'; });
-    var prio = state.rows.filter(function(r){ return noCadastro(r) && prioridadeNasc(r) != null; });
-    var pos = state.rows.filter(noContratos), regs = state.rows.filter(function(r){ return fechado(r) && regularizada(r); });
-    box.innerHTML = kpi('i-users', 'Leads', leads.length, 'chegaram no período') +
-      kpi('i-phone', 'Leads trabalhados', trabalhados.length, pct(trabalhados.length, leads.length) + ' dos leads') +
-      kpi('i-check', 'Contratos fechados', contratos.length, pct(contratos.length, leads.length) + ' dos leads', '--green') +
-      kpi('i-clock', 'Taxa de fechamento', pct(contratos.length, leads.length), contratos.length + ' contratos de ' + leads.length + ' leads');
-    $('dash-perdas').innerHTML = kpi('i-bellx', 'Desqualificados', desq.length, pct(desq.length, leads.length) + ' dos leads · ver lista', '--amber') +
-      kpi('i-clock', 'Sem resposta / perdidos', perdidos.length, 'leads do período sem retorno', '--red') +
-      kpi('i-bellx', 'Parto perto', prio.length, 'gestantes com parto em até ' + PRIORIDADE_DIAS + ' dias', '--red') +
-      kpi('i-file', 'No Pós-venda', pos.length, regs.length + ' regularizadas');
-    // gráfico: leads e contratos por dia
-    var dias = [], d0 = new Date(iv.ini === '0000-01-01' ? (leads.map(diaDe).sort()[0] || iv.fim) : iv.ini + 'T12:00:00'), dF = new Date(iv.fim + 'T12:00:00');
-    for (var d = new Date(d0); d <= dF && dias.length < 400; d.setDate(d.getDate() + 1)) dias.push(iso(d));
-    var cl = {}, cc = {}; leads.forEach(function(r){ var k = diaDe(r); cl[k] = (cl[k] || 0) + 1; }); contratos.forEach(function(r){ var k = String(r.contratoEm).slice(0, 10); cc[k] = (cc[k] || 0) + 1; });
-    var sl = dias.map(function(k){ return cl[k] || 0; }), sc = dias.map(function(k){ return cc[k] || 0; });
-    var max = Math.max.apply(null, sl.concat(sc).concat([4])), W = 1000, H = 230, L = 36, R = 10, T = 12, B = 26, gw = W - L - R, gh = H - T - B;
-    var x = function(i){ return L + (dias.length > 1 ? i / (dias.length - 1) : 0.5) * gw; }, y = function(v){ return T + gh - v / max * gh; };
-    var linha = function(s){ return s.map(function(v, i){ return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1); }).join(' '); };
-    var grade = ''; for (var g = 0; g <= 4; g++){ var v = Math.round(max * g / 4), yy = y(v); grade += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + yy + '" y2="' + yy + '" class="gr"/><text x="' + (L - 6) + '" y="' + (yy + 4) + '" text-anchor="end" class="gt">' + v + '</text>'; }
-    var passo = Math.max(1, Math.ceil(dias.length / 10)), eixo = dias.map(function(k, i){ return i % passo === 0 ? '<text x="' + x(i).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle" class="gt">' + k.slice(8, 10) + '/' + k.slice(5, 7) + '</text>' : ''; }).join('');
-    var area = linha(sl) + ' L' + x(dias.length - 1).toFixed(1) + ' ' + (T + gh) + ' L' + x(0).toFixed(1) + ' ' + (T + gh) + ' Z';
-    $('dash-graf').innerHTML = '<div class="dg-top"><div><b>Leads e fechamentos por dia</b><small>cadastros e contratos fechados</small></div><div class="dg-leg"><span><i style="background:var(--gold,#a07a45)"></i>Leads <b class="tnum">' + leads.length + '</b></span><span><i style="background:#3fa16b"></i>Fechamentos <b class="tnum">' + contratos.length + '</b></span></div></div>' +
-      '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" role="img" aria-label="Leads e fechamentos por dia">' + grade + eixo + '<path d="' + area + '" class="ar"/><path d="' + linha(sl) + '" class="ln l1"/><path d="' + linha(sc) + '" class="ln l2"/></svg>';
-  }
-  $('dash-per').addEventListener('click', function(e){ var b = e.target.closest('button[data-d]'); if (!b) return; dashDias = b.dataset.d; renderDash(); });
-  function render(){ renderDash(); pintarCard(); renderEstadosCfg(); renderRegioes(); renderContratos(); renderDesq(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
+  function render(){ pintarCard(); renderEstadosCfg(); renderRegioes(); renderContratos(); renderDesq(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
   var clQ = '';
   // stage of each process, derived from what is already recorded (no extra typing)
   var ETAPAS = [
@@ -6700,9 +6661,8 @@ td,.row{font-size:13px}
     } catch(err){ toast(errMsg(err)); }
     finally { $('av-save').disabled = false; }
   });
-  var VIEWS = { b: ['tab-dash', 'view-dash'], d: ['tab-cad', 'view-cad'], i: ['tab-inss', 'view-inss'], k: ['tab-ctr', 'view-ctr'], q: ['tab-desq', 'view-desq'], n: ['tab-nasc', 'view-nasc'], c: ['tab-clientes', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-ret', 'view-ret'], g: ['tab-parc', 'view-parc'], e: ['tab-equipe', 'view-equipe'] };
+  var VIEWS = { d: ['tab-cad', 'view-cad'], i: ['tab-inss', 'view-inss'], k: ['tab-ctr', 'view-ctr'], q: ['tab-desq', 'view-desq'], n: ['tab-nasc', 'view-nasc'], c: ['tab-clientes', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-ret', 'view-ret'], g: ['tab-parc', 'view-parc'], e: ['tab-equipe', 'view-equipe'] };
   var TITULOS = {
-    b: ['Dashboard', 'Funil de cadastro, perdas e evolução'],
     d: ['Cadastro', 'Clientes ainda sem requerimento no INSS: dados, documentos e prazo'],
     i: ['INSS', 'Requerimentos administrativos: análise, exigências, concessões e indeferimentos'],
     c: ['Judicial', 'Ações judiciais: acompanhamento do processo até a sentença e o pagamento'],
@@ -6732,7 +6692,7 @@ td,.row{font-size:13px}
   }
   Object.keys(VIEWS).forEach(function(k){ $(VIEWS[k][0]).addEventListener('click', function(){ showTab(k); }); });
 
-  try { var sv = sessionStorage.getItem('qe-view'); showTab(sv && VIEWS[sv] ? sv : 'b'); } catch(e){ showTab('b'); }
+  try { var sv = sessionStorage.getItem('qe-view'); showTab(sv && VIEWS[sv] ? sv : 'd'); } catch(e){ showTab('d'); }
 
   $('p-res').innerHTML = opts(RES, 'Todos os resultados') + '<option value="-">Sem resultado lançado</option>';
   $('p-rec').innerHTML = opts(REC, 'Embargos: todos');
