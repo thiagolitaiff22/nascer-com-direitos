@@ -2183,6 +2183,38 @@ section.vw-dash{gap:16px!important}
 .eq-row,.reg-card,.est-card{border-radius:12px!important}
 :root[data-theme="dark"] .fbar{background:var(--panel)}
 #inss-stats,#ctr-stats,#nasc-stats,#cad-stats,#desq-stats,#fin-stats,.r-stats,.stats.three{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important}
+/* cadastro mais compacto e elegante */
+#cad-list .cad-nome .name,#cad-list .row.cad-closer .cad-nome .name{font-size:13.5px!important;font-weight:600!important}
+#cad-list .nome-abrir{font-weight:600!important}
+#cad-list .tel-grande{font-size:13px!important;font-weight:600!important;letter-spacing:.01em}
+#cad-list .cad-origem,#cad-list .addr{font-size:11.5px!important}
+#cad-list .row{padding-top:9px!important;padding-bottom:9px!important;min-height:0!important}
+#cad-list .lead-sel,#cad-list select.inss-sel{font-size:12px!important;height:30px!important;min-height:30px!important;padding-top:0!important;padding-bottom:0!important}
+#cad-list .btn,#cad-list .inss-acao,#cad-list .tent{font-size:12px!important;height:30px!important;min-height:30px!important;padding:0 12px!important}
+#cad-list .tel-ic{width:28px!important;height:28px!important}
+.parado-tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(220,60,50,.12);color:#c0362c;border:1px solid rgba(220,60,50,.35)}
+.minhas-btn{white-space:nowrap}
+/* avisos */
+.avisos-btn{width:100%;justify-content:center;gap:8px;margin-bottom:8px}
+.av-n{min-width:20px;height:20px;border-radius:999px;background:#c0362c;color:#fff;font-size:11px;display:inline-grid;place-items:center;padding:0 6px}
+.av-lista{gap:12px!important}
+.av-g>b{display:block;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2);margin:4px 0 6px}
+.av-g button{display:flex!important;justify-content:space-between;align-items:center;width:100%;gap:10px}
+.av-g button small{color:var(--ink-3);font-size:12px;text-align:right}
+/* linha do tempo e cobrança no card */
+.fc-cobra{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0 0}.fc-cobra small{color:var(--ink-3);font-size:12px}
+.lt{margin:16px 0 0;border-top:1px solid var(--line);padding-top:12px}
+.lt-t{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);margin-bottom:8px}
+.lt-i{display:flex;gap:12px;padding:6px 0 6px 12px;border-left:2px solid var(--gold,#a07a45);font-size:13px}
+.lt-i time{flex:none;width:118px;color:var(--ink-3);font-size:12px}
+/* relatório */
+#view-equipe:not([data-cfg-ativa="rel"]) [data-cfg="rel"]{display:none!important}
+#view-equipe[data-cfg-ativa="rel"] [data-cfg]:not([data-cfg="rel"]){display:none!important}
+.rel-tab table{width:100%;border-collapse:collapse;font-size:13px}
+.rel-tab th{text-align:left;font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);padding:10px 14px;background:var(--soft);font-weight:700}
+.rel-tab td{padding:9px 14px;border-top:1px solid var(--line)}
+.rel-tab .n{text-align:right}.rel-tab .vz{text-align:center;color:var(--ink-3)}
+#rel-per button{padding:7px 14px;font-size:12.5px;white-space:nowrap;flex:none;height:auto}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2275,6 +2307,7 @@ section.vw-dash{gap:16px!important}
     <div class="top-right">
       <small id="sync">Conectando à base…</small>
       
+      <button class="btn avisos-btn" id="btn-avisos" type="button" title="Pontos que precisam de atenção"><svg class="i"><use href="#i-bellx"/></svg>Avisos <b id="avisos-n" class="av-n" hidden></b></button>
       <button class="btn primary" id="btn-novo" type="button"><svg class="i"><use href="#i-plus"/></svg>Novo cadastro</button>
       <div class="side-foot"><div class="av" id="me-av">E</div><div class="user-nome"><b id="me"></b><button type="button" class="linkbtn" id="btn-senha">Alterar senha</button> <button type="button" class="linkbtn" id="btn-sair">Sair</button></div></div>
     </div>
@@ -2302,6 +2335,7 @@ section.vw-dash{gap:16px!important}
         <div class="fbar">
           <div class="search tb-busca"><svg class="i"><use href="#i-search"/></svg><input id="cad-q" type="search" autocomplete="off" placeholder="Buscar cliente por nome ou CPF"></div>
           <select id="cad-sit" class="tb-sel" aria-label="Situação do cadastro"></select>
+          <button type="button" class="btn minhas-btn" data-minhas aria-pressed="false" title="Mostra só as clientes em que você é o responsável">Minhas clientes</button>
           <span class="tb-fim fb-count tnum" id="cad-count"></span>
         </div>
         <div class="sec-rot">Clientes em cadastro</div>
@@ -2316,6 +2350,7 @@ section.vw-dash{gap:16px!important}
           <select id="ctr-sit" class="tb-sel" aria-label="Filtrar" hidden></select>
           <div class="seg-bi" id="pv-lane" style="flex:none"><button type="button" data-l="gest" aria-pressed="true">Gestantes</button><button type="button" data-l="nasc" aria-pressed="false">Bebê já nasceu</button></div>
           <button type="button" class="btn" id="pv-atr" aria-pressed="false">Só atrasados</button>
+          <button type="button" class="btn minhas-btn" data-minhas aria-pressed="false" title="Mostra só as clientes em que você é o responsável">Minhas clientes</button>
           <a class="btn guia-link" id="ctr-guia" href="https://sal.rfb.gov.br/home" target="_blank" rel="noopener noreferrer" title="Abre o SAL da Receita Federal: gerar a guia e fazer o pagamento"><svg class="i"><use href="#i-cash"/></svg>Gerar e pagar guia</a><span class="tb-fim fb-count tnum" id="ctr-count"></span>
         </div>
         <div class="sec-rot">Kanban de documentação</div>
@@ -2554,8 +2589,10 @@ section.vw-dash{gap:16px!important}
           <button type="button" class="cfg-tab on" role="tab" data-cfg-tab="equipe" aria-selected="true">Equipe</button>
           <button type="button" class="cfg-tab" role="tab" data-cfg-tab="integ" aria-selected="false">Integrações</button>
           <button type="button" class="cfg-tab" role="tab" data-cfg-tab="estados" aria-selected="false">Estados</button>
+          <button type="button" class="cfg-tab" role="tab" data-cfg-tab="rel" aria-selected="false">Relatório de gestão</button>
         </div>
         <div class="est-cfg" id="cfg-estados" data-cfg="estados"></div>
+        <div class="rel-cfg" id="cfg-rel" data-cfg="rel" style="display:flex;flex-direction:column;gap:12px"></div>
         <div class="sec-title" data-cfg="equipe">Equipe</div>
         <div class="prosp-head" data-cfg="equipe">
           <p class="view-desc">Funcionários com acesso ao sistema. Só quem está nesta lista, e ativo, consegue ver os clientes.</p>
@@ -3248,6 +3285,7 @@ section.vw-dash{gap:16px!important}
     if (quando) partes.push(esc(quando));
     var dcad = String(r.dataCadastro || r.criadoEm || '').slice(0, 10), nd2 = dcad ? -daysUntil(dcad) : null;
     if (leadDe(r) === 'novo' && nd2 != null && nd2 >= 2) partes.push('<span class="cad-atraso">sem ligação há ' + nd2 + ' dias</span>');
+    else if (tagParado(r)) partes.push(tagParado(r));
     return partes.join(' · ');
   }
   function partoCell(r){
@@ -3475,7 +3513,7 @@ section.vw-dash{gap:16px!important}
       ['Processo', proc], ['Ajuizado em', r.protocolo ? fmtDate(r.protocolo) : ''],
       ['Teses da contestação', teses], ['Audiência', aud],
       ['Aviso', aviso], ['Resultado', res],
-      ['Pagamento', r.pagamento && PAG[r.pagamento] ? PAG[r.pagamento][0] : ''], ['Penalidades', penalidadesTxt(r)], ['Observações', obsDaEquipe(r)]
+      ['Pagamento', r.pagamento && PAG[r.pagamento] ? PAG[r.pagamento][0] : ''], ['Penalidades', penalidadesTxt(r)], ['Observações', obsDaEquipe(r) || null]
     ].filter(function(c){ return c[1] !== null; });
     if (compacto) campos = campos.filter(function(c){ return ['Nome completo', 'CPF', 'RG', 'Nascimento', 'NIT / PIS', 'Telefone', 'Cidade', 'Endereço', 'Parceiro', 'Fechamento', 'Criança', 'Testemunhas', 'Penalidades', 'Observações'].indexOf(c[0]) >= 0; });
     var fl = faltaDocs(r);
@@ -3498,7 +3536,8 @@ section.vw-dash{gap:16px!important}
   function pintarCard(){
     if (!cardAberto) return;
     var r = acharRow(cardAberto.id); if (!r){ fecharCard(); return; }
-    cardAberto.el.querySelector('.fc-corpo').innerHTML = fichaCliente(r, cardAberto.compacto);
+    var zp = zapUrl(foneDe(r));
+    cardAberto.el.querySelector('.fc-corpo').innerHTML = fichaCliente(r, cardAberto.compacto) + (zp ? '<div class="fc-cobra"><a class="btn" target="_blank" rel="noopener" style="text-decoration:none" href="' + esc(zp + '?text=' + encodeURIComponent(msgCobranca(r))) + '">Cobrar a mãe pelo WhatsApp</a><small>abre o WhatsApp com a mensagem pronta; você confere e envia</small></div>' : '') + htmlLinhaTempo(r);
     cardAberto.el.querySelector('.fc-nome').textContent = r.nome || 'Cliente';
   }
   function abrirCard(id, compacto){
@@ -3942,7 +3981,7 @@ section.vw-dash{gap:16px!important}
   }
   function renderCad(){
     var box = $('cad-list'); if (!box) return;
-    var todos = state.rows.filter(noCadastro);
+    var todos = state.rows.filter(noCadastro).filter(function(r){ return !soMinhas || minha(r); });
     var conta = { conferir: 0, incompleto: 0, documentos: 0, gestante: 0, pronto: 0 };
     todos.forEach(function(r){ conta[situacaoCad(r)[0]]++; });
     var semTel = todos.filter(function(r){ return !temContato(r); }).length;
@@ -3957,12 +3996,12 @@ section.vw-dash{gap:16px!important}
       // pendências: documento que o parceiro ainda não mandou ou dados incompletos (cada cliente conta uma vez)
       cardC('i-bellx', 'Pendências', todos.filter(function(r){ return docsPendentes(r) || situacaoCad(r)[0] === 'incompleto'; }).length, nFaltaC + ' com documento pendente · ' + conta.incompleto + ' com dados incompletos · ' + semTel + ' sem telefone' + (nPrazo ? ' · ' + nPrazo + ' com prazo perto do fim' : ''), '--red', 'pendencias');
     var nFalta = todos.filter(docsPendentes).length;
-    var SITS = [['', 'Todas as situações · ' + todos.length], ['prioridade', 'Prioridade (parto perto) · ' + todos.filter(function(r){ return prioridadeNasc(r) != null; }).length], ['faltam', 'Faltam documentos · ' + nFalta], ['pronto', 'Prontos para requerer · ' + conta.pronto], ['conferir', 'Conferir dados · ' + conta.conferir], ['incompleto', 'Dados incompletos · ' + conta.incompleto], ['gestante', 'Aguardando o parto · ' + conta.gestante], ['prazo', 'Prazo perto do fim · ' + nPrazo], ['pendencias', 'Pendências (documento ou dados)'],
+    var SITS = [['', 'Todas as situações · ' + todos.length], ['atrasadas', 'Atrasadas (paradas) · ' + todos.filter(atrasada).length], ['prioridade', 'Prioridade (parto perto) · ' + todos.filter(function(r){ return prioridadeNasc(r) != null; }).length], ['faltam', 'Faltam documentos · ' + nFalta], ['pronto', 'Prontos para requerer · ' + conta.pronto], ['conferir', 'Conferir dados · ' + conta.conferir], ['incompleto', 'Dados incompletos · ' + conta.incompleto], ['gestante', 'Aguardando o parto · ' + conta.gestante], ['prazo', 'Prazo perto do fim · ' + nPrazo], ['pendencias', 'Pendências (documento ou dados)'],
       ['l:novo', 'Para ligar (novos) · ' + todos.filter(function(r){ return leadDe(r) === 'novo'; }).length], ['l:retornar', 'Retornar depois · ' + todos.filter(function(r){ return leadDe(r) === 'retornar'; }).length],
       ['l:sem_resposta', 'Sem resposta · ' + todos.filter(function(r){ return leadDe(r) === 'sem_resposta'; }).length], ['l:contato', 'Em contato · ' + todos.filter(function(r){ return leadDe(r) === 'contato'; }).length]];
     $('cad-sit').innerHTML = SITS.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === cadSit ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
     $('cad-sit').classList.toggle('ativo', !!cadSit);
-    var lista = todos.filter(function(r){ return (!cadSit || (cadSit === 'prioridade' ? prioridadeNasc(r) != null : cadSit === 'faltam' ? docsPendentes(r) : cadSit === 'pendencias' ? (docsPendentes(r) || situacaoCad(r)[0] === 'incompleto') : cadSit === 'prazo' ? !!prazoTag(r) : /^l:/.test(cadSit) ? leadDe(r) === cadSit.slice(2) : situacaoCad(r)[0] === cadSit)) && buscaCliente(r, cadQ); })
+    var lista = todos.filter(function(r){ return (!cadSit || (cadSit === 'atrasadas' ? atrasada(r) : cadSit === 'prioridade' ? prioridadeNasc(r) != null : cadSit === 'faltam' ? docsPendentes(r) : cadSit === 'pendencias' ? (docsPendentes(r) || situacaoCad(r)[0] === 'incompleto') : cadSit === 'prazo' ? !!prazoTag(r) : /^l:/.test(cadSit) ? leadDe(r) === cadSit.slice(2) : situacaoCad(r)[0] === cadSit)) && buscaCliente(r, cadQ); })
       // mais recente primeiro (pelo dia do cadastro); no mesmo dia, em ordem alfabética
       .sort(function(a, b){ var da = String(a.dataCadastro || a.criadoEm || '').slice(0, 10), db = String(b.dataCadastro || b.criadoEm || '').slice(0, 10); var pa = prioridadeNasc(a), pb = prioridadeNasc(b); if (pa != null || pb != null){ if (pa == null) return 1; if (pb == null) return -1; if (pa !== pb) return pa - pb; } return (LEAD_ORDEM[leadDe(a)] - LEAD_ORDEM[leadDe(b)]) || db.localeCompare(da) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); });
     var nParaLigar = todos.filter(function(r){ return leadDe(r) === 'novo'; }).length;
@@ -4195,11 +4234,27 @@ section.vw-dash{gap:16px!important}
   function fechado(r){ return !!r.contratoEm && !r.arquivado && !String(r.processo || '').trim() && !requerido(r); }
   // fluxo: contrato fechado → Pós-venda (regulariza documentos) → Aguardando nascimento (gestante) → certidão → INSS
   function regularizada(r){ return r.posEtapa === 'regularizada'; }
-  function aguardaNasc(r){ return fechado(r) && regularizada(r) && r.fatoGerador === 'gestante' && !r.criancaNasc; }
+  function jaPodeRequerer(r){ var n = daysUntil(pedeRequerer(r)); return n != null && n <= 0; }
+  function aguardaNasc(r){ return fechado(r) && regularizada(r) && r.fatoGerador === 'gestante' && !r.criancaNasc && !jaPodeRequerer(r); }
   function esperaCert(r){ return fechado(r) && regularizada(r) && !r.certidaoRecebida && (!!r.criancaNasc || r.fatoGerador !== 'gestante'); }
+  // gestante dentro dos 28 dias antes do parto: vai para o INSS com o atestado (a certidão vem depois, se o INSS pedir)
   function noContratos(r){ return fechado(r) && !regularizada(r); }
   // prioridade do closer: gestante com parto até 30 dias (ou que já passou): depois de nascer a mãe perde a chance
   var PRIORIDADE_DIAS = 30;
+  var soMinhas = false;
+  function meuEmail(){ return String((state.me && state.me.email) || '').toLowerCase(); }
+  function meuNome(){ var e = meuEmail(), u = (state.equipe || []).filter(function(x){ return String(x.email).toLowerCase() === e; })[0]; return (u && u.nome) || e; }
+  function minha(r){ var e = meuEmail(); if (!e) return true; return [r.contatoCloserEmail, r.contratoPorEmail, r.posRespEmail, r.respEmail].some(function(x){ return String(x || '').toLowerCase() === e; }); }
+  // tempo parado na etapa atual e o limite de cada etapa
+  var LIMITE_ETAPA = { cadastro: 3, pos: 7, cert: 10 };
+  function etapaAtual(r){ return noCadastro(r) ? 'cadastro' : (noContratos(r) ? 'pos' : (esperaCert(r) ? 'cert' : '')); }
+  function diasParado(r){
+    var e = etapaAtual(r); if (!e) return null;
+    var base = e === 'cadastro' ? (r.leadMudouEm || r.ultimoContatoEm || r.dataCadastro || r.criadoEm) : e === 'pos' ? (r.posMudouEm || r.contratoEm) : (r.posMudouEm || r.criancaNasc);
+    return diasDesdeIso(base);
+  }
+  function atrasada(r){ var e = etapaAtual(r), d = diasParado(r); return !!e && d != null && d > LIMITE_ETAPA[e]; }
+  function tagParado(r){ if (!atrasada(r)) return ''; return '<span class="parado-tag" title="Passou do prazo desta etapa (' + LIMITE_ETAPA[etapaAtual(r)] + ' dias)">parada há ' + diasParado(r) + ' dias</span>'; }
   function prioridadeNasc(r){ if (r.fatoGerador !== 'gestante' || r.criancaNasc || !r.dpp) return null; var n = daysUntil(r.dpp); return n != null && n >= 0 && n <= PRIORIDADE_DIAS ? n : null; }   // só parto que ainda vai acontecer; depois de nascer não é prioridade
   function tagPrioridade(r){ var n = prioridadeNasc(r); if (n == null){ var d = (r.fatoGerador === 'gestante' && !r.criancaNasc && r.dpp) ? daysUntil(r.dpp) : null; return d != null && d < 0 ? '<span class="nasc-tag" title="A data prevista do parto passou: confirmar se o bebê já nasceu e atualizar o cadastro">Parto previsto passou há ' + (-d) + (d === -1 ? ' dia' : ' dias') + ' · bebê já nasceu?</span>' : ''; } return '<span class="prio-tag' + (n <= 7 ? ' crit' : '') + '" title="Fechar o contrato antes de o bebê nascer">' + (n < 0 ? 'PRIORIDADE · parto previsto passou há ' + (-n) + ' dias' : n === 0 ? 'PRIORIDADE · parto previsto é hoje' : 'PRIORIDADE · parto em ' + n + (n === 1 ? ' dia' : ' dias')) + '</span>'; }
   function etapaCtr(r){ return 'regularizar'; }
@@ -4216,7 +4271,7 @@ section.vw-dash{gap:16px!important}
   function editBtn(r){ return '<button type="button" class="ico-btn" data-act="edit" data-id="' + esc(r.id) + '" title="Editar cadastro" aria-label="Editar ' + esc(r.nome) + '"><svg class="i"><use href="#i-pencil"/></svg></button>'; }
   /* ---------- Pós-venda (Kanban): regulariza a documentação de quem fechou contrato ---------- */
   var POS_COLS = {
-    gest: [['falta_doc', 'Pendente documentação'], ['falta_gov', 'Pendente senha gov.br'], ['regularizada', 'Regularizada']],
+    gest: [['falta_doc', 'Pendente documentação'], ['falta_gov', 'Pendente senha gov.br'], ['guia', 'Guia / regularização no INSS'], ['regularizada', 'Regularizada']],
     nasc: [['falta_doc', 'Pendente documentação'], ['rural', 'Documentação rural'], ['falta_gov', 'Pendente senha gov.br'], ['regularizada', 'Regularizada']]
   };
   function posLane(r){ return r.fatoGerador === 'gestante' ? 'gest' : 'nasc'; }
@@ -4243,6 +4298,8 @@ section.vw-dash{gap:16px!important}
       '<div class="pv-l">' + esc(quando) + '</div>' +
       '<div class="pv-l">' + (cid ? esc(cid) + ' · ' : '') + ok + '/' + docs.length + ' docs</div>' +
       (fim ? '<div class="pv-ok">segue para ' + esc(dest) + '</div>' : atraso ? '<div class="pv-atraso">' + d + ' dias no Pós-venda</div>' : '<div class="pv-l">' + (d <= 0 ? 'chegou hoje' : d + (d === 1 ? ' dia' : ' dias') + ' no Pós-venda') + '</div>') +
+      (lane === 'gest' && et === 'guia' ? '<div class="pv-l">Guia: <b>' + (guiaDe(r) === 'paga' ? 'paga' : 'aguardando pagamento') + '</b>' + (guiaDe(r) === 'paga' ? '' : ' · <button type="button" class="linkbtn" data-guia-paga="' + esc(r.id) + '">marcar paga</button>') + '</div>' : '') +
+      (r.posResp ? '<div class="pv-l">Responsável: ' + esc(r.posResp) + '</div>' : '') +
       '<div class="pv-pe"><span class="pv-av" title="' + esc(r.contratoPor ? 'Fechou: ' + r.contratoPor : 'Sem closer registrado') + '">' + esc(iniciais(r.contratoPor || prospName(r.responsavelId))) + '</span>' +
       '<span class="pv-ic">' + (r.pastaUrl ? '<a href="' + esc(r.pastaUrl) + '" target="_blank" rel="noopener" title="Pasta no Drive" onclick="event.stopPropagation()"><svg class="i"><use href="#i-folder"/></svg></a>' : '') +
       (docs.length - ok ? '<span class="pv-pend" title="Faltam: ' + esc(docs.filter(function(x){ return !x.ok; }).map(function(x){ return x.n; }).join(', ')) + '"><svg class="i"><use href="#i-bellx"/></svg></span>' : '') +
@@ -4253,7 +4310,7 @@ section.vw-dash{gap:16px!important}
     Array.prototype.forEach.call($('pv-lane').querySelectorAll('button'), function(bt){ bt.setAttribute('aria-pressed', String(bt.dataset.l === pvLane)); });
     $('pv-atr').setAttribute('aria-pressed', String(pvAtr)); $('pv-atr').classList.toggle('primary', pvAtr);
     var busca = function(r){ return buscaOk(r, ctrQ2); };
-    var emPos = state.rows.filter(noContratos).filter(busca);
+    var emPos = state.rows.filter(noContratos).filter(busca).filter(function(r){ return !soMinhas || minha(r); });
     var regs = state.rows.filter(function(r){ return fechado(r) && regularizada(r) && busca(r); });
     var gest = emPos.filter(function(r){ return posLane(r) === 'gest'; }), nasc = emPos.filter(function(r){ return posLane(r) === 'nasc'; });
     var atrasadas = emPos.filter(function(r){ return diasNoPos(r) >= PV_DIAS_ATRASO; }), semDoc = emPos.filter(function(r){ return docsApp(r).some(function(x){ return !x.ok; }); });
@@ -4292,7 +4349,7 @@ section.vw-dash{gap:16px!important}
     if (etapa === '__cad'){ voltarCadastro(id); render(); return; }
     var r = acharRow(id); if (!r) return;
     var antes = { posEtapa: r.posEtapa || '', penalidades: Array.isArray(r.penalidades) ? r.penalidades : [] };
-    var mudanca = { posEtapa: etapa, posMudouEm: new Date().toISOString(), atualizadoEm: new Date().toISOString() };
+    var mudanca = { posEtapa: etapa, posMudouEm: new Date().toISOString(), atualizadoEm: new Date().toISOString(), posResp: meuNome(), posRespEmail: meuEmail() };
     if (etapa === 'regularizada'){
       var faltam = docsApp(r).filter(function(x){ return !x.ok; });
       if (faltam.length){
@@ -4788,7 +4845,99 @@ section.vw-dash{gap:16px!important}
     var els = document.querySelectorAll('.cron[data-fim]'), t = Date.now();
     for (var i = 0; i < els.length; i++) els[i].textContent = cronTexto(+els[i].getAttribute('data-fim') - t);
   }, 1000);
-  function render(){ pintarCard(); renderEstadosCfg(); renderRegioes(); renderContratos(); renderDesq(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
+  /* ---------- avisos para a equipe ---------- */
+  function avisosLista(){
+    var a = [], hoje = iso(new Date());
+    var add = function(tipo, r, txt){ a.push({ tipo: tipo, id: r.id, nome: r.nome || 'Sem nome', txt: txt }); };
+    var cpfs = {};
+    state.rows.forEach(function(r){
+      if (r.arquivado) return;
+      var d = String(r.cpf || '').replace(/\D/g, ''); if (d.length === 11){ (cpfs[d] = cpfs[d] || []).push(r); }
+      if (noCadastro(r) && prioridadeNasc(r) != null) add('Parto perto e sem contrato', r, 'parto em ' + prioridadeNasc(r) + ' dias');
+      if (fechado(r) && regularizada(r) && r.fatoGerador === 'gestante' && !r.criancaNasc && jaPodeRequerer(r) && !requerido(r)) add('Já pode protocolar no INSS', r, 'a partir de ' + fmtDate(pedeRequerer(r)) + ' (28 dias antes do parto)');
+      if (r.inssStatus === 'exigencia' && r.exigenciaPrazo){ var n = daysUntil(r.exigenciaPrazo); if (n != null && n <= 5) add('Exigência do INSS vencendo', r, n < 0 ? 'prazo venceu há ' + (-n) + ' dias' : 'faltam ' + n + ' dias'); }
+      if (atrasada(r)) add('Parada além do prazo', r, (etapaAtual(r) === 'pos' ? 'Pós-venda' : etapaAtual(r) === 'cert' ? 'cobrar certidão' : 'Cadastro') + ' há ' + diasParado(r) + ' dias');
+      if (r.fatoGerador === 'gestante' && !r.criancaNasc && r.dpp){ var p = daysUntil(r.dpp); if (p != null && (p < -45 || p > 300)) add('Data para conferir', r, 'parto previsto ' + fmtDate(r.dpp) + (p < 0 ? ' (já passou: o bebê nasceu?)' : ' (muito distante)')); }
+      if (r.criancaNasc && r.criancaNasc > hoje) add('Data para conferir', r, 'nascimento no futuro: ' + fmtDate(r.criancaNasc));
+    });
+    Object.keys(cpfs).forEach(function(k){ if (cpfs[k].length > 1) cpfs[k].forEach(function(r){ add('CPF repetido', r, 'mesmo CPF em ' + cpfs[k].length + ' cadastros'); }); });
+    return a;
+  }
+  function pintarAvisosBtn(){ var b = $('btn-avisos'); if (!b) return; var n = avisosLista().length; $('avisos-n').textContent = n || ''; $('avisos-n').hidden = !n; }
+  function abrirAvisos(){
+    var l = avisosLista(), grupos = {};
+    l.forEach(function(x){ (grupos[x.tipo] = grupos[x.tipo] || []).push(x); });
+    var ordem = ['Parto perto e sem contrato', 'Já pode protocolar no INSS', 'Exigência do INSS vencendo', 'Parada além do prazo', 'CPF repetido', 'Data para conferir'];
+    var f = document.createElement('div'); f.className = 'cid-sheet';
+    f.innerHTML = '<div style="width:min(620px,100%)"><h3>Avisos</h3><p>' + (l.length ? l.length + (l.length === 1 ? ' ponto para olhar' : ' pontos para olhar') : 'Nada pendente agora.') + '</p><div class="lista av-lista">' +
+      ordem.filter(function(k){ return grupos[k]; }).map(function(k){ return '<div class="av-g"><b>' + esc(k) + ' <span class="tnum">' + grupos[k].length + '</span></b>' + grupos[k].map(function(x){ return '<button type="button" data-av="' + esc(x.id) + '"><span>' + esc(x.nome) + '</span><small>' + esc(x.txt) + '</small></button>'; }).join('') + '</div>'; }).join('') +
+      '</div><div style="text-align:right;margin-top:10px"><button type="button" class="btn" data-x>Fechar</button></div></div>';
+    document.body.appendChild(f);
+    f.addEventListener('click', function(e){ if (e.target === f || e.target.closest('[data-x]')) return f.remove(); var b = e.target.closest('[data-av]'); if (b){ f.remove(); abrirCard(b.dataset.av, true); } });
+  }
+  /* ---------- linha do tempo da cliente (no card) ---------- */
+  function eventosCliente(r){
+    var ev = [], q = function(em, txt){ if (em) ev.push({ em: String(em), txt: txt }); };
+    q(r.criadoEm || r.dataCadastro, 'Cadastrada' + (prospName(r.responsavelId) ? ' por ' + prospName(r.responsavelId) : r.criadoPorNome ? ' por ' + r.criadoPorNome : ''));
+    q(r.ultimoContatoEm, 'Contato' + (r.contatoCloser ? ' de ' + r.contatoCloser : '') + (r.tentativas ? ' · ' + r.tentativas + ' tentativa(s) sem atender' : ''));
+    q(r.desqualEm, 'Desqualificada' + (r.desqualMotivo ? ': ' + r.desqualMotivo : ''));
+    q(r.contratoEm, 'Contrato fechado' + (r.contratoPor ? ' por ' + r.contratoPor : '') + (r.propostaAceita ? ' · proposta aceita' : ''));
+    q(r.posMudouEm, 'Pós-venda: ' + ({ falta_doc: 'pendente documentação', falta_gov: 'pendente senha gov.br', guia: 'guia / regularização', rural: 'documentação rural', regularizada: 'regularizada' }[r.posEtapa] || 'em andamento') + (r.posResp ? ' (' + r.posResp + ')' : ''));
+    q(r.guiaPagaEm, 'Guia paga');
+    q(r.criancaNasc, 'Bebê nasceu');
+    q(r.certidaoEm, 'Certidão de nascimento recebida');
+    q(r.der, 'Requerimento no INSS' + (r.protocoloInss ? ' · protocolo ' + r.protocoloInss : ''));
+    (Array.isArray(r.penalidades) ? r.penalidades : []).forEach(function(p){ q(p.em, 'Penalidade ' + (p.percentual || 50) + '% · ' + (p.tipo === 'contato_expirado' ? 'prazo de contato (' + (p.closer || 'closer') + ')' : 'pasta incompleta (' + (p.pos || 'pós-venda') + ')')); });
+    return ev.sort(function(a, b){ return b.em.localeCompare(a.em); });
+  }
+  function htmlLinhaTempo(r){
+    var ev = eventosCliente(r); if (!ev.length) return '';
+    return '<div class="lt"><div class="lt-t">Linha do tempo</div>' + ev.map(function(e){ var d = e.em.slice(0, 10); return '<div class="lt-i"><time>' + fmtDate(d) + (e.em.length > 10 ? ' ' + e.em.slice(11, 16) : '') + '</time><span>' + esc(e.txt) + '</span></div>'; }).join('') + '</div>';
+  }
+  /* ---------- cobrar a mãe pelo WhatsApp (mensagem pronta; a equipe envia) ---------- */
+  function msgCobranca(r){
+    var n = String(r.nome || '').trim().split(/\s+/)[0] || 'tudo bem';
+    var falta = docsApp(r).filter(function(x){ return !x.ok; }).map(function(x){ return x.n; });
+    var base = 'Olá, ' + n + '! Aqui é da equipe Nascer com Direitos. ';
+    if (noContratos(r) && falta.length) return base + 'Para seguir com o seu salário-maternidade, ainda falta: ' + falta.join(', ') + '. Pode mandar a foto por aqui?';
+    if (noContratos(r) && posEtapaDe(r) === 'falta_gov') return base + 'Precisamos regularizar o seu acesso ao gov.br para seguir com o pedido. Podemos falar agora?';
+    if (noContratos(r) && posEtapaDe(r) === 'rural') return base + 'Para o seu pedido, precisamos de documentos que comprovem o trabalho rural (por exemplo, declaração do sindicato, notas do produtor, cadastro na agricultura). Pode mandar a foto do que tiver?';
+    if (esperaCert(r)) return base + 'O bebê já nasceu? Por favor, mande a foto da certidão de nascimento para darmos entrada no seu benefício.';
+    return base + 'Podemos conversar sobre o seu salário-maternidade?';
+  }
+  /* ---------- relatório de gestão (Configurações › Relatório) ---------- */
+  var relPer = 'mes';
+  function renderRelatorio(){
+    var box = $('cfg-rel'); if (!box) return;
+    var hoje = iso(new Date()), ini = relPer === 'mes' ? hoje.slice(0, 8) + '01' : relPer === '0' ? '0000' : (function(){ var d = new Date(); d.setDate(d.getDate() - 29); return iso(d); })();
+    var no = function(s){ s = String(s || '').slice(0, 10); return !!s && s >= ini && s <= hoje; };
+    var por = {}, conta = function(nome, k){ if (!nome) return; por[nome] = por[nome] || { contatos: 0, fechamentos: 0, penClo: 0, regs: 0, penPos: 0 }; por[nome][k]++; };
+    var parc = {}, est = {};
+    state.rows.forEach(function(r){
+      if (no(r.ultimoContatoEm)) conta(r.contatoCloser, 'contatos');
+      if (no(r.contratoEm)) conta(r.contratoPor, 'fechamentos');
+      if (r.posEtapa === 'regularizada' && no(r.posMudouEm)) conta(r.posResp, 'regs');
+      (Array.isArray(r.penalidades) ? r.penalidades : []).forEach(function(p){ if (no(p.em)) conta(p.tipo === 'contato_expirado' ? p.closer : p.pos, p.tipo === 'contato_expirado' ? 'penClo' : 'penPos'); });
+      var dc = String(r.dataCadastro || r.criadoEm || '').slice(0, 10);
+      if (no(dc)){
+        var pn = prospName(r.responsavelId) || 'Sem parceiro'; parc[pn] = parc[pn] || { maes: 0, contratos: 0, desq: 0 }; parc[pn].maes++; if (r.contratoEm) parc[pn].contratos++; if (r.leadStatus === 'desqualificado') parc[pn].desq++;
+        var uf = String(r.cidadeUf || ((prospById(r.responsavelId) || {}).regiaoId) || '').toUpperCase() || 'Sem estado'; est[uf] = est[uf] || { maes: 0, contratos: 0 }; est[uf].maes++; if (r.contratoEm) est[uf].contratos++;
+      }
+    });
+    var tab = function(cab, linhas){ return '<div class="card list rel-tab"><table><thead><tr>' + cab.map(function(c, i){ return '<th' + (i ? ' class="n"' : '') + '>' + c + '</th>'; }).join('') + '</tr></thead><tbody>' + (linhas.length ? linhas.join('') : '<tr><td colspan="' + cab.length + '" class="vz">Nada no período.</td></tr>') + '</tbody></table></div>'; };
+    var td = function(v, i){ return '<td' + (i ? ' class="n tnum"' : '') + '>' + esc(String(v)) + '</td>'; };
+    box.innerHTML = '<div class="seg-bi" id="rel-per" style="flex:none;align-self:flex-start"><button type="button" data-p="30" aria-pressed="' + (relPer === '30') + '">30 dias</button><button type="button" data-p="mes" aria-pressed="' + (relPer === 'mes') + '">Este mês</button><button type="button" data-p="0" aria-pressed="' + (relPer === '0') + '">Tudo</button></div>' +
+      '<div class="sec-rot">Por pessoa da equipe</div>' + tab(['Pessoa', 'Contatos', 'Contratos fechados', 'Penalidades (closer)', 'Regularizadas', 'Penalidades (pós-venda)'], Object.keys(por).sort().map(function(k){ var x = por[k]; return '<tr>' + [k, x.contatos, x.fechamentos, x.penClo, x.regs, x.penPos].map(td).join('') + '</tr>'; })) +
+      '<div class="sec-rot">Por parceiro / prospectador</div>' + tab(['Parceiro', 'Mães indicadas', 'Contratos', 'Desqualificadas'], Object.keys(parc).sort(function(a, b){ return parc[b].maes - parc[a].maes; }).map(function(k){ var x = parc[k]; return '<tr>' + [k, x.maes, x.contratos, x.desq].map(td).join('') + '</tr>'; })) +
+      '<div class="sec-rot">Por estado</div>' + tab(['Estado', 'Mães cadastradas', 'Contratos'], Object.keys(est).sort().map(function(k){ var x = est[k]; return '<tr>' + [((typeof ESTADOS_BI !== 'undefined' && ESTADOS_BI) || {})[k] || k, x.maes, x.contratos].map(td).join('') + '</tr>'; }));
+  }
+  document.addEventListener('click', function(e){
+    var p = e.target.closest && e.target.closest('#rel-per button[data-p]'); if (p){ relPer = p.dataset.p; renderRelatorio(); return; }
+    var m = e.target.closest && e.target.closest('[data-minhas]'); if (m){ soMinhas = !soMinhas; Array.prototype.forEach.call(document.querySelectorAll('[data-minhas]'), function(b){ b.setAttribute('aria-pressed', String(soMinhas)); b.classList.toggle('primary', soMinhas); }); render(); return; }
+    var g = e.target.closest && e.target.closest('[data-guia-paga]'); if (g){ e.stopPropagation(); var rg = acharRow(g.dataset.guiaPaga); if (!rg) return; patchRow(rg.id, { guiaStatus: 'paga', guiaPagaEm: iso(new Date()), atualizadoEm: new Date().toISOString() }).then(function(){ toast('Guia paga: ' + rg.nome); }).catch(function(e2){ toast(errMsg(e2)); }); return; }
+    if (e.target.closest && e.target.closest('#btn-avisos')) abrirAvisos();
+  }, true);
+  function render(){ pintarAvisosBtn(); renderRelatorio(); pintarCard(); renderEstadosCfg(); renderRegioes(); renderContratos(); renderDesq(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
   var clQ = '';
   // stage of each process, derived from what is already recorded (no extra typing)
   var ETAPAS = [
@@ -6383,6 +6532,9 @@ section.vw-dash{gap:16px!important}
       exige(gest ? !!$('f-dpp').value : !!$('f-cnasc').value, gest ? 'data prevista do parto' : 'data de nascimento da criança', gest ? 'f-dpp' : 'f-cnasc');
       if (faltaN.length){ toast('Falta preencher: ' + faltaN.join(', ') + '.'); if ($(primeiroN)) $(primeiroN).focus(); return; }
     }
+    // datas que não fazem sentido (erro de digitação)
+    if ($('f-fato').value === 'gestante' && $('f-dpp').value){ var ndpp = daysUntil($('f-dpp').value); if (ndpp != null && ndpp < -45){ toast('A data prevista do parto já passou há ' + (-ndpp) + ' dias. Se o bebê nasceu, marque "Já nasceu" e informe a data de nascimento.'); $('f-dpp').focus(); return; } if (ndpp != null && ndpp > 300){ toast('Data prevista do parto muito distante. Confira o ano.'); $('f-dpp').focus(); return; } }
+    if ($('f-cnasc').value && $('f-fato').value !== 'gestante'){ var nn = daysUntil($('f-cnasc').value); if (nn != null && nn > 0){ toast('A data de nascimento está no futuro. Confira a data.'); $('f-cnasc').focus(); return; } }
     var prev = state.rows.find(function(r){ return r.id === state.editing; }) || {};
     var situacao = $('f-situacao').value, avisado = situacao === 'avisado';
     var avisoEm = $('f-avisoem').value || (avisado ? iso(new Date()) : '');
