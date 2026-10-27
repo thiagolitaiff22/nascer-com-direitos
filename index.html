@@ -1340,6 +1340,11 @@ section.vw-dash{gap:10px!important}
 #form.novo .f-body > .field:has(#f-cnasc){display:flex!important;order:9}
 #form.novo.gest .f-body > .field:has(#f-cnasc){display:none!important}
 #form.novo .f-body > .field:has(#f-dpp):not([hidden]){display:flex!important;order:10}
+#form.novo .f-body > #f-atend-box{display:flex!important;order:11}
+#form.novo .f-body > #f-prop-box{display:flex!important;order:12}
+#form.novo .f-body > .field:has(#f-obs){display:flex!important;order:13;grid-column:1/-1}
+.prop-chk{display:flex!important;align-items:center;justify-content:flex-start!important;gap:10px;font-weight:600;padding:10px 12px;border:1px solid var(--line-2);border-radius:10px;background:var(--soft);text-align:left;width:100%;cursor:pointer}.prop-chk input{width:18px!important;height:18px!important;flex:none!important;margin:0!important}
+#f-obs{min-height:72px}
 #form.novo.com-pasta .f-body > .field:has(#f-pasta){display:flex!important;order:1}
 #form.novo .field:has(#f-resp) .hint{display:none}
 .ficha-foto{display:flex;align-items:center;gap:12px;margin:8px 0 12px}
@@ -2733,6 +2738,8 @@ section.vw-dash{gap:16px!important}
       <div class="field" hidden><label for="f-nasc">Data de nascimento da mãe</label><input id="f-nasc" type="date"></div>
       </div></details>
 
+      <div class="field" id="f-atend-box"><label for="f-atend">Atendente</label><select id="f-atend"><option value="">Sem atendente</option></select></div>
+      <div class="field" id="f-prop-box"><label>Proposta</label><label class="chk prop-chk"><input id="f-prop" type="checkbox"> Proposta aceita pela cliente</label><input id="f-propobs" placeholder="Detalhe da proposta (opcional)" style="margin-top:6px"></div>
       <div class="section-lbl">Criança</div>
       <div class="field full" id="f-seg-box"><label>A criança</label><div class="seg-bi" id="f-seg"><button type="button" data-v="gestante" aria-pressed="false">Ainda gestante</button><button type="button" data-v="parto" aria-pressed="true">Já nasceu</button></div></div>
       <div class="field"><label for="f-fato">Fato gerador</label><select id="f-fato"><option value="parto">Parto</option><option value="gestante">Ainda gestante</option><option value="adocao">Adoção</option><option value="guarda">Guarda para adoção</option><option value="natimorto">Natimorto</option><option value="aborto">Aborto não criminoso</option></select></div>
@@ -3525,7 +3532,8 @@ section.vw-dash{gap:16px!important}
       // os mesmos dados que o aplicativo coleta; RG, NIT, nascimento da mãe e endereço só aparecem se alguém preencheu
       ['Nome completo', r.nome], ['CPF', r.cpf], ['Telefone', contato], ['Cidade', cidadeCli(r)], ['Parceiro', prospName(r.responsavelId)],
       ['RG', r.rg ? r.rg : null], ['Nascimento', r.nascimento ? fmtDate(r.nascimento) : null], ['NIT / PIS', r.nit ? r.nit : null], ['Endereço', r.endereco ? r.endereco : null],
-      ['Fechamento', r.contratoEm ? 'fechado' + (r.contratoPor ? ' por ' + r.contratoPor : '') + ' em ' + fmtDate(String(r.contratoEm).slice(0, 10)) + (r.propostaAceita ? ' · proposta aceita' + (r.propostaObs ? ' (' + r.propostaObs + ')' : '') : '') : null], ['Criança', crianca],
+      ['Atendente', r.atendente || r.contratoPor || null], ['Proposta', r.propostaAceita ? 'aceita pela cliente' + (r.propostaObs ? ' · ' + r.propostaObs : '') : null],
+      ['Fechamento', r.contratoEm ? 'fechado' + (r.contratoPor ? ' por ' + r.contratoPor : '') + ' em ' + fmtDate(String(r.contratoEm).slice(0, 10)) : null], ['Criança', crianca],
       ['Testemunhas', r.tipoSegurada === 'especial' || r.testemunhas ? r.testemunhas : null],
       ['INSS', inss], ['Exigência', r.inssStatus === 'exigencia' ? (r.exigenciaObs || 'sem descrição') + (r.exigenciaPrazo ? ' · prazo ' + fmtDate(r.exigenciaPrazo) : '') : null],
       ['Motivo do indeferimento', r.inssStatus === 'indeferido' ? r.motivoIndeferimento : null],
@@ -3534,7 +3542,7 @@ section.vw-dash{gap:16px!important}
       ['Aviso', aviso], ['Resultado', res],
       ['Pagamento', r.pagamento && PAG[r.pagamento] ? PAG[r.pagamento][0] : ''], ['Penalidades', penalidadesTxt(r)], ['Observações', obsDaEquipe(r) || null]
     ].filter(function(c){ return c[1] !== null; });
-    if (compacto) campos = campos.filter(function(c){ return ['Nome completo', 'CPF', 'RG', 'Nascimento', 'NIT / PIS', 'Telefone', 'Cidade', 'Endereço', 'Parceiro', 'Fechamento', 'Criança', 'Testemunhas', 'Penalidades', 'Observações'].indexOf(c[0]) >= 0; });
+    if (compacto) campos = campos.filter(function(c){ return ['Nome completo', 'CPF', 'RG', 'Nascimento', 'NIT / PIS', 'Telefone', 'Cidade', 'Endereço', 'Parceiro', 'Atendente', 'Proposta', 'Fechamento', 'Criança', 'Testemunhas', 'Penalidades', 'Observações'].indexOf(c[0]) >= 0; });
     var fl = faltaDocs(r);
     var ok = '<i class="fc-ok"><svg class="i"><use href="#i-check"/></svg></i>', nada = '<i class="fc-nao">–</i>';
     var fotoOk = /^data:image\/(jpeg|png);base64,/.test(r.fotoCliente || '');
@@ -4545,12 +4553,12 @@ section.vw-dash{gap:16px!important}
     var f = document.createElement('div'); f.className = 'cid-sheet';
     f.innerHTML = '<div><h3>Fechar contrato</h3><p>' + esc(r.nome) + '</p>' +
       '<label class="mini" style="display:block;margin:6px 0 4px">Atendente que fez o fechamento</label><select id="fc-quem" style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;margin-bottom:10px"><option value="">Escolha a atendente</option>' +
-      quem.map(function(u){ return '<option value="' + esc(u.email) + '"' + (String(u.email).toLowerCase() === meu ? ' selected' : '') + '>' + esc(u.nome || u.email) + '</option>'; }).join('') + '<option value="__outra">Outra atendente (digitar o nome)</option></select>' +
+      quem.map(function(u){ return '<option value="' + esc(u.email) + '"' + (String(u.email).toLowerCase() === (String(r.atendenteEmail || '').toLowerCase() || meu) ? ' selected' : '') + '>' + esc(u.nome || u.email) + '</option>'; }).join('') + '<option value="__outra">Outra atendente (digitar o nome)</option></select>' +
       '<input id="fc-outra" placeholder="Nome da atendente" hidden style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;margin:-4px 0 10px">' +
       '<label class="mini" style="display:block;margin:0 0 4px">A criança</label><select id="fc-fato" style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;margin-bottom:10px"><option value="gestante"' + (r.fatoGerador === 'gestante' ? ' selected' : '') + '>Ainda gestante</option><option value="parto"' + (r.fatoGerador !== 'gestante' ? ' selected' : '') + '>Já nasceu (cobrar documentação rural)</option></select>' +
       '<label class="mini" style="display:block;margin:0 0 4px">Data do fechamento</label><input type="date" id="fc-data" value="' + iso(new Date()) + '">' +
-      '<label style="display:flex;gap:10px;align-items:flex-start;margin:0 0 6px;font-size:14px;line-height:1.35"><input type="checkbox" id="fc-aceita" style="margin-top:3px;width:18px;height:18px;flex:none"><span><b>A cliente aceitou a proposta</b><br><span class="mini">Marque somente se ela aceitou a proposta na ligação.</span></span></label>' +
-      '<input id="fc-prop" placeholder="Detalhe da proposta aceita (opcional)" style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;margin:0 0 12px">' +
+      '<label style="display:flex;gap:10px;align-items:flex-start;margin:0 0 6px;font-size:14px;line-height:1.35"><input type="checkbox" id="fc-aceita"' + (r.propostaAceita ? ' checked' : '') + ' style="margin-top:3px;width:18px;height:18px;flex:none"><span><b>A cliente aceitou a proposta</b><br><span class="mini">Marque somente se ela aceitou a proposta na ligação.</span></span></label>' +
+      '<input id="fc-prop" value="' + esc(r.propostaObs || '') + '" placeholder="Detalhe da proposta aceita (opcional)" style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;margin:0 0 12px">' +
       '<p style="margin:0 0 10px">A cliente vai para o <b>Pós-venda</b>.</p>' +
       '<div style="display:flex;gap:8px;justify-content:flex-end"><button type="button" class="btn" data-x>Cancelar</button><button type="button" class="btn primary" data-ok>Confirmar fechamento</button></div></div>';
     ($('dlg').open ? $('dlg') : document.body).appendChild(f);
@@ -6490,6 +6498,13 @@ section.vw-dash{gap:16px!important}
     $('f-prev').value = r ? r.previsao || '' : '';
     protHint();
     $('f-obs').value = r ? r.obs || '' : '';
+    (function(){
+      var eq = (state.equipe || []).filter(function(u){ return u.ativo !== false && u.email; }).sort(function(a, b){ return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
+      var atual = r ? String(r.atendenteEmail || r.contratoPorEmail || '').toLowerCase() : String((state.me && state.me.email) || '').toLowerCase();
+      $('f-atend').innerHTML = '<option value="">Sem atendente</option>' + eq.map(function(u){ return '<option value="' + esc(u.email) + '"' + (String(u.email).toLowerCase() === atual ? ' selected' : '') + '>' + esc(u.nome || u.email) + '</option>'; }).join('');
+      $('f-prop').checked = !!(r && r.propostaAceita);
+      $('f-propobs').value = r ? r.propostaObs || '' : '';
+    })();
     renderFolderField(r);
     carregarHistoricoCliente(r);
     $('f-del').hidden = !r; delArmed = false; $('f-del').classList.remove('armed'); $('f-del').textContent = 'Excluir';
@@ -6576,6 +6591,8 @@ section.vw-dash{gap:16px!important}
       avisado: avisado, situacao: situacao, responsavelId: $('f-resp').value || (!state.editing && prospForAddress($('f-end').value) ? prospForAddress($('f-end').value).id : ''), avisadoEm: avisoEm || null, avisoRespId: $('f-aviso-resp').value, avisadoA: $('f-avisadoa').value.trim(), meioAviso: avisado ? $('f-meio').value : (prev.meioAviso || ''),
       processo: $('f-proc').value.trim(), tese: $('f-tese').value.trim(),
       nascimento: $('f-nasc').value || '', nit: $('f-nit').value.trim(), tipoSegurada: $('f-tipo').value, atividade: $('f-ativ').value.trim(),
+      atendenteEmail: $('f-atend').value, atendente: $('f-atend').value ? ($('f-atend').selectedOptions[0] || {}).textContent || '' : '',
+      propostaAceita: $('f-prop').checked, propostaObs: $('f-propobs').value.trim(), propostaAceitaEm: $('f-prop').checked ? (prev.propostaAceitaEm || iso(new Date())) : '',
       fatoGerador: $('f-fato').value, crianca: nomeProprio($('f-crianca').value.trim()), criancaNasc: $('f-cnasc').value || '', dpp: $('f-fato').value === 'gestante' ? ($('f-dpp').value || '') : '', testemunhas: $('f-test').value.trim(),
       der: $('f-der').value || '', protocoloInss: $('f-pinss').value.trim(), nb: $('f-nb').value.trim(),
       inssStatus: $('f-inss').value || ($('f-der').value || $('f-pinss').value.trim() ? 'analise' : ''),
