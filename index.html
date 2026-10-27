@@ -2240,6 +2240,13 @@ section.vw-dash{gap:16px!important}
 #cad-list .row.cad-closer .cad-atend .tent{border:1px solid var(--line-2)!important;border-radius:8px!important;background:transparent!important;font-weight:600!important;color:var(--ink-2)!important}
 #cad-list .row.cad-closer .cad-atend .tent:hover{border-color:var(--gold,#a07a45)!important;color:var(--ink)!important}
 #cad-list .row.cad-closer .cad-origem{display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px}
+/* situação "Proposta aceita" e listas suspensas combinando com o tema */
+#cad-list select.lead-proposta{background-color:rgba(34,139,84,.16)!important;color:#1f8a54!important}
+:root[data-theme="dark"] #cad-list select.lead-proposta{background-color:rgba(63,161,107,.2)!important;color:#7fd3a3!important}
+select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
+:root[data-theme="dark"] select{color-scheme:dark}
+:root[data-theme="dark"] select option{background:#1f1a14;color:#f1e3c8}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) select{color-scheme:dark}}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -4025,7 +4032,7 @@ section.vw-dash{gap:16px!important}
     var nFalta = todos.filter(docsPendentes).length;
     var SITS = [['', 'Todas as situações · ' + todos.length], ['atrasadas', 'Atrasadas (paradas) · ' + todos.filter(atrasada).length], ['prioridade', 'Prioridade (parto perto) · ' + todos.filter(function(r){ return prioridadeNasc(r) != null; }).length], ['faltam', 'Faltam documentos · ' + nFalta], ['pronto', 'Prontos para requerer · ' + conta.pronto], ['conferir', 'Conferir dados · ' + conta.conferir], ['incompleto', 'Dados incompletos · ' + conta.incompleto], ['gestante', 'Aguardando o parto · ' + conta.gestante], ['prazo', 'Prazo perto do fim · ' + nPrazo], ['pendencias', 'Pendências (documento ou dados)'],
       ['l:novo', 'Para ligar (novos) · ' + todos.filter(function(r){ return leadDe(r) === 'novo'; }).length], ['l:retornar', 'Retornar depois · ' + todos.filter(function(r){ return leadDe(r) === 'retornar'; }).length],
-      ['l:sem_resposta', 'Sem resposta · ' + todos.filter(function(r){ return leadDe(r) === 'sem_resposta'; }).length], ['l:contato', 'Em contato · ' + todos.filter(function(r){ return leadDe(r) === 'contato'; }).length]];
+      ['l:sem_resposta', 'Sem resposta · ' + todos.filter(function(r){ return leadDe(r) === 'sem_resposta'; }).length], ['l:proposta', 'Proposta aceita · ' + todos.filter(function(r){ return leadDe(r) === 'proposta'; }).length], ['l:contato', 'Em contato · ' + todos.filter(function(r){ return leadDe(r) === 'contato'; }).length]];
     $('cad-sit').innerHTML = SITS.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === cadSit ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
     $('cad-sit').classList.toggle('ativo', !!cadSit);
     var lista = todos.filter(function(r){ return (!cadSit || (cadSit === 'atrasadas' ? atrasada(r) : cadSit === 'prioridade' ? prioridadeNasc(r) != null : cadSit === 'faltam' ? docsPendentes(r) : cadSit === 'pendencias' ? (docsPendentes(r) || situacaoCad(r)[0] === 'incompleto') : cadSit === 'prazo' ? !!prazoTag(r) : /^l:/.test(cadSit) ? leadDe(r) === cadSit.slice(2) : situacaoCad(r)[0] === cadSit)) && buscaCliente(r, cadQ); })
@@ -4217,7 +4224,7 @@ section.vw-dash{gap:16px!important}
   });
 
   /* ---------- Cadastro como lead, Contratos fechados e Pagamento de guia ---------- */
-  var LEAD = { novo: 'Novo lead', contato: 'Em contato', sem_resposta: 'Sem resposta', retornar: 'Retornar depois', perdido: 'Perdido (não fechou)', desqualificado: 'Desqualificado' };
+  var LEAD = { novo: 'Novo lead', contato: 'Em contato', proposta: 'Proposta aceita', sem_resposta: 'Sem resposta', retornar: 'Retornar depois', perdido: 'Perdido (não fechou)', desqualificado: 'Desqualificado' };
   // regras automáticas: 3 tentativas sem atender = sem resposta; em contato há mais de 3 dias = sem resposta;
   // sem resposta há mais de 15 dias = perdido; "retornar depois" volta para "novo lead" na data marcada
   var LEAD_TENTATIVAS = 3, LEAD_DIAS_CONTATO = 3, LEAD_DIAS_PERDIDO = 15;
@@ -4251,7 +4258,7 @@ section.vw-dash{gap:16px!important}
     }
     return k;
   }
-  var LEAD_ORDEM = { novo: 0, retornar: 1, contato: 2, sem_resposta: 3, perdido: 4, desqualificado: 5 };
+  var LEAD_ORDEM = { proposta: -1, novo: 0, retornar: 1, contato: 2, sem_resposta: 3, perdido: 4, desqualificado: 5 };
   function leadSelect(r){
     var k = leadDe(r);
     return '<select class="inss-sel lead-sel lead-' + k + '" data-lead="' + esc(r.id) + '" aria-label="Situação do contato com ' + esc(r.nome) + '">' +
@@ -4519,11 +4526,12 @@ section.vw-dash{gap:16px!important}
         await patchRow(r.id, { ctrEtapa: sl.value, atualizadoEm: new Date().toISOString() });
         toast(CTR_ETAPAS[sl.value][0] + ': ' + r.nome, 'Desfazer', function(){ patchRow(r.id, antesC).catch(function(e2){ toast(errMsg(e2)); }); });
       } else {
-        var antesL = { leadStatus: r.leadStatus || '', arquivado: !!r.arquivado, arquivadoEm: r.arquivadoEm || '', desqualMotivo: r.desqualMotivo || '', desqualEm: r.desqualEm || '', contatoPrazoEm: r.contatoPrazoEm || '' };
+        var antesL = { leadStatus: r.leadStatus || '', arquivado: !!r.arquivado, arquivadoEm: r.arquivadoEm || '', desqualMotivo: r.desqualMotivo || '', desqualEm: r.desqualEm || '', contatoPrazoEm: r.contatoPrazoEm || '', propostaAceita: !!r.propostaAceita, propostaAceitaEm: r.propostaAceitaEm || '', atendente: r.atendente || '', atendenteEmail: r.atendenteEmail || '' };
         var agoraL = new Date().toISOString();
         var p = { leadStatus: sl.value, leadMudouEm: agoraL, atualizadoEm: agoraL };
         if (sl.value === 'contato' || sl.value === 'sem_resposta') p.ultimoContatoEm = agoraL;
         p.contatoPrazoEm = ''; if (sl.value === 'contato') Object.assign(p, prazoContato());
+        if (sl.value === 'proposta'){ p.propostaAceita = true; p.propostaAceitaEm = r.propostaAceitaEm || iso(new Date()); if (!r.atendenteEmail){ p.atendente = meuNome(); p.atendenteEmail = meuEmail(); } }
         if (sl.value === 'novo'){ p.tentativas = 0; p.retornarEm = ''; }
         if (sl.value === 'desqualificado'){
           var motivo = String(window.prompt('Desqualificado: descreva o motivo (obrigatório).', r.desqualMotivo || '') || '').trim();
