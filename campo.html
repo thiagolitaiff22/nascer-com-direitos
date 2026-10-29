@@ -898,7 +898,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 58;
+  var APP_VERSAO = 59;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -2529,6 +2529,13 @@ button,a,label,[role=button]{touch-action:manipulation}
       ['l-nome', 'l-fone', 'l-cidade', 'l-cpf', 'l-dpp', 'l-cnasc'].forEach(function(i){ var l = $(i); if (l && l.querySelector('input') && !l.querySelector('input').value.trim()) l.classList.add('falta'); });
       var msg = 'Para enviar o cadastro, falta preencher: ' + faltaDados.join(', ') + '.';
       falar(msg); alert(msg); if ($(primeiro)) $(primeiro).focus(); return;
+    }
+    // bebê já nascido: só até 3 meses de vida (e a data não pode ser no futuro)
+    if (!gestante()){
+      var dn = new Date(lsGet('campo_crianca_nasc') + 'T12:00:00'), hj = new Date(); hj.setHours(12, 0, 0, 0);
+      var dias = Math.round((hj - dn) / 86400000);
+      if (dias < 0){ var m0 = 'A data de nascimento está no futuro. Confira a data.'; falar(m0); alert(m0); if ($('cnasc')) $('cnasc').focus(); return; }
+      if (dias > 90){ var m1 = 'Só cadastramos bebês com até 3 meses de nascidos. Este bebê tem ' + Math.floor(dias / 30) + ' meses.'; falar(m1); alert(m1); if ($('cnasc')) $('cnasc').focus(); return; }
     }
     var falta = DOCS.filter(function(d){ return obrig(d) && !fotos[d.k]; });
     if (falta.length){

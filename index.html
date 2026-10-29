@@ -6579,6 +6579,7 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
     }
     // datas que não fazem sentido (erro de digitação)
     if ($('f-fato').value === 'gestante' && $('f-dpp').value){ var ndpp = daysUntil($('f-dpp').value); if (ndpp != null && ndpp < -45){ toast('A data prevista do parto já passou há ' + (-ndpp) + ' dias. Se o bebê nasceu, marque "Já nasceu" e informe a data de nascimento.'); $('f-dpp').focus(); return; } if (ndpp != null && ndpp > 300){ toast('Data prevista do parto muito distante. Confira o ano.'); $('f-dpp').focus(); return; } }
+    if (!state.editing && $('f-cnasc').value && $('f-fato').value !== 'gestante'){ var nn3 = daysUntil($('f-cnasc').value); if (nn3 != null && nn3 < -90){ toast('Só cadastramos bebês com até 3 meses de nascidos. Este tem ' + Math.floor(-nn3 / 30) + ' meses.'); $('f-cnasc').focus(); return; } }
     if ($('f-cnasc').value && $('f-fato').value !== 'gestante'){ var nn = daysUntil($('f-cnasc').value); if (nn != null && nn > 0){ toast('A data de nascimento está no futuro. Confira a data.'); $('f-cnasc').focus(); return; } }
     if (!state.editing){
       var cpfN = String($('f-cpf').value || '').replace(/\D/g, ''), telN = String($('f-contato').value || '').replace(/\D/g, '').slice(-9);
