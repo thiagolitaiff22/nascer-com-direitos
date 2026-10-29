@@ -5,7 +5,12 @@
   "server": {
     "url": "https://www.nascercomdireitos.com.br/campo.html",
     "errorPath": "offline.html",
-    "androidScheme": "https"
+    "androidScheme": "https",
+    "allowNavigation": [
+      "www.nascercomdireitos.com.br",
+      "nascercomdireitos.com.br",
+      "thiagolitaiff22.github.io"
+    ]
   },
   "android": {
     "allowMixedContent": false
