@@ -3529,23 +3529,6 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     if (aguardandoParto(r)) return ['gestante', 'Aguardando o parto', 'warn'];
     return ['pronto', 'Pronto para requerer', 'ok'];
   }
-  var CAD_COLS = [['novo', 'Novo lead'], ['retornar', 'Retornar depois'], ['contato', 'Em contato'], ['proposta', 'Proposta aceita', 'ok'], ['sem_resposta', 'Sem resposta'], ['perdido', 'Perdido (não fechou)', 'prob']];
-  function cadCard(r){
-    var k = leadDe(r), par = prospById(r.responsavelId), parNome = par ? (par.tipo === 'clinica' && par.clinica ? par.clinica : par.nome) : (r.criadoPorNome || (r.origem === 'organico' ? 'Orgânico' : ''));
-    var dc = String(r.dataCadastro || r.criadoEm || '').slice(0, 10), nd = dc ? -daysUntil(dc) : null, al = [];
-    var pn = prioridadeNasc(r); if (pn != null) al.push('Prioridade: ' + (pn === 0 ? 'parto previsto é hoje' : 'parto em ' + pn + (pn === 1 ? ' dia' : ' dias')));
-    var falt = dadosFaltando(r); if (falt.length) al.push('Falta: ' + falt.join(', '));
-    var quando = nd == null ? '' : k === 'novo' && nd >= 2 ? '<p class="verm">Sem ligação há ' + nd + ' dias</p>' : '<p>' + (nd <= 0 ? 'Cadastrada hoje' : nd === 1 ? 'Cadastrada ontem' : 'Cadastrada há ' + nd + ' dias') + '</p>';
-    var opts = Object.keys(LEAD).map(function(x){ return '<option value="' + x + '"' + (x === k ? ' selected' : '') + '>' + LEAD[x] + '</option>'; }).join('');
-    return kbCard(r, { arrasta: true, resp: r.atendente || r.contatoCloser, dias: diasNaEtapa(r), parado: atrasada(r),
-      linhas: [linhaParto(r), '<div class="kb-tel">' + contatoCloser(r) + '</div>', linhaLugar(r, parNome), quando, linhaDocs(r),
-        contadorContato(r) ? '<div class="kb-par"><span>Prazo do contato</span>' + contadorContato(r) + '</div>' : '',
-        r.propostaAceita && k !== 'proposta' ? '<p class="ok">Proposta aceita</p>' : ''],
-      alertas: al,
-      acoes: '<button type="button" class="kb-btn" data-act="fechar" data-id="' + esc(r.id) + '" title="O contrato foi assinado: a cliente vai para o Pós-venda">' + svgI('i-check') + 'Fechar contrato</button>' +
-        '<button type="button" class="kb-lnk" data-act="tentativa" data-id="' + esc(r.id) + '" title="Ligou e não atendeu: conta uma tentativa. Com ' + LEAD_TENTATIVAS + ' vira Sem resposta">Não atendeu' + (r.tentativas > 0 ? ' · ' + r.tentativas + '/' + LEAD_TENTATIVAS : '') + '</button>',
-      mover: kbMover('<select data-lead="' + esc(r.id) + '" aria-label="Situação de ' + esc(r.nome) + '">' + opts + '</select>') });
-  }
   function renderCad(){
     var box = $('cad-list'); if (!box) return;
     var todos = state.rows.filter(noCadastro).filter(function(r){ return (!soMinhas || minha(r)) && passaFiltro(r); });
@@ -3563,10 +3546,6 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     // parto perto primeiro; depois a situação e o cadastro mais recente; no mesmo dia, em ordem alfabética
     lista = ordenar(lista, function(a, b){ var da = String(a.dataCadastro || a.criadoEm || '').slice(0, 10), db = String(b.dataCadastro || b.criadoEm || '').slice(0, 10); var pa = prioridadeNasc(a), pb = prioridadeNasc(b); if (pa != null || pb != null){ if (pa == null) return 1; if (pb == null) return -1; if (pa !== pb) return pa - pb; } return (LEAD_ORDEM[leadDe(a)] - LEAD_ORDEM[leadDe(b)]) || db.localeCompare(da) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); });
     kbInfo('cad', 'd', lista.length, 'cliente', 'clientes');
-    if (vistaDe('d') === 'quadro'){
-      pintarQuadro(box, 'cad', CAD_COLS.map(function(c){ return { col: c, cartoes: lista.filter(function(r){ return leadDe(r) === c[0]; }).map(cadCard), vazio: 'Solte uma cliente aqui' }; }));
-      return;
-    }
     var html = '<div class="row head cad-closer"><div>Cliente</div><div>Telefone</div><div class="cab-at"><span>Situação</span><span>Tentativas</span></div><div></div><div></div></div>';
     if (!lista.length) html += '<div class="empty">' + (todos.length ? 'Nenhum cliente neste filtro.' : 'Nenhum cliente em cadastro. Clique em <b>Novo cadastro</b> para começar.') + '</div>';
     lista.slice(0, 300).forEach(function(r){
@@ -4657,7 +4636,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function lerGuardado(k, pad){ try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? pad : v; } catch(e){ return pad; } }
   function guardar(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
   var vistas = lerGuardado('nascer-vistas', {}), topoRecolhido = !!lerGuardado('nascer-topo-recolhido', false), telaAberta = 'd', ultimaFase = 'd';
-  function vistaDe(t){ return t === 'q' ? 'lista' : (vistas[t] === 'lista' ? 'lista' : 'quadro'); }
+  function vistaDe(t){ return t === 'q' || t === 'd' ? 'lista' : (vistas[t] === 'lista' ? 'lista' : 'quadro'); }   // Cadastro é sempre em lista
   function telaDoFunil(t){ return FASES.some(function(f){ return f[0] === t; }); }
   function resumoFases(){
     var rows = state.rows, cad = rows.filter(noCadastro), pos = rows.filter(noContratos), fila = rows.filter(naFila), ins = rows.filter(noInss), jud = rows.filter(noControle), arq = rows.filter(function(r){ return r.arquivado; });
@@ -4711,7 +4690,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     $('pg-sub').textContent = res ? tit[0] + ' · ' + res[2] : t === 'q' ? plural(state.rows.filter(desqualificada).length, 'lead desqualificado', 'leads desqualificados') : tit[1];
     var bt = VIEWS[t] && $(VIEWS[t][0]), u = bt && bt.querySelector('use'); if (u) $('pg-ico').setAttribute('href', u.getAttribute('href'));
     var fluxo = telaDoFunil(t);
-    $('vista-seg').hidden = !fluxo;
+    $('vista-seg').hidden = !fluxo || t === 'd';
     Array.prototype.forEach.call($('vista-seg').querySelectorAll('button'), function(b){ b.setAttribute('aria-pressed', String(b.dataset.vista === vistaDe(t))); });
     $('btn-novo').hidden = !(t === 'd' || t === 'k' || t === 'h' || t === 'i' || t === 'c');
     $('mais-box').hidden = t !== 'k';
@@ -4800,7 +4779,6 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     if (a.dataset.fn){ soltarNaFase(r, a.dataset.fn); return; }
     var q = a.dataset.quadro, col = a.dataset.col;
     if (q === 'pos'){ if (posEtapaDe(r) !== col) moverPos(id, col); }
-    else if (q === 'cad'){ if (leadDe(r) !== col) mudarLead(r, col).catch(function(err){ toast(errMsg(err)); render(); }); }
     else if (q === 'inss'){ if (statusInss(r) !== col) mudarInss(r, col); }
     else if (q === 'fila'){
       var de = FILA_ORDEM.indexOf(filaEtapaDe(r)), para = FILA_ORDEM.indexOf(col);
@@ -4812,7 +4790,6 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     if (de === 'k' && fase === 'd') voltarCadastro(r.id);
     else if (de === 'k' && fase === 'h'){ if (posEtapaDe(r) === 'ok') encaminharAnalise(r.id); else toast('Só vai para a Fila quem está em Documentação OK.'); }
     else if (de === 'h' && fase === 'k') filaAcao(r.id, 'devolver');
-    else if (de === 'd' && fase === 'k') confirmarFechamento(r);
     else if (de === 'h' && fase === 'i'){ if (filaEtapaDe(r) === 'protocolar') abrirRequerimento(r); else toast('Só vai para o INSS quem está em Protocolar.'); }
     else if (de === 'i' && fase === 'c'){ openForm(r); setTimeout(function(){ $('f-proc').scrollIntoView({ block: 'center' }); $('f-proc').focus(); }, 60); toast('Preencha o número do processo e a data do ajuizamento'); }
     else toast('Essa passagem não é permitida por aqui.');
