@@ -6,6 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Nascer com Direitos</title>
 <link rel="icon" href="img/icone-192.png">
+<script>try { document.documentElement.setAttribute('data-theme', localStorage.getItem('nascer-tema') || 'dark'); } catch(e){ document.documentElement.setAttribute('data-theme', 'dark'); }</script>
 <style>
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -1237,12 +1238,11 @@ select option,select optgroup{background-color:var(--panel);color:var(--ink)}
 .nav .tab:hover{color:var(--ink);background:none}
 .nav .tab[aria-selected="true"]{color:var(--ink);font-weight:600;background:none}
 .nav .tab[aria-selected="true"]::before{content:"";position:absolute;left:0;top:5.6px;bottom:5.6px;width:3px;border-radius:0 3px 3px 0;background:var(--primary)}
-#sync{flex:none;display:block;padding:6px 14px 8px;font-size:10.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-[data-role="assistente"] .nav-lbl:has(+ #tab-fin){display:none}
+#sync{display:block;padding:0 11px 6px;font-size:11px;color:var(--ink-3);white-space:nowrap}
 .app.collapsed .lateral{width:48px}
 .app.collapsed .lat-topo{flex-direction:column;padding:8px 0 4px;gap:6px}
 .app.collapsed .brand{justify-content:center;flex:none}
-.app.collapsed .brand-t,.app.collapsed #sync,.app.collapsed .nav .tab span{display:none}
+.app.collapsed .brand-t,.app.collapsed .nav .tab span{display:none}
 .app.collapsed .brand .logo img{height:32px;max-width:32px}
 .app.collapsed .nav-lbl{height:1px;padding:0;margin:6px 8px;font-size:0;background:var(--line);overflow:hidden}
 .app.collapsed .nav-lbl:first-child{display:none}
@@ -1253,9 +1253,9 @@ select option,select optgroup{background-color:var(--panel);color:var(--ink)}
 .busca-geral{position:relative;min-width:0}
 .busca-geral label{position:relative;display:block}
 .busca-geral label .i{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--ink-3);pointer-events:none}
-.busca-geral input{height:37.5px;width:300px;max-width:100%;border:1px solid var(--line-2);border-radius:999px!important;padding:0 37px;background:transparent;font-size:14px;color:var(--ink);outline:0;box-shadow:none;transition:width .2s,border-color .2s}
+.busca-geral input:not([type=checkbox]):not([type=radio]){height:37.5px;width:300px;max-width:100%;border:1px solid var(--line-2);border-radius:999px!important;padding:0 37px;background:transparent;font-size:14px;color:var(--ink);outline:0;box-shadow:none;transition:width .2s,border-color .2s}
 .busca-geral input::placeholder{color:var(--ink-3)}
-.busca-geral input:focus{width:600px;border-color:var(--primary);box-shadow:none}
+.busca-geral input:not([type=checkbox]):not([type=radio]):focus{width:600px;border-color:var(--primary);box-shadow:none}
 .busca-geral input::-webkit-search-cancel-button{display:none}
 .bg-res{position:absolute;left:0;top:calc(100% + 8px);width:600px;max-width:calc(100vw - 32px);max-height:26rem;overflow:auto;border:1px solid hsl(var(--c-pri)/.7);border-radius:14px;background:var(--panel);box-shadow:0 18px 40px rgba(0,0,0,.22);padding:12px;z-index:60}
 .bg-cab{font-size:12px;color:var(--ink-3);padding:0 8px 8px}
@@ -1694,13 +1694,13 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
 @media (max-width:1280px){
   .content{padding:24px 22px 40px}
   .topo{padding:0 16px}
-  .busca-geral input{width:230px}
+  .busca-geral input:not([type=checkbox]):not([type=radio]){width:230px}
 }
 @media (max-width:999px){
   .app{flex-direction:column}
   .lateral,.app.collapsed .lateral{position:static;width:100%;height:auto;border-right:0;border-bottom:1px solid var(--line)}
   .lat-topo{min-height:0;padding:8px 12px;flex-direction:row}
-  .lat-rec,#sync{display:none}
+  .lat-rec{display:none}
   .nav{flex-direction:row;overflow-x:auto;padding:0 6px 6px;gap:2px}
   .nav-lbl,.app.collapsed .nav-lbl{display:none}
   .nav .tab,.app.collapsed .nav .tab{width:auto;height:32px;padding:0 10px;font-size:13px;gap:7px;justify-content:flex-start}
@@ -1708,7 +1708,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   .nav .tab[aria-selected="true"]::before{left:8px;right:8px;top:auto;bottom:0;width:auto;height:2px;border-radius:2px}
   .topo{position:static;height:auto;padding:8px 12px;flex-wrap:wrap}
   .busca-geral{order:5;width:100%}
-  .busca-geral input,.busca-geral input:focus{width:100%}
+  .busca-geral input:not([type=checkbox]):not([type=radio]),.busca-geral input:not([type=checkbox]):not([type=radio]):focus{width:100%}
   .topo-user .ola{display:none}
   .content{padding:14px 12px 28px;gap:14px}
   .funil,.stats{overflow-x:auto;flex-wrap:nowrap}
@@ -1777,6 +1777,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4zM22 2 11 13"/></symbol>
   <symbol id="i-sair" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
   <symbol id="i-chave" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6M15.5 7.5l3 3L22 7l-3-3"/></symbol>
+  <symbol id="i-pasta" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></symbol>
   <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></symbol>
 </svg>
 
@@ -1812,23 +1813,14 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       <button type="button" class="lat-rec" id="btn-side" title="Esconder o menu" aria-label="Esconder o menu" aria-expanded="true"><svg class="i"><use href="#i-panel"/></svg></button>
     </div>
     <nav class="nav" role="tablist" aria-orientation="vertical">
-      <div class="nav-lbl" aria-hidden="true">Comercial</div>
-      <button class="tab" role="tab" id="tab-cad" aria-selected="false" type="button" title="Cadastro"><svg class="i"><use href="#i-phone"/></svg><span>Cadastro</span></button>
-      <button class="tab" role="tab" id="tab-desq" aria-selected="false" type="button" title="Leads desqualificados"><svg class="i"><use href="#i-bellx"/></svg><span>Leads desqualificados</span></button>
-      <div class="nav-lbl" aria-hidden="true">Pós-venda</div>
-      <button class="tab" role="tab" id="tab-ctr" aria-selected="false" type="button" title="Pós-venda"><svg class="i"><use href="#i-check"/></svg><span>Pós-venda</span></button>
       <div class="nav-lbl" aria-hidden="true">Operacional</div>
-      <button class="tab" role="tab" id="tab-fila" aria-selected="false" type="button" title="Fila de protocolo"><svg class="i"><use href="#i-file"/></svg><span>Fila de protocolo</span></button>
-      <button class="tab" role="tab" id="tab-inss" aria-selected="false" type="button" title="INSS"><svg class="i"><use href="#i-inss"/></svg><span>INSS</span></button>
-      <button class="tab" role="tab" id="tab-clientes" aria-selected="false" type="button" title="Judicial"><svg class="i"><use href="#i-gavel"/></svg><span>Judicial</span></button>
-      <div class="nav-lbl" aria-hidden="true">Financeiro</div>
-      <button class="tab admin-only" role="tab" id="tab-fin" aria-selected="false" type="button" title="Financeiro"><svg class="i"><use href="#i-cash"/></svg><span>Financeiro</span></button>
+      <button class="tab" role="tab" id="tab-proc" aria-selected="false" type="button" title="Processos"><svg class="i"><use href="#i-pasta"/></svg><span>Processos</span></button>
+      <button class="tab" role="tab" id="tab-desq" aria-selected="false" type="button" title="Leads desqualificados"><svg class="i"><use href="#i-bellx"/></svg><span>Leads desqualificados</span></button>
       <div class="nav-lbl" aria-hidden="true">Gestão</div>
-      <button class="tab" role="tab" id="tab-ret" aria-selected="false" type="button" title="Arquivados"><svg class="i"><use href="#i-box"/></svg><span>Arquivados</span></button>
+      <button class="tab admin-only" role="tab" id="tab-fin" aria-selected="false" type="button" title="Financeiro"><svg class="i"><use href="#i-cash"/></svg><span>Financeiro</span></button>
       <button class="tab" role="tab" id="tab-parc" aria-selected="false" type="button" title="Parceiros"><svg class="i"><use href="#i-users"/></svg><span>Parceiros</span></button>
       <button class="tab admin-only" role="tab" id="tab-equipe" aria-selected="false" type="button" title="Configurações"><svg class="i"><use href="#i-gear"/></svg><span>Configurações</span></button>
     </nav>
-    <small id="sync">Conectando à base…</small>
   </aside>
   <div class="main">
     <header class="topo">
@@ -1842,7 +1834,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
         <div class="pop-box"><button type="button" class="topo-add" id="btn-add" aria-haspopup="true" aria-expanded="false">Adicionar<svg class="i"><use href="#i-chev"/></svg></button>
           <div class="pop" id="pop-add" hidden><button type="button" data-add="cad"><svg class="i"><use href="#i-phone"/></svg>Novo cadastro</button><button type="button" data-add="parc"><svg class="i"><use href="#i-users"/></svg>Novo parceiro</button><button type="button" class="admin-only" data-add="func"><svg class="i"><use href="#i-gear"/></svg>Novo funcionário</button></div></div>
         <div class="pop-box"><button type="button" class="topo-user" id="btn-user" aria-haspopup="true" aria-expanded="false"><span class="av" id="me-av">E</span><span class="ola">Olá, <b id="me-ola"></b></span><svg class="i"><use href="#i-chev"/></svg></button>
-          <div class="pop" id="pop-user" hidden><p class="pop-nome" id="me"></p><button type="button" id="btn-senha"><svg class="i"><use href="#i-chave"/></svg>Alterar senha</button><button type="button" id="btn-sair"><svg class="i"><use href="#i-sair"/></svg>Sair</button></div></div>
+          <div class="pop" id="pop-user" hidden><p class="pop-nome" id="me"></p><small id="sync">Conectando à base…</small><button type="button" id="btn-senha"><svg class="i"><use href="#i-chave"/></svg>Alterar senha</button><button type="button" id="btn-sair"><svg class="i"><use href="#i-sair"/></svg>Sair</button></div></div>
       </div>
     </header>
     <div class="content" id="conteudo">
@@ -4664,7 +4656,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   var FASES = [['d', 'i-phone'], ['k', 'i-check'], ['h', 'i-file'], ['i', 'i-inss'], ['c', 'i-gavel'], ['r', 'i-box']];
   function lerGuardado(k, pad){ try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? pad : v; } catch(e){ return pad; } }
   function guardar(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
-  var vistas = lerGuardado('nascer-vistas', {}), topoRecolhido = !!lerGuardado('nascer-topo-recolhido', false), telaAberta = 'd';
+  var vistas = lerGuardado('nascer-vistas', {}), topoRecolhido = !!lerGuardado('nascer-topo-recolhido', false), telaAberta = 'd', ultimaFase = 'd';
   function vistaDe(t){ return t === 'q' ? 'lista' : (vistas[t] === 'lista' ? 'lista' : 'quadro'); }
   function telaDoFunil(t){ return FASES.some(function(f){ return f[0] === t; }); }
   function resumoFases(){
@@ -4715,8 +4707,8 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function pintarPagina(){
     var t = telaAberta, tit = TITULOS[t]; if (!tit) return;
     var res = telaDoFunil(t) ? resumoFases()[t] : null;
-    $('pg-tit').textContent = tit[0];
-    $('pg-sub').textContent = res ? res[2] : t === 'q' ? plural(state.rows.filter(desqualificada).length, 'lead desqualificado', 'leads desqualificados') : tit[1];
+    $('pg-tit').textContent = res ? 'Processos' : tit[0];
+    $('pg-sub').textContent = res ? tit[0] + ' · ' + res[2] : t === 'q' ? plural(state.rows.filter(desqualificada).length, 'lead desqualificado', 'leads desqualificados') : tit[1];
     var bt = VIEWS[t] && $(VIEWS[t][0]), u = bt && bt.querySelector('use'); if (u) $('pg-ico').setAttribute('href', u.getAttribute('href'));
     var fluxo = telaDoFunil(t);
     $('vista-seg').hidden = !fluxo;
@@ -6749,7 +6741,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     } catch(err){ toast(errMsg(err)); }
     finally { $('av-save').disabled = false; }
   });
-  var VIEWS = { d: ['tab-cad', 'view-cad'], i: ['tab-inss', 'view-inss'], k: ['tab-ctr', 'view-ctr'], q: ['tab-desq', 'view-desq'], h: ['tab-fila', 'view-fila'], c: ['tab-clientes', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-ret', 'view-ret'], g: ['tab-parc', 'view-parc'], e: ['tab-equipe', 'view-equipe'] };
+  var VIEWS = { d: ['tab-proc', 'view-cad'], i: ['tab-proc', 'view-inss'], k: ['tab-proc', 'view-ctr'], q: ['tab-desq', 'view-desq'], h: ['tab-proc', 'view-fila'], c: ['tab-proc', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-proc', 'view-ret'], g: ['tab-parc', 'view-parc'], e: ['tab-equipe', 'view-equipe'] };
   var TITULOS = {
     d: ['Cadastro', 'Clientes ainda sem requerimento no INSS: dados, documentos e prazo'],
     i: ['INSS', 'Requerimentos administrativos: análise, exigências, concessões e indeferimentos'],
@@ -6769,12 +6761,13 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function showTab(which){
     state.view = which;
     if ((which === 'e' || which === 'f') && !isAdmin()) which = 'c';
-    telaAberta = which;
-    Object.keys(VIEWS).forEach(function(k){ $(VIEWS[k][0]).setAttribute('aria-selected', k === which ? 'true' : 'false'); $(VIEWS[k][1]).hidden = k !== which; });
+    telaAberta = which; if (telaDoFunil(which)) ultimaFase = which;
+    Object.keys(VIEWS).forEach(function(k){ $(VIEWS[k][0]).setAttribute('aria-selected', VIEWS[k][0] === VIEWS[which][0] ? 'true' : 'false'); $(VIEWS[k][1]).hidden = k !== which; });
     try { sessionStorage.setItem('qe-view', which); } catch(e){}
     renderFunil(); pintarPagina(); medirQuadros();
   }
-  Object.keys(VIEWS).forEach(function(k){ $(VIEWS[k][0]).addEventListener('click', function(){ showTab(k); }); });
+  Object.keys(VIEWS).forEach(function(k){ if (!telaDoFunil(k)) $(VIEWS[k][0]).addEventListener('click', function(){ showTab(k); }); });
+  $('tab-proc').addEventListener('click', function(){ showTab(ultimaFase); });
 
   try { var sv = sessionStorage.getItem('qe-view'); showTab(sv && VIEWS[sv] ? sv : 'd'); } catch(e){ showTab('d'); }
 
@@ -7375,17 +7368,17 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
 
 
   /* ---------- light / dark ---------- */
-  function currentTheme(){ return document.documentElement.getAttribute('data-theme') || 'light'; }   // padrão: branco e dourado
+  function currentTheme(){ return document.documentElement.getAttribute('data-theme') || 'dark'; }   // padrão: escuro e dourado
   function applyTheme(t){
     if (t) document.documentElement.setAttribute('data-theme', t);
     var dark = currentTheme() === 'dark';
     $('tema-claro').setAttribute('aria-pressed', String(!dark)); $('tema-escuro').setAttribute('aria-pressed', String(dark));
   }
-  try { applyTheme(localStorage.getItem('qe-theme')); } catch(e){ applyTheme(null); }
+  try { applyTheme(localStorage.getItem('nascer-tema')); } catch(e){ applyTheme(null); }
   function trocarTema(next){
     if (next === currentTheme()) return;
     applyTheme(next);
-    try { localStorage.setItem('qe-theme', next); } catch(e){}
+    try { localStorage.setItem('nascer-tema', next); } catch(e){}
     render(); // charts read colors from the theme
   }
   $('tema-claro').addEventListener('click', function(){ trocarTema('light'); });
