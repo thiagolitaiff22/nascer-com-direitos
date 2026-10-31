@@ -898,7 +898,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 59;
+  var APP_VERSAO = 60;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -912,6 +912,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     { k: 'titulo', arq: 'Título de eleitor - frente', t: 'Título de eleitor', s: 'frente e verso, se tiver', lado: 'Frente', ic: 'i-id', req: true, fala: 'Tire a foto da frente do título de eleitor.' },
     { k: 'titulo_verso', arq: 'Título de eleitor - verso', t: 'Título de eleitor', s: 'verso', lado: 'Verso', oculto: true, ic: 'i-idv', fala: 'Agora o verso do título de eleitor, se tiver.' },
     { k: 'residencia', arq: 'Comprovante de residência', t: 'Comprovante de residência', s: 'da mãe', ic: 'i-casa', req: true, fala: 'Tire a foto do comprovante de residência.' },
+    { k: 'rural', arq: 'Provas de atividade rural', t: 'Provas de atividade rural', s: 'tire quantas fotos precisar', ic: 'i-doc', req: true, multi: true, fala: 'Tire a foto das provas de atividade rural. Toque de novo para cada documento a mais.' },
     { k: 'video', arq: 'Vídeo de concordância', t: 'Vídeo de concordância', s: 'a cliente aceitando os termos do contrato', ic: 'i-video', opcional: true, video: true, fala: 'Grave um vídeo curto com a cliente concordando com os termos do contrato.' },
     { k: 'procuracao', arq: 'Contrato e procuração', t: 'Contrato e procuração', s: 'fotografe os dois, um em seguida do outro', ic: 'i-pena', opcional: true, multi: true, fala: 'Tire a foto do contrato e, em seguida, da procuração. Toque de novo para cada folha.' },
     { k: 'outro', arq: 'Outro documento', t: 'Outros documentos', s: 'tire quantas fotos precisar', ic: 'i-doc', opcional: true, multi: true, fala: 'Tire a foto do documento. Toque de novo para cada folha ou documento a mais.' }
@@ -2556,6 +2557,7 @@ button,a,label,[role=button]{touch-action:manipulation}
       { nome: 'CPF', ks: ['cpf'] },
       { nome: 'TÍTULO DE ELEITOR', ks: ['titulo', 'titulo_verso'] },
       { nome: 'COMPROVANTE DE RESIDÊNCIA', ks: ['residencia'] },
+      { nome: 'PROVAS DE ATIVIDADE RURAL', ks: ['rural'] },
       { nome: 'OUTROS DOCUMENTOS', ks: ['outro'] }
     ];
     var nDocs = GRUPOS_ARQ.filter(function(g){ return g.ks.some(function(k){ return fotos[k]; }); }).length, nFeito = 0;

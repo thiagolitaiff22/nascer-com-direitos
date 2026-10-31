@@ -2247,6 +2247,15 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
 :root[data-theme="dark"] select{color-scheme:dark}
 :root[data-theme="dark"] select option{background:#1f1a14;color:#f1e3c8}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) select{color-scheme:dark}}
+/* quadros do Pós-venda e da Fila */
+.pv-col{flex:1 0 248px!important;max-width:300px!important;min-width:248px!important}
+.pv-acao{width:100%;justify-content:center;margin-top:6px;white-space:normal}
+.pv-voltar{align-self:flex-start;font-size:12px;margin-top:6px}
+.pv-alerta{color:var(--red)!important;font-weight:700}
+.pv-devolvida{font-size:12.5px;line-height:1.35;padding:7px 9px;border-radius:8px;background:var(--red-soft);color:var(--red);border:1px solid var(--red)}
+.pv-devolvida b{display:block}
+#fila-stats{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important}
+#pv-lane button{white-space:nowrap}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2324,8 +2333,8 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
       <button class="tab" role="tab" id="tab-desq" aria-selected="false" type="button" title="Leads desqualificados"><svg class="i"><use href="#i-bellx"/></svg><span>Leads desqualificados</span></button>
       <div class="nav-lbl" aria-hidden="true">Pós-venda</div>
       <button class="tab" role="tab" id="tab-ctr" aria-selected="false" type="button" title="Pós-venda"><svg class="i"><use href="#i-check"/></svg><span>Pós-venda</span></button>
-      <button class="tab" role="tab" id="tab-nasc" aria-selected="false" type="button" title="Aguardando nascimento"><svg class="i"><use href="#i-clock"/></svg><span>Aguardando nascimento</span></button>
       <div class="nav-lbl" aria-hidden="true">Operacional</div>
+      <button class="tab" role="tab" id="tab-fila" aria-selected="false" type="button" title="Fila de protocolo"><svg class="i"><use href="#i-file"/></svg><span>Fila de protocolo</span></button>
       <button class="tab" role="tab" id="tab-inss" aria-selected="false" type="button" title="INSS"><svg class="i"><use href="#i-inss"/></svg><span>INSS</span></button>
       <button class="tab" role="tab" id="tab-clientes" aria-selected="false" type="button" title="Judicial"><svg class="i"><use href="#i-gavel"/></svg><span>Judicial</span></button>
       <div class="nav-lbl" aria-hidden="true">Financeiro</div>
@@ -2380,12 +2389,12 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
         <div class="fbar">
           <div class="search tb-busca"><svg class="i"><use href="#i-search"/></svg><input id="ctr-q" type="search" autocomplete="off" placeholder="Buscar cliente por nome ou CPF"></div>
           <select id="ctr-sit" class="tb-sel" aria-label="Filtrar" hidden></select>
-          <div class="seg-bi" id="pv-lane" style="flex:none"><button type="button" data-l="gest" aria-pressed="true">Gestantes</button><button type="button" data-l="nasc" aria-pressed="false">Bebê já nasceu</button></div>
+          <div class="seg-bi" id="pv-lane" style="flex:none"><button type="button" data-l="todas" aria-pressed="true">Todas</button><button type="button" data-l="gest" aria-pressed="false">Gestantes</button><button type="button" data-l="nasc" aria-pressed="false">Bebê já nasceu</button></div>
           <button type="button" class="btn" id="pv-atr" aria-pressed="false">Só atrasados</button>
           <button type="button" class="btn minhas-btn" data-minhas aria-pressed="false" title="Mostra só as clientes em que você é o responsável">Minhas clientes</button>
           <a class="btn guia-link" id="ctr-guia" href="https://sal.rfb.gov.br/home" target="_blank" rel="noopener noreferrer" title="Abre o SAL da Receita Federal: gerar a guia e fazer o pagamento"><svg class="i"><use href="#i-cash"/></svg>Gerar e pagar guia</a><span class="tb-fim fb-count tnum" id="ctr-count"></span>
         </div>
-        <div class="sec-rot">Kanban de documentação</div>
+        <div class="sec-rot">Etapas do Pós-venda</div>
         <div class="list" id="ctr-list"></div>
       </section>
 
@@ -2401,16 +2410,15 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
         <p class="foot-note">Para desqualificar alguém, use a situação <b>Desqualificado</b> no Cadastro e escreva o motivo. Se a situação mudar, use <b>Reativar</b>: a pessoa volta ao Cadastro como novo lead.</p>
       </section>
 
-      <section id="view-nasc" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
-        <div class="sec-rot">Resumo das gestantes</div>
-        <div class="stats" id="nasc-stats"></div>
+      <section id="view-fila" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
+        <div class="sec-rot">Resumo da fila</div>
+        <div class="stats" id="fila-stats"></div>
         <div class="fbar">
-          <div class="search tb-busca"><svg class="i"><use href="#i-search"/></svg><input id="nasc-q" type="search" autocomplete="off" placeholder="Buscar cliente por nome ou CPF"></div>
-          <select id="nasc-sit" class="tb-sel" aria-label="Filtrar"></select>
-          <span class="tb-fim fb-count tnum" id="nasc-count"></span>
+          <div class="search tb-busca"><svg class="i"><use href="#i-search"/></svg><input id="fila-q" type="search" autocomplete="off" placeholder="Buscar cliente por nome ou CPF"></div>
+          <span class="tb-fim fb-count tnum" id="fila-count"></span>
         </div>
-        <div class="sec-rot">Aguardando o nascimento e a certidão</div>
-        <div class="card list" id="nasc-list"></div>
+        <div class="sec-rot">Etapas até o protocolo</div>
+        <div class="list" id="fila-list"></div>
       </section>
 
       <section id="view-inss" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
@@ -3234,8 +3242,8 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
   function desqualificada(r){ return r.leadStatus === 'desqualificado' && !r.contratoEm && !r.arquivado; }
   // INSS: requerimento feito, ainda sem ação judicial
   // contrato fechado com a documentação toda ok: sai de Contratos fechados e vai para o INSS redigir o requerimento
-  function prontoRequerer(r){ return fechado(r) && regularizada(r) && !aguardaNasc(r) && !esperaCert(r) && !dadosFaltando(r).length; }
-  function noInss(r){ return !String(r.processo || '').trim() && !r.arquivado && (requerido(r) || prontoRequerer(r)); }
+  function prontoRequerer(r){ return naFila(r) && ['fazer_requerimento', 'redigindo', 'protocolar'].indexOf(r.filaEtapa) >= 0; }
+  function noInss(r){ return !String(r.processo || '').trim() && !r.arquivado && requerido(r); }
   function passEtapaCl(r, f){
     if (!noControle(r)) return false;
     if (!f) return true;
@@ -3371,7 +3379,7 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
   // documentos que o parceiro não fotografou (o aplicativo grava em faltaDocs)
   var DOC_FALTA = { procuracao: 'Procuração', rg_frente: 'RG', cpf: 'CPF', titulo: 'Título de eleitor', certidao: 'Certidão de nascimento', residencia: 'Comprovante de residência', autodeclaracao: 'Autodeclaração rural', rural: 'Provas de atividade rural', ctps: 'CTPS / contribuições', cliente: 'Foto da cliente' };
   // documentos que o aplicativo pede e o que veio de cada um (campoDocs = fotos enviadas pelo app)
-  var DOCS_APP = [['rg_frente', 'RG'], ['cpf', 'CPF'], ['titulo', 'Título de eleitor'], ['residencia', 'Comprovante de residência']];
+  var DOCS_APP = [['rg_frente', 'RG'], ['cpf', 'CPF'], ['titulo', 'Título de eleitor'], ['residencia', 'Comprovante de residência'], ['rural', 'Provas de atividade rural']];
   function docsApp(r){
     var campo = Array.isArray(r.campoDocs) ? r.campoDocs : null, antigo = Array.isArray(r.faltaDocs) ? r.faltaDocs : null;
     return DOCS_APP.map(function(d){
@@ -4107,7 +4115,6 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
     var cardI = function(ico, rot, n, cap, cor, filtro){ return '<div class="card stat cad-filtro' + (inssSit === filtro ? ' ativo' : '') + '" role="button" tabindex="0" aria-pressed="' + (inssSit === filtro) + '" data-inss-filtro="' + filtro + '" title="Mostrar na lista" data-cor-fixa="1" style="--cor-linha:var(' + cor + ')"><div class="stat-h"><svg class="i"><use href="#' + ico + '"/></svg>' + rot + '</div><div class="stat-v tnum">' + n + '</div><div class="stat-c">' + cap + '</div><div class="stat-viz"></div></div>'; };
     $('inss-stats').innerHTML =
       cardI('i-inss', 'Requerimentos', todos.length, 'no INSS, ainda sem ação judicial', '--line-2', '') +
-      cardI('i-pencil', 'Redigir requerimento', conta.redigir, 'documentação ok: falta o requerimento', '--amber', 'redigir') +
       cardI('i-clock', 'Em análise', conta.analise, (emAnalise.length ? 'média de ' + media + ' dias' : 'nenhum em análise') + (atras ? ' · ' + atras + ' passaram de ' + INSS_PRAZO_ANALISE + ' dias' : ''), '--blue', 'analise') +
       cardI('i-bellx', 'Exigências', conta.exigencia, vence ? vence + ' com prazo em até 5 dias' : 'o INSS pediu documento', '--amber', 'exigencia') +
       cardI('i-check', 'Concedidos', conta.concedido, (decididos ? Math.round(conta.concedido / decididos * 100) + '% dos decididos' : 'nenhum decidido ainda') + ' · vão para o Financeiro', '--green', 'concedido') +
@@ -4266,13 +4273,20 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
   }
   var CTR_ETAPAS = { regularizar: ['Regularizar documentos', 'crit'] };
   function fechado(r){ return !!r.contratoEm && !r.arquivado && !String(r.processo || '').trim() && !requerido(r); }
-  // fluxo: contrato fechado → Pós-venda (regulariza documentos) → Aguardando nascimento (gestante) → certidão → INSS
-  function regularizada(r){ return r.posEtapa === 'regularizada'; }
-  function jaPodeRequerer(r){ var n = daysUntil(pedeRequerer(r)); return n != null && n <= 0; }
-  function aguardaNasc(r){ return fechado(r) && regularizada(r) && r.fatoGerador === 'gestante' && !r.criancaNasc && !jaPodeRequerer(r); }
-  function esperaCert(r){ return fechado(r) && regularizada(r) && !r.certidaoRecebida && (!!r.criancaNasc || r.fatoGerador !== 'gestante'); }
-  // gestante dentro dos 28 dias antes do parto: vai para o INSS com o atestado (a certidão vem depois, se o INSS pedir)
-  function noContratos(r){ return fechado(r) && !regularizada(r); }
+  // fluxo do Salário Maternidade (o mesmo do BI de Vendas): Pós-venda → análise da Controladoria → Fila de protocolo → INSS
+  function foiParaAnalise(r){ return r.pvAnalise === 'em_analise' || r.pvAnalise === 'aprovado'; }
+  function naFila(r){ return fechado(r) && foiParaAnalise(r); }
+  function noContratos(r){ return fechado(r) && !foiParaAnalise(r); }
+  function nascido(r){ return r.fatoGerador !== 'gestante' || !!r.criancaNasc; }
+  // GPS: vence 2 meses antes do parto (30/04 vira 28/02); o cartão pula para Emitir/Pagar 5 dias antes de vencer
+  function prazoGps(r){
+    if (nascido(r) || !r.dpp) return '';
+    var p = String(r.dpp).slice(0, 10).split('-').map(Number), ult = new Date(p[0], p[1] - 2, 0).getDate();
+    return iso(new Date(p[0], p[1] - 3, Math.min(p[2], ult), 12));
+  }
+  function gatilhoGps(r){ var v = prazoGps(r); if (!v) return ''; var d = new Date(v + 'T12:00:00'); d.setDate(d.getDate() - 5); return iso(d); }
+  function gpsPaga(r){ return r.guiaStatus === 'paga'; }
+  function gpsAPagar(r){ var g = gatilhoGps(r), hj = iso(new Date()); return !!g && !gpsPaga(r) && g <= hj && String(r.dpp).slice(0, 10) > hj; }
   // prioridade do closer: gestante com parto até 30 dias (ou que já passou): depois de nascer a mãe perde a chance
   var PRIORIDADE_DIAS = 30;
   var soMinhas = false;
@@ -4280,21 +4294,30 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
   function meuNome(){ var e = meuEmail(), u = (state.equipe || []).filter(function(x){ return String(x.email).toLowerCase() === e; })[0]; return (u && u.nome) || e; }
   function minha(r){ var e = meuEmail(); if (!e) return true; return [r.contatoCloserEmail, r.contratoPorEmail, r.posRespEmail, r.respEmail].some(function(x){ return String(x || '').toLowerCase() === e; }); }
   // tempo parado na etapa atual e o limite de cada etapa
-  var LIMITE_ETAPA = { cadastro: 3, pos: 7, cert: 10 };
-  function etapaAtual(r){ return noCadastro(r) ? 'cadastro' : (noContratos(r) ? 'pos' : (esperaCert(r) ? 'cert' : '')); }
+  var LIMITE_ETAPA = { cadastro: 3, pos: 7, fila: 7 };
+  function etapaAtual(r){ return noCadastro(r) ? 'cadastro' : (naFila(r) ? 'fila' : (noContratos(r) ? 'pos' : '')); }
   function diasParado(r){
     var e = etapaAtual(r); if (!e) return null;
-    var base = e === 'cadastro' ? (r.leadMudouEm || r.ultimoContatoEm || r.dataCadastro || r.criadoEm) : e === 'pos' ? (r.posMudouEm || r.contratoEm) : (r.posMudouEm || r.criancaNasc);
-    return diasDesdeIso(base);
+    return diasDesdeIso(e === 'cadastro' ? (r.leadMudouEm || r.ultimoContatoEm || r.dataCadastro || r.criadoEm) : e === 'fila' ? (r.filaMudouEm || r.encaminhadoEm) : (r.posMudouEm || r.contratoEm));
   }
-  function atrasada(r){ var e = etapaAtual(r), d = diasParado(r); return !!e && d != null && d > LIMITE_ETAPA[e]; }
-  function tagParado(r){ if (!atrasada(r)) return ''; return '<span class="parado-tag" title="Passou do prazo desta etapa (' + LIMITE_ETAPA[etapaAtual(r)] + ' dias)">parada há ' + diasParado(r) + ' dias</span>'; }
+  function atrasoTxt(r){
+    var e = etapaAtual(r); if (!e) return '';
+    if (e === 'pos' && posEtapaDe(r) !== 'ok'){
+      var hj = iso(new Date()), parto = r.criancaNasc || (r.fatoGerador === 'gestante' ? r.dpp : '');
+      if (r.fatoGerador === 'gestante' && (!parto || String(parto).slice(0, 10) > hj)){ var v = prazoGps(r); if (!v || gpsPaga(r) || v >= hj) return ''; return 'GPS atrasada há ' + (-daysUntil(v)) + ' dias'; }
+      var dp = diasDesdeIso(parto ? String(parto).slice(0, 10) > String(r.contratoEm).slice(0, 10) ? parto : r.contratoEm : r.contratoEm);
+      return dp != null && dp > LIMITE_ETAPA.pos ? 'documentação atrasada há ' + (dp - LIMITE_ETAPA.pos) + ' dias' : '';
+    }
+    var d = diasParado(r); return d != null && d > (LIMITE_ETAPA[e] || 99999) ? 'parada há ' + d + ' dias' : '';
+  }
+  function atrasada(r){ return !!atrasoTxt(r); }
+  function tagParado(r){ var t = atrasoTxt(r); return t ? '<span class="parado-tag">' + esc(t) + '</span>' : ''; }
   function prioridadeNasc(r){ if (r.fatoGerador !== 'gestante' || r.criancaNasc || !r.dpp) return null; var n = daysUntil(r.dpp); return n != null && n >= 0 && n <= PRIORIDADE_DIAS ? n : null; }   // só parto que ainda vai acontecer; depois de nascer não é prioridade
   function tagPrioridade(r){ var n = prioridadeNasc(r); if (n == null){ var d = (r.fatoGerador === 'gestante' && !r.criancaNasc && r.dpp) ? daysUntil(r.dpp) : null; return d != null && d < 0 ? '<span class="nasc-tag" title="A data prevista do parto passou: confirmar se o bebê já nasceu e atualizar o cadastro">Parto previsto passou há ' + (-d) + (d === -1 ? ' dia' : ' dias') + ' · bebê já nasceu?</span>' : ''; } return '<span class="prio-tag' + (n <= 7 ? ' crit' : '') + '" title="Fechar o contrato antes de o bebê nascer">' + (n < 0 ? 'PRIORIDADE · parto previsto passou há ' + (-n) + ' dias' : n === 0 ? 'PRIORIDADE · parto previsto é hoje' : 'PRIORIDADE · parto em ' + n + (n === 1 ? ' dia' : ' dias')) + '</span>'; }
   function etapaCtr(r){ return 'regularizar'; }
   // guia da contribuição: aguardando pagamento ou paga (controle em Contratos fechados)
   function guiaDe(r){ return r.guiaStatus === 'paga' ? 'paga' : 'aguardando'; }
-  var ctrSit = '', ctrQ = '', ctrAberto = {}, nascSit = '', nascQ = '', nascAberto = {};
+  var ctrSit = '', ctrQ = '', ctrAberto = {};
   function buscaOk(r, q){ if (!q) return true; var s = semAcento(q), d = digits(q); return semAcento(r.nome || '').indexOf(s) >= 0 || (!!d && digits(r.cpf || '').indexOf(d) >= 0); }
   function cardLista(attr, ico, rot, n, cap, filtro, atual){
     return '<div class="card stat cad-filtro' + (atual === filtro ? ' ativo' : '') + '" role="button" tabindex="0" aria-pressed="' + (atual === filtro) + '" ' + attr + '="' + filtro + '"><div class="stat-h"><svg class="i"><use href="#' + ico + '"/></svg>' + rot + '</div><div class="stat-v tnum">' + n + '</div><div class="stat-c">' + cap + '</div></div>';
@@ -4304,98 +4327,168 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
   }
   function editBtn(r){ return '<button type="button" class="ico-btn" data-act="edit" data-id="' + esc(r.id) + '" title="Editar cadastro" aria-label="Editar ' + esc(r.nome) + '"><svg class="i"><use href="#i-pencil"/></svg></button>'; }
   /* ---------- Pós-venda (Kanban): regulariza a documentação de quem fechou contrato ---------- */
-  var POS_COLS = {
-    gest: [['falta_doc', 'Pendente documentação'], ['falta_gov', 'Pendente senha gov.br'], ['guia', 'Guia / regularização no INSS'], ['regularizada', 'Regularizada']],
-    nasc: [['falta_doc', 'Pendente documentação'], ['rural', 'Documentação rural'], ['falta_gov', 'Pendente senha gov.br'], ['regularizada', 'Regularizada']]
-  };
-  function posLane(r){ return r.fatoGerador === 'gestante' ? 'gest' : 'nasc'; }
+  var POS_COLS = [['senha', 'Senha Meu INSS'], ['docs', 'Documentação Pessoal'], ['prazo_gps', 'Aguardando Prazo da GPS'], ['gps', 'Emitir/Pagar GPS'], ['nasc', 'Aguardando Nascimento'], ['cert', 'Solicitar Certidão de Nascimento'], ['ok', 'Documentação OK']];
+  var POS_ORDEM = POS_COLS.map(function(c){ return c[0]; }), POS_LEGADO = { recem: 'senha', falta_gov: 'senha', falta_doc: 'docs', rural: 'docs', guia: 'gps' };
+  var POS_SO_GESTANTE = { prazo_gps: 1, gps: 1, nasc: 1 };
+  function posLane(r){ return nascido(r) ? 'nasc' : 'gest'; }
+  // a coluna vem do que foi gravado, mais o que as datas mandam (só anda para frente)
   function posEtapaDe(r){
-    var cols = POS_COLS[posLane(r)].map(function(c){ return c[0]; });
-    if (r.posEtapa === 'recem') return 'falta_gov';
-    if (r.posEtapa && cols.indexOf(r.posEtapa) >= 0 && r.posEtapa !== 'regularizada') return r.posEtapa;
-    if (docsPendentes(r)) return 'falta_doc';   // o app não juntou tudo: pendente documentação
-    return posLane(r) === 'nasc' ? 'rural' : 'falta_gov';   // documentos ok: gestante vai para a senha gov.br; bebê nascido, documentação rural
+    var e = POS_LEGADO[r.posEtapa] || r.posEtapa;
+    if (e === 'regularizada') e = r.certidaoRecebida ? 'ok' : 'nasc';
+    if (POS_ORDEM.indexOf(e) < 0) e = 'senha';
+    if (nascido(r)){ if (POS_SO_GESTANTE[e]) e = r.certidaoRecebida ? 'ok' : 'cert'; return e; }
+    var hj = iso(new Date()), mudou = String(r.posMudouEm || '').slice(0, 10), parto = String(r.dpp || '').slice(0, 10);
+    if (parto && parto <= hj && POS_ORDEM.indexOf(e) < POS_ORDEM.indexOf('cert') && (!mudou || mudou < parto)) return 'cert';
+    if (gpsPaga(r) && (e === 'prazo_gps' || e === 'gps')) return 'nasc';
+    if (e === 'prazo_gps' && gatilhoGps(r) && gatilhoGps(r) <= hj) return 'gps';
+    return e;
   }
-  var ctrQ2 = '', pvLane = 'gest', pvAtr = false;
-  var PV_DIAS_ATRASO = 7;
+  var ctrQ2 = '', pvLane = 'todas', pvAtr = false;
   function diasNoPos(r){ var d = diasDesdeIso(r.posMudouEm || r.contratoEm); return d == null ? 0 : d; }
   function iniciais(n){ var p = String(n || '?').trim().split(/\s+/); return ((p[0] || '?').charAt(0) + (p.length > 1 ? p[p.length - 1].charAt(0) : '')).toUpperCase(); }
-  function posCard(r, fim){
-    var lane = posLane(r), cols = POS_COLS[lane], et = fim ? 'regularizada' : posEtapaDe(r), docs = docsApp(r), ok = docs.filter(function(x){ return x.ok; }).length;
-    var tag = lane === 'gest' && !fim ? tagPrioridade(r) : '';
-    var quando = lane === 'gest' ? 'Gestante' + (r.dpp ? ' · parto ' + fmtDate(r.dpp) : '') : 'Bebê já nasceu' + (r.criancaNasc ? ' · ' + fmtDate(r.criancaNasc) : '');
-    var d = diasNoPos(r), atraso = !fim && d >= PV_DIAS_ATRASO;
-    var cid = cidadeCli(r);
-    var dest = lane === 'gest' ? (aguardaNasc(r) ? 'Aguardando nascimento' : esperaCert(r) ? 'Cobrar certidão' : 'INSS') : (esperaCert(r) ? 'Cobrar certidão' : 'INSS');
+  function relogioMae(r){
+    if (nascido(r)) return 'Bebê já nasceu' + (r.criancaNasc ? ' · ' + fmtDate(r.criancaNasc) : '');
+    if (!r.dpp) return 'Gestante · sem data do parto';
+    var n = daysUntil(r.dpp); return 'Gestante · parto ' + fmtDate(r.dpp) + (n > 0 ? ' · faltam ' + n + ' dias' : n === 0 ? ' · é hoje' : ' · passou há ' + (-n) + ' dias');
+  }
+  function posCard(r){
+    var et = posEtapaDe(r), docs = docsApp(r), ok = docs.filter(function(x){ return x.ok; }).length, cid = cidadeCli(r), vGps = prazoGps(r), atr = atrasoTxt(r);
+    var gpsL = !vGps ? '' : gpsPaga(r) ? '<div class="pv-ok">GPS paga</div>' : '<div class="pv-l' + (gpsAPagar(r) ? ' pv-alerta' : '') + '">GPS até ' + fmtDate(vGps) + (daysUntil(vGps) >= 0 ? ' · faltam ' + daysUntil(vGps) + ' dias' : ' · venceu') + '</div>';
+    var opts = POS_COLS.filter(function(c){ return !nascido(r) || !POS_SO_GESTANTE[c[0]]; }).map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === et ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('');
+    var acao = et === 'gps' && !gpsPaga(r) ? '<button type="button" class="btn pv-acao" data-guia-paga="' + esc(r.id) + '">Marcar GPS paga</button>'
+      : et === 'cert' ? '<button type="button" class="btn pv-acao" data-pv-cert="' + esc(r.id) + '">Recebi a certidão</button>'
+      : et === 'ok' ? '<button type="button" class="btn primary pv-acao" data-pv-enc="' + esc(r.id) + '">Encaminhar para análise</button>' : '';
     return '<div class="pv-card" draggable="true" data-linha="' + esc(r.id) + '" data-pv="' + esc(r.id) + '">' +
-      '<div class="pv-n">' + esc(r.nome || 'Sem nome') + '</div>' + (tag ? '<div>' + tag + '</div>' : '') +
-      '<div class="pv-l">' + esc(quando) + '</div>' +
+      '<div class="pv-n">' + esc(r.nome || 'Sem nome') + '</div>' +
+      '<div class="pv-l">' + esc(relogioMae(r)) + '</div>' + gpsL +
       '<div class="pv-l">' + (cid ? esc(cid) + ' · ' : '') + ok + '/' + docs.length + ' docs</div>' +
-      (fim ? '<div class="pv-ok">segue para ' + esc(dest) + '</div>' : atraso ? '<div class="pv-atraso">' + d + ' dias no Pós-venda</div>' : '<div class="pv-l">' + (d <= 0 ? 'chegou hoje' : d + (d === 1 ? ' dia' : ' dias') + ' no Pós-venda') + '</div>') +
-      (lane === 'gest' && et === 'guia' ? '<div class="pv-l">Guia: <b>' + (guiaDe(r) === 'paga' ? 'paga' : 'aguardando pagamento') + '</b>' + (guiaDe(r) === 'paga' ? '' : ' · <button type="button" class="linkbtn" data-guia-paga="' + esc(r.id) + '">marcar paga</button>') + '</div>' : '') +
-      (r.posResp ? '<div class="pv-l">Responsável: ' + esc(r.posResp) + '</div>' : '') +
+      (r.pvAnalise === 'devolvido' ? '<div class="pv-devolvida"><b>Devolvida pela Controladoria</b>' + esc(r.analiseMotivo || '') + '</div>' : '') +
+      (atr ? '<div class="pv-atraso">' + esc(atr) + '</div>' : '') +
+      (r.posResp ? '<div class="pv-l">Responsável: ' + esc(r.posResp) + '</div>' : '') + acao +
       '<div class="pv-pe"><span class="pv-av" title="' + esc(r.contratoPor ? 'Fechou: ' + r.contratoPor : 'Sem closer registrado') + '">' + esc(iniciais(r.contratoPor || prospName(r.responsavelId))) + '</span>' +
       '<span class="pv-ic">' + (r.pastaUrl ? '<a href="' + esc(r.pastaUrl) + '" target="_blank" rel="noopener" title="Pasta no Drive" onclick="event.stopPropagation()"><svg class="i"><use href="#i-folder"/></svg></a>' : '') +
-      (docs.length - ok ? '<span class="pv-pend" title="Faltam: ' + esc(docs.filter(function(x){ return !x.ok; }).map(function(x){ return x.n; }).join(', ')) + '"><svg class="i"><use href="#i-bellx"/></svg></span>' : '') +
-      '<select data-pos="' + esc(r.id) + '" aria-label="Mover ' + esc(r.nome) + '" title="Mover para outra coluna">' + cols.map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === et ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '<option value="__cad">↩ Voltar ao Cadastro</option></select></span></div></div>';
+      '<select data-pos="' + esc(r.id) + '" aria-label="Mover ' + esc(r.nome) + '" title="Mover para outra coluna">' + opts + '<option value="__cad">↩ Voltar ao Cadastro</option></select></span></div></div>';
   }
   function renderContratos(){
     var box = $('ctr-list'); if (!box) return;
     Array.prototype.forEach.call($('pv-lane').querySelectorAll('button'), function(bt){ bt.setAttribute('aria-pressed', String(bt.dataset.l === pvLane)); });
     $('pv-atr').setAttribute('aria-pressed', String(pvAtr)); $('pv-atr').classList.toggle('primary', pvAtr);
-    var busca = function(r){ return buscaOk(r, ctrQ2); };
-    var emPos = state.rows.filter(noContratos).filter(busca).filter(function(r){ return !soMinhas || minha(r); });
-    var regs = state.rows.filter(function(r){ return fechado(r) && regularizada(r) && busca(r); });
-    var gest = emPos.filter(function(r){ return posLane(r) === 'gest'; }), nasc = emPos.filter(function(r){ return posLane(r) === 'nasc'; });
-    var atrasadas = emPos.filter(function(r){ return diasNoPos(r) >= PV_DIAS_ATRASO; }), semDoc = emPos.filter(function(r){ return docsApp(r).some(function(x){ return !x.ok; }); });
-    var prio = emPos.filter(function(r){ return prioridadeNasc(r) != null; });
-    $('ctr-stats').innerHTML = cardLista('data-ctr-filtro', 'i-users', 'Clientes no Pós-venda', emPos.length, gest.length + ' gestantes · ' + nasc.length + ' com bebê nascido', '', '') +
-      cardLista('data-ctr-filtro', 'i-file', 'Documentos faltando', semDoc.length, 'RG, CPF, título ou residência', 'x', '') +
-      cardLista('data-ctr-filtro', 'i-bellx', 'Parto perto', prio.length, 'gestantes com parto em até ' + PRIORIDADE_DIAS + ' dias', 'p', '') +
-      cardLista('data-ctr-filtro', 'i-clock', 'Atrasadas', atrasadas.length, 'mais de ' + PV_DIAS_ATRASO + ' dias no Pós-venda', 'a', '');
-    var lane = pvLane, lista = (lane === 'gest' ? gest : nasc).filter(function(r){ return !pvAtr || diasNoPos(r) >= PV_DIAS_ATRASO; });
-    var fimLista = regs.filter(function(r){ return posLane(r) === lane; });
+    var emPos = state.rows.filter(noContratos).filter(function(r){ return buscaOk(r, ctrQ2) && (!soMinhas || minha(r)); });
+    var lista = emPos.filter(function(r){ return (pvLane === 'todas' || posLane(r) === pvLane) && (!pvAtr || atrasada(r)); });
+    $('ctr-stats').innerHTML = cardLista('data-ctr-filtro', 'i-users', 'Clientes no Pós-venda', emPos.length, emPos.filter(function(r){ return !nascido(r); }).length + ' gestantes · ' + emPos.filter(nascido).length + ' com bebê nascido', '', '') +
+      cardLista('data-ctr-filtro', 'i-file', 'Documentos faltando', emPos.filter(function(r){ return docsApp(r).some(function(x){ return !x.ok; }); }).length, 'pendências de documentos do app', 'x', '') +
+      cardLista('data-ctr-filtro', 'i-cash', 'GPS a pagar', emPos.filter(gpsAPagar).length, 'prazo: 2 meses antes do parto', 'g', '') +
+      cardLista('data-ctr-filtro', 'i-clock', 'Atrasadas', emPos.filter(atrasada).length, 'GPS ou documentação fora do prazo', 'a', '');
     $('ctr-count').textContent = lista.length + (lista.length === 1 ? ' cliente' : ' clientes');
-    var ord = function(x, y){
-      if (lane === 'gest'){ var px = prioridadeNasc(x), py = prioridadeNasc(y); if (px != null || py != null){ if (px == null) return 1; if (py == null) return -1; if (px !== py) return px - py; } var dx = x.dpp || '9999', dy = y.dpp || '9999'; return dx.localeCompare(dy) || String(x.nome).localeCompare(String(y.nome), 'pt'); }
-      return String(x.contratoEm).localeCompare(String(y.contratoEm)) || String(x.nome).localeCompare(String(y.nome), 'pt');
-    };
-    box.innerHTML = '<div class="pv-board">' + POS_COLS[lane].map(function(c){
-      var fim = c[0] === 'regularizada';
-      var cards = (fim ? fimLista : lista.filter(function(r){ return posEtapaDe(r) === c[0]; })).slice().sort(ord).slice(0, 80);
-      return '<section class="pv-col' + (fim ? ' fim' : '') + '" data-col="' + c[0] + '" data-lane="' + lane + '"><header><b>' + c[1] + '</b><span class="pv-n-col tnum">' + cards.length + '</span></header>' +
-        '<div class="pv-body">' + (cards.map(function(r){ return posCard(r, fim); }).join('') || '<div class="pv-vazio">Nenhuma cliente</div>') + '</div></section>';
+    var ord = function(x, y){ return String(x.dpp || x.criancaNasc || '9999').localeCompare(String(y.dpp || y.criancaNasc || '9999')) || String(x.nome || '').localeCompare(String(y.nome || ''), 'pt'); };
+    box.innerHTML = '<div class="pv-board">' + POS_COLS.map(function(c){
+      var cards = lista.filter(function(r){ return posEtapaDe(r) === c[0]; }).sort(ord).slice(0, 80);
+      return '<section class="pv-col" data-col="' + c[0] + '"><header><b>' + c[1] + '</b><span class="pv-n-col tnum">' + cards.length + '</span></header><div class="pv-body">' + (cards.map(posCard).join('') || '<div class="pv-vazio">Nenhuma cliente</div>') + '</div></section>';
     }).join('') + '</div>';
   }
+  /* ---------- Fila de protocolo: um botão por etapa ---------- */
+  var FILA_COLS = [['para_analisar', 'Para analisar'], ['analise', 'Em análise'], ['fazer_requerimento', 'Fazer requerimento'], ['redigindo', 'Redigindo requerimento'], ['protocolar', 'Protocolar']];
+  var FILA_ORDEM = FILA_COLS.map(function(c){ return c[0]; }), filaQ = '';
+  function filaEtapaDe(r){ return FILA_ORDEM.indexOf(r.filaEtapa) >= 0 ? r.filaEtapa : 'para_analisar'; }
+  function podeAnalisar(){ if (isAdmin()) return true; var e = meuEmail(), u = (state.equipe || []).filter(function(x){ return String(x.email).toLowerCase() === e; })[0]; return !!u && u.cargo === 'operacional'; }
+  function filaCard(r){
+    var et = filaEtapaDe(r), d = diasParado(r), docs = docsApp(r), ok = docs.filter(function(x){ return x.ok; }).length, cid = cidadeCli(r);
+    var acoes = et === 'para_analisar' ? '<button type="button" class="btn primary pv-acao" data-fila="iniciar" data-id="' + esc(r.id) + '">Iniciar análise</button>'
+      : et === 'analise' ? '<button type="button" class="btn primary pv-acao" data-fila="aprovar" data-id="' + esc(r.id) + '">Aprovar</button><button type="button" class="btn pv-acao" data-fila="devolver" data-id="' + esc(r.id) + '">Devolver ao Pós-venda</button>'
+      : et === 'fazer_requerimento' ? '<button type="button" class="btn primary pv-acao" data-fila="redigir" data-id="' + esc(r.id) + '">Começar a redigir</button>'
+      : et === 'redigindo' ? '<button type="button" class="btn primary pv-acao" data-fila="enviar" data-id="' + esc(r.id) + '">Enviar para protocolo</button>'
+      : '<button type="button" class="btn primary pv-acao" data-fila="protocolar" data-id="' + esc(r.id) + '">Registrar protocolo</button>';
+    return '<div class="pv-card" data-linha="' + esc(r.id) + '"><div class="pv-n">' + esc(r.nome || 'Sem nome') + '</div><div class="pv-l">' + esc(relogioMae(r)) + '</div>' +
+      '<div class="pv-l">' + (cid ? esc(cid) + ' · ' : '') + ok + '/' + docs.length + ' docs</div>' +
+      '<div class="' + (d != null && d > LIMITE_ETAPA.fila ? 'pv-atraso' : 'pv-l') + '">' + (d ? d + (d === 1 ? ' dia' : ' dias') + ' nesta etapa' : 'chegou hoje') + '</div>' +
+      (r.filaPor ? '<div class="pv-l">Com: ' + esc(r.filaPor) + '</div>' : '') + acoes +
+      (et !== 'para_analisar' ? '<button type="button" class="linkbtn pv-voltar" data-fila="voltar" data-id="' + esc(r.id) + '">Voltar etapa</button>' : '') + '</div>';
+  }
+  function renderFila(){
+    var box = $('fila-list'); if (!box) return;
+    var todos = state.rows.filter(naFila).filter(function(r){ return buscaOk(r, filaQ); });
+    var conta = function(ks){ return todos.filter(function(r){ return ks.indexOf(filaEtapaDe(r)) >= 0; }).length; };
+    $('fila-stats').innerHTML = cardLista('data-fila-f', 'i-users', 'Na fila', todos.length, 'aguardando protocolo no INSS', '', '') +
+      cardLista('data-fila-f', 'i-check', 'Com a Controladoria', conta(['para_analisar', 'analise']), 'para analisar e em análise', 'a', '') +
+      cardLista('data-fila-f', 'i-pencil', 'Requerimento', conta(['fazer_requerimento', 'redigindo']), 'a fazer e sendo redigidos', 'r', '') +
+      cardLista('data-fila-f', 'i-inss', 'Protocolar', conta(['protocolar']), 'prontos para o Meu INSS', 'p', '');
+    $('fila-count').textContent = todos.length + (todos.length === 1 ? ' cliente' : ' clientes');
+    box.innerHTML = '<div class="pv-board">' + FILA_COLS.map(function(c){
+      var cards = todos.filter(function(r){ return filaEtapaDe(r) === c[0]; }).sort(function(a, b){ return (diasParado(b) || 0) - (diasParado(a) || 0); });
+      return '<section class="pv-col"><header><b>' + c[1] + '</b><span class="pv-n-col tnum">' + cards.length + '</span></header><div class="pv-body">' + (cards.map(filaCard).join('') || '<div class="pv-vazio">Nenhuma cliente</div>') + '</div></section>';
+    }).join('') + '</div>';
+  }
+  async function filaAcao(id, acao){
+    var r = acharRow(id); if (!r) return;
+    if ((acao === 'iniciar' || acao === 'aprovar' || acao === 'devolver') && !podeAnalisar()){ toast('A análise é feita pela Controladoria (cargo Operacional) ou por um gestor.'); return; }
+    if (acao === 'protocolar'){ abrirRequerimento(r); return; }
+    var et = filaEtapaDe(r), ag = new Date().toISOString();
+    var antes = { pvAnalise: r.pvAnalise || '', filaEtapa: r.filaEtapa || '', filaMudouEm: r.filaMudouEm || '', filaPor: r.filaPor || '', analiseMotivo: r.analiseMotivo || '', analisePor: r.analisePor || '' };
+    var p = { filaMudouEm: ag, filaPor: meuNome(), atualizadoEm: ag }, msg = '';
+    if (acao === 'iniciar'){ p.filaEtapa = 'analise'; msg = 'Em análise'; }
+    else if (acao === 'aprovar'){ p.filaEtapa = 'fazer_requerimento'; p.pvAnalise = 'aprovado'; p.analisePor = meuNome(); p.analiseEm = ag; msg = 'Aprovada: fazer requerimento'; }
+    else if (acao === 'devolver'){
+      var mot = String(window.prompt('Por que está devolvendo ao Pós-venda? (obrigatório)', '') || '').trim();
+      if (mot.length < 3){ if (mot) toast('Escreva o motivo da devolução.'); return; }
+      p.pvAnalise = 'devolvido'; p.analiseMotivo = mot.slice(0, 300); p.analisePor = meuNome(); p.analiseEm = ag; p.filaEtapa = ''; msg = 'Devolvida ao Pós-venda';
+    }
+    else if (acao === 'redigir'){ p.filaEtapa = 'redigindo'; msg = 'Redigindo requerimento'; }
+    else if (acao === 'enviar'){ p.filaEtapa = 'protocolar'; msg = 'Pronta para protocolar'; }
+    else if (acao === 'voltar'){ p.filaEtapa = FILA_ORDEM[Math.max(0, FILA_ORDEM.indexOf(et) - 1)]; if (FILA_ORDEM.indexOf(p.filaEtapa) < 2) p.pvAnalise = 'em_analise'; msg = 'Voltou uma etapa'; }
+    try { await patchRow(id, p); toast(msg + ': ' + r.nome, 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); }); } catch(err){ toast(errMsg(err)); }
+  }
+  async function encaminharAnalise(id){
+    var r = acharRow(id); if (!r) return;
+    var ag = new Date().toISOString(), p = { pvAnalise: 'em_analise', filaEtapa: 'para_analisar', filaMudouEm: ag, filaPor: '', analiseMotivo: '', encaminhadoEm: ag, posResp: meuNome(), posRespEmail: meuEmail(), atualizadoEm: ag };
+    var faltam = docsApp(r).filter(function(x){ return !x.ok; });
+    if (faltam.length){
+      if (!window.confirm('A pasta está INCOMPLETA (faltam: ' + faltam.map(function(x){ return x.n; }).join(', ') + ').\n\nFechar a pasta incompleta gera penalidade de 50% para o Pós-venda (' + meuNome() + ').\n\nEncaminhar mesmo assim?')) return;
+      p.penalidades = (Array.isArray(r.penalidades) ? r.penalidades : []).concat([{ tipo: 'pasta_incompleta', percentual: 50, pos: meuNome(), email: meuEmail(), faltavam: faltam.map(function(x){ return x.n; }), em: ag }]);
+    }
+    var antes = { pvAnalise: r.pvAnalise || '', filaEtapa: r.filaEtapa || '', analiseMotivo: r.analiseMotivo || '', penalidades: Array.isArray(r.penalidades) ? r.penalidades : [] };
+    try { await patchRow(id, p); toast(r.nome + ' foi para a análise da Controladoria', 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); }); } catch(err){ toast(errMsg(err)); }
+  }
+  async function receberCertidao(id){
+    var r = acharRow(id); if (!r) return;
+    var ag = new Date().toISOString(), p = { certidaoRecebida: true, certidaoEm: iso(new Date()), posEtapa: 'ok', posMudouEm: ag, posResp: meuNome(), posRespEmail: meuEmail(), atualizadoEm: ag };
+    if (!r.criancaNasc){
+      var t = String(window.prompt('Data de nascimento da criança (dd/mm/aaaa):', '') || '').trim(), m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(t);
+      if (!m){ if (t) toast('Data inválida. Use dd/mm/aaaa.'); return; }
+      p.criancaNasc = m[3] + '-' + m[2] + '-' + m[1]; p.fatoGerador = 'parto';
+      if (daysUntil(p.criancaNasc) > 0){ toast('A data de nascimento está no futuro.'); return; }
+    }
+    var antes = { certidaoRecebida: !!r.certidaoRecebida, certidaoEm: r.certidaoEm || '', posEtapa: r.posEtapa || '', posMudouEm: r.posMudouEm || '', criancaNasc: r.criancaNasc || '', fatoGerador: r.fatoGerador || '' };
+    try { await patchRow(id, p); toast('Certidão recebida: ' + r.nome + ' foi para Documentação OK', 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); }); } catch(err){ toast(errMsg(err)); }
+  }
+  $('ctr-list').addEventListener('click', function(e){
+    var c = e.target.closest('[data-pv-cert]'); if (c){ receberCertidao(c.dataset.pvCert); return; }
+    var n = e.target.closest('[data-pv-enc]'); if (n){ encaminharAnalise(n.dataset.pvEnc); return; }
+  });
+  $('fila-list').addEventListener('click', function(e){ var b = e.target.closest('[data-fila]'); if (b) filaAcao(b.dataset.id, b.dataset.fila); });
+  $('fila-q').addEventListener('input', function(){ filaQ = this.value.trim(); renderFila(); });
   $('pv-lane').addEventListener('click', function(e){ var bt = e.target.closest('button[data-l]'); if (!bt) return; pvLane = bt.dataset.l; renderContratos(); });
   $('pv-atr').addEventListener('click', function(){ pvAtr = !pvAtr; renderContratos(); });
   async function voltarCadastro(id){
     var r = acharRow(id); if (!r) return;
     if (!window.confirm('Voltar ' + (r.nome || 'a cliente') + ' para o Cadastro?\n\nO fechamento do contrato será desfeito e ela volta como Novo lead.')) return;
-    var antes = { contratoEm: r.contratoEm || '', leadStatus: r.leadStatus || '', posEtapa: r.posEtapa || '', propostaAceita: !!r.propostaAceita, propostaObs: r.propostaObs || '', contratoPor: r.contratoPor || '', contratoPorEmail: r.contratoPorEmail || '', certidaoRecebida: !!r.certidaoRecebida };
+    var antes = { pvAnalise: r.pvAnalise || '', filaEtapa: r.filaEtapa || '', contratoEm: r.contratoEm || '', leadStatus: r.leadStatus || '', posEtapa: r.posEtapa || '', propostaAceita: !!r.propostaAceita, propostaObs: r.propostaObs || '', contratoPor: r.contratoPor || '', contratoPorEmail: r.contratoPorEmail || '', certidaoRecebida: !!r.certidaoRecebida };
     var ag = new Date().toISOString();
     try {
-      await patchRow(id, { contratoEm: '', leadStatus: 'novo', posEtapa: '', propostaAceita: false, propostaObs: '', contratoPor: '', contratoPorEmail: '', certidaoRecebida: false, contatoPrazoEm: '', tentativas: 0, leadMudouEm: ag, voltouAoCadastroEm: ag, atualizadoEm: ag });
+      await patchRow(id, { pvAnalise: '', filaEtapa: '', analiseMotivo: '', contratoEm: '', leadStatus: 'novo', posEtapa: '', propostaAceita: false, propostaObs: '', contratoPor: '', contratoPorEmail: '', certidaoRecebida: false, contatoPrazoEm: '', tentativas: 0, leadMudouEm: ag, voltouAoCadastroEm: ag, atualizadoEm: ag });
       toast((r.nome || 'Cliente') + ' voltou para o Cadastro', 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
     } catch(err){ toast(errMsg(err)); render(); }
   }
   async function moverPos(id, etapa){
     if (etapa === '__cad'){ voltarCadastro(id); render(); return; }
     var r = acharRow(id); if (!r) return;
-    var antes = { posEtapa: r.posEtapa || '', penalidades: Array.isArray(r.penalidades) ? r.penalidades : [] };
+    if (nascido(r) && POS_SO_GESTANTE[etapa]){ toast('Bebê já nascido não passa pela GPS nem por Aguardando Nascimento.'); render(); return; }
+    if (etapa === 'ok' && !r.certidaoRecebida){ toast('Use "Recebi a certidão" na coluna Solicitar Certidão de Nascimento.'); render(); return; }
+    var antes = { posEtapa: r.posEtapa || '', posMudouEm: r.posMudouEm || '' };
     var mudanca = { posEtapa: etapa, posMudouEm: new Date().toISOString(), atualizadoEm: new Date().toISOString(), posResp: meuNome(), posRespEmail: meuEmail() };
-    if (etapa === 'regularizada'){
-      var faltam = docsApp(r).filter(function(x){ return !x.ok; });
-      if (faltam.length){
-        var eu = (state.me && state.me.email) || '', ue = (state.equipe || []).filter(function(x){ return String(x.email).toLowerCase() === String(eu).toLowerCase(); })[0];
-        if (!window.confirm('A pasta está INCOMPLETA (faltam: ' + faltam.map(function(x){ return x.n; }).join(', ') + ').\n\nFechar a pasta incompleta gera penalidade de 50% para o Pós-venda (' + ((ue && ue.nome) || eu) + ').\n\nRegularizar mesmo assim?')){ render(); return; }
-        mudanca.penalidades = (Array.isArray(r.penalidades) ? r.penalidades : []).concat([{ tipo: 'pasta_incompleta', percentual: 50, pos: (ue && ue.nome) || eu, email: eu, faltavam: faltam.map(function(x){ return x.n; }), em: new Date().toISOString() }]);
-      }
-    }
     try {
       await patchRow(id, mudanca);
-      var nome = (POS_COLS[posLane(r)].filter(function(c){ return c[0] === etapa; })[0] || [0, etapa])[1];
-      toast(etapa === 'regularizada' ? r.nome + ' regularizada: ' + (posLane(r) === 'gest' ? 'foi para Aguardando nascimento' : 'foi para a certidão') : r.nome + ': ' + nome, 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
+      var nome = (POS_COLS.filter(function(c){ return c[0] === etapa; })[0] || [0, etapa])[1];
+      toast(r.nome + ': ' + nome, 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
     } catch(err){ toast(errMsg(err)); render(); }
   }
   document.addEventListener('change', function(e){ var s = e.target.closest && e.target.closest('select[data-pos]'); if (s) moverPos(s.dataset.pos, s.value); });
@@ -4403,9 +4496,9 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
   document.addEventListener('dragover', function(e){ var col = e.target.closest && e.target.closest('.pv-col'); if (col){ e.preventDefault(); col.classList.add('alvo'); } });
   document.addEventListener('dragleave', function(e){ var col = e.target.closest && e.target.closest('.pv-col'); if (col) col.classList.remove('alvo'); });
   document.addEventListener('drop', function(e){
-    var col = e.target.closest && e.target.closest('.pv-col'); if (!col) return;
+    var col = e.target.closest && e.target.closest('.pv-col'); if (!col || !col.dataset.col) return;
     e.preventDefault(); col.classList.remove('alvo');
-    var id = e.dataTransfer.getData('text/plain'), r = acharRow(id); if (!r || posLane(r) !== col.dataset.lane) return;
+    var id = e.dataTransfer.getData('text/plain'), r = acharRow(id); if (!r || !col.dataset.col) return;
     moverPos(id, col.dataset.col);
   });
   var desqQ = '', desqAberto = {};
@@ -4443,44 +4536,6 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
     } catch(err){ toast(errMsg(err)); }
   });
   function pedeRequerer(r){ var d = parseDate(r.dpp); if (!d) return null; d.setDate(d.getDate() - 28); return iso(d); }
-  function renderNasc(){
-    var box = $('nasc-list'); if (!box) return;
-    var todos = state.rows.filter(function(r){ return aguardaNasc(r) || esperaCert(r); });
-    var pode = todos.filter(function(r){ var n = daysUntil(pedeRequerer(r)); return n != null && n <= 0; });
-    pode = pode.filter(aguardaNasc);
-    var atras = todos.filter(function(r){ var n = daysUntil(r.dpp); return aguardaNasc(r) && n != null && n < 0; });
-    var certs = todos.filter(esperaCert);
-    var pend = todos.filter(docsPendentes);
-    $('nasc-stats').innerHTML =
-      cardLista('data-nasc-filtro', 'i-clock', 'Aguardando nascimento', todos.length - certs.length, 'gestantes regularizadas esperando o parto', '', nascSit) +
-      cardLista('data-nasc-filtro', 'i-file', 'Cobrar certidão', certs.length, 'bebê nasceu: pedir a certidão à mãe', 'cert', nascSit) +
-      cardLista('data-nasc-filtro', 'i-check', 'Já podem requerer', pode.length, 'a partir de 28 dias antes do parto', 'pode', nascSit) +
-      cardLista('data-nasc-filtro', 'i-bellx', 'Passou da data prevista', atras.length, 'confirmar se o bebê nasceu', 'atrasou', nascSit) +
-      cardLista('data-nasc-filtro', 'i-bellx', 'Documentos pendentes', pend.length, 'falta documento ou dado', 'docs', nascSit);
-    $('nasc-sit').innerHTML = [['', 'Todas · ' + todos.length], ['pode', 'Já podem requerer · ' + pode.length], ['atrasou', 'Passou da data prevista · ' + atras.length], ['cert', 'Cobrar certidão · ' + certs.length], ['docs', 'Documentos pendentes · ' + pend.length]]
-      .map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === nascSit ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
-    var lista = todos.filter(function(r){
-      if (nascSit === 'pode' && pode.indexOf(r) < 0) return false;
-      if (nascSit === 'atrasou' && atras.indexOf(r) < 0) return false;
-      if (nascSit === 'docs' && !docsPendentes(r)) return false;
-      if (nascSit === 'cert' && !esperaCert(r)) return false;
-      return buscaOk(r, nascQ);
-    }).sort(function(a, b){ return String(a.dpp || '9999').localeCompare(String(b.dpp || '9999')) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); });
-    $('nasc-count').textContent = lista.length + (lista.length === 1 ? ' cliente' : ' clientes');
-    var html = '<div class="row head"><div>Cliente</div><div>Contato</div><div>Parto / nascimento</div><div>Pode requerer a partir de</div><div>Documentos</div><div></div></div>';
-    if (!lista.length) html += '<div class="empty">' + (todos.length ? 'Nenhuma cliente neste filtro.' : 'Nenhuma gestante com contrato fechado. Elas aparecem aqui quando o fato gerador é <b>Ainda gestante</b>.') + '</div>';
-    lista.slice(0, 300).forEach(function(r){
-      var n = daysUntil(r.dpp), pr = pedeRequerer(r), np = daysUntil(pr);
-      html += '<div class="row' + (nascAberto[r.id] ? ' aberto' : '') + '" data-linha="' + esc(r.id) + '">' + nomeCell(r) +
-        '<div><span class="lbl">Contato</span>' + telCell(r, true) + '</div>' +
-        '<div><span class="lbl">Parto previsto</span><div class="val">' + (r.dpp ? fmtDate(r.dpp) : '<span class="muted-dash">não informado</span>') + '</div>' + (n != null ? '<div class="mini">' + (n < 0 ? 'passou há ' + (-n) + ' dias' : n === 0 ? 'é hoje' : 'faltam ' + n + ' dias') + '</div>' : '') + '</div>' +
-        '<div><span class="lbl">Pode requerer</span><div class="val">' + (pr ? fmtDate(pr) : '—') + '</div>' + (np != null ? '<div class="mini">' + (np <= 0 ? '<b>já pode requerer</b>' : 'em ' + np + ' dias') + '</div>' : '') + '</div>' +
-        '<div><span class="lbl">Documentos</span>' + docsCell(r) + '</div>' +
-        '<div class="c-act">' + (esperaCert(r) ? '<button type="button" class="btn inss-acao" data-act="certidao" data-id="' + esc(r.id) + '" title="A mãe mandou a certidão: segue para o INSS">Recebi a certidão</button>' : '<button type="button" class="btn inss-acao" data-act="nasceu" data-id="' + esc(r.id) + '" title="O bebê nasceu: informar a data e pedir a certidão">Nasceu</button>') + editBtn(r) + '</div>' +
-      '</div>' + (nascAberto[r.id] ? fichaCliente(r) : '');
-    });
-    box.innerHTML = html;
-  }
   function acharRow(id){ return state.rows.filter(function(x){ return x.id === id; })[0]; }
   function ligarLista(prefixo, getAberto, render){
     $(prefixo + '-list').addEventListener('click', function(e){
@@ -4489,8 +4544,6 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
         var r = acharRow(b.dataset.id);
         if (b.dataset.act === 'edit'){ if (r) openForm(r); return; }
         if (b.dataset.act === 'requerer'){ if (r) abrirRequerimento(r); return; }
-        if (b.dataset.act === 'certidao'){ if (!r) return; var antesC = { certidaoRecebida: !!r.certidaoRecebida, certidaoEm: r.certidaoEm || '' }; patchRow(r.id, { certidaoRecebida: true, certidaoEm: iso(new Date()), atualizadoEm: new Date().toISOString() }).then(function(){ toast('Certidão recebida: ' + r.nome + ' segue para o INSS', 'Desfazer', function(){ patchRow(r.id, antesC).catch(function(e2){ toast(errMsg(e2)); }); }); }).catch(function(e2){ toast(errMsg(e2)); }); return; }
-        if (b.dataset.act === 'nasceu'){ if (!r) return; openForm(r); $('f-fato').value = 'parto'; $('f-fato').dispatchEvent(new Event('change')); setTimeout(function(){ $('f-cnasc').focus(); }, 60); toast('Informe a data de nascimento da criança e salve'); return; }
       }
       var ln = b && b.dataset.act === 'abrir' ? { dataset: { linha: b.dataset.id } } : e.target.closest('[data-linha]');
       if (!ln || (!b && e.target.closest('a,button,select,input,label,.ficha'))) return;
@@ -4498,17 +4551,14 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
     });
   }
   ligarLista('ctr', function(){ return ctrAberto; }, renderContratos);
-  ligarLista('nasc', function(){ return nascAberto; }, renderNasc);
+  ligarLista('fila', function(){ return {}; }, renderFila);
   function filtroCards(el, attr, set, render){
     el.addEventListener('click', function(e){ var c = e.target.closest('[' + attr + ']'); if (!c) return; set(c.getAttribute(attr)); render(); });
     el.addEventListener('keydown', function(e){ if (e.key !== 'Enter' && e.key !== ' ') return; var c = e.target.closest('[' + attr + ']'); if (!c) return; e.preventDefault(); set(c.getAttribute(attr)); render(); });
   }
   filtroCards($('ctr-stats'), 'data-ctr-filtro', function(f){ ctrSit = ctrSit === f ? '' : f; }, renderContratos);
-  filtroCards($('nasc-stats'), 'data-nasc-filtro', function(f){ nascSit = nascSit === f ? '' : f; }, renderNasc);
   $('ctr-sit').addEventListener('change', function(){ ctrSit = this.value; renderContratos(); });
-  $('nasc-sit').addEventListener('change', function(){ nascSit = this.value; renderNasc(); });
   $('ctr-q').addEventListener('input', function(){ ctrQ2 = this.value.trim(); renderContratos(); });
-  $('nasc-q').addEventListener('input', function(){ nascQ = this.value.trim(); renderNasc(); });
   document.addEventListener('click', function(e){ if (e.target.closest && e.target.closest('select[data-lead],select[data-ctr],select[data-guia]')) e.stopPropagation(); }, true);
   document.addEventListener('change', async function(e){
     var sl = e.target.closest && e.target.closest('select[data-lead],select[data-ctr],select[data-guia]'); if (!sl) return;
@@ -4585,7 +4635,7 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
       var antes = { contratoEm: r.contratoEm || '', leadStatus: r.leadStatus || '', contratoPor: r.contratoPor || '', contratoPorEmail: r.contratoPorEmail || '', fatoGerador: r.fatoGerador || '', posEtapa: r.posEtapa || '', propostaAceita: !!r.propostaAceita, propostaObs: r.propostaObs || '' };
       this.disabled = true;
       try {
-        await patchRow(r.id, { contratoEm: data, leadStatus: 'fechado', contratoPor: atendente, contratoPorEmail: atendenteEmail, propostaAceita: true, propostaObs: f.querySelector('#fc-prop').value.trim(), fatoGerador: fatoNovo, posEtapa: '', contatoPrazoEm: '', atualizadoEm: new Date().toISOString() });
+        await patchRow(r.id, { contratoEm: data, leadStatus: 'fechado', contratoPor: atendente, contratoPorEmail: atendenteEmail, pvAnalise: '', filaEtapa: '', propostaAceita: true, propostaObs: f.querySelector('#fc-prop').value.trim(), fatoGerador: fatoNovo, posEtapa: '', contatoPrazoEm: '', atualizadoEm: new Date().toISOString() });
         f.remove();
         toast('Contrato fechado por ' + atendente + ': ' + r.nome + ' · foi para o Pós-venda', 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
       } catch(err){ this.disabled = false; toast(errMsg(err)); }
@@ -4890,9 +4940,13 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
       var d = String(r.cpf || '').replace(/\D/g, ''); if (d.length === 11){ (cpfs[d] = cpfs[d] || []).push(r); }
       var tl = String(r.contato || '').replace(/\D/g, '').slice(-9); if (tl.length === 9){ (tels[tl] = tels[tl] || []).push(r); }
       if (noCadastro(r) && prioridadeNasc(r) != null) add('Parto perto e sem contrato', r, 'parto em ' + prioridadeNasc(r) + ' dias');
-      if (fechado(r) && regularizada(r) && r.fatoGerador === 'gestante' && !r.criancaNasc && jaPodeRequerer(r) && !requerido(r)) add('Já pode protocolar no INSS', r, 'a partir de ' + fmtDate(pedeRequerer(r)) + ' (28 dias antes do parto)');
       if (r.inssStatus === 'exigencia' && r.exigenciaPrazo){ var n = daysUntil(r.exigenciaPrazo); if (n != null && n <= 5) add('Exigência do INSS vencendo', r, n < 0 ? 'prazo venceu há ' + (-n) + ' dias' : 'faltam ' + n + ' dias'); }
-      if (atrasada(r)) add('Parada além do prazo', r, (etapaAtual(r) === 'pos' ? 'Pós-venda' : etapaAtual(r) === 'cert' ? 'cobrar certidão' : 'Cadastro') + ' há ' + diasParado(r) + ' dias');
+      if (noContratos(r) && gpsAPagar(r)) add('Pagar a GPS', r, 'vence ' + fmtDate(prazoGps(r)) + ' · parto ' + fmtDate(r.dpp));
+      if (noContratos(r) && r.fatoGerador === 'gestante' && !r.criancaNasc && !r.dpp) add('Informar a data do parto', r, 'gestante sem data prevista');
+      if (noContratos(r) && posEtapaDe(r) === 'cert') add('Falar com a mãe: pedir a certidão', r, r.criancaNasc ? 'nasceu em ' + fmtDate(r.criancaNasc) : 'parto previsto ' + fmtDate(r.dpp));
+      if (naFila(r) && filaEtapaDe(r) === 'para_analisar') add('Para a Controladoria analisar', r, 'encaminhada ' + fmtDate(String(r.encaminhadoEm || '').slice(0, 10)));
+      if (r.pvAnalise === 'devolvido' && noContratos(r)) add('Devolvida pela Controladoria', r, r.analiseMotivo || '');
+      if (atrasada(r)) add('Parada além do prazo', r, atrasoTxt(r));
       if (r.fatoGerador === 'gestante' && !r.criancaNasc && r.dpp){ var p = daysUntil(r.dpp); if (p != null && (p < -45 || p > 300)) add('Data para conferir', r, 'parto previsto ' + fmtDate(r.dpp) + (p < 0 ? ' (já passou: o bebê nasceu?)' : ' (muito distante)')); }
       if (r.criancaNasc && r.criancaNasc > hoje) add('Data para conferir', r, 'nascimento no futuro: ' + fmtDate(r.criancaNasc));
     });
@@ -4905,7 +4959,7 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
   function abrirAvisos(){
     var l = avisosLista(), grupos = {};
     l.forEach(function(x){ (grupos[x.tipo] = grupos[x.tipo] || []).push(x); });
-    var ordem = ['Parto perto e sem contrato', 'Já pode protocolar no INSS', 'Exigência do INSS vencendo', 'Parada além do prazo', 'Cadastro repetido', 'Data para conferir'];
+    var ordem = ['Parto perto e sem contrato', 'Pagar a GPS', 'Informar a data do parto', 'Falar com a mãe: pedir a certidão', 'Devolvida pela Controladoria', 'Para a Controladoria analisar', 'Exigência do INSS vencendo', 'Parada além do prazo', 'Cadastro repetido', 'Data para conferir'];
     var f = document.createElement('div'); f.className = 'cid-sheet';
     f.innerHTML = '<div style="width:min(620px,100%)"><h3>Avisos</h3><p>' + (l.length ? l.length + (l.length === 1 ? ' ponto para olhar' : ' pontos para olhar') : 'Nada pendente agora.') + '</p><div class="lista av-lista">' +
       ordem.filter(function(k){ return grupos[k]; }).map(function(k){ return '<div class="av-g"><b>' + esc(k) + ' <span class="tnum">' + grupos[k].length + '</span></b>' + grupos[k].map(function(x){ return '<button type="button" data-av="' + esc(x.id) + '"><span>' + esc(x.nome) + '</span><small>' + esc(x.txt) + '</small></button>'; }).join('') + '</div>'; }).join('') +
@@ -4920,10 +4974,12 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
     q(r.ultimoContatoEm, 'Contato' + (r.contatoCloser ? ' de ' + r.contatoCloser : '') + (r.tentativas ? ' · ' + r.tentativas + ' tentativa(s) sem atender' : ''));
     q(r.desqualEm, 'Desqualificada' + (r.desqualMotivo ? ': ' + r.desqualMotivo : ''));
     q(r.contratoEm, 'Contrato fechado' + (r.contratoPor ? ' por ' + r.contratoPor : '') + (r.propostaAceita ? ' · proposta aceita' : ''));
-    q(r.posMudouEm, 'Pós-venda: ' + ({ falta_doc: 'pendente documentação', falta_gov: 'pendente senha gov.br', guia: 'guia / regularização', rural: 'documentação rural', regularizada: 'regularizada' }[r.posEtapa] || 'em andamento') + (r.posResp ? ' (' + r.posResp + ')' : ''));
+    q(r.posMudouEm, 'Pós-venda: ' + ((POS_COLS.filter(function(c){ return c[0] === posEtapaDe(r); })[0] || [0, 'em andamento'])[1]) + (r.posResp ? ' (' + r.posResp + ')' : ''));
     q(r.guiaPagaEm, 'Guia paga');
     q(r.criancaNasc, 'Bebê nasceu');
     q(r.certidaoEm, 'Certidão de nascimento recebida');
+    q(r.encaminhadoEm, 'Encaminhada para a análise da Controladoria');
+    q(r.analiseEm, (r.pvAnalise === 'devolvido' ? 'Devolvida ao Pós-venda' + (r.analiseMotivo ? ': ' + r.analiseMotivo : '') : 'Análise aprovada') + (r.analisePor ? ' (' + r.analisePor + ')' : ''));
     q(r.der, 'Requerimento no INSS' + (r.protocoloInss ? ' · protocolo ' + r.protocoloInss : ''));
     (Array.isArray(r.penalidades) ? r.penalidades : []).forEach(function(p){ q(p.em, 'Penalidade ' + (p.percentual || 50) + '% · ' + (p.tipo === 'contato_expirado' ? 'prazo de contato (' + (p.closer || 'closer') + ')' : 'pasta incompleta (' + (p.pos || 'pós-venda') + ')')); });
     return ev.sort(function(a, b){ return b.em.localeCompare(a.em); });
@@ -4938,9 +4994,8 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
     var falta = docsApp(r).filter(function(x){ return !x.ok; }).map(function(x){ return x.n; });
     var base = 'Olá, ' + n + '! Aqui é da equipe Nascer com Direitos. ';
     if (noContratos(r) && falta.length) return base + 'Para seguir com o seu salário-maternidade, ainda falta: ' + falta.join(', ') + '. Pode mandar a foto por aqui?';
-    if (noContratos(r) && posEtapaDe(r) === 'falta_gov') return base + 'Precisamos regularizar o seu acesso ao gov.br para seguir com o pedido. Podemos falar agora?';
-    if (noContratos(r) && posEtapaDe(r) === 'rural') return base + 'Para o seu pedido, precisamos de documentos que comprovem o trabalho rural (por exemplo, declaração do sindicato, notas do produtor, cadastro na agricultura). Pode mandar a foto do que tiver?';
-    if (esperaCert(r)) return base + 'O bebê já nasceu? Por favor, mande a foto da certidão de nascimento para darmos entrada no seu benefício.';
+    if (noContratos(r) && posEtapaDe(r) === 'senha') return base + 'Precisamos regularizar o seu acesso ao Meu INSS (gov.br) para seguir com o pedido. Podemos falar agora?';
+    if (noContratos(r) && posEtapaDe(r) === 'cert') return base + 'O bebê já nasceu? Por favor, mande a foto da certidão de nascimento para darmos entrada no seu benefício.';
     return base + 'Podemos conversar sobre o seu salário-maternidade?';
   }
   /* ---------- relatório de gestão (Configurações › Relatório) ---------- */
@@ -4954,7 +5009,7 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
     state.rows.forEach(function(r){
       if (no(r.ultimoContatoEm)) conta(r.contatoCloser, 'contatos');
       if (no(r.contratoEm)) conta(r.contratoPor, 'fechamentos');
-      if (r.posEtapa === 'regularizada' && no(r.posMudouEm)) conta(r.posResp, 'regs');
+      if (no(r.encaminhadoEm)) conta(r.posResp, 'regs');
       (Array.isArray(r.penalidades) ? r.penalidades : []).forEach(function(p){ if (no(p.em)) conta(p.tipo === 'contato_expirado' ? p.closer : p.pos, p.tipo === 'contato_expirado' ? 'penClo' : 'penPos'); });
       var dc = String(r.dataCadastro || r.criadoEm || '').slice(0, 10);
       if (no(dc)){
@@ -4965,17 +5020,17 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
     var tab = function(cab, linhas){ return '<div class="card list rel-tab"><table><thead><tr>' + cab.map(function(c, i){ return '<th' + (i ? ' class="n"' : '') + '>' + c + '</th>'; }).join('') + '</tr></thead><tbody>' + (linhas.length ? linhas.join('') : '<tr><td colspan="' + cab.length + '" class="vz">Nada no período.</td></tr>') + '</tbody></table></div>'; };
     var td = function(v, i){ return '<td' + (i ? ' class="n tnum"' : '') + '>' + esc(String(v)) + '</td>'; };
     box.innerHTML = '<div class="seg-bi" id="rel-per" style="flex:none;align-self:flex-start"><button type="button" data-p="30" aria-pressed="' + (relPer === '30') + '">30 dias</button><button type="button" data-p="mes" aria-pressed="' + (relPer === 'mes') + '">Este mês</button><button type="button" data-p="0" aria-pressed="' + (relPer === '0') + '">Tudo</button></div>' +
-      '<div class="sec-rot">Por pessoa da equipe</div>' + tab(['Pessoa', 'Contatos', 'Contratos fechados', 'Penalidades (closer)', 'Regularizadas', 'Penalidades (pós-venda)'], Object.keys(por).sort().map(function(k){ var x = por[k]; return '<tr>' + [k, x.contatos, x.fechamentos, x.penClo, x.regs, x.penPos].map(td).join('') + '</tr>'; })) +
+      '<div class="sec-rot">Por pessoa da equipe</div>' + tab(['Pessoa', 'Contatos', 'Contratos fechados', 'Penalidades (closer)', 'Encaminhadas', 'Penalidades (pós-venda)'], Object.keys(por).sort().map(function(k){ var x = por[k]; return '<tr>' + [k, x.contatos, x.fechamentos, x.penClo, x.regs, x.penPos].map(td).join('') + '</tr>'; })) +
       '<div class="sec-rot">Por parceiro / prospectador</div>' + tab(['Parceiro', 'Mães indicadas', 'Contratos', 'Desqualificadas'], Object.keys(parc).sort(function(a, b){ return parc[b].maes - parc[a].maes; }).map(function(k){ var x = parc[k]; return '<tr>' + [k, x.maes, x.contratos, x.desq].map(td).join('') + '</tr>'; })) +
       '<div class="sec-rot">Por estado</div>' + tab(['Estado', 'Mães cadastradas', 'Contratos'], Object.keys(est).sort().map(function(k){ var x = est[k]; return '<tr>' + [((typeof ESTADOS_BI !== 'undefined' && ESTADOS_BI) || {})[k] || k, x.maes, x.contratos].map(td).join('') + '</tr>'; }));
   }
   document.addEventListener('click', function(e){
     var p = e.target.closest && e.target.closest('#rel-per button[data-p]'); if (p){ relPer = p.dataset.p; renderRelatorio(); return; }
     var m = e.target.closest && e.target.closest('[data-minhas]'); if (m){ soMinhas = !soMinhas; Array.prototype.forEach.call(document.querySelectorAll('[data-minhas]'), function(b){ b.setAttribute('aria-pressed', String(soMinhas)); b.classList.toggle('primary', soMinhas); }); render(); return; }
-    var g = e.target.closest && e.target.closest('[data-guia-paga]'); if (g){ e.stopPropagation(); var rg = acharRow(g.dataset.guiaPaga); if (!rg) return; patchRow(rg.id, { guiaStatus: 'paga', guiaPagaEm: iso(new Date()), atualizadoEm: new Date().toISOString() }).then(function(){ toast('Guia paga: ' + rg.nome); }).catch(function(e2){ toast(errMsg(e2)); }); return; }
+    var g = e.target.closest && e.target.closest('[data-guia-paga]'); if (g){ e.stopPropagation(); var rg = acharRow(g.dataset.guiaPaga); if (!rg) return; patchRow(rg.id, { guiaStatus: 'paga', guiaPagaEm: iso(new Date()), posEtapa: 'nasc', posMudouEm: new Date().toISOString(), posResp: meuNome(), posRespEmail: meuEmail(), atualizadoEm: new Date().toISOString() }).then(function(){ toast('GPS paga: ' + rg.nome + ' foi para Aguardando Nascimento'); }).catch(function(e2){ toast(errMsg(e2)); }); return; }
     if (e.target.closest && e.target.closest('#btn-avisos')) abrirAvisos();
   }, true);
-  function render(){ pintarAvisosBtn(); renderRelatorio(); pintarCard(); renderEstadosCfg(); renderRegioes(); renderContratos(); renderDesq(); renderNasc(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
+  function render(){ pintarAvisosBtn(); renderRelatorio(); pintarCard(); renderEstadosCfg(); renderRegioes(); renderContratos(); renderFila(); renderDesq(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); }
   var clQ = '';
   // stage of each process, derived from what is already recorded (no extra typing)
   var ETAPAS = [
@@ -6866,14 +6921,14 @@ select option{background:var(--panel,#fff);color:var(--ink,#2b2118)}
     } catch(err){ toast(errMsg(err)); }
     finally { $('av-save').disabled = false; }
   });
-  var VIEWS = { d: ['tab-cad', 'view-cad'], i: ['tab-inss', 'view-inss'], k: ['tab-ctr', 'view-ctr'], q: ['tab-desq', 'view-desq'], n: ['tab-nasc', 'view-nasc'], c: ['tab-clientes', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-ret', 'view-ret'], g: ['tab-parc', 'view-parc'], e: ['tab-equipe', 'view-equipe'] };
+  var VIEWS = { d: ['tab-cad', 'view-cad'], i: ['tab-inss', 'view-inss'], k: ['tab-ctr', 'view-ctr'], q: ['tab-desq', 'view-desq'], h: ['tab-fila', 'view-fila'], c: ['tab-clientes', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-ret', 'view-ret'], g: ['tab-parc', 'view-parc'], e: ['tab-equipe', 'view-equipe'] };
   var TITULOS = {
     d: ['Cadastro', 'Clientes ainda sem requerimento no INSS: dados, documentos e prazo'],
     i: ['INSS', 'Requerimentos administrativos: análise, exigências, concessões e indeferimentos'],
     c: ['Judicial', 'Ações judiciais: acompanhamento do processo até a sentença e o pagamento'],
-    k: ['Pós-venda', 'Contratos fechados: regularizar a documentação (Kanban) antes de seguir'],
+    k: ['Pós-venda', 'Contratos fechados: documentos, GPS, nascimento e certidão, até a análise da Controladoria'],
     q: ['Leads desqualificados', 'Quem foi desqualificado e o motivo; dá para reativar'],
-    n: ['Aguardando nascimento', 'Gestantes regularizadas esperando o parto e certidão de nascimento a cobrar'],
+    h: ['Fila de protocolo', 'Da análise da Controladoria até o protocolo no INSS'],
     a: ['Audiências', 'Pauta por dia, avisos e convites'],
     l: ['Clientes', 'Todas as clientes e a etapa de cada caso'],
     p: ['Pós-audiência', 'Resultados, conclusos, recursos e pagamentos'],
