@@ -1743,6 +1743,19 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   .ficha-card>div{width:100%}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* senha gov.br na janela do card */
+.fc-senha{flex-wrap:wrap}
+.fc-senha-v{word-break:break-all;user-select:all}
+.fc-senha input{flex:1 1 120px;min-width:0;height:28px;padding:0 8px;font-size:12px}
+.fc-senha .fc-senha-ok{height:28px;padding:0 10px;font-size:11.25px}
+.fc-lnk{padding:0;border:0;background:none;font:inherit;font-size:11.25px;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.fc-lnk:hover{text-decoration:none}
+.fc-lin em.fc-neutro{color:var(--ink-3)}
+.fc-lin em.fc-erro,.fc-senha-hist .fc-erro{color:hsl(var(--c-red))}
+.fc-senha-hist{margin:2px 0 7.5px;padding:7.5px 9.4px;max-height:170px;overflow:auto;border:1px solid var(--line-2);border-radius:4px;font-size:11.25px;color:var(--ink-3)}
+.fc-senha-hist p{margin:0 0 5.6px;font-weight:600;color:var(--ink)}
+.fc-senha-hist ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:3.75px}
+.fc-senha-hist b{font-weight:600;color:var(--ink)}
 /* Dashboard e Perdas e desqualificados */
 :root{--ser-1:#a86a00;--ser-2:#1273b8}
 :root[data-theme="dark"]{--ser-1:#c4850f;--ser-2:#3f8fe0}
@@ -1789,6 +1802,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-baby" viewBox="0 0 24 24"><circle cx="12" cy="7.5" r="3.5"/><path d="M5 21v-2.5a7 7 0 0 1 14 0V21"/><path d="M9 15.5c1.8 1.2 4.2 1.2 6 0"/></symbol>
   <symbol id="i-inss" viewBox="0 0 24 24"><path d="M3 21h18M5 21V10M19 21V10M9 21v-7M15 21v-7M12 3 3 8h18z"/></symbol>
+  <symbol id="i-chave" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3 20 3"/><path d="M16 7l3 3"/></symbol>
   <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
   <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
   <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
@@ -3123,11 +3137,68 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function fecharCard(){ if (cardAberto){ cardAberto.el.remove(); cardAberto = null; } }
   function fcCopiar(v, titulo){ return '<button type="button" class="fc-cp" data-fc-copia="' + esc(v) + '" title="' + esc(titulo) + '" aria-label="' + esc(titulo) + '">' + svgI('i-copy') + '</button>'; }
   function fcLeitura(rot, val){ return val ? '<div class="fc-leit"><span>' + esc(rot) + '</span><b>' + esc(val) + '</b></div>' : ''; }
+  // senha do gov.br: mora no cofre do banco e só fica na memória enquanto o card está aberto; o banco registra quem leu
+  function fcSenhaHtml(){
+    var s = (cardAberto && cardAberto.senha) || { fase: 'lendo' }, adm = isAdmin() ? '<button type="button" class="fc-cp" data-fc-senha="historico" title="Quem viu e senhas anteriores" aria-label="Quem viu e senhas anteriores">' + svgI('i-historico') + '</button>' : '', meio;
+    if (s.fase === 'editando') meio = '<input id="fc-senha-in" type="text" autocomplete="off" spellcheck="false" data-lpignore="true" aria-label="Senha do gov.br" value="' + esc(s.txt || '') + '"><button type="button" class="btn primary fc-senha-ok" data-fc-senha="salvar">Salvar</button><button type="button" class="fc-lnk" data-fc-senha="cancelar">Cancelar</button>';
+    else if (s.fase === 'salvando') meio = '<em class="fc-neutro">Salvando…</em>';
+    else if (s.fase === 'lendo') meio = '<em class="fc-neutro">Lendo…</em>';
+    else if (s.fase === 'sem_cofre') meio = '<em class="fc-neutro">Cofre ainda não ativado no banco</em>';
+    else if (s.fase === 'erro') meio = '<em class="fc-erro">Não foi possível ler a senha</em><button type="button" class="fc-lnk" data-fc-senha="ler">Tentar de novo</button>';
+    else if (s.fase === 'ok') meio = '<b class="tnum fc-senha-v">' + esc(s.valor) + '</b><button type="button" class="fc-cp" data-fc-senha="copiar" title="Copiar a senha" aria-label="Copiar a senha">' + svgI('i-copy') + '</button><button type="button" class="fc-cp" data-fc-senha="editar" title="Trocar a senha" aria-label="Trocar a senha">' + svgI('i-pencil') + '</button>' + adm;
+    else meio = '<em>Não cadastrada</em><button type="button" class="fc-lnk" data-fc-senha="editar">Cadastrar</button>' + adm;
+    var hist = '';
+    if (s.hist && s.fase !== 'editando') hist = '<div class="fc-senha-hist"><p>Quem viu e senhas anteriores</p>' + (s.hist === 'lendo' ? '<span>Lendo…</span>' : s.hist === 'erro' ? '<span class="fc-erro">Não foi possível ler o histórico.</span>' : !s.hist.length ? '<span>Nenhum registro ainda.</span>' : '<ul>' + s.hist.map(function(l){
+      var q = new Date(l.em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+      return '<li><span class="tnum">' + esc(q) + '</span> <b>' + esc(l.quem) + '</b> ' + (l.acao === 'leu' ? 'leu' : 'trocou; era <b class="fc-senha-v">' + esc(l.senha || '') + '</b>') + '</li>';
+    }).join('') + '</ul>') + '</div>';
+    return '<div class="fc-senha-box"><div class="fc-lin fc-senha">' + svgI('i-chave') + '<span>Senha gov.br</span>' + meio + '</div>' + hist + '</div>';
+  }
+  function pintarSenha(){ var b = cardAberto && cardAberto.el.querySelector('.fc-senha-box'); if (b) b.outerHTML = fcSenhaHtml(); }
+  async function lerSenhaCard(){
+    var c = cardAberto; if (!c) return;
+    c.senha = { fase: 'lendo' }; pintarSenha();
+    try {
+      var r = await SB.rpc('senha_gov_ler', { p_cliente: c.id }); if (r.error) throw r.error;
+      if (cardAberto !== c) return;
+      c.senha = r.data ? { fase: 'ok', valor: r.data } : { fase: 'vazia' };
+    } catch(err){ if (cardAberto !== c) return; c.senha = { fase: err && err.code === 'PGRST202' ? 'sem_cofre' : 'erro' }; }
+    pintarSenha();
+  }
+  async function salvarSenhaCard(){
+    var c = cardAberto, s = c && c.senha; if (!s || s.fase !== 'editando') return;
+    var nova = String(s.txt || '').trim();
+    if (!nova){ toast('Digite a senha.'); return; }
+    var volta = { fase: 'editando', txt: s.txt, antes: s.antes };
+    c.senha = { fase: 'salvando' }; pintarSenha();
+    try {
+      var r = await SB.rpc('senha_gov_gravar', { p_cliente: c.id, p_senha: nova }); if (r.error) throw r.error;
+      if (cardAberto !== c) return;
+      c.senha = { fase: 'ok', valor: nova }; pintarSenha();
+      toast('Senha do gov.br salva');
+    } catch(err){ if (cardAberto === c){ c.senha = volta; pintarSenha(); } toast(errMsg(err)); }
+  }
+  async function acaoSenha(a){
+    var c = cardAberto, s = c.senha;
+    if (a === 'ler'){ lerSenhaCard(); return; }
+    if (a === 'salvar'){ salvarSenhaCard(); return; }
+    if (a === 'editar'){ c.senha = { fase: 'editando', txt: s.valor || '', antes: s.valor || '' }; pintarSenha(); var i = c.el.querySelector('#fc-senha-in'); if (i){ i.focus(); i.select(); } return; }
+    if (a === 'cancelar'){ c.senha = s.antes ? { fase: 'ok', valor: s.antes } : { fase: 'vazia' }; pintarSenha(); return; }
+    if (a === 'copiar'){ try { await copiarTexto(s.valor); toast('Senha copiada'); } catch(err){ toast('Não foi possível copiar.'); } return; }
+    if (a === 'historico'){
+      if (s.hist){ s.hist = null; pintarSenha(); return; }
+      s.hist = 'lendo'; pintarSenha();
+      try {
+        var r = await SB.rpc('senha_gov_historico', { p_cliente: c.id }); if (r.error) throw r.error;
+        if (c.senha === s){ s.hist = r.data || []; pintarSenha(); }
+      } catch(err){ if (c.senha === s){ s.hist = 'erro'; pintarSenha(); } }
+    }
+  }
   function fcCaixa(r){
     var cpf = digits(r.cpf), tel = foneDe(r), zp = zapUrl(tel), num = String(r.processo || '').trim() || String(r.protocoloInss || '').trim() || 'Processo sem número';
     return '<div class="fc-caixa"><div class="fc-cx-top"><div class="fc-cx-nome"><button type="button" class="fc-nome" data-act="edit" title="Abrir o cadastro">' + esc(r.nome || 'Cliente') + '</button><p class="fc-num tnum">' + esc(num) + '</p></div>' +
         (r.pastaUrl ? '<a class="fc-pasta" href="' + esc(r.pastaUrl) + '" target="_blank" rel="noopener">' + svgI('i-folder') + 'Pasta no Drive</a>' : '<span class="fc-sem-pasta">Pasta ainda não criada no Drive</span>') + '</div>' +
-      '<div class="fc-lin">' + svgI('i-users') + '<span>CPF</span>' + (cpf.length >= 11 ? '<b class="tnum">' + esc(r.cpf) + '</b>' + fcCopiar(cpf, 'Copiar o CPF') : '<em>Não cadastrado</em>') + '</div>' +
+      '<div class="fc-lin">' + svgI('i-users') + '<span>CPF</span>' + (cpf.length >= 11 ? '<b class="tnum">' + esc(r.cpf) + '</b>' + fcCopiar(cpf, 'Copiar o CPF') : '<em>Não cadastrado</em>') + '</div>' + fcSenhaHtml() +
       '<div class="fc-lin">' + svgI('i-zap') + '<span>WhatsApp</span>' + (tel ? (zp ? '<a class="tnum" href="' + esc(zp) + '" target="_blank" rel="noopener" title="Abrir a conversa no WhatsApp">' + esc(fmtTel(tel)) + '</a>' : '<b class="tnum">' + esc(fmtTel(tel)) + '</b>') + fcCopiar(digits(tel), 'Copiar o WhatsApp') : '<em>Não cadastrado</em>') + '</div>' +
       '<div class="fc-links"><a href="https://meu.inss.gov.br/" target="_blank" rel="noopener">' + svgI('i-inss') + 'Meu INSS</a><a href="https://sal.rfb.gov.br/calculo-contribuicao/contribuintes-2" target="_blank" rel="noopener">' + svgI('i-cash') + 'Gerar guia</a></div></div>';
   }
@@ -3146,6 +3217,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     var pode = t !== 'r' && t !== 'q';
     return '<div class="fc-p p-dados"><div class="fc-c"><span class="fc-rot">Partes envolvidas*</span><div class="fc-parte"><button type="button" data-act="edit" title="Abrir o cadastro">' + esc(r.nome || 'Cliente') + '</button><span>Cliente</span></div></div>' +
       '<div class="kb-linhas fc-parto">' + linhaParto(r) + linhaGps(r) + '</div>' +
+      (tarefaPos(r) ? '<div class="kb-alerta">' + svgI('i-alert') + '<span>' + esc(tarefaPos(r)) + '</span></div>' : '') +
       (r.pvAnalise === 'devolvido' ? '<div class="kb-alerta">' + svgI('i-alert') + '<span>Devolvida pela Controladoria' + (r.analiseMotivo ? ': ' + esc(r.analiseMotivo) : '') + '</span></div>' : '') +
       '<label class="fc-c"><span class="fc-rot">Anotações gerais</span><textarea id="fc-obs" rows="3" placeholder="Anotações sobre a cliente">' + esc(obsDaEquipe(r)) + '</textarea></label>' +
       (requerido(r) ? '<label class="fc-c"><span class="fc-rot">Número do protocolo/requerimento</span><input id="fc-prot" value="' + esc(r.protocoloInss || '') + '"></label><label class="fc-c"><span class="fc-rot">Data do requerimento</span><input id="fc-der" type="date" value="' + esc(r.der || '') + '"></label><label class="fc-c"><span class="fc-rot">NB</span><input id="fc-nb" value="' + esc(r.nb || '') + '"></label>' : '') +
@@ -3175,7 +3247,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     Array.prototype.forEach.call(el.querySelectorAll('.fc-abas button'), function(b){ b.setAttribute('aria-pressed', String(b.dataset.aba === cardAberto.aba)); });
     var ba = el.querySelector('.fc-abas [data-aba="arq"]'); ba.title = 'Arquivos ' + ok + '/' + docs.length; ba.setAttribute('aria-label', ba.title);
     el.querySelector('.fc-ponto').hidden = ok === docs.length;
-    if (cardAberto.sujo) return;   // tem alguém digitando: a atualização da base não apaga o texto
+    if (cardAberto.sujo || (cardAberto.senha && cardAberto.senha.fase === 'editando')) return;   // tem alguém digitando: a atualização da base não apaga o texto
     var topo = corpo.scrollTop;
     corpo.innerHTML = fcCaixa(r) + fcDados(r) + fcArquivos(r) + fcHistorico(r);
     corpo.scrollTop = topo;
@@ -3202,21 +3274,30 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       toast('Dados atualizados: ' + r.nome, 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
     } catch(err){ toast(errMsg(err)); }
   }
-  function pedirFecharCard(){ if (!cardAberto) return; if (cardAberto.sujo && !window.confirm('Há anotações sem salvar. Fechar assim mesmo?')) return; fecharCard(); }
+  function pedirFecharCard(){
+    if (!cardAberto) return;
+    var s = cardAberto.senha, senhaSuja = s && s.fase === 'editando' && String(s.txt || '').trim() !== String(s.antes || '');
+    if ((cardAberto.sujo || senhaSuja) && !window.confirm('Há alterações sem salvar. Fechar assim mesmo?')) return;
+    fecharCard();
+  }
   function abrirCard(id, compacto){
     var r = acharRow(id); if (!r) return;
     fecharCard();
     var el = document.createElement('div'); el.className = 'ficha-card';
     el.innerHTML = '<div role="dialog" aria-modal="true" aria-label="Dados da cliente"><div class="fc-barra"><div class="fc-abas"><button type="button" data-aba="dados" title="Dados do processo" aria-label="Dados do processo">' + svgI('i-folder') + '</button><button type="button" data-aba="arq">' + svgI('i-nuvem') + '<span class="fc-ponto" hidden></span></button><button type="button" data-aba="hist" title="Histórico" aria-label="Histórico">' + svgI('i-historico') + '</button></div><button type="button" class="fc-x" data-fc-x aria-label="Fechar">' + svgI('i-x') + '</button></div><div class="fc-corpo"></div></div>';
     document.body.appendChild(el);
-    cardAberto = { el: el, id: id, compacto: !!compacto, aba: 'dados', sujo: false };
+    cardAberto = { el: el, id: id, compacto: !!compacto, aba: 'dados', sujo: false, senha: { fase: 'lendo' } };
     pintarCard();
-    el.addEventListener('input', function(e){ if (e.target.closest('#fc-obs,#fc-prot,#fc-der,#fc-nb,#fc-proc,#fc-resp')) cardAberto.sujo = true; });
+    lerSenhaCard();
+    el.addEventListener('keydown', function(e){ if (e.key === 'Enter' && e.target.id === 'fc-senha-in'){ e.preventDefault(); salvarSenhaCard(); } });
+    el.addEventListener('input', function(e){ if (e.target.id === 'fc-senha-in'){ cardAberto.senha.txt = e.target.value; return; } if (e.target.closest('#fc-obs,#fc-prot,#fc-der,#fc-nb,#fc-proc,#fc-resp')) cardAberto.sujo = true; });
     el.addEventListener('click', async function(e){
       if (e.target === el || e.target.closest('[data-fc-x]')){ pedirFecharCard(); return; }
       var ab = e.target.closest('.fc-abas button');
       if (ab){ cardAberto.aba = ab.dataset.aba; pintarCard(); return; }
       if (e.target.closest('[data-fc-salvar]')){ salvarCard(); return; }
+      var bs = e.target.closest('[data-fc-senha]');
+      if (bs){ acaoSenha(bs.dataset.fcSenha); return; }
       var cp = e.target.closest('[data-fc-copia]');
       if (cp){ try { await copiarTexto(cp.dataset.fcCopia); toast('Copiado: ' + cp.dataset.fcCopia); } catch(err){ toast('Não foi possível copiar.'); } return; }
       var bv = e.target.closest('[data-act="voltar-cad"]');
@@ -3900,6 +3981,16 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function gatilhoGps(r){ var v = prazoGps(r); if (!v) return ''; var d = new Date(v + 'T12:00:00'); d.setDate(d.getDate() - 5); return iso(d); }
   function gpsPaga(r){ return r.guiaStatus === 'paga'; }
   function gpsAPagar(r){ var g = gatilhoGps(r), hj = iso(new Date()); return !!g && !gpsPaga(r) && g <= hj && String(r.dpp).slice(0, 10) > hj; }
+  // a tarefa da GPS nasce quando o prazo chega, mesmo com o cartão em Senha ou Documentação, ou quando ele está em Emitir/Pagar GPS
+  function gpsTarefa(r){ return noContratos(r) && !nascido(r) && !gpsPaga(r) && (gpsAPagar(r) || posEtapaDe(r) === 'gps'); }
+  // o que o responsável precisa fazer agora: aparece no cartão, na janela e no sino até ser feito
+  function tarefaPos(r){
+    if (!noContratos(r)) return '';
+    if (gpsTarefa(r)) return 'Tarefa: pagar a GPS' + (prazoGps(r) ? ' até ' + fmtDate(prazoGps(r)) : '');
+    if (posEtapaDe(r) === 'cert') return 'Tarefa: falar com a mãe e pedir a certidão';
+    if (!nascido(r) && !r.dpp) return 'Tarefa: informar a data do parto';
+    return '';
+  }
   // prioridade do closer: gestante com parto até 30 dias (ou que já passou): depois de nascer a mãe perde a chance
   var PRIORIDADE_DIAS = 30;
   var soMinhas = false;
@@ -3956,14 +4047,21 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     return e;
   }
   var ctrQ2 = '';
-  function diasNoPos(r){ var d = diasDesdeIso(r.posMudouEm || r.contratoEm); return d == null ? 0 : d; }
+  function diasNoPos(r){
+    var et = posEtapaDe(r), base = String(r.posMudouEm || r.contratoEm || '');
+    if (et !== (POS_LEGADO[r.posEtapa] || r.posEtapa)){
+      var pulo = String((et === 'gps' ? gatilhoGps(r) : et === 'cert' ? (r.criancaNasc || r.dpp) : et === 'nasc' ? r.guiaPagaEm : '') || '');
+      if (pulo.slice(0, 10) > base.slice(0, 10)) base = pulo;
+    }
+    var d = diasDesdeIso(base); return d == null ? 0 : d;
+  }
   function iniciais(n){ var p = String(n || '?').trim().split(/\s+/); return ((p[0] || '?').charAt(0) + (p.length > 1 ? p[p.length - 1].charAt(0) : '')).toUpperCase(); }
   function posCard(r){
     var et = posEtapaDe(r), atr = atrasoTxt(r), d = diasNoPos(r), al = [];
-    if (et === 'gps' && !gpsPaga(r)) al.push('Pagar a GPS');
+    if (tarefaPos(r)) al.push(tarefaPos(r));
     if ((et === 'docs' || et === 'ok') && faltamTxt(r)) al.push('Falta: ' + faltamTxt(r));
     var opts = POS_COLS.filter(function(c){ return !nascido(r) || !POS_SO_GESTANTE[c[0]]; }).map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === et ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('');
-    var acao = et === 'gps' && !gpsPaga(r) ? '<button type="button" class="kb-btn" data-guia-paga="' + esc(r.id) + '">' + svgI('i-cash') + 'Marcar GPS paga</button>'
+    var acao = gpsTarefa(r) ? '<button type="button" class="kb-btn" data-guia-paga="' + esc(r.id) + '">' + svgI('i-cash') + 'Marcar GPS paga</button>'
       : et === 'cert' ? '<button type="button" class="kb-btn" data-pv-cert="' + esc(r.id) + '">' + svgI('i-check') + 'Recebi a certidão</button>'
       : et === 'ok' ? '<button type="button" class="kb-btn" data-pv-enc="' + esc(r.id) + '" title="Manda para a Controladoria: se estiver OK, vai para o protocolo; se não, volta para regularizar">' + svgI('i-file') + 'Encaminhar para análise</button>' : '';
     return kbCard(r, { arrasta: true, resp: r.posResp || r.contratoPor, dias: d, parado: d > 14,
@@ -3974,7 +4072,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       mover: kbMover('<select data-pos="' + esc(r.id) + '" aria-label="Mover ' + esc(r.nome) + '">' + opts + '<option value="__cad">↩ Voltar ao Cadastro</option></select>') });
   }
   var CTR_SITS = [['', 'Status: todas'], ['gest', 'Gestantes'], ['nasc', 'Bebê já nasceu'], ['atr', 'Atrasadas'], ['gps', 'GPS a pagar'], ['docs', 'Documentos faltando'], ['dev', 'Devolvidas pela Controladoria']];
-  function passaCtr(r, f){ return !f || (f === 'gest' ? !nascido(r) : f === 'nasc' ? nascido(r) : f === 'atr' ? atrasada(r) : f === 'gps' ? gpsAPagar(r) : f === 'docs' ? !!faltamTxt(r) : f === 'dev' ? r.pvAnalise === 'devolvido' : true); }
+  function passaCtr(r, f){ return !f || (f === 'gest' ? !nascido(r) : f === 'nasc' ? nascido(r) : f === 'atr' ? atrasada(r) : f === 'gps' ? gpsTarefa(r) : f === 'docs' ? !!faltamTxt(r) : f === 'dev' ? r.pvAnalise === 'devolvido' : true); }
   function renderContratos(){
     var box = $('ctr-list'); if (!box) return;
     var emPos = state.rows.filter(noContratos).filter(function(r){ return buscaOk(r, ctrQ2) && (!soMinhas || minha(r)) && passaFiltro(r); });
@@ -3996,8 +4094,8 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       (lista.map(function(r){
         var et = posEtapaDe(r), v = prazoGps(r), docs = docsApp(r), ok = docs.filter(function(x){ return x.ok; }).length, d = diasNoPos(r);
         var opts = POS_COLS.filter(function(c){ return !nascido(r) || !POS_SO_GESTANTE[c[0]]; }).map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === et ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('');
-        var acao = et === 'gps' && !gpsPaga(r) ? '<button type="button" class="kb-btn" data-guia-paga="' + esc(r.id) + '">Marcar GPS paga</button>' : et === 'cert' ? '<button type="button" class="kb-btn" data-pv-cert="' + esc(r.id) + '">Recebi a certidão</button>' : et === 'ok' ? '<button type="button" class="kb-btn" data-pv-enc="' + esc(r.id) + '">Encaminhar para análise</button>' : '';
-        return '<tr data-linha="' + esc(r.id) + '"><td class="nome">' + esc(r.nome || 'Sem nome') + '<small>' + esc(cidadeCli(r) || '') + '</small></td><td class="tnum">' + esc(fmtTel(foneDe(r)) || '—') + '</td>' +
+        var acao = gpsTarefa(r) ? '<button type="button" class="kb-btn" data-guia-paga="' + esc(r.id) + '">Marcar GPS paga</button>' : et === 'cert' ? '<button type="button" class="kb-btn" data-pv-cert="' + esc(r.id) + '">Recebi a certidão</button>' : et === 'ok' ? '<button type="button" class="kb-btn" data-pv-enc="' + esc(r.id) + '">Encaminhar para análise</button>' : '';
+        return '<tr data-linha="' + esc(r.id) + '"><td class="nome">' + esc(r.nome || 'Sem nome') + '<small>' + esc(cidadeCli(r) || '') + '</small>' + (tarefaPos(r) ? '<small class="verm" title="' + esc(tarefaPos(r)) + '">' + esc(tarefaPos(r)) + '</small>' : '') + '</td><td class="tnum">' + esc(fmtTel(foneDe(r)) || '—') + '</td>' +
           '<td>' + (nascido(r) ? 'Nasceu' + (r.criancaNasc ? ' ' + fmtDate(String(r.criancaNasc).slice(0, 10)) : '') : r.dpp ? '<span class="kb-par"><span>' + fmtDate(String(r.dpp).slice(0, 10)) + '</span>' + relogio(r.dpp) + '</span>' : 'Sem data') + '</td>' +
           '<td>' + (!v ? '—' : gpsPaga(r) ? '<span class="kb-cron verde">paga</span>' : '<span class="' + (gpsAPagar(r) ? 'verm' : '') + '">' + fmtDate(v) + '</span>') + '</td>' +
           '<td>' + (ok === docs.length ? 'Completa' : ok + ' de ' + docs.length) + '</td><td><select data-pos="' + esc(r.id) + '" aria-label="Etapa de ' + esc(r.nome) + '">' + opts + '<option value="__cad">↩ Voltar ao Cadastro</option></select></td>' +
@@ -4569,9 +4667,10 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       var tl = String(r.contato || '').replace(/\D/g, '').slice(-9); if (tl.length === 9){ (tels[tl] = tels[tl] || []).push(r); }
       if (noCadastro(r) && prioridadeNasc(r) != null) add('Parto perto e sem contrato', r, 'parto em ' + prioridadeNasc(r) + ' dias');
       if (r.inssStatus === 'exigencia' && r.exigenciaPrazo){ var n = daysUntil(r.exigenciaPrazo); if (n != null && n <= 5) add('Exigência do INSS vencendo', r, n < 0 ? 'prazo venceu há ' + (-n) + ' dias' : 'faltam ' + n + ' dias'); }
-      if (noContratos(r) && gpsAPagar(r)) add('Pagar a GPS', r, 'vence ' + fmtDate(prazoGps(r)) + ' · parto ' + fmtDate(r.dpp));
+      var respPos = primeiroNome(r.posResp || r.contratoPor), comResp = respPos ? ' · responsável: ' + respPos : '';
+      if (gpsTarefa(r)) add('Pagar a GPS', r, (prazoGps(r) ? 'vence ' + fmtDate(prazoGps(r)) + ' · parto ' + fmtDate(r.dpp) : 'sem data do parto') + comResp);
       if (noContratos(r) && r.fatoGerador === 'gestante' && !r.criancaNasc && !r.dpp) add('Informar a data do parto', r, 'gestante sem data prevista');
-      if (noContratos(r) && posEtapaDe(r) === 'cert') add('Falar com a mãe: pedir a certidão', r, r.criancaNasc ? 'nasceu em ' + fmtDate(r.criancaNasc) : 'parto previsto ' + fmtDate(r.dpp));
+      if (noContratos(r) && posEtapaDe(r) === 'cert') add('Falar com a mãe: pedir a certidão', r, (r.criancaNasc ? 'nasceu em ' + fmtDate(r.criancaNasc) : 'parto previsto ' + fmtDate(r.dpp)) + comResp);
       if (naFila(r) && filaEtapaDe(r) === 'para_analisar') add('Para a Controladoria analisar', r, 'encaminhada ' + fmtDate(String(r.encaminhadoEm || '').slice(0, 10)));
       if (r.pvAnalise === 'devolvido' && noContratos(r)) add('Devolvida pela Controladoria', r, r.analiseMotivo || '');
       if (atrasada(r)) add('Parada além do prazo', r, atrasoTxt(r));
@@ -4655,7 +4754,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   document.addEventListener('click', function(e){
     var p = e.target.closest && e.target.closest('#rel-per button[data-p]'); if (p){ relPer = p.dataset.p; renderRelatorio(); return; }
     var m = e.target.closest && e.target.closest('[data-minhas]'); if (m){ soMinhas = !soMinhas; Array.prototype.forEach.call(document.querySelectorAll('[data-minhas]'), function(b){ b.setAttribute('aria-pressed', String(soMinhas)); b.classList.toggle('primary', soMinhas); }); render(); return; }
-    var g = e.target.closest && e.target.closest('[data-guia-paga]'); if (g){ e.stopPropagation(); var rg = acharRow(g.dataset.guiaPaga); if (!rg) return; patchRow(rg.id, { guiaStatus: 'paga', guiaPagaEm: iso(new Date()), posEtapa: 'nasc', posMudouEm: new Date().toISOString(), posResp: meuNome(), posRespEmail: meuEmail(), atualizadoEm: new Date().toISOString() }).then(function(){ toast('GPS paga: ' + rg.nome + ' foi para Aguardando Nascimento'); }).catch(function(e2){ toast(errMsg(e2)); }); return; }
+    var g = e.target.closest && e.target.closest('[data-guia-paga]'); if (g){ e.stopPropagation(); var rg = acharRow(g.dataset.guiaPaga); if (!rg) return; var ga = iso(new Date()), etg = posEtapaDe(rg), anda = etg === 'gps' || etg === 'prazo_gps', pg = { guiaStatus: 'paga', guiaPagaEm: ga, posResp: meuNome(), posRespEmail: meuEmail(), atualizadoEm: new Date().toISOString() }; if (anda){ pg.posEtapa = 'nasc'; pg.posMudouEm = new Date().toISOString(); } patchRow(rg.id, pg).then(function(){ toast('GPS paga: ' + rg.nome + (anda ? ' foi para Aguardando Nascimento' : '')); }).catch(function(e2){ toast(errMsg(e2)); }); return; }
     if (e.target.closest && e.target.closest('#btn-avisos')) abrirAvisos();
   }, true);
   /* ---------- peças do quadro (as mesmas da aba Processos do BI de Vendas) ---------- */
@@ -4844,7 +4943,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       : dashGrafico(dashSerie, Math.floor(box.clientWidth - 28));
     html += dashSecao('Cadastros e contratos', 'por ' + (j.mensal ? 'mês' : 'dia'), '<div class="card dash-graf-card">' + cabGraf + corpoGraf + '</div>');
     html += dashSecao('Pós-venda, protocolo e INSS', 'no período', '<div class="stats">' +
-      dashCard('k', 'i-alert', 'GPS a pagar', pos.filter(gpsAPagar).length, 'agora no Pós-venda') +
+      dashCard('k', 'i-alert', 'GPS a pagar', pos.filter(gpsTarefa).length, 'agora no Pós-venda') +
       dashCard('h', 'i-file', 'Encaminhadas para análise', rows.filter(function(r){ return no(r.encaminhadoEm); }).length, 'no período') +
       dashCard('i', 'i-inss', 'Protocolos no INSS', rows.filter(function(r){ return no(r.der); }).length, 'no período') +
       dashCard('i', 'i-check', 'Concedidos', rows.filter(function(r){ return r.inssStatus === 'concedido' && no(r.inssDecisaoEm); }).length, 'decididos no período') +
