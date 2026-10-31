@@ -1502,28 +1502,6 @@ input[type=checkbox],input[type=radio]{accent-color:var(--primary)}
 .more{border-top:1px solid hsl(var(--c-line)/.4)}
 .empty{padding:32px 16px;font-size:13px}
 /* Cadastro em lista: colunas fixas, tudo alinhado */
-#cad-list .row.cad-closer{grid-template-columns:minmax(0,1fr) 150px 300px 118px 30px;column-gap:12px}
-#cad-list .row.cad-closer > *{min-width:0}
-#cad-list .c-name{display:flex;align-items:center;gap:10px;min-width:0}
-#cad-list .cad-nome{min-width:0}
-#cad-list .cad-ponto{width:7px;height:7px;border-radius:50%;background:hsl(var(--c-red));flex:none;display:inline-block}
-#cad-list .cad-origem{display:flex;align-items:center;flex-wrap:wrap;gap:3px 5px;font-size:11px;color:var(--ink-3)}
-#cad-list .cad-origem b{font-weight:500;color:var(--ink-2)}
-#cad-list .cad-bnd{display:inline-flex;flex:none}
-#cad-list .cad-bnd:empty{display:none}
-#cad-list .cad-bnd img,#cad-list .cad-bnd svg{width:16px;height:11px;border-radius:2px;object-fit:cover}
-.cad-atraso{color:hsl(var(--c-red));font-weight:600}
-#cad-list .cad-contato{display:flex;align-items:center;gap:5.6px}
-#cad-list .tel-grande{font-size:11.25px;font-weight:400;color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
-#cad-list .tel-ic{width:22px;height:22px;padding:0;border:0;background:none;color:var(--ink-3);display:inline-grid;place-items:center;border-radius:3px;cursor:pointer}
-#cad-list .tel-ic:hover{color:var(--ink)}
-#cad-list .tel-ic.ok{color:hsl(var(--c-green))}
-#cad-list .tel-ic .i{width:13px;height:13px}
-#cad-list .cad-atend{display:grid;grid-template-columns:172px 118px;column-gap:10px;row-gap:3px;align-items:center;justify-items:start}
-#cad-list .row.head .cab-at{display:grid;grid-template-columns:172px 118px;column-gap:10px}
-#cad-list .cad-atend .lead-sel{grid-column:1;grid-row:1}
-#cad-list .cad-atend .tent{grid-column:2;grid-row:1;width:118px}
-#cad-list .cad-atend .cd-timer{grid-column:1;grid-row:2}
 .lead-sel{width:172px;height:26px;padding:0 22px 0 8px;border:0;border-radius:4px;font-size:11.25px;font-weight:600;background-color:hsl(var(--c-pri)/.14);color:var(--primary);-webkit-appearance:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%238a6a3d%27 stroke-width=%272.5%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M6 9l6 6 6-6%27/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 7px center;background-size:11px}
 .lead-sel.lead-proposta{background-color:hsl(var(--c-green)/.14);color:hsl(var(--c-green))}
 .lead-sel.lead-perdido{background-color:hsl(var(--c-red)/.12);color:hsl(var(--c-red))}
@@ -1531,7 +1509,6 @@ input[type=checkbox],input[type=radio]{accent-color:var(--primary)}
 .lead-sel.lead-sem_resposta,.lead-sel.lead-desqualificado{background-color:hsl(var(--c-fg)/.08);color:var(--ink-3)}
 .prop-chk{border-radius:4px!important;background:hsl(var(--c-sec)/.6)!important;font-size:12px}
 .btn.tent{min-height:26px;height:26px;padding:0 7px;font-size:11px;font-weight:400;color:var(--ink-3);background:none}
-#cad-list .cad-fechar .btn{width:100%;min-height:26px;height:26px;padding:0 6px}
 .prio-tag,.nasc-tag,.parado-tag{display:inline-block;padding:0 6px;border-radius:3.75px;font-size:10.5px;font-weight:600;line-height:18px;letter-spacing:0;border:0}
 .prio-tag{background:hsl(var(--c-gold)/.15);color:hsl(var(--c-gold))}
 .prio-tag.crit,.parado-tag{background:hsl(var(--c-red)/.12);color:hsl(var(--c-red))}
@@ -1547,8 +1524,20 @@ input[type=checkbox],input[type=radio]{accent-color:var(--primary)}
 .kb-tab tbody tr{cursor:pointer}
 .kb-tab tbody tr:hover,.ct-tbl tbody tr:hover,.rel-tab tbody tr:hover{background:hsl(var(--c-sec)/.5)}
 .kb-tab .tnum{font-variant-numeric:tabular-nums}
-.kb-tab select{height:26px;width:100%;max-width:190px;padding:0 5px;border:1px solid var(--line-2);background:var(--bg);font-size:11.25px}
-.kb-tab .kb-cron{margin-left:5px}
+.kb-tab select:not(.lead-sel){height:26px;width:100%;max-width:190px;padding:0 5px;border:1px solid var(--line-2);background:var(--bg);font-size:11.25px}
+.kb-tab .kb-par .kb-cron{margin-left:5px}
+.kb-tab td small{display:block;font-size:11px;line-height:1.35;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kb-tab td small.verm{color:hsl(var(--c-red))}
+#cad-list .kb-tab{table-layout:fixed;min-width:1060px}
+#cad-list .kb-tab th,#cad-list .kb-tab td{padding-left:8px;padding-right:8px}
+#cad-list .kb-tab th:first-child,#cad-list .kb-tab td:first-child{padding-left:11px}
+#cad-list .lead-sel{width:100%}
+.cad-l1{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:18px}
+.cad-sit-box{display:flex;flex-direction:column;align-items:stretch;gap:3px}
+.cad-sit-box .cd-timer{align-self:flex-start}
+.cad-acoes{display:flex;align-items:center;justify-content:flex-end;gap:6px}
+.cad-acoes .btn{flex:none;width:102px;min-height:26px;height:26px;padding:0 4px;font-size:11px}
+.cad-acoes .ico-btn{flex:none;width:24px;height:24px;padding:0;display:inline-grid;place-items:center}
 .kb-tab .kb-btn{width:auto;padding:0 10px;height:26px}
 .kb-tab .kb-par{justify-content:flex-start}
 .kb-tab .parado{color:hsl(var(--c-orange))}
@@ -1717,12 +1706,10 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   .kb-col{width:250px}
   .fbar .search,.tb-busca{width:100%}
   .kb-info .kb-dica{display:none}
-  .row,#list .row,#inss-list .row,#desq-list .row,#cad-list .row.cad-closer{grid-template-columns:1fr!important;row-gap:4px}
-  .row.head,#cad-list .row.head.cad-closer{display:none!important}
+  .row,#list .row,#inss-list .row,#desq-list .row{grid-template-columns:1fr!important;row-gap:4px}
+  .row.head{display:none!important}
   .row .c-name,.row .c-act{grid-column:auto}
   .lbl{display:block;font-size:10.5px;letter-spacing:.025em;text-transform:uppercase;color:var(--ink-3)}
-  #cad-list .cad-atend{grid-template-columns:1fr 1fr}
-  #cad-list .cad-atend .lead-sel,#cad-list .cad-atend .tent{width:100%}
   .ficha-card>div{width:100%}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -2816,19 +2803,6 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       '<button type="button" class="tel-ic" data-id="' + esc(r.id) + '" data-copiar-tel="' + esc(copia) + '" title="Copiar o telefone" aria-label="Copiar o telefone"><svg class="i"><use href="#i-copy"/></svg></button>' +
       '';
   }
-  // de onde é o lead: bandeira e nome da cidade da cliente, e o parceiro que indicou
-  function origemLead(r, par, parNome, quando){
-    var g = (r.cidadeUf && regiaoPorId(r.cidadeUf)) || regiaoDe(par);
-    var cidade = r.cidade || (par && par.regiao) || '';
-    var partes = [];
-    if (cidade) partes.push('<span class="cad-bnd">' + (g ? bandeiraCidade(g, cidade) : '') + '</span><b>' + esc(cidade) + (g ? '/' + esc(String(g.uf || g.id).toUpperCase()) : '') + '</b>');
-    partes.push(par ? 'indicação de <b>' + esc(parNome) + '</b>' : r.criadoPorNome ? 'cadastro de <b>' + esc(r.criadoPorNome) + '</b>' : esc(r.origem === 'organico' ? 'Orgânico' : 'Sem parceiro'));
-    if (quando) partes.push(esc(quando));
-    var dcad = String(r.dataCadastro || r.criadoEm || '').slice(0, 10), nd2 = dcad ? -daysUntil(dcad) : null;
-    if (leadDe(r) === 'novo' && nd2 != null && nd2 >= 2) partes.push('<span class="cad-atraso">sem ligação há ' + nd2 + ' dias</span>');
-    else if (tagParado(r)) partes.push(tagParado(r));
-    return partes.join(' · ');
-  }
   function partoCell(r){
     var d = r.dpp; if (!d) return '<span class="mini">sem data</span>';
     var n = daysUntil(d); if (n == null) return '<span class="mini">sem data</span>';
@@ -3546,25 +3520,28 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     // parto perto primeiro; depois a situação e o cadastro mais recente; no mesmo dia, em ordem alfabética
     lista = ordenar(lista, function(a, b){ var da = String(a.dataCadastro || a.criadoEm || '').slice(0, 10), db = String(b.dataCadastro || b.criadoEm || '').slice(0, 10); var pa = prioridadeNasc(a), pb = prioridadeNasc(b); if (pa != null || pb != null){ if (pa == null) return 1; if (pb == null) return -1; if (pa !== pb) return pa - pb; } return (LEAD_ORDEM[leadDe(a)] - LEAD_ORDEM[leadDe(b)]) || db.localeCompare(da) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); });
     kbInfo('cad', 'd', lista.length, 'cliente', 'clientes');
-    var html = '<div class="row head cad-closer"><div>Cliente</div><div>Telefone</div><div class="cab-at"><span>Situação</span><span>Tentativas</span></div><div></div><div></div></div>';
-    if (!lista.length) html += '<div class="empty">' + (todos.length ? 'Nenhum cliente neste filtro.' : 'Nenhum cliente em cadastro. Clique em <b>Novo cadastro</b> para começar.') + '</div>';
-    lista.slice(0, 300).forEach(function(r){
-      var st = situacaoCad(r);
-      var par = prospById(r.responsavelId), parNome = par ? (par.tipo === 'clinica' && par.clinica ? par.clinica : par.nome) : (r.criadoPorNome ? 'cadastro de ' + r.criadoPorNome : (r.origem === 'organico' ? 'Orgânico' : ''));
-      var dc = String(r.dataCadastro || r.criadoEm || '').slice(0, 10), nd = dc ? -daysUntil(dc) : null;
-      var quando = nd == null ? '' : nd <= 0 ? 'cadastrada hoje' : nd === 1 ? 'cadastrada ontem' : 'cadastrada há ' + nd + ' dias';
-      var docsOk = !docsPendentes(r), incompleto = st[0] === 'incompleto';
-      var aviso = !docsOk || incompleto ? '<span class="cad-ponto" title="' + esc((!docsOk ? 'Documentos pendentes' : '') + (!docsOk && incompleto ? ' · ' : '') + (incompleto ? 'Dados incompletos' : '')) + '"></span>' : '';
-      html += '<div class="row cad-closer' + (cadAberto[r.id] ? ' aberto' : '') + '" data-linha="' + esc(r.id) + '">' +
-        '<div class="c-name"><div class="cad-nome"><div class="name"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome) + '</button>' + aviso + tagPrioridade(r) + '</div>' +
-          '<div class="addr cad-origem">' + origemLead(r, par, parNome, quando) + '</div></div></div>' +
-        '<div class="cad-contato">' + contatoCloser(r) + '</div>' +
-        '<div class="cad-atend">' + leadSelect(r) + '<button type="button" class="btn tent" data-act="tentativa" data-id="' + esc(r.id) + '" title="Ligou e não atendeu: conta uma tentativa. Com ' + LEAD_TENTATIVAS + ' vira Sem resposta">Não atendeu' + (r.tentativas > 0 ? ' · ' + r.tentativas + '/' + LEAD_TENTATIVAS : '') + '</button></div>' +
-        '<div class="cad-fechar"><button type="button" class="btn primary inss-acao" data-act="fechar" data-id="' + esc(r.id) + '" title="O contrato foi assinado: a cliente vai para o Pós-venda">Fechar contrato</button></div>' +
-        '<div class="c-act"><button type="button" class="ico-btn" data-act="edit" data-id="' + esc(r.id) + '" title="Editar cadastro" aria-label="Editar ' + esc(r.nome) + '"><svg class="i"><use href="#i-pencil"/></svg></button></div>' +
-      '</div>' + (cadAberto[r.id] ? fichaCliente(r, true) : '');
-    });
-    pintarLista(box, html);
+    pintarLista(box, '<table class="kb-tab"><colgroup><col><col style="width:124px"><col style="width:116px"><col style="width:110px"><col style="width:66px"><col style="width:164px"><col style="width:92px"><col style="width:256px"></colgroup>' +
+      '<thead><tr><th>Cliente</th><th>Telefone</th><th>Origem</th><th>Parto / bebê</th><th>Docs</th><th>Situação</th><th>Cadastro</th><th></th></tr></thead><tbody>' +
+      (lista.slice(0, 300).map(cadLinha).join('') || '<tr><td colspan="8" class="empty">' + (todos.length ? 'Nenhum cliente neste filtro.' : 'Nenhum cliente em cadastro. Clique em <b>Novo cadastro</b> para começar.') + '</td></tr>') + '</tbody></table>');
+  }
+  function cadLinha(r){
+    var id = esc(r.id), k = leadDe(r), par = prospById(r.responsavelId), parNome = par ? (par.tipo === 'clinica' && par.clinica ? par.clinica : par.nome) : (r.criadoPorNome ? 'Cadastro de ' + r.criadoPorNome : (r.origem === 'organico' ? 'Orgânico' : 'Sem parceiro'));
+    var falt = dadosFaltando(r), dc = String(r.dataCadastro || r.criadoEm || '').slice(0, 10), nd = dc ? -daysUntil(dc) : null;
+    var docs = docsApp(r), ok = docs.filter(function(x){ return x.ok; }).length, pn = prioridadeNasc(r), atr = k === 'novo' && nd >= 2 ? 'sem ligação' : atrasoTxt(r).replace('parada há ', 'parada ');
+    var parto = nascido(r) ? '<div class="cad-l1">Bebê já nasceu</div>' + (r.criancaNasc ? '<small>' + fmtDate(String(r.criancaNasc).slice(0, 10)) + '</small>' : '')
+      : !r.dpp ? '<button type="button" class="kb-inline" data-act="edit" data-id="' + id + '">Informar data</button>'
+      : '<div class="cad-l1">' + fmtDate(String(r.dpp).slice(0, 10)) + '</div><div>' + relogio(r.dpp, pn != null ? 'verm' : '') + '</div>';
+    return '<tr data-linha="' + id + '"><td class="nome"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + id + '">' + esc(r.nome || 'Sem nome') + '</button>' +
+        (falt.length ? '<small class="verm" title="Falta: ' + esc(falt.join(', ')) + '">Falta: ' + esc(falt.join(', ')) + '</small>' : '<small>CPF ' + esc(r.cpf) + '</small>') + '</td>' +
+      '<td><div class="kb-tel">' + contatoCloser(r) + '</div></td>' +
+      '<td>' + (cidadeCli(r) ? '<div class="kb-lugar cad-l1">' + ufFlag(r) + '<span title="' + esc(cidadeCli(r)) + '">' + esc(cidadeCli(r)) + '</span></div>' : '<div class="cad-l1">—</div>') + '<small title="' + esc(parNome) + '">' + esc(parNome) + '</small></td>' +
+      '<td>' + parto + '</td>' +
+      '<td title="' + (ok === docs.length ? 'Documentação completa' : 'Faltam: ' + esc(faltamTxt(r))) + '">' + (ok === docs.length ? '<span class="kb-cron verde"><span>Completa</span></span>' : ok + ' de ' + docs.length) + '</td>' +
+      '<td><div class="cad-sit-box">' + leadSelect(r) + (contadorContato(r) ? '' : r.atendente ? '<small>' + esc(primeiroNome(r.atendente)) + '</small>' : '') + '</div></td>' +
+      '<td><div class="cad-l1">' + (nd == null ? '—' : nd <= 0 ? 'hoje' : nd === 1 ? 'ontem' : 'há ' + nd + ' dias') + '</div>' + (atr ? '<small class="verm" title="' + esc(atr) + '">' + esc(atr) + '</small>' : '') + '</td>' +
+      '<td><div class="cad-acoes"><button type="button" class="btn tent" data-act="tentativa" data-id="' + id + '" title="Ligou e não atendeu: conta uma tentativa. Com ' + LEAD_TENTATIVAS + ' vira Sem resposta">Não atendeu' + (r.tentativas > 0 ? ' · ' + r.tentativas + '/' + LEAD_TENTATIVAS : '') + '</button>' +
+        '<button type="button" class="btn primary fechar" data-act="fechar" data-id="' + id + '" title="O contrato foi assinado: a cliente vai para o Pós-venda">Fechar contrato</button>' +
+        '<button type="button" class="ico-btn" data-act="edit" data-id="' + id + '" title="Editar cadastro" aria-label="Editar ' + esc(r.nome) + '"><svg class="i"><use href="#i-pencil"/></svg></button></div></td></tr>';
   }
   /* INSS: requerimentos feitos e ainda sem ação judicial */
   var inssQ = '', inssSit = '', inssAberto = {};
@@ -3720,6 +3697,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   $('cad-list').addEventListener('click', function(e){
     var b = e.target.closest('[data-act]');
     if (b && b.dataset.act === 'edit'){ var r = state.rows.filter(function(x){ return x.id === b.dataset.id; })[0]; if (r) openForm(r, false, true); return; }
+    if (b && b.dataset.act === 'tel'){ var rt = acharRow(b.dataset.id); if (rt){ openForm(rt, false, true); setTimeout(function(){ $('f-contato').focus(); }, 60); } return; }
     if (b && b.dataset.act === 'requerer'){ var rq = state.rows.filter(function(x){ return x.id === b.dataset.id; })[0]; if (rq) abrirRequerimento(rq); return; }
     if (b && b.dataset.act !== 'abrir') return;
     var ln = b ? { dataset: { linha: b.dataset.id } } : e.target.closest('[data-linha]');
@@ -3810,7 +3788,6 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function atrasada(r){ return !!atrasoTxt(r); }
   function tagParado(r){ var t = atrasoTxt(r); return t ? '<span class="parado-tag">' + esc(t) + '</span>' : ''; }
   function prioridadeNasc(r){ if (r.fatoGerador !== 'gestante' || r.criancaNasc || !r.dpp) return null; var n = daysUntil(r.dpp); return n != null && n >= 0 && n <= PRIORIDADE_DIAS ? n : null; }   // só parto que ainda vai acontecer; depois de nascer não é prioridade
-  function tagPrioridade(r){ var n = prioridadeNasc(r); if (n == null){ var d = (r.fatoGerador === 'gestante' && !r.criancaNasc && r.dpp) ? daysUntil(r.dpp) : null; return d != null && d < 0 ? '<span class="nasc-tag" title="A data prevista do parto passou: confirmar se o bebê já nasceu e atualizar o cadastro">Parto previsto passou há ' + (-d) + (d === -1 ? ' dia' : ' dias') + ' · bebê já nasceu?</span>' : ''; } return '<span class="prio-tag' + (n <= 7 ? ' crit' : '') + '" title="Fechar o contrato antes de o bebê nascer">' + (n < 0 ? 'PRIORIDADE · parto previsto passou há ' + (-n) + ' dias' : n === 0 ? 'PRIORIDADE · parto previsto é hoje' : 'PRIORIDADE · parto em ' + n + (n === 1 ? ' dia' : ' dias')) + '</span>'; }
   function etapaCtr(r){ return 'regularizar'; }
   // guia da contribuição: aguardando pagamento ou paga (controle em Contratos fechados)
   function guiaDe(r){ return r.guiaStatus === 'paga' ? 'paga' : 'aguardando'; }
@@ -4640,12 +4617,12 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function telaDoFunil(t){ return FASES.some(function(f){ return f[0] === t; }); }
   function resumoFases(){
     var rows = state.rows, cad = rows.filter(noCadastro), pos = rows.filter(noContratos), fila = rows.filter(naFila), ins = rows.filter(noInss), jud = rows.filter(noControle), arq = rows.filter(function(r){ return r.arquivado; });
-    var prio = cad.filter(function(r){ return prioridadeNasc(r) != null; }).length, lig = cad.filter(function(r){ return leadDe(r) === 'novo'; }).length;
+    var prio = cad.filter(function(r){ return prioridadeNasc(r) != null; }).length, lig = cad.filter(function(r){ return leadDe(r) === 'novo'; }).length, parCad = cad.filter(atrasada).length;
     var atr = pos.filter(atrasada).length, par = fila.filter(function(r){ return (diasParado(r) || 0) > LIMITE_ETAPA.fila; }).length;
     var exi = ins.filter(function(r){ return statusInss(r) === 'exigencia'; }).length, lat = ins.filter(analiseAtrasada).length;
     var marc = jud.filter(isFuture).length, pagos = arq.filter(arquivadoPago).length;
     return {
-      d: [cad.length, prio ? plural(prio, 'com parto perto', 'com parto perto') : lig ? plural(lig, 'para ligar', 'para ligar') : 'Tudo em dia', plural(cad.length, 'em cadastro', 'em cadastro') + (prio ? ' · ' + prio + ' prioridade' : '') + (lig ? ' · ' + lig + ' para ligar' : '')],
+      d: [cad.length, prio ? plural(prio, 'com parto perto', 'com parto perto') : lig ? plural(lig, 'para ligar', 'para ligar') : parCad ? plural(parCad, 'parada', 'paradas') : 'Tudo em dia', plural(cad.length, 'em cadastro', 'em cadastro') + (prio ? ' · ' + prio + ' prioridade' : '') + (lig ? ' · ' + lig + ' para ligar' : '')],
       k: [pos.length, atr ? plural(atr, 'atrasada', 'atrasadas') : 'Tudo em dia', plural(pos.length, 'cliente', 'clientes') + ' · ' + plural(atr, 'atrasada', 'atrasadas')],
       h: [fila.length, par ? plural(par, 'parada', 'paradas') : 'Tudo em dia', plural(fila.length, 'na fila', 'na fila') + ' · ' + plural(par, 'parada', 'paradas')],
       i: [ins.length, exi ? plural(exi, 'em exigência', 'em exigência') : lat ? plural(lat, 'análise atrasada', 'análises atrasadas') : 'requerimentos no INSS', plural(ins.length, 'requerimento', 'requerimentos') + ' · ' + plural(exi, 'exigência', 'exigências')],
