@@ -2809,7 +2809,8 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   // Judicial: tem número de processo e ainda não foi arquivada (acompanha a ação até a sentença e o pagamento)
   function noControle(r){ return !!String(r.processo || '').trim() && !r.arquivado; }
   // Cadastro: ainda sem requerimento no INSS e sem número de processo
-  function noCadastro(r){ return !String(r.processo || '').trim() && !requerido(r) && !r.arquivado && !r.contratoEm && r.leadStatus !== 'desqualificado'; }
+  function noCadastro(r){ return !String(r.processo || '').trim() && !requerido(r) && !r.arquivado && !r.contratoEm && r.leadStatus !== 'desqualificado' && leadDe(r) !== 'perdido'; }
+  function perdidoAuto(r){ return !String(r.processo || '').trim() && !requerido(r) && !r.arquivado && !r.contratoEm && r.leadStatus !== 'desqualificado' && leadDe(r) === 'perdido'; }
   function desqualificada(r){ return r.leadStatus === 'desqualificado' && !r.contratoEm && !r.arquivado; }
   // INSS: requerimento feito, ainda sem ação judicial
   // contrato fechado com a documentação toda ok: sai de Contratos fechados e vai para o INSS redigir o requerimento
@@ -3008,7 +3009,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       await copiarTexto(b.dataset.copiarTel); b.classList.add('ok'); setTimeout(function(){ b.classList.remove('ok'); }, 1500);
       var rc = b.dataset.id ? acharRow(b.dataset.id) : null, msg = 'Telefone copiado: ' + b.dataset.copiarTel;
       // quem copia o telefone vai ligar: o lead novo passa para "Em contato" sozinho
-      if (rc && leadDe(rc) === 'novo'){ var ag = new Date().toISOString(); patchRow(rc.id, Object.assign({ leadStatus: 'contato', leadMudouEm: ag, ultimoContatoEm: ag, atualizadoEm: ag }, prazoContato())).catch(function(){}); msg += ' · marcado como Em contato'; }
+      if (rc && noCadastro(rc) && leadDe(rc) === 'novo'){ var ag = new Date().toISOString(); patchRow(rc.id, Object.assign({ leadStatus: 'contato', leadMudouEm: ag, ultimoContatoEm: ag, atualizadoEm: ag }, prazoContato())).catch(function(){}); msg += ' · marcado como Em contato'; }
       toast(msg);
     }
     catch(err){ toast('Não foi possível copiar. Selecione o número e use Ctrl+C.'); }
@@ -3120,8 +3121,8 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     if (compacto) campos = campos.filter(function(c){ return ['Nome completo', 'CPF', 'RG', 'Nascimento', 'NIT / PIS', 'Telefone', 'Cidade', 'Endereço', 'Parceiro', 'Atendente', 'Proposta', 'Fechamento', 'Criança', 'Testemunhas', 'Penalidades', 'Observações'].indexOf(c[0]) >= 0; });
     var fl = faltaDocs(r);
     var ok = '<i class="fc-ok"><svg class="i"><use href="#i-check"/></svg></i>', nada = '<i class="fc-nao">–</i>';
-    var fotoOk = /^data:image\/(jpeg|png);base64,/.test(r.fotoCliente || '');
-    return '<div class="ficha"><div class="ficha-t">Dados do cliente</div>' + (fotoOk ? '<div class="ficha-foto"><img src="' + r.fotoCliente + '" alt="Foto de ' + esc(r.nome) + '"><span>Foto tirada pelo parceiro</span></div>' : '') + (prazoTag(r) ? '<div style="margin:0 0 10px">' + prazoTag(r) + '</div>' : '') + '<div class="ficha-g">' + campos.map(function(c){
+    var fotoOk = /^data:image\/(jpeg|png);base64,[A-Za-z0-9+\/=]+$/.test(r.fotoCliente || '');
+    return '<div class="ficha"><div class="ficha-t">Dados do cliente</div>' + (fotoOk ? '<div class="ficha-foto"><img src="' + esc(r.fotoCliente) + '" alt="Foto de ' + esc(r.nome) + '"><span>Foto tirada pelo parceiro</span></div>' : '') + (prazoTag(r) ? '<div style="margin:0 0 10px">' + prazoTag(r) + '</div>' : '') + '<div class="ficha-g">' + campos.map(function(c){
       var v = c[1] == null ? '' : String(c[1]).trim();
       return '<div class="ficha-i">' + (v ? ok : nada) + '<div><span>' + c[0] + '</span><b>' + (v ? esc(v) : '—') + '</b></div></div>';
     }).join('') + '</div>' +
@@ -3129,7 +3130,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
         (fl.length ? '<div class="docs-recebi"><span>Faltam: ' + esc(faltaTexto(r)) + '. Se chegou por outro meio, marque como recebido:</span><div>' + fl.map(function(k){ return '<button type="button" class="btn" data-act="recebido" data-id="' + esc(r.id) + '" data-doc="' + k + '"><svg class="i"><use href="#i-check"/></svg>Recebi ' + DOC_FALTA[k] + '</button>'; }).join('') + '</div></div>' : '') + '</div>' +
       '<div class="ficha-acoes"><button type="button" class="btn" data-act="edit" data-id="' + esc(r.id) + '"><svg class="i"><use href="#i-pencil"/></svg>Editar cadastro</button>' +
       (fechado(r) ? '<button type="button" class="btn" data-act="voltar-cad" data-id="' + esc(r.id) + '" title="Desfaz o fechamento do contrato">↩ Voltar ao Cadastro</button>' : '') +
-      (r.pastaUrl ? '<a class="btn" style="text-decoration:none" href="' + esc(r.pastaUrl) + '" target="_blank" rel="noopener"><svg class="i"><use href="#i-folder"/></svg>Pasta no Drive</a>' : '') +
+      (r.pastaUrl ? '<a class="btn" style="text-decoration:none" href="' + esc(urlSegura(r.pastaUrl)) + '" target="_blank" rel="noopener"><svg class="i"><use href="#i-folder"/></svg>Pasta no Drive</a>' : '') +
       '</div></div>';
   }
   /* ---------- card com os dados do cliente (abre ao clicar na linha) ---------- */
@@ -3197,7 +3198,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function fcCaixa(r){
     var cpf = digits(r.cpf), tel = foneDe(r), zp = zapUrl(tel), num = String(r.processo || '').trim() || String(r.protocoloInss || '').trim() || 'Processo sem número';
     return '<div class="fc-caixa"><div class="fc-cx-top"><div class="fc-cx-nome"><button type="button" class="fc-nome" data-act="edit" title="Abrir o cadastro">' + esc(r.nome || 'Cliente') + '</button><p class="fc-num tnum">' + esc(num) + '</p></div>' +
-        (r.pastaUrl ? '<a class="fc-pasta" href="' + esc(r.pastaUrl) + '" target="_blank" rel="noopener">' + svgI('i-folder') + 'Pasta no Drive</a>' : '<span class="fc-sem-pasta">Pasta ainda não criada no Drive</span>') + '</div>' +
+        (r.pastaUrl ? '<a class="fc-pasta" href="' + esc(urlSegura(r.pastaUrl)) + '" target="_blank" rel="noopener">' + svgI('i-folder') + 'Pasta no Drive</a>' : '<span class="fc-sem-pasta">Pasta ainda não criada no Drive</span>') + '</div>' +
       '<div class="fc-lin">' + svgI('i-users') + '<span>CPF</span>' + (cpf.length >= 11 ? '<b class="tnum">' + esc(r.cpf) + '</b>' + fcCopiar(cpf, 'Copiar o CPF') : '<em>Não cadastrado</em>') + '</div>' + fcSenhaHtml() +
       '<div class="fc-lin">' + svgI('i-zap') + '<span>WhatsApp</span>' + (tel ? (zp ? '<a class="tnum" href="' + esc(zp) + '" target="_blank" rel="noopener" title="Abrir a conversa no WhatsApp">' + esc(fmtTel(tel)) + '</a>' : '<b class="tnum">' + esc(fmtTel(tel)) + '</b>') + fcCopiar(digits(tel), 'Copiar o WhatsApp') : '<em>Não cadastrado</em>') + '</div>' +
       '<div class="fc-links"><a href="https://meu.inss.gov.br/" target="_blank" rel="noopener">' + svgI('i-inss') + 'Meu INSS</a><a href="https://sal.rfb.gov.br/calculo-contribuicao/contribuintes-2" target="_blank" rel="noopener">' + svgI('i-cash') + 'Gerar guia</a></div></div>';
@@ -3226,7 +3227,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       '<p class="fc-sec">Fase do processo</p>' + (pode ? '<label class="fc-c"><span class="fc-rot">Responsável</span>' + respSel + '</label>' : '') +
       '<label class="fc-c"><span class="fc-rot">Fase*</span><input disabled value="' + esc(TITULOS[t] ? TITULOS[t][0] : '') + '"></label><label class="fc-c"><span class="fc-rot">Etapa*</span>' + etapaSel + '</label>' +
       (t === 'h' ? '<p class="fc-nota">Para avançar, use o botão do card.</p>' : '') +
-      '<p class="fc-sec">Fechamento</p><div>' + fcLeitura('Situação', t === 'd' || t === 'q' ? (LEAD[leadDe(r)] || '—') : 'Contrato fechado') + fcLeitura('Closer', r.contratoPor || r.atendente || '—') + fcLeitura('Proposta', r.propostaAceita ? 'Aceita pela cliente' + (r.propostaObs ? ' · ' + r.propostaObs : '') : '') +
+      '<p class="fc-sec">Fechamento</p><div>' + fcLeitura('Situação', t === 'd' ? (LEAD[leadDe(r)] || '—') : t === 'q' ? (desqualificada(r) ? 'Desqualificado' : 'Perda') : 'Contrato fechado') + fcLeitura('Closer', r.contratoPor || r.atendente || '—') + fcLeitura('Proposta', r.propostaAceita ? 'Aceita pela cliente' + (r.propostaObs ? ' · ' + r.propostaObs : '') : '') +
         fcLeitura('Origem do contrato', parNome || '—') + fcLeitura('Cidade', cidadeCli(r)) + fcLeitura('Criança', r.crianca) +
         fcLeitura('Exigência', r.inssStatus === 'exigencia' ? (r.exigenciaObs || 'Sem descrição') + (r.exigenciaPrazo ? ' · prazo ' + fmtDate(r.exigenciaPrazo) : '') : '') + fcLeitura('Motivo', r.desqualMotivo || r.motivoIndeferimento || r.motivoArquivo) +
         fcLeitura('Resultado', r.resultado && RES[r.resultado] ? RES[r.resultado][0] : '') + fcLeitura('Pagamento', r.pagamento && PAG[r.pagamento] ? PAG[r.pagamento][0] : '') + fcLeitura('Penalidades', penalidadesTxt(r)) + '</div>' +
@@ -3604,7 +3605,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   // encerrado sem êxito: perdeu no Judicial (improcedente/extinto) ou indeferido no INSS e arquivado sem ação
   function arquivadoPago(r){ return !!r.arquivado && (ganhou(r) || r.pagamento === 'pago' || !!(r.recebimento && r.recebimento.data) || !!(r.repasse && r.repasse.data)); }
   function encerradoSemExito(r){ return !!r.arquivado && !arquivadoPago(r); }
-  function perdaOuDesq(r){ return encerradoSemExito(r) || desqualificada(r); }
+  function perdaOuDesq(r){ return encerradoSemExito(r) || desqualificada(r) || perdidoAuto(r); }
   function renderRet(){
     var f = state.r;
     var arq = state.rows.filter(arquivadoPago), sem = state.rows.filter(perdaOuDesq);
@@ -3731,7 +3732,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     var nPrio = todos.filter(function(r){ return prioridadeNasc(r) != null; }).length, nAtr = todos.filter(atrasada).length, nInc = todos.filter(function(r){ return dadosFaltando(r).length; }).length;
     var nLead = function(k){ return todos.filter(function(r){ return leadDe(r) === k; }).length; };
     var SITS = [['', 'Status: todas · ' + todos.length], ['prioridade', 'Prioridade (parto perto) · ' + nPrio], ['atrasadas', 'Paradas além do prazo · ' + nAtr], ['incompleto', 'Dados incompletos · ' + nInc],
-      ['l:novo', 'Para ligar (novos) · ' + nLead('novo')], ['l:retornar', 'Retornar depois · ' + nLead('retornar')], ['l:contato', 'Em contato · ' + nLead('contato')], ['l:proposta', 'Proposta aceita · ' + nLead('proposta')], ['l:sem_resposta', 'Sem resposta · ' + nLead('sem_resposta')], ['l:perdido', 'Perdido · ' + nLead('perdido')]];
+      ['l:novo', 'Para ligar (novos) · ' + nLead('novo')], ['l:retornar', 'Retornar depois · ' + nLead('retornar')], ['l:contato', 'Em contato · ' + nLead('contato')], ['l:proposta', 'Proposta aceita · ' + nLead('proposta')], ['l:sem_resposta', 'Sem resposta · ' + nLead('sem_resposta')]];
     $('cad-sit').innerHTML = SITS.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === cadSit ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
     $('cad-sit').classList.toggle('ativo', !!cadSit);
     $('cad-chips').innerHTML = (nPrio ? fbChip('ver', 'i-alert', plural(nPrio, 'com parto em até ' + PRIORIDADE_DIAS + ' dias', 'com parto em até ' + PRIORIDADE_DIAS + ' dias'), 'cad:prioridade', 'cad:' + cadSit) : '') + (nAtr ? fbChip('lar', 'i-clock', plural(nAtr, 'parada além do prazo', 'paradas além do prazo'), 'cad:atrasadas', 'cad:' + cadSit) : '') +
@@ -3946,7 +3947,11 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       var ms = new Date(el.dataset.ate).getTime() - Date.now(); el.textContent = fmtContador(ms); el.classList.toggle('crit', ms < 120000);
     });
   }, 1000);
-  function diasDesdeIso(s){ if (!s) return null; var d = new Date(s); if (isNaN(d.getTime())) return null; return Math.floor((Date.now() - d.getTime()) / 86400000); }
+  // "2026-11-03" é o dia local; carimbo com hora vira o dia local da equipe
+  // link vindo do app só abre se for https (bloqueia javascript: e afins)
+  function urlSegura(u){ u = String(u || '').trim(); return /^https:\/\//i.test(u) ? u : '#'; }
+  function diaLocal(v){ v = String(v || ''); if (v.length <= 10) return v; var d = new Date(v); return isNaN(d.getTime()) ? v.slice(0, 10) : iso(d); }
+  function diasDesdeIso(s){ if (!s) return null; var d = /^\d{4}-\d{2}-\d{2}$/.test(String(s)) ? parseDate(s) : new Date(s); if (!d) return null; if (isNaN(d.getTime())) return null; return Math.floor((Date.now() - d.getTime()) / 86400000); }
   function leadDe(r){
     var k = LEAD[r.leadStatus] ? r.leadStatus : 'novo';
     if (k === 'retornar' && r.retornarEm){ var n = daysUntil(r.retornarEm); if (n != null && n <= 0) return 'novo'; }
@@ -3984,9 +3989,16 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   // a tarefa da GPS nasce quando o prazo chega, mesmo com o cartão em Senha ou Documentação, ou quando ele está em Emitir/Pagar GPS
   function gpsTarefa(r){ return noContratos(r) && !nascido(r) && !gpsPaga(r) && (gpsAPagar(r) || posEtapaDe(r) === 'gps'); }
   // o que o responsável precisa fazer agora: aparece no cartão, na janela e no sino até ser feito
+  // gestante que fechou antes do prazo da GPS e não pagou: continua avisando depois do parto
+  function gpsVencida(r){
+    if (gpsPaga(r) || !r.dpp || !r.contratoEm) return '';
+    var p = String(r.dpp).slice(0, 10).split('-').map(Number), ult = new Date(p[0], p[1] - 2, 0).getDate(), v = iso(new Date(p[0], p[1] - 3, Math.min(p[2], ult), 12));
+    return v < iso(new Date()) && String(r.contratoEm).slice(0, 10) <= v ? v : '';
+  }
   function tarefaPos(r){
     if (!noContratos(r)) return '';
     if (gpsTarefa(r)) return 'Tarefa: pagar a GPS' + (prazoGps(r) ? ' até ' + fmtDate(prazoGps(r)) : '');
+    if (gpsVencida(r) && String(r.dpp).slice(0, 10) <= iso(new Date())) return 'GPS não foi paga (venceu ' + fmtDate(gpsVencida(r)) + '): confira antes de encaminhar';
     if (posEtapaDe(r) === 'cert') return 'Tarefa: falar com a mãe e pedir a certidão';
     if (!nascido(r) && !r.dpp) return 'Tarefa: informar a data do parto';
     return '';
@@ -4012,6 +4024,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       var dp = diasDesdeIso(parto ? String(parto).slice(0, 10) > String(r.contratoEm).slice(0, 10) ? parto : r.contratoEm : r.contratoEm);
       return dp != null && dp > LIMITE_ETAPA.pos ? 'documentação atrasada há ' + (dp - LIMITE_ETAPA.pos) + ' dias' : '';
     }
+    if (e === 'cadastro' && r.leadStatus === 'retornar' && r.retornarEm && daysUntil(r.retornarEm) > 0) return '';
     var d = diasParado(r); return d != null && d > (LIMITE_ETAPA[e] || 99999) ? 'parada há ' + d + ' dias' : '';
   }
   function atrasada(r){ return !!atrasoTxt(r); }
@@ -4040,7 +4053,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     if (e === 'regularizada') e = r.certidaoRecebida ? 'ok' : 'nasc';
     if (POS_ORDEM.indexOf(e) < 0) e = 'senha';
     if (nascido(r)){ if (POS_SO_GESTANTE[e]) e = r.certidaoRecebida ? 'ok' : 'cert'; return e; }
-    var hj = iso(new Date()), mudou = String(r.posMudouEm || '').slice(0, 10), parto = String(r.dpp || '').slice(0, 10);
+    var hj = iso(new Date()), mudou = diaLocal(r.posMudouEm), parto = String(r.dpp || '').slice(0, 10);
     if (parto && parto <= hj && POS_ORDEM.indexOf(e) < POS_ORDEM.indexOf('cert') && (!mudou || mudou < parto)) return 'cert';
     if (gpsPaga(r) && (e === 'prazo_gps' || e === 'gps')) return 'nasc';
     if (e === 'prazo_gps' && gatilhoGps(r) && gatilhoGps(r) <= hj) return 'gps';
@@ -4170,11 +4183,12 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     var r = acharRow(id); if (!r) return;
     var ag = new Date().toISOString(), p = { pvAnalise: 'em_analise', filaEtapa: 'para_analisar', filaMudouEm: ag, filaPor: '', analiseMotivo: '', encaminhadoEm: ag, posResp: meuNome(), posRespEmail: meuEmail(), atualizadoEm: ag };
     var faltam = docsApp(r).filter(function(x){ return !x.ok; });
+    if (gpsVencida(r) && !window.confirm('A GPS de ' + (r.nome || 'a cliente') + ' venceu em ' + fmtDate(gpsVencida(r)) + ' e não está marcada como paga.\n\nEncaminhar mesmo assim?')) return;
     if (faltam.length){
       if (!window.confirm('A pasta está INCOMPLETA (faltam: ' + faltam.map(function(x){ return x.n; }).join(', ') + ').\n\nFechar a pasta incompleta gera penalidade de 50% para o Pós-venda (' + meuNome() + ').\n\nEncaminhar mesmo assim?')) return;
       p.penalidades = (Array.isArray(r.penalidades) ? r.penalidades : []).concat([{ tipo: 'pasta_incompleta', percentual: 50, pos: meuNome(), email: meuEmail(), faltavam: faltam.map(function(x){ return x.n; }), em: ag }]);
     }
-    var antes = { pvAnalise: r.pvAnalise || '', filaEtapa: r.filaEtapa || '', analiseMotivo: r.analiseMotivo || '', penalidades: Array.isArray(r.penalidades) ? r.penalidades : [] };
+    var antes = antesDe(r, p);
     try { await patchRow(id, p); toast(r.nome + ' foi para a análise da Controladoria', 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); }); } catch(err){ toast(errMsg(err)); }
   }
   async function receberCertidao(id){
@@ -4184,6 +4198,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       var t = String(window.prompt('Data de nascimento da criança (dd/mm/aaaa):', '') || '').trim(), m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(t);
       if (!m){ if (t) toast('Data inválida. Use dd/mm/aaaa.'); return; }
       p.criancaNasc = m[3] + '-' + m[2] + '-' + m[1]; p.fatoGerador = 'parto';
+      var dc = new Date(+m[3], +m[2] - 1, +m[1]); if (dc.getDate() !== +m[1] || dc.getMonth() !== +m[2] - 1){ toast('Essa data não existe. Confira o dia e o mês.'); return; }
       if (daysUntil(p.criancaNasc) > 0){ toast('A data de nascimento está no futuro.'); return; }
     }
     var antes = { certidaoRecebida: !!r.certidaoRecebida, certidaoEm: r.certidaoEm || '', posEtapa: r.posEtapa || '', posMudouEm: r.posMudouEm || '', criancaNasc: r.criancaNasc || '', fatoGerador: r.fatoGerador || '' };
@@ -4195,13 +4210,17 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   });
   $('fila-list').addEventListener('click', function(e){ var b = e.target.closest('[data-fila]'); if (b) filaAcao(b.dataset.id, b.dataset.fila); });
   $('fila-q').addEventListener('input', function(){ filaQ = this.value.trim(); renderFila(); });
+  // o "antes" do Desfazer: o valor de cada campo que a ação vai mudar
+  function antesDe(r, p){ var a = {}; Object.keys(p).forEach(function(k){ a[k] = r[k] == null ? '' : JSON.parse(JSON.stringify(r[k])); }); return a; }
   async function voltarCadastro(id){
     var r = acharRow(id); if (!r) return;
     if (!window.confirm('Voltar ' + (r.nome || 'a cliente') + ' para o Cadastro?\n\nO fechamento do contrato será desfeito e ela volta como Novo lead.')) return;
     var antes = { pvAnalise: r.pvAnalise || '', filaEtapa: r.filaEtapa || '', contratoEm: r.contratoEm || '', leadStatus: r.leadStatus || '', posEtapa: r.posEtapa || '', propostaAceita: !!r.propostaAceita, propostaObs: r.propostaObs || '', contratoPor: r.contratoPor || '', contratoPorEmail: r.contratoPorEmail || '', certidaoRecebida: !!r.certidaoRecebida };
     var ag = new Date().toISOString();
     try {
-      await patchRow(id, { pvAnalise: '', filaEtapa: '', analiseMotivo: '', contratoEm: '', leadStatus: 'novo', posEtapa: '', propostaAceita: false, propostaObs: '', contratoPor: '', contratoPorEmail: '', certidaoRecebida: false, contatoPrazoEm: '', tentativas: 0, leadMudouEm: ag, voltouAoCadastroEm: ag, atualizadoEm: ag });
+      var pv = { pvAnalise: '', filaEtapa: '', analiseMotivo: '', contratoEm: '', leadStatus: 'novo', posEtapa: '', posMudouEm: '', encaminhadoEm: '', filaMudouEm: '', filaPor: '', propostaAceita: false, propostaObs: '', contratoPor: '', contratoPorEmail: '', certidaoRecebida: false, contatoPrazoEm: '', tentativas: 0, leadMudouEm: ag, voltouAoCadastroEm: ag, atualizadoEm: ag };
+      antes = antesDe(r, pv);
+      await patchRow(id, pv);
       toast((r.nome || 'Cliente') + ' voltou para o Cadastro', 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
     } catch(err){ toast(errMsg(err)); render(); }
   }
@@ -4225,7 +4244,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     var todos = state.rows.filter(perdaOuDesq), d = todos.filter(desqualificada).length, p = todos.length - d;
     return todos.length ? plural(d, 'desqualificado', 'desqualificados') + ' · ' + plural(p, 'perda', 'perdas') : 'Ninguém por aqui até agora';
   }
-  function desqMotivo(r){ return r.desqualMotivo || r.motivoArquivo || r.motivoIndeferimento || (r.resultado && RES[r.resultado] ? RES[r.resultado][0] : '') || (r.leadStatus === 'perdido' ? 'Não fechou contrato' : ''); }
+  function desqMotivo(r){ return r.desqualMotivo || r.motivoArquivo || r.motivoIndeferimento || (r.resultado && RES[r.resultado] ? RES[r.resultado][0] : '') || (r.leadStatus === 'perdido' ? 'Não fechou contrato' : perdidoAuto(r) ? 'Sem resposta: virou perdido sozinho' : ''); }
   function podeReativar(r){ return !r.contratoEm && !requerido(r) && !String(r.processo || '').trim(); }
   function renderDesq(){
     var box = $('desq-list'); if (!box) return;
@@ -4320,7 +4339,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     } catch(err){ toast(errMsg(err)); render(); }
   });
   async function mudarLead(r, valor){
-    var antesL = { leadStatus: r.leadStatus || '', arquivado: !!r.arquivado, arquivadoEm: r.arquivadoEm || '', desqualMotivo: r.desqualMotivo || '', desqualEm: r.desqualEm || '', contatoPrazoEm: r.contatoPrazoEm || '', propostaAceita: !!r.propostaAceita, propostaAceitaEm: r.propostaAceitaEm || '', atendente: r.atendente || '', atendenteEmail: r.atendenteEmail || '' };
+    var antesL0 = { leadStatus: r.leadStatus || '', arquivado: !!r.arquivado, arquivadoEm: r.arquivadoEm || '', desqualMotivo: r.desqualMotivo || '', desqualEm: r.desqualEm || '', contatoPrazoEm: r.contatoPrazoEm || '', propostaAceita: !!r.propostaAceita, propostaAceitaEm: r.propostaAceitaEm || '', atendente: r.atendente || '', atendenteEmail: r.atendenteEmail || '' };
     var agoraL = new Date().toISOString();
     var p = { leadStatus: valor, leadMudouEm: agoraL, atualizadoEm: agoraL };
     if (valor === 'contato' || valor === 'sem_resposta') p.ultimoContatoEm = agoraL;
@@ -4338,6 +4357,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       var dv = new Date(); dv.setDate(dv.getDate() + dias); p.retornarEm = iso(dv);
     }
     if (valor === 'perdido'){ p.arquivado = true; p.arquivadoEm = iso(new Date()); }
+    var antesL = Object.assign(antesL0, antesDe(r, p));
     await patchRow(r.id, p);
     toast(LEAD[valor] + ': ' + r.nome + (valor === 'desqualificado' ? ' · ' + p.desqualMotivo : '') + (valor === 'perdido' ? ' (foi para Perdas e desqualificados)' : ''), 'Desfazer', function(){ patchRow(r.id, antesL).catch(function(e2){ toast(errMsg(e2)); }); });
   }
@@ -4377,7 +4397,9 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       var antes = { contratoEm: r.contratoEm || '', leadStatus: r.leadStatus || '', contratoPor: r.contratoPor || '', contratoPorEmail: r.contratoPorEmail || '', fatoGerador: r.fatoGerador || '', posEtapa: r.posEtapa || '', propostaAceita: !!r.propostaAceita, propostaObs: r.propostaObs || '' };
       this.disabled = true;
       try {
-        await patchRow(r.id, { contratoEm: data, leadStatus: 'fechado', contratoPor: atendente, contratoPorEmail: atendenteEmail, pvAnalise: '', filaEtapa: '', propostaAceita: true, propostaObs: f.querySelector('#fc-prop').value.trim(), fatoGerador: fatoNovo, posEtapa: '', contatoPrazoEm: '', atualizadoEm: new Date().toISOString() });
+        var pf = { contratoEm: data, leadStatus: 'fechado', posMudouEm: '', encaminhadoEm: '', filaMudouEm: '', filaPor: '', contratoPor: atendente, contratoPorEmail: atendenteEmail, pvAnalise: '', filaEtapa: '', propostaAceita: true, propostaObs: f.querySelector('#fc-prop').value.trim(), fatoGerador: fatoNovo, posEtapa: '', contatoPrazoEm: '', atualizadoEm: new Date().toISOString() };
+        antes = antesDe(r, pf);
+        await patchRow(r.id, pf);
         f.remove();
         toast('Contrato fechado por ' + atendente + ': ' + r.nome + ' · foi para o Pós-venda', 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
       } catch(err){ this.disabled = false; toast(errMsg(err)); }
@@ -4754,7 +4776,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   document.addEventListener('click', function(e){
     var p = e.target.closest && e.target.closest('#rel-per button[data-p]'); if (p){ relPer = p.dataset.p; renderRelatorio(); return; }
     var m = e.target.closest && e.target.closest('[data-minhas]'); if (m){ soMinhas = !soMinhas; Array.prototype.forEach.call(document.querySelectorAll('[data-minhas]'), function(b){ b.setAttribute('aria-pressed', String(soMinhas)); b.classList.toggle('primary', soMinhas); }); render(); return; }
-    var g = e.target.closest && e.target.closest('[data-guia-paga]'); if (g){ e.stopPropagation(); var rg = acharRow(g.dataset.guiaPaga); if (!rg) return; var ga = iso(new Date()), etg = posEtapaDe(rg), anda = etg === 'gps' || etg === 'prazo_gps', pg = { guiaStatus: 'paga', guiaPagaEm: ga, posResp: meuNome(), posRespEmail: meuEmail(), atualizadoEm: new Date().toISOString() }; if (anda){ pg.posEtapa = 'nasc'; pg.posMudouEm = new Date().toISOString(); } patchRow(rg.id, pg).then(function(){ toast('GPS paga: ' + rg.nome + (anda ? ' foi para Aguardando Nascimento' : '')); }).catch(function(e2){ toast(errMsg(e2)); }); return; }
+    var g = e.target.closest && e.target.closest('[data-guia-paga]'); if (g){ e.stopPropagation(); var rg = acharRow(g.dataset.guiaPaga); if (!rg) return; var ga = iso(new Date()), etg = posEtapaDe(rg), anda = etg === 'gps' || etg === 'prazo_gps', pg = { guiaStatus: 'paga', guiaPagaEm: ga, posResp: meuNome(), posRespEmail: meuEmail(), atualizadoEm: new Date().toISOString() }; if (anda){ pg.posEtapa = 'nasc'; pg.posMudouEm = new Date().toISOString(); } var antesG = antesDe(rg, pg); patchRow(rg.id, pg).then(function(){ toast('GPS paga: ' + rg.nome + (anda ? ' foi para Aguardando Nascimento' : ''), 'Desfazer', function(){ patchRow(rg.id, antesG).catch(function(e3){ toast(errMsg(e3)); }); }); }).catch(function(e2){ toast(errMsg(e2)); }); return; }
     if (e.target.closest && e.target.closest('#btn-avisos')) abrirAvisos();
   }, true);
   /* ---------- peças do quadro (as mesmas da aba Processos do BI de Vendas) ---------- */
@@ -4786,7 +4808,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function linhaLugar(r, extra){ var t = [cidadeCli(r), extra].filter(Boolean).join(' · '); return t ? '<div class="kb-lugar">' + ufFlag(r) + '<span title="' + esc(t) + '">' + esc(t) + '</span></div>' : ''; }
   function linhaDocs(r){ var l = docsApp(r), ok = l.filter(function(x){ return x.ok; }).length; return ok === l.length ? '<p class="ok">Documentação completa</p>' : '<p>' + ok + ' de ' + l.length + ' documentos</p>'; }
   function faltamTxt(r){ return docsApp(r).filter(function(x){ return !x.ok; }).map(function(x){ return x.n; }).join(', '); }
-  function kbPasta(r){ return r.pastaUrl ? '<a class="kb-ic" href="' + esc(r.pastaUrl) + '" target="_blank" rel="noopener" title="Pasta no Drive" aria-label="Pasta no Drive">' + svgI('i-folder') + '</a>' : ''; }
+  function kbPasta(r){ return r.pastaUrl ? '<a class="kb-ic" href="' + esc(urlSegura(r.pastaUrl)) + '" target="_blank" rel="noopener" title="Pasta no Drive" aria-label="Pasta no Drive">' + svgI('i-folder') + '</a>' : ''; }
   function kbMover(sel){ return '<label class="kb-ic kb-mover" title="Mover para outra coluna">' + svgI('i-mover') + sel + '</label>'; }
   // cartão: nome, linhas cinzas, alertas em vermelho, botão da etapa e rodapé com responsável e tempo na etapa
   function kbCard(r, o){
@@ -4868,9 +4890,9 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   /* ---------- Dashboard: números por período, gráfico de cadastros e contratos e rankings ---------- */
   var DASH_PERIODOS = [['mes', 'Este mês'], ['30', '30 dias'], ['ano', 'Este ano'], ['tudo', 'Tudo']], DASH_MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
   var dashPer = lerGuardado('nascer-dash-per', 'mes'), dashTabela = false, dashSerie = null;
-  function dataCad(r){ return String(r.dataCadastro || r.criadoEm || '').slice(0, 10); }
-  function dataPerda(r){ return String(r.desqualEm || r.arquivadoEm || r.leadMudouEm || '').slice(0, 10); }
-  function dataGanho(r){ return String((r.repasse && r.repasse.data) || (r.recebimento && r.recebimento.data) || r.inssDecisaoEm || r.arquivadoEm || '').slice(0, 10); }
+  function dataCad(r){ return diaLocal(r.dataCadastro || r.criadoEm); }
+  function dataPerda(r){ return diaLocal(r.desqualEm || r.arquivadoEm || r.ultimoContatoEm || r.leadMudouEm); }
+  function dataGanho(r){ return diaLocal((r.repasse && r.repasse.data) || (r.recebimento && r.recebimento.data) || r.inssDecisaoEm || r.arquivadoEm); }
   function dashJanela(){
     var ag = new Date(), fim = iso(ag), ini;
     if (dashPer === '30'){ var d = new Date(); d.setDate(d.getDate() - 29); ini = iso(d); }
@@ -4919,7 +4941,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   }
   function renderDash(){
     var box = $('dash-box'); if (!box || $('view-dash').hidden) return;
-    var rows = state.rows, j = dashJanela(), no = function(d){ d = String(d || '').slice(0, 10); return !!d && d >= j.ini && d <= j.fim; };
+    var rows = state.rows, j = dashJanela(), no = function(d){ d = diaLocal(d); return !!d && d >= j.ini && d <= j.fim; };
     var faixa = j.ini ? fmtDate(j.ini) + ' a ' + fmtDate(j.fim) : 'desde o início';
     var res = resumoFases(), html = '';
     var cads = rows.filter(function(r){ return no(dataCad(r)); }), ctrs = rows.filter(function(r){ return no(r.contratoEm); }), perdas = rows.filter(function(r){ return perdaOuDesq(r) && no(dataPerda(r)); });
@@ -4934,7 +4956,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       dashCard('q', 'i-bellx', 'Perdas e desqualificados', perdas.length, 'encerrados no período') + '</div>');
     var todasDatas = rows.map(dataCad).concat(rows.map(function(r){ return String(r.contratoEm || '').slice(0, 10); }));
     var baldes = dashBaldes(j, todasDatas.filter(Boolean)), corte = j.mensal ? 7 : 10;
-    var conta = function(lista, data){ return baldes.map(function(b){ return lista.filter(function(r){ return String(data(r) || '').slice(0, corte) === b.k; }).length; }); };
+    var conta = function(lista, data){ return baldes.map(function(b){ return lista.filter(function(r){ return diaLocal(data(r)).slice(0, corte) === b.k; }).length; }); };
     dashSerie = { mensal: j.mensal, rot: baldes.map(function(b){ return b.rot; }), a: conta(cads, dataCad), b: conta(ctrs, function(r){ return r.contratoEm; }) };
     var soma = function(v){ return v.reduce(function(a, x){ return a + x; }, 0); };
     var cabGraf = '<div class="dash-graf-cab"><div class="dash-leg"><span><i style="background:var(--ser-1)"></i>Cadastros <b class="tnum">' + soma(dashSerie.a) + '</b></span><span><i style="background:var(--ser-2)"></i>Contratos <b class="tnum">' + soma(dashSerie.b) + '</b></span></div><div class="seg-bi" role="group" aria-label="Forma de ver"><button type="button" data-dash-tab="0" aria-pressed="' + !dashTabela + '">Gráfico</button><button type="button" data-dash-tab="1" aria-pressed="' + dashTabela + '">Tabela</button></div></div>';
@@ -5156,7 +5178,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     else if (de === 'i' && fase === 'c'){ openForm(r); setTimeout(function(){ $('f-proc').scrollIntoView({ block: 'center' }); $('f-proc').focus(); }, 60); toast('Preencha o número do processo e a data do ajuizamento'); }
     else toast('Essa passagem não é permitida por aqui.');
   }
-  function faseDe(r){ if (r.arquivado) return arquivadoPago(r) ? 'r' : 'q'; if (String(r.processo || '').trim()) return 'c'; if (requerido(r)) return 'i'; if (naFila(r)) return 'h'; if (noContratos(r)) return 'k'; if (desqualificada(r)) return 'q'; return 'd'; }
+  function faseDe(r){ if (r.arquivado) return arquivadoPago(r) ? 'r' : 'q'; if (String(r.processo || '').trim()) return 'c'; if (requerido(r)) return 'i'; if (naFila(r)) return 'h'; if (noContratos(r)) return 'k'; if (desqualificada(r) || perdidoAuto(r)) return 'q'; return 'd'; }
   function faseTexto(r){
     var t = faseDe(r), n = TITULOS[t] ? TITULOS[t][0] : '';
     if (t === 'd') return n + ' · ' + LEAD[leadDe(r)];
@@ -5189,7 +5211,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     else if (e.key === 'Enter' && bgItens[bgMarcado]){ e.preventDefault(); var r = bgItens[bgMarcado]; $('bg-res').hidden = true; this.blur(); abrirCard(r.id, noCadastro(r)); }
   });
   $('bg-res').addEventListener('mousedown', function(e){ e.preventDefault(); var b = e.target.closest('[data-bg]'); if (!b) return; var r = acharRow(b.dataset.bg); $('bg-res').hidden = true; $('bg-q').blur(); if (r) abrirCard(r.id, noCadastro(r)); });
-  function render(){ pintarAvisosBtn(); renderRelatorio(); pintarCard(); renderEstadosCfg(); renderRegioes(); renderContratos(); renderFila(); renderDesq(); renderCad(); renderInss(); renderStats(); renderPauta(); renderList(); renderLista(); renderPos(); renderRet(); renderProsp(); renderEquipe(); renderContest(); renderBusca(); renderClSessao(); renderFin(); if (typeof AV !== 'undefined' && AV && !AV.rodando) avMontar(); renderDash(); renderFunil(); pintarPagina(); medirQuadros(); }
+  function render(){ pintarAvisosBtn(); renderRelatorio(); pintarCard(); renderEstadosCfg(); renderRegioes(); renderContratos(); renderFila(); renderDesq(); renderCad(); renderInss(); renderList(); renderRet(); renderProsp(); renderEquipe(); renderFin(); renderDash(); renderFunil(); pintarPagina(); medirQuadros(); }
   var clQ = '';
   // stage of each process, derived from what is already recorded (no extra typing)
   var ETAPAS = [
@@ -6486,15 +6508,15 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     } finally { folderBusy[id] = false; }
   }
   function pastaIco(r){
-    return r.pastaUrl ? '<a class="pasta-ico" href="' + esc(r.pastaUrl) + '" target="_blank" rel="noopener" title="Abrir pasta no Drive" aria-label="Abrir pasta no Drive"><svg class="i"><use href="#i-folder"/></svg></a>' : '';
+    return r.pastaUrl ? '<a class="pasta-ico" href="' + esc(urlSegura(r.pastaUrl)) + '" target="_blank" rel="noopener" title="Abrir pasta no Drive" aria-label="Abrir pasta no Drive"><svg class="i"><use href="#i-folder"/></svg></a>' : '';
   }
   function folderLink(r){
-    if (r.pastaUrl) return '<a class="folder" href="' + esc(r.pastaUrl) + '" target="_blank" rel="noopener"><svg class="i"><use href="#i-folder"/></svg>Pasta</a>';
+    if (r.pastaUrl) return '<a class="folder" href="' + esc(urlSegura(r.pastaUrl)) + '" target="_blank" rel="noopener"><svg class="i"><use href="#i-folder"/></svg>Pasta</a>';
     return '<button type="button" class="folder add" data-act="edit" data-id="' + esc(r.id) + '" title="Abrir o cadastro para criar a pasta no Drive"><svg class="i"><use href="#i-folder"/></svg>Criar pasta</button>';
   }
   function renderFolderField(r){
     var box = $('f-pasta');
-    if (r && r.pastaUrl){ box.innerHTML = '<div class="pasta-acoes"><a class="folder" href="' + esc(r.pastaUrl) + '" target="_blank" rel="noopener"><svg class="i"><use href="#i-folder"/></svg>Abrir pasta no Drive</a>' + '</div>' +
+    if (r && r.pastaUrl){ box.innerHTML = '<div class="pasta-acoes"><a class="folder" href="' + esc(urlSegura(r.pastaUrl)) + '" target="_blank" rel="noopener"><svg class="i"><use href="#i-folder"/></svg>Abrir pasta no Drive</a>' + '</div>' +
       '<span class="small" id="f-pasta-msg">Jogue na pasta as fotos ou PDFs da procuração, RG, CPF, certidão de nascimento, comprovante de residência e provas da atividade. Os dados são preenchidos por vocês.</span>'; return; }
     var colar = '<details class="pasta-colar"><summary>Já tem pasta antiga? Colar o link</summary><input id="f-pasta-url" type="url" placeholder="Cole aqui o link da pasta no Google Drive" style="width:100%"></details>';
     if (!r){ box.innerHTML = '<div class="pasta-auto"><svg class="i"><use href="#i-folder"/></svg><span>A pasta é criada sozinha no Drive ao salvar, em <b>CLIENTES › PENDENTES DE REQUERIMENTO</b>.</span></div>' + colar; return; }
@@ -6654,6 +6676,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     var lugar = embutido ? $('cad-box') : dlg;
     if ($('form').parentElement !== lugar) lugar.appendChild($('form'));
     state.editing = r ? r.id : null;
+    state.editBase = r ? JSON.parse(JSON.stringify(r)) : null;
     $('form').classList.toggle('novo', !r || !!compacto); // cadastro inicial: só os dados do cliente
     $('form').classList.toggle('com-pasta', !!(r && (comPasta || !r.pastaUrl)));   // sem pasta ligada: mostra o campo para colar o link
     $('f-title').textContent = r ? 'Editar cliente' : 'Novo cadastro (orgânico)';
@@ -6674,7 +6697,8 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     $('f-situacao').value = r ? sit(r) : 'pendente';
     // parceiros e prospectadores (função híbrida: o prospectador também cadastra mães)
     $('f-resp').innerHTML = '<option value="">Sem parceiro</option>' + state.prosp.filter(function(p){ return p.ativo !== false; }).slice().sort(function(x, y){ return String(x.nome || '').localeCompare(String(y.nome || ''), 'pt'); }).map(function(p){ return '<option value="' + esc(p.id) + '">' + esc(p.nome) + (ehProspectador(p) ? ' (prospectador)' : '') + '</option>'; }).join('');
-    $('f-resp').value = r && prospById(r.responsavelId) ? r.responsavelId : '';
+    if (r && r.responsavelId && !Array.prototype.some.call($('f-resp').options, function(o){ return o.value === r.responsavelId; })){ var paAt = prospById(r.responsavelId); $('f-resp').insertAdjacentHTML('beforeend', '<option value="' + esc(r.responsavelId) + '">' + esc(paAt ? paAt.nome + ' (inativo)' : 'Parceiro atual (não carregado)') + '</option>'); }
+    $('f-resp').value = r && r.responsavelId ? r.responsavelId : '';
     $('f-aviso-resp').innerHTML = '<option value="">O próprio parceiro</option>' + soParceiros().map(function(p){ return '<option value="' + esc(p.id) + '">' + esc(p.nome) + '</option>'; }).join('');
     $('f-aviso-resp').value = r && prospById(r.avisoRespId) ? r.avisoRespId : '';
     $('f-avisoem').value = r && r.avisadoEm ? String(r.avisadoEm).slice(0, 10) : '';
@@ -6722,8 +6746,10 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     $('f-obs').value = r ? r.obs || '' : '';
     (function(){
       var eq = (state.equipe || []).filter(function(u){ return u.ativo !== false && u.email; }).sort(function(a, b){ return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
-      var atual = r ? String(r.atendenteEmail || r.contratoPorEmail || '').toLowerCase() : String((state.me && state.me.email) || '').toLowerCase();
+      var atual = r ? String(r.atendenteEmail || '').toLowerCase() : String((state.me && state.me.email) || '').toLowerCase();
       $('f-atend').innerHTML = '<option value="">Sem atendente</option>' + eq.map(function(u){ return '<option value="' + esc(u.email) + '"' + (String(u.email).toLowerCase() === atual ? ' selected' : '') + '>' + esc(u.nome || u.email) + '</option>'; }).join('');
+      if (r && atual && !eq.some(function(u){ return String(u.email).toLowerCase() === atual; })) $('f-atend').insertAdjacentHTML('beforeend', '<option value="' + esc(atual) + '" selected>' + esc(r.atendente || atual) + '</option>');
+      else if (r && !atual && r.atendente) $('f-atend').insertAdjacentHTML('beforeend', '<option value="__atual" selected>' + esc(r.atendente) + '</option>');
       $('f-prop').checked = !!(r && r.propostaAceita);
       $('f-propobs').value = r ? r.propostaObs || '' : '';
     })();
@@ -6758,7 +6784,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   }
   ['f-cnasc', 'f-der', 'f-pinss', 'f-proc'].forEach(function(id){ $(id).addEventListener('input', protHint); });
   $('f-fato').addEventListener('change', fatoUI);
-  $('f-inss').addEventListener('change', function(){ inssUI(); if (this.value && !$('f-der').value) $('f-der').value = iso(new Date()); if ((this.value === 'concedido' || this.value === 'indeferido') && !$('f-inssdec').value) $('f-inssdec').value = iso(new Date()); });
+  $('f-inss').addEventListener('change', function(){ inssUI(); var rIn = state.editing ? acharRow(state.editing) : null; if (this.value && !$('f-der').value && rIn && (requerido(rIn) || (naFila(rIn) && filaEtapaDe(rIn) === 'protocolar'))) $('f-der').value = iso(new Date()); if ((this.value === 'concedido' || this.value === 'indeferido') && !$('f-inssdec').value) $('f-inssdec').value = iso(new Date()); });
   $('f-pinss').addEventListener('input', function(){ if (this.value.trim() && !$('f-inss').value){ $('f-inss').value = 'analise'; inssUI(); } });
   function cpfHint(){
     var v = $('f-cpf').value, h = $('h-cpf');
@@ -6792,7 +6818,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       if (faltaN.length){ toast('Falta preencher: ' + faltaN.join(', ') + '.'); if ($(primeiroN)) $(primeiroN).focus(); return; }
     }
     // datas que não fazem sentido (erro de digitação)
-    if ($('f-fato').value === 'gestante' && $('f-dpp').value){ var ndpp = daysUntil($('f-dpp').value); if (ndpp != null && ndpp < -45){ toast('A data prevista do parto já passou há ' + (-ndpp) + ' dias. Se o bebê nasceu, marque "Já nasceu" e informe a data de nascimento.'); $('f-dpp').focus(); return; } if (ndpp != null && ndpp > 300){ toast('Data prevista do parto muito distante. Confira o ano.'); $('f-dpp').focus(); return; } }
+    if ($('f-fato').value === 'gestante' && $('f-dpp').value && !$('f-cnasc').value){ var ndpp = daysUntil($('f-dpp').value); if (ndpp != null && ndpp < -45){ toast('A data prevista do parto já passou há ' + (-ndpp) + ' dias. Se o bebê nasceu, marque "Já nasceu" e informe a data de nascimento.'); $('f-dpp').focus(); return; } if (ndpp != null && ndpp > 300){ toast('Data prevista do parto muito distante. Confira o ano.'); $('f-dpp').focus(); return; } }
     if (!state.editing && $('f-cnasc').value && $('f-fato').value !== 'gestante'){ var nn3 = daysUntil($('f-cnasc').value); if (nn3 != null && nn3 < -90){ toast('Só cadastramos bebês com até 3 meses de nascidos. Este tem ' + Math.floor(-nn3 / 30) + ' meses.'); $('f-cnasc').focus(); return; } }
     if ($('f-cnasc').value && $('f-fato').value !== 'gestante'){ var nn = daysUntil($('f-cnasc').value); if (nn != null && nn > 0){ toast('A data de nascimento está no futuro. Confira a data.'); $('f-cnasc').focus(); return; } }
     if (!state.editing){
@@ -6814,7 +6840,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       avisado: avisado, situacao: situacao, responsavelId: $('f-resp').value || (!state.editing && prospForAddress($('f-end').value) ? prospForAddress($('f-end').value).id : ''), avisadoEm: avisoEm || null, avisoRespId: $('f-aviso-resp').value, avisadoA: $('f-avisadoa').value.trim(), meioAviso: avisado ? $('f-meio').value : (prev.meioAviso || ''),
       processo: $('f-proc').value.trim(), tese: $('f-tese').value.trim(),
       nascimento: $('f-nasc').value || '', nit: $('f-nit').value.trim(), tipoSegurada: $('f-tipo').value, atividade: $('f-ativ').value.trim(),
-      atendenteEmail: $('f-atend').value, atendente: $('f-atend').value ? ($('f-atend').selectedOptions[0] || {}).textContent || '' : '',
+      atendenteEmail: $('f-atend').value === '__atual' ? (prev.atendenteEmail || '') : $('f-atend').value, atendente: $('f-atend').value === '__atual' ? (prev.atendente || '') : $('f-atend').value ? ($('f-atend').selectedOptions[0] || {}).textContent || '' : '',
       propostaAceita: $('f-prop').checked, propostaObs: $('f-propobs').value.trim(), propostaAceitaEm: $('f-prop').checked ? (prev.propostaAceitaEm || iso(new Date())) : '',
       fatoGerador: $('f-fato').value, crianca: nomeProprio($('f-crianca').value.trim()), criancaNasc: $('f-cnasc').value || '', dpp: $('f-fato').value === 'gestante' ? ($('f-dpp').value || '') : '', testemunhas: $('f-test').value.trim(),
       der: $('f-der').value || '', protocoloInss: $('f-pinss').value.trim(), nb: $('f-nb').value.trim(),
@@ -6832,6 +6858,11 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       criadoPorNome: prev.criadoPorNome || (state.editing ? '' : (state.me ? state.me.nome : '')),
       criadoPorEmail: prev.criadoPorEmail || (state.editing ? '' : (state.me ? state.me.email : ''))
     });
+    // o formulário guarda os dados de quando foi aberto: o que a pessoa não mexeu fica com o valor atual (outra pessoa pode ter mudado nesse meio-tempo)
+    if (state.editing && state.editBase){
+      var igual = function(a, b){ return (a == null || a === '' ? '' : JSON.stringify(a)) === (b == null || b === '' ? '' : JSON.stringify(b)); };
+      Object.keys(data).forEach(function(k){ if (k in prev && igual(data[k], state.editBase[k])) data[k] = prev[k]; });
+    }
     var pastaCol = $('f-pasta-url') ? $('f-pasta-url').value.trim() : '';
     if (pastaCol){ var pm = pastaCol.match(/folders\/([A-Za-z0-9_-]+)/); data.pastaUrl = pastaCol; data.pastaId = pm ? pm[1] : ''; }
     delete data.id;
@@ -7753,7 +7784,8 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function watchTable(table, onRows, onErr, mapRow, key){
     key = key || 'id'; mapRow = mapRow || function(x){ return Object.assign({ id: x.id }, x.data || {}); };
     var rows = new Map(), ready = false;
-    function emit(){ if (ready) onRows(Array.from(rows.values())); }
+    var emitT = 0;
+    function emit(){ if (!ready) return; clearTimeout(emitT); emitT = setTimeout(function(){ onRows(Array.from(rows.values())); }, 80); }
     async function load(){
       var all = [], from = 0;
       for (;;){

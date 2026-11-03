@@ -331,15 +331,19 @@ function tentarParceiro(cpf, senha){
   function prospectadores(){ return S.prosp.filter(ehProsp); }
   function nomeParc(p){ return p && p.tipo === 'clinica' && p.clinica ? p.clinica : (p && p.nome) || ''; }
   function regiao(id){ return S.regioes.filter(function(g){ return g.id === id; })[0] || null; }
+  // mesmas fases do BI (index.html, faseDe): Cadastro, Pós-venda, Fila de protocolo, INSS, Judicial, Arquivados e Perdas
+  function pagoArq(c){ return !!c.arquivado && (c.inssStatus === 'concedido' || ['procedente', 'parcial', 'acordo'].indexOf(c.resultado) >= 0 || c.pagamento === 'pago' || !!(c.recebimento && c.recebimento.data) || !!(c.repasse && c.repasse.data)); }
   function etapa(c){
-    if (c.arquivado) return ['Arquivada', ''];
-    if (String(c.processo || '').trim()) return ['Na Justiça', 'warn'];
-    if (c.der || String(c.protocoloInss || '').trim()) return ['No INSS', 'ok'];
-    if (c.contratoEm) return c.fatoGerador === 'gestante' && !c.criancaNasc ? ['Pagamento de guia', ''] : ['Contrato fechado', 'ok'];
-    return ['Em cadastro', ''];
+    if (c.arquivado) return pagoArq(c) ? ['Arquivada: benefício pago', 'ok'] : ['Perda', 'warn'];
+    if (String(c.processo || '').trim()) return ['Judicial', 'warn'];
+    if (c.der || String(c.protocoloInss || '').trim()) return ['INSS', 'ok'];
+    if (c.contratoEm) return c.pvAnalise === 'em_analise' || c.pvAnalise === 'aprovado' ? ['Fila de protocolo', 'ok'] : ['Pós-venda', 'ok'];
+    if (c.leadStatus === 'desqualificado') return ['Desqualificado', 'warn'];
+    return ['Cadastro', ''];
   }
   function docsFalta(c){ return Array.isArray(c.faltaDocs) ? c.faltaDocs : []; }
-  function docsOk(c){ return !docsFalta(c).length && (c.docsCompletos === true || (c.origem === 'campo' && Array.isArray(c.faltaDocs))); }
+  // como no BI (docsApp): o que o app recebeu vale; cliente que chegou em Documentação OK no Pós-venda está com a pasta completa
+  function docsOk(c){ return c.posEtapa === 'ok' || c.certidaoRecebida === true || (!docsFalta(c).length && (c.docsCompletos === true || (Array.isArray(c.campoDocs) && c.campoDocs.length >= 4) || (c.origem === 'campo' && Array.isArray(c.faltaDocs)))); }
 
   /* ---------- desenho ---------- */
   function desenhar(){
@@ -360,7 +364,7 @@ function tentarParceiro(cpf, senha){
       '<div class="num"><div><b>' + n.ind + '</b><small>indic.</small></div><div><b>' + n.con + '</b><small>contr.</small></div><div><b>' + n.cnc + '</b><small>conc.</small></div></div></div>';
   }
   /* ====== PAINEL: números, gráficos e rankings da rede ====== */
-  var LEAD_NOMES = { novo: 'Novo lead', contato: 'Em contato', sem_resposta: 'Sem resposta', retornar: 'Retornar depois', perdido: 'Perdido' };
+  var LEAD_NOMES = { proposta: 'Proposta aceita', novo: 'Novo lead', contato: 'Em contato', sem_resposta: 'Sem resposta', retornar: 'Retornar depois', perdido: 'Perdido' };
   function dataC(c){ return String(c.dataCadastro || c.criadoEm || '').slice(0, 10); }
   function isoDia(d){ return d.toISOString().slice(0, 10); }
   function diaAtras(n){ var d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - n); return isoDia(d); }
@@ -538,7 +542,7 @@ function tentarParceiro(cpf, senha){
     /* parceiros parados + composição */
     var parados = porP.filter(function(x){ return x.ind === 0 && x.p.ativo !== false; }).sort(function(x, y){ return String(x.ult).localeCompare(String(y.ult)); }).slice(0, 8);
     var tipoPessoa = ps.filter(function(p){ return p.tipo !== 'clinica'; }).length, tipoClin = ps.length - tipoPessoa;
-    var leads = {}; cliRede.filter(function(c){ return !c.contratoEm && !c.arquivado; }).forEach(function(c){ var k = LEAD_NOMES[c.leadStatus] ? c.leadStatus : 'novo'; leads[k] = (leads[k] || 0) + 1; });
+    var leads = {}; cliRede.filter(function(c){ return !c.contratoEm && !c.arquivado && c.leadStatus !== 'desqualificado' && !c.der && !String(c.protocoloInss || '').trim() && !String(c.processo || '').trim(); }).forEach(function(c){ var k = LEAD_NOMES[c.leadStatus] ? c.leadStatus : 'novo'; leads[k] = (leads[k] || 0) + 1; });
     html += '<div class="grid2"><section class="cx"><h3>Parceiros parados <small>(sem indicar no período)</small></h3>' +
       (parados.length ? '<div class="bars">' + parados.map(function(x){ var d = x.ult ? Math.floor((Date.parse(hoje) - Date.parse(x.ult)) / 864e5) : null; return '<div class="bar-l"><div class="bar-t"><span class="bar-n">' + esc(nomeParc(x.p)) + '</span><b>' + (d == null ? 'nunca indicou' : 'há ' + d + ' dias') + '</b></div><div class="bar-s">' + esc(x.p.regiao || '') + ' · ' + x.total + ' indic. no total</div></div>'; }).join('') + '</div>' : '<div class="vazio" style="padding:14px 4px">Todos os parceiros indicaram no período.</div>') + '</section>' +
       '<section class="cx"><h3>Composição</h3>' + rosca([{ n: 'Pessoas', v: tipoPessoa }, { n: 'Clínicas', v: tipoClin }]) +
@@ -604,7 +608,7 @@ function tentarParceiro(cpf, senha){
         return '<div class="cli"><b>' + esc(bonito(c.nome) || 'Sem nome') + '</b><span class="tag ' + e[1] + '">' + e[0] + '</span> ' +
           (docsOk(c) ? '<span class="tag ok">Documentação completa</span>' : '<span class="tag bad">' + (fl.length ? 'Faltam: ' + esc(fl.map(function(k){ return NOMES[k] || k; }).join(', ')) : 'Documentos não conferidos') + '</span>') +
           '<div style="font-size:12.5px;color:var(--ink2);margin-top:4px">' + esc(p ? nomeParc(p) : 'Sem parceiro') + (c.cidade ? ' · ' + esc(c.cidade) : '') + (c.contato ? ' · ' + esc(c.contato) : '') + '</div>' +
-          '<div class="acoes">' + (c.pastaUrl ? '<a class="btn p" href="' + esc(c.pastaUrl) + '" target="_blank" rel="noopener">Abrir pasta no Drive</a>' : '<span class="tag">Sem pasta no Drive</span>') +
+          '<div class="acoes">' + (c.pastaUrl ? '<a class="btn p" href="' + esc(/^https:\/\//i.test(String(c.pastaUrl)) ? c.pastaUrl : '#') + '" target="_blank" rel="noopener">Abrir pasta no Drive</a>' : '<span class="tag">Sem pasta no Drive</span>') +
           (c.cpf ? '<button class="btn" data-cpf="' + esc(c.cpf) + '">Copiar CPF</button>' : '') + '</div></div>';
       }).join('') : '<div class="vazio">Nenhum cliente neste filtro.</div>') + '</div></section>';
     var b = $('busca'); b.addEventListener('input', function(){ S.busca = this.value; var pos = this.selectionStart; telaDocs(); var n = $('busca'); n.focus(); try { n.setSelectionRange(pos, pos); } catch(x){} });

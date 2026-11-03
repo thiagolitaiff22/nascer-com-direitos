@@ -725,11 +725,12 @@ html[data-tema="dark"] .lista > div:has(i.ok) small::before{background:#4ade80}
 
 /* ---------- logo bem à vista ---------- */
 .topo .logo img{height:62px!important;filter:drop-shadow(0 2px 8px rgba(138,106,61,.28))}
-.topo{padding:10px 12px 10px!important}
+.topo{padding:calc(10px + env(safe-area-inset-top)) 12px 10px!important}
 .login-logo{width:210px!important;max-width:70%!important;height:auto!important;margin:0 auto 22px!important;padding:0!important;background:none!important;box-shadow:none!important;border-radius:0!important;filter:drop-shadow(0 4px 14px rgba(138,106,61,.28))}
 html[data-tema="dark"] .login-logo{filter:brightness(1.55) saturate(1.05) drop-shadow(0 4px 14px rgba(0,0,0,.5))}
 .login-t{font-size:22px!important;font-weight:700;letter-spacing:-.01em}
-.topo{padding:10px 16px 10px!important}
+.topo{padding:calc(10px + env(safe-area-inset-top)) 16px 10px!important}
+.folha > div{max-height:88vh;max-height:88dvh}
 
 /* ================= tela de entrada: limpa, centralizada e legível nos dois modos ================= */
 .login{background:none!important;overflow:visible!important;align-items:center}
@@ -784,7 +785,7 @@ html[data-tema="dark"] .mini-btn{background:#1b1712;border-color:#4b4132;color:#
 :root{--gx:max(22px,env(safe-area-inset-left));--gxr:max(22px,env(safe-area-inset-right))}
 .vista{padding-left:var(--gx)!important;padding-right:var(--gxr)!important}
 .topo{margin:0 0 6px!important;padding-left:var(--gx)!important;padding-right:var(--gxr)!important}
-html,body{overflow-x:hidden}
+html,body{overflow-x:clip}
 .folha > div{padding-left:var(--gx)!important;padding-right:var(--gxr)!important}
 .barra{padding-left:var(--gx)!important;padding-right:var(--gxr)!important}
 .abas{left:var(--gx)!important;right:var(--gxr)!important}
@@ -800,7 +801,7 @@ html,body{overflow-x:hidden}
 .cid-seta{width:20px;height:20px;flex:none;color:var(--ink2)}
 .cid-flag{width:26px;height:18px;border-radius:3px;object-fit:cover;flex:none;box-shadow:0 0 0 1px rgba(0,0,0,.12);background:#fff}
 .cid-flag.vazio{box-shadow:none;background:var(--soft,#f1ece2);opacity:.7;border-radius:4px}
-.cid-folha{display:flex;flex-direction:column;max-height:86dvh;max-height:86vh}
+.cid-folha{display:flex;flex-direction:column;max-height:86vh;max-height:86dvh}
 .cid-busca{width:100%;height:46px;border:1px solid var(--line);border-radius:14px;padding:0 14px;font:inherit;font-size:16px;background:var(--card,#fff);color:inherit;margin:0 0 10px}
 .cid-lista{overflow:auto;-webkit-overflow-scrolling:touch;min-height:120px;flex:1;border:1px solid var(--line);border-radius:14px;background:var(--card,#fff)}
 .cid-item{display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;border:0;border-top:1px solid var(--line);background:none;font:inherit;font-size:16px;color:inherit;text-align:left}
@@ -835,7 +836,7 @@ html,body{overflow-x:hidden}
 /* adaptação a qualquer aparelho: nada passa da largura da tela (de 320 px até tablet) */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 *,*::before,*::after{box-sizing:border-box}
-html,body{max-width:100%;overflow-x:hidden}
+html,body{max-width:100%;overflow-x:clip}
 img,video,canvas,svg{max-width:100%}
 .vista,.wrap,.dados,.lista,.kpis,.grid,.chips,.folha > div,.tela > div{min-width:0;max-width:100%}
 .dados > *,.dados .fone,.fone{min-width:0;max-width:100%}
@@ -898,7 +899,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 60;
+  var APP_VERSAO = 61;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1154,6 +1155,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     $('abas').addEventListener('click', function(e){ var b = e.target.closest('[data-aba]'); if (!b) return; if (ehProspectador() && b.dataset.aba === 'novo') return escolherNovo(); irPara(b.dataset.aba); });
     var tq = document.querySelector('#app .topo .quem'); if (tq){ tq.style.cursor = 'pointer'; tq.onclick = function(){ irPara('conta'); }; }
     var tl = document.querySelector('#app .topo .logo'); if (tl) tl.onclick = function(){ irPara('painel'); };
+    try { var temaSalvo = localStorage.getItem('nascer_tema'); if (temaSalvo === 'dark' || temaSalvo === 'light') document.documentElement.setAttribute('data-tema', temaSalvo); } catch(e){}
     $('tema').addEventListener('click', function(){
       var novo = document.documentElement.getAttribute('data-tema') === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-tema', novo);
@@ -1358,9 +1360,9 @@ button,a,label,[role=button]{touch-action:manipulation}
         var u = flags[x.i.slice(0, 6)];
         return '<button type="button" class="cid-item' + (semAcento(x.n) === semAcento(atual) ? ' atual' : '') + '" data-n="' + esc(x.n) + '">' +
           (u ? '<img class="cid-flag" loading="lazy" alt="" src="' + esc(u) + '">' : '<span class="cid-flag vazio"></span>') + '<span>' + esc(x.n) + '</span></button>';
-      }).join('') : '<p class="cid-vazio">Nenhuma cidade com esse nome.</p>';
+      }).join('') : !lista.length && busca.value.trim().length >= 2 ? '<p class="cid-vazio">Sem internet para carregar a lista. Toque abaixo para usar a cidade como foi digitada.</p><button type="button" class="cid-item" data-n="' + esc(busca.value.trim()) + '"><span>' + esc(busca.value.trim()) + '</span></button>' : '<p class="cid-vazio">Nenhuma cidade com esse nome.</p>';
     }
-    cidadesUF(uf, function(l){ lista = l; pintar(); if (!l.length) box.innerHTML = '<p class="cid-vazio">Sem internet para carregar as cidades. Tente de novo com sinal.</p>';
+    cidadesUF(uf, function(l){ lista = l; pintar(); if (!l.length) box.innerHTML = '<p class="cid-vazio">Sem internet para carregar as cidades. Digite o nome da cidade acima.</p>';
       bandeirasUF(uf, function(m){ flags = m; pintar(); }); });
     busca.addEventListener('input', pintar);
     box.addEventListener('click', function(e){ var b = e.target.closest('.cid-item'); if (!b) return; var n = b.dataset.n; f.remove(); ok(n); });
@@ -1692,10 +1694,11 @@ button,a,label,[role=button]{touch-action:manipulation}
     if (ehProspectador()) carregarProsp();   // e segue: ele também tem as próprias mães
     if (!CFG_OK || buscandoPainel || !token || navigator.onLine === false) return Promise.resolve();
     buscandoPainel = true;
-    return fetch(CFG.url + '/rest/v1/rpc/campo_painel', { method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_token: token }) })
+    var ctl = window.AbortController ? new AbortController() : null, limite = setTimeout(function(){ if (ctl) ctl.abort(); }, 20000);
+    return fetch(CFG.url + '/rest/v1/rpc/campo_painel', { method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_token: token }), signal: ctl ? ctl.signal : undefined })
       .then(function(r){ return r.json(); })
       .then(function(d){ if (d && d.clientes){ var sig = JSON.stringify(d.clientes), mudou = sig !== painelSig; painelSig = sig; painel = maiusculas(d); lsSet('campo_painel', JSON.stringify(d)); return limparApagados().then(function(){ if (mudou && aba !== 'novo' && $('vista')) telaInicial(); }); } })
-      .catch(function(){}).then(function(){ buscandoPainel = false; });
+      .catch(function(){}).then(function(){ clearTimeout(limite); buscandoPainel = false; });
   }
 
   /* ---------- início do parceiro: só o essencial (cadastrar, mães enviadas, quantas deram certo) ---------- */
@@ -2005,7 +2008,7 @@ button,a,label,[role=button]{touch-action:manipulation}
   }
   // tirar foto agora ou anexar o que a cliente mandou (WhatsApp, galeria, arquivos)
   /* ---------- vídeo de concordância (opcional) ---------- */
-  var VIDEO_MAX = 45 * 1024 * 1024;   // o envio pelo script do Google aguenta até uns 45 MB
+  var VIDEO_MAX = 30 * 1024 * 1024;   // com folga: o envio pelo script do Google trava perto de 45 MB
   function escolherVideo(d){
     var t = tela('<b>Vídeo de concordância</b><p>A cliente dizendo que concorda com os termos do contrato. Vídeo curto, de até 30 segundos.</p>' +
       '<button id="t-grava">Gravar vídeo agora</button><button class="sec2" id="t-arq">Escolher da galeria</button><button class="sec2" id="t-cancela">Cancelar</button>');
@@ -2531,6 +2534,12 @@ button,a,label,[role=button]{touch-action:manipulation}
       var msg = 'Para enviar o cadastro, falta preencher: ' + faltaDados.join(', ') + '.';
       falar(msg); alert(msg); if ($(primeiro)) $(primeiro).focus(); return;
     }
+    if (gestante()){
+      var dp = new Date(lsGet('campo_dpp') + 'T12:00:00'), hjp = new Date(); hjp.setHours(12, 0, 0, 0);
+      var faltamP = Math.round((dp - hjp) / 86400000);
+      if (faltamP < 0){ var mp0 = 'A data prevista do parto já passou. Se o bebê nasceu, marque "Já nasceu" e informe a data de nascimento.'; falar(mp0); alert(mp0); if ($('dpp')) $('dpp').focus(); return; }
+      if (faltamP > 300){ var mp1 = 'A data prevista do parto está longe demais (mais de 10 meses). Confira o ano.'; falar(mp1); alert(mp1); if ($('dpp')) $('dpp').focus(); return; }
+    }
     // bebê já nascido: só até 3 meses de vida (e a data não pode ser no futuro)
     if (!gestante()){
       var dn = new Date(lsGet('campo_crianca_nasc') + 'T12:00:00'), hj = new Date(); hj.setHours(12, 0, 0, 0);
@@ -2594,7 +2603,7 @@ button,a,label,[role=button]{touch-action:manipulation}
          .then(function(l){ envio.arquivos = l; return filaPor(envio); }).then(function(){ return histPor({ id: envio.id, token: token, cliente: envio.cliente + (comp ? ' · documentos' : ''), clienteId: comp ? comp.id : '', criado: envio.criado, enviado: null }); }).then(function(){ return envio; });
      })
      .then(function(envio){
-       fotos = {}; local = null;
+       fotos = {}; local = null; guardarRascunho();   // apaga o rascunho dessas fotos
        if (comp){ completando = null; lsSet('campo_completando', ''); if (painel) painel.clientes.forEach(function(c){ if (c.id === comp.id) c.faltaDocs = comp.faltaDocs.filter(function(k){ return envio.docs.indexOf(k) < 0; }); }); }
        else { ['campo_fone', 'campo_cpf', 'campo_cidade', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp', 'campo_nasceu'].forEach(function(k){ lsSet(k, ''); }); }
        t.remove(); aba = comp ? 'painel' : 'novo'; telaInicial(); window.scrollTo(0, 0);
@@ -3000,6 +3009,6 @@ button,a,label,[role=button]{touch-action:manipulation}
 })();
 </script>
 
-<script>/* sem zoom por gesto (iPhone) */document.addEventListener('gesturestart',function(e){e.preventDefault()});document.addEventListener('gesturechange',function(e){e.preventDefault()});var _tq=0;document.addEventListener('touchend',function(e){var n=Date.now();if(n-_tq<350)e.preventDefault();_tq=n},{passive:false});</script>
+
 </body>
 </html>
