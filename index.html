@@ -1743,6 +1743,9 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   .ficha-card>div{width:100%}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.kb-acao2{display:flex;gap:12px;justify-content:flex-end;padding:0 11px 6px}
+.kb-acao2 .kb-lnk{width:auto;font-size:10.5px;color:var(--ink-3)}
+.kb-acao2 .kb-lnk.verm:hover{color:hsl(var(--c-red))}
 /* senha gov.br na janela do card */
 .fc-senha{flex-wrap:wrap}
 .fc-senha-v{word-break:break-all;user-select:all}
@@ -2331,7 +2334,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       <div class="field"><label for="f-fato">Fato gerador</label><select id="f-fato"><option value="parto">Parto</option><option value="gestante">Ainda gestante</option><option value="adocao">Adoção</option><option value="guarda">Guarda para adoção</option><option value="natimorto">Natimorto</option><option value="aborto">Aborto não criminoso</option></select></div>
       <div class="field" hidden><label for="f-crianca">Nome da criança</label><input id="f-crianca" autocomplete="off" placeholder="Nome do bebê (se já tiver)"></div>
       <div class="field"><label for="f-cnasc" id="f-cnasc-lbl">Data de nascimento da criança</label><input id="f-cnasc" type="date"><span class="hint" id="h-prazo"></span></div>
-      <div class="field" id="f-dpp-box" hidden><label for="f-dpp">Data prevista do parto</label><input id="f-dpp" type="date"><span class="hint">A gestante pode pedir a partir de 28 dias antes do parto.</span></div>
+      <div class="field" id="f-dpp-box" hidden><label for="f-dpp">Data prevista do parto</label><input id="f-dpp" type="date"><span class="hint">A GPS vence 2 meses antes desta data.</span></div>
       <div class="field full"><label for="f-test">Testemunhas da atividade rural</label><input id="f-test" placeholder="Nome e telefone de 2 ou 3 pessoas que conhecem o trabalho dela"></div>
 
       <div class="section-lbl">Requerimento no INSS</div>
@@ -4021,7 +4024,8 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     if (e === 'pos' && posEtapaDe(r) !== 'ok'){
       var hj = iso(new Date()), parto = r.criancaNasc || (r.fatoGerador === 'gestante' ? r.dpp : '');
       if (r.fatoGerador === 'gestante' && (!parto || String(parto).slice(0, 10) > hj)){ var v = prazoGps(r); if (!v || gpsPaga(r) || v >= hj) return ''; return 'GPS atrasada há ' + (-daysUntil(v)) + ' dias'; }
-      var dp = diasDesdeIso(parto ? String(parto).slice(0, 10) > String(r.contratoEm).slice(0, 10) ? parto : r.contratoEm : r.contratoEm);
+      var etp = posEtapaDe(r); if (etp === 'prazo_gps' || etp === 'nasc' || !faltamTxt(r)) return '';
+      var dp = diasDesdeIso(parto ? String(parto).slice(0, 10) : r.contratoEm);
       return dp != null && dp > LIMITE_ETAPA.pos ? 'documentação atrasada há ' + (dp - LIMITE_ETAPA.pos) + ' dias' : '';
     }
     if (e === 'cadastro' && r.leadStatus === 'retornar' && r.retornarEm && daysUntil(r.retornarEm) > 0) return '';
@@ -4052,11 +4056,20 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     var e = POS_LEGADO[r.posEtapa] || r.posEtapa;
     if (e === 'regularizada') e = r.certidaoRecebida ? 'ok' : 'nasc';
     if (POS_ORDEM.indexOf(e) < 0) e = 'senha';
-    if (nascido(r)){ if (POS_SO_GESTANTE[e]) e = r.certidaoRecebida ? 'ok' : 'cert'; return e; }
-    var hj = iso(new Date()), mudou = diaLocal(r.posMudouEm), parto = String(r.dpp || '').slice(0, 10);
-    if (parto && parto <= hj && POS_ORDEM.indexOf(e) < POS_ORDEM.indexOf('cert') && (!mudou || mudou < parto)) return 'cert';
-    if (gpsPaga(r) && (e === 'prazo_gps' || e === 'gps')) return 'nasc';
-    if (e === 'prazo_gps' && gatilhoGps(r) && gatilhoGps(r) <= hj) return 'gps';
+    var hj = iso(new Date()), mudou = diaLocal(r.posMudouEm), antes = function(a){ return POS_ORDEM.indexOf(e) < POS_ORDEM.indexOf(a); };
+    // bebê já nascido (inclusive antes do contrato): vai para Solicitar Certidão; se alguém arrastou de volta depois do nascimento, respeita
+    if (nascido(r)){
+      if (POS_SO_GESTANTE[e]) e = r.certidaoRecebida ? 'ok' : 'cert';
+      var nasc = String(r.criancaNasc || '').slice(0, 10);
+      if (antes('cert') && (!mudou || (nasc && mudou < nasc))) return 'cert';
+      return e;
+    }
+    var parto = String(r.dpp || '').slice(0, 10), g = gatilhoGps(r);
+    if (parto && parto <= hj && antes('cert') && (!mudou || mudou < parto)) return 'cert';
+    // GPS paga: vai para Aguardando Nascimento de qualquer coluna anterior (só para a frente)
+    if (gpsPaga(r) && antes('nasc')) return 'nasc';
+    // prazo da GPS chegou: pula uma vez só; quem arrastou de volta depois do pulo fica onde deixou
+    if (e === 'prazo_gps' && g && g <= hj && (!mudou || mudou < g)) return 'gps';
     return e;
   }
   var ctrQ2 = '';
@@ -4077,7 +4090,10 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     var acao = gpsTarefa(r) ? '<button type="button" class="kb-btn" data-guia-paga="' + esc(r.id) + '">' + svgI('i-cash') + 'Marcar GPS paga</button>'
       : et === 'cert' ? '<button type="button" class="kb-btn" data-pv-cert="' + esc(r.id) + '">' + svgI('i-check') + 'Recebi a certidão</button>'
       : et === 'ok' ? '<button type="button" class="kb-btn" data-pv-enc="' + esc(r.id) + '" title="Manda para a Controladoria: se estiver OK, vai para o protocolo; se não, volta para regularizar">' + svgI('i-file') + 'Encaminhar para análise</button>' : '';
+    if (r.pvAnalise === 'devolvido' && et !== 'ok' && !gpsTarefa(r) && et !== 'cert') acao = '<button type="button" class="kb-btn" data-pv-enc="' + esc(r.id) + '">' + svgI('i-file') + 'Encaminhar para análise</button>';
+    if (r.pvProblema) al.unshift('Problema: ' + r.pvProblema);
     return kbCard(r, { arrasta: true, resp: r.posResp || r.contratoPor, dias: d, parado: d > 14,
+      acoes2: botoesCaso(r),
       linhas: [linhaParto(r), linhaGps(r), linhaLugar(r), linhaDocs(r),
         r.pvAnalise === 'devolvido' ? '<p class="verm quebra" title="' + esc(r.analiseMotivo || '') + '">Devolvida pela Controladoria' + (r.analiseMotivo ? ': ' + esc(r.analiseMotivo) : '') + '</p>' : '',
         atr ? '<p class="verm">' + esc(atr.charAt(0).toUpperCase() + atr.slice(1)) + '</p>' : ''],
@@ -4129,9 +4145,31 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     if (et === 'redigindo') return '<button type="button" class="kb-btn" data-fila="enviar" data-id="' + id + '">' + svgI('i-send') + 'Enviar para protocolo</button>';
     return '<button type="button" class="kb-btn" data-fila="protocolar" data-id="' + id + '">' + svgI('i-file') + 'Registrar protocolo</button>';
   }
+  // como no BI de Vendas: registrar um problema (aparece em vermelho no cartão) e marcar a perda com motivo
+  function botoesCaso(r){ var id = esc(r.id); return '<button type="button" class="kb-lnk" data-pv-prob="' + id + '">' + (r.pvProblema ? 'Editar problema' : 'Registrar problema') + '</button><button type="button" class="kb-lnk verm" data-pv-perda="' + id + '">Marcar como perda</button>'; }
+  document.addEventListener('click', async function(e){
+    var bp = e.target.closest && e.target.closest('[data-pv-prob],[data-pv-perda],[data-pv-volta]'); if (!bp) return;
+    e.stopPropagation();
+    var r = acharRow(bp.dataset.pvProb || bp.dataset.pvPerda || bp.dataset.pvVolta); if (!r) return;
+    var ag = new Date().toISOString(), p, msg;
+    if (bp.dataset.pvProb){
+      var t = window.prompt('Qual é o problema? (deixe em branco para tirar o aviso)', r.pvProblema || ''); if (t === null) return;
+      p = { pvProblema: String(t).trim().slice(0, 300), atualizadoEm: ag }; msg = p.pvProblema ? 'Problema registrado: ' + r.nome : 'Aviso de problema retirado: ' + r.nome;
+    } else if (bp.dataset.pvPerda){
+      var m = String(window.prompt('Marcar ' + (r.nome || 'a cliente') + ' como perda. Qual o motivo? (obrigatório)', '') || '').trim();
+      if (m.length < 3){ if (m) toast('Escreva o motivo da perda.'); return; }
+      p = { arquivado: true, arquivadoEm: iso(new Date()), motivoArquivo: m.slice(0, 300), perdaEtapa: naFila(r) ? 'fila' : 'pos', perdaPor: meuNome(), atualizadoEm: ag };
+      msg = r.nome + ' foi para Perdas e desqualificados';
+    } else {
+      p = { arquivado: false, arquivadoEm: '', motivoArquivo: '', perdaEtapa: '', perdaPor: '', atualizadoEm: ag }; msg = r.nome + ' voltou para ' + (r.perdaEtapa === 'fila' ? 'a Fila de protocolo' : 'o Pós-venda');
+    }
+    var antes = antesDe(r, p);
+    try { await patchRow(r.id, p); toast(msg, 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); }); } catch(err){ toast(errMsg(err)); }
+  }, true);
   function filaCard(r){
     var et = filaEtapaDe(r), d = diasParado(r);
     return kbCard(r, { arrasta: true, resp: r.filaPor, dias: d == null ? 0 : d, parado: d != null && d > LIMITE_ETAPA.fila,
+      alertas: r.pvProblema ? ['Problema: ' + r.pvProblema] : [], acoes2: botoesCaso(r),
       linhas: [linhaParto(r), linhaGps(r), linhaLugar(r), linhaDocs(r)],
       acoes: filaBotoes(r) + (et !== 'para_analisar' ? '<button type="button" class="kb-lnk" data-fila="voltar" data-id="' + esc(r.id) + '">Voltar etapa</button>' : '') });
   }
@@ -4168,14 +4206,14 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     var antes = { pvAnalise: r.pvAnalise || '', filaEtapa: r.filaEtapa || '', filaMudouEm: r.filaMudouEm || '', filaPor: r.filaPor || '', analiseMotivo: r.analiseMotivo || '', analisePor: r.analisePor || '' };
     var p = { filaMudouEm: ag, filaPor: meuNome(), atualizadoEm: ag }, msg = '';
     if (acao === 'iniciar'){ p.filaEtapa = 'analise'; msg = 'Em análise'; }
-    else if (acao === 'aprovar'){ p.filaEtapa = 'fazer_requerimento'; p.pvAnalise = 'aprovado'; p.analisePor = meuNome(); p.analiseEm = ag; msg = 'Aprovada: fazer requerimento'; }
+    else if (acao === 'aprovar'){ p.filaPor = ''; p.filaEtapa = 'fazer_requerimento'; p.pvAnalise = 'aprovado'; p.analisePor = meuNome(); p.analiseEm = ag; msg = 'Aprovada: fazer requerimento'; }
     else if (acao === 'devolver'){
       var mot = String(window.prompt('Por que está devolvendo ao Pós-venda? (obrigatório)', '') || '').trim();
       if (mot.length < 3){ if (mot) toast('Escreva o motivo da devolução.'); return; }
       p.pvAnalise = 'devolvido'; p.analiseMotivo = mot.slice(0, 300); p.analisePor = meuNome(); p.analiseEm = ag; p.filaEtapa = ''; msg = 'Devolvida ao Pós-venda';
     }
     else if (acao === 'redigir'){ p.filaEtapa = 'redigindo'; msg = 'Redigindo requerimento'; }
-    else if (acao === 'enviar'){ p.filaEtapa = 'protocolar'; msg = 'Pronta para protocolar'; }
+    else if (acao === 'enviar'){ p.filaPor = ''; p.filaEtapa = 'protocolar'; msg = 'Pronta para protocolar'; }
     else if (acao === 'voltar'){ p.filaEtapa = destino || FILA_ORDEM[Math.max(0, FILA_ORDEM.indexOf(et) - 1)]; if (FILA_ORDEM.indexOf(p.filaEtapa) < 2) p.pvAnalise = 'em_analise'; msg = 'Voltou uma etapa'; }
     try { await patchRow(id, p); toast(msg + ': ' + r.nome, 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); }); } catch(err){ toast(errMsg(err)); }
   }
@@ -4269,7 +4307,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
           '<td><span class="pill crit">' + (desqualificada(r) ? 'Desqualificado' : 'Perda') + '</span></td>' +
           '<td class="tnum">' + (d ? fmtDate(d) : '—') + '</td>' +
           '<td><div class="desq-motivo" title="' + esc(m) + '">' + (m ? esc(m) : '<small>Sem motivo registrado</small>') + '</div></td>' +
-          '<td><div class="cad-acoes">' + (podeReativar(r) ? '<button type="button" class="btn" data-act="reativar" data-id="' + id + '" title="Volta para o Cadastro como novo lead">Reativar</button>' : '') +
+          '<td><div class="cad-acoes">' + (podeReativar(r) ? '<button type="button" class="btn" data-act="reativar" data-id="' + id + '" title="Volta para o Cadastro como novo lead">Reativar</button>' : r.perdaEtapa ? '<button type="button" class="btn" data-pv-volta="' + id + '" title="Desfaz a perda: volta para onde estava">Desfazer perda</button>' : '') +
           '<button type="button" class="ico-btn" data-act="edit" data-id="' + id + '" title="Editar cadastro" aria-label="Editar ' + esc(r.nome) + '"><svg class="i"><use href="#i-pencil"/></svg></button></div></td></tr>';
       }).join('') || '<tr><td colspan="6" class="empty">' + (todos.length ? 'Nenhuma cliente neste filtro.' : 'Ninguém por aqui até agora. Quem for desqualificado ou perdido no Cadastro aparece nesta página.') + '</td></tr>') + '</tbody></table>');
   }
@@ -4679,6 +4717,8 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     for (var i = 0; i < els.length; i++) els[i].textContent = cronTexto(+els[i].getAttribute('data-fim') - t);
   }, 1000);
   /* ---------- avisos para a equipe ---------- */
+  // prazo de uma tarefa: N dias depois de a cliente entrar na etapa (vermelho no texto quando passou)
+  function prazoTarefa(desde, n){ var b = diaLocal(desde); if (!b) return 'sem data'; var d = parseDate(b); if (!d) return 'sem data'; d.setDate(d.getDate() + n); var v = iso(d); return fmtDate(v) + (v < iso(new Date()) ? ' (atrasada)' : ''); }
   function avisosLista(){
     var a = [], hoje = iso(new Date());
     var add = function(tipo, r, txt){ a.push({ tipo: tipo, id: r.id, nome: r.nome || 'Sem nome', txt: txt }); };
@@ -4693,7 +4733,13 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       if (gpsTarefa(r)) add('Pagar a GPS', r, (prazoGps(r) ? 'vence ' + fmtDate(prazoGps(r)) + ' · parto ' + fmtDate(r.dpp) : 'sem data do parto') + comResp);
       if (noContratos(r) && r.fatoGerador === 'gestante' && !r.criancaNasc && !r.dpp) add('Informar a data do parto', r, 'gestante sem data prevista');
       if (noContratos(r) && posEtapaDe(r) === 'cert') add('Falar com a mãe: pedir a certidão', r, (r.criancaNasc ? 'nasceu em ' + fmtDate(r.criancaNasc) : 'parto previsto ' + fmtDate(r.dpp)) + comResp);
-      if (naFila(r) && filaEtapaDe(r) === 'para_analisar') add('Para a Controladoria analisar', r, 'encaminhada ' + fmtDate(String(r.encaminhadoEm || '').slice(0, 10)));
+      if (naFila(r) && filaEtapaDe(r) === 'para_analisar') add('Para a Controladoria analisar', r, 'encaminhada ' + fmtDate(diaLocal(r.encaminhadoEm)) + ' · prazo ' + prazoTarefa(r.encaminhadoEm, 2));
+      if (naFila(r) && filaEtapaDe(r) === 'analise') add('Analisar a documentação', r, 'prazo ' + prazoTarefa(r.filaMudouEm, 2) + (r.filaPor ? ' · responsável: ' + primeiroNome(r.filaPor) : ''));
+      if (naFila(r) && (filaEtapaDe(r) === 'fazer_requerimento' || filaEtapaDe(r) === 'redigindo')) add('Redigir o requerimento', r, 'prazo ' + prazoTarefa(r.filaMudouEm, 3) + (r.filaPor ? ' · responsável: ' + primeiroNome(r.filaPor) : ''));
+      if (naFila(r) && filaEtapaDe(r) === 'protocolar') add('Protocolar no INSS', r, 'prazo ' + prazoTarefa(r.filaMudouEm, 2));
+      if (noInss(r) && r.der && !String(r.protocoloInss || '').trim() && (diasDesdeIso(r.der) || 0) >= 7) add('Pôr o número do protocolo', r, 'requerido em ' + fmtDate(r.der) + ' e ainda sem número');
+      if (noContratos(r) && faltamTxt(r) && (diasDesdeIso(r.contratoEm) || 0) >= 5 && (diasDesdeIso(r.ultimoContatoEm) == null || diasDesdeIso(r.ultimoContatoEm) >= 5)) add('Cobrar documentos da mãe', r, 'falta: ' + faltamTxt(r) + comResp);
+      if (r.pvProblema && (noContratos(r) || naFila(r))) add('Problema registrado', r, r.pvProblema);
       if (r.pvAnalise === 'devolvido' && noContratos(r)) add('Devolvida pela Controladoria', r, r.analiseMotivo || '');
       if (atrasada(r)) add('Parada além do prazo', r, atrasoTxt(r));
       if (r.fatoGerador === 'gestante' && !r.criancaNasc && r.dpp){ var p = daysUntil(r.dpp); if (p != null && (p < -45 || p > 300)) add('Data para conferir', r, 'parto previsto ' + fmtDate(r.dpp) + (p < 0 ? ' (já passou: o bebê nasceu?)' : ' (muito distante)')); }
@@ -4708,7 +4754,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function abrirAvisos(){
     var l = avisosLista(), grupos = {};
     l.forEach(function(x){ (grupos[x.tipo] = grupos[x.tipo] || []).push(x); });
-    var ordem = ['Parto perto e sem contrato', 'Pagar a GPS', 'Informar a data do parto', 'Falar com a mãe: pedir a certidão', 'Devolvida pela Controladoria', 'Para a Controladoria analisar', 'Exigência do INSS vencendo', 'Parada além do prazo', 'Cadastro repetido', 'Data para conferir'];
+    var ordem = ['Parto perto e sem contrato', 'Problema registrado', 'Pagar a GPS', 'Informar a data do parto', 'Falar com a mãe: pedir a certidão', 'Cobrar documentos da mãe', 'Devolvida pela Controladoria', 'Para a Controladoria analisar', 'Analisar a documentação', 'Redigir o requerimento', 'Protocolar no INSS', 'Pôr o número do protocolo', 'Exigência do INSS vencendo', 'Parada além do prazo', 'Cadastro repetido', 'Data para conferir'];
     var f = document.createElement('div'); f.className = 'cid-sheet av-sheet';
     f.innerHTML = '<div><div class="av-cab"><b>Avisos</b><span>' + (l.length ? l.length + (l.length === 1 ? ' ponto para olhar' : ' pontos para olhar') : 'Nada pendente agora') + '</span></div><div class="lista av-lista">' +
       ordem.filter(function(k){ return grupos[k]; }).map(function(k){ return '<div class="av-g"><b>' + esc(k) + ' <span class="tnum">' + grupos[k].length + '</span></b>' + grupos[k].map(function(x){ return '<button type="button" data-av="' + esc(x.id) + '"><span>' + esc(x.nome) + '</span><small>' + esc(x.txt) + '</small></button>'; }).join('') + '</div>'; }).join('') +
@@ -4776,7 +4822,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   document.addEventListener('click', function(e){
     var p = e.target.closest && e.target.closest('#rel-per button[data-p]'); if (p){ relPer = p.dataset.p; renderRelatorio(); return; }
     var m = e.target.closest && e.target.closest('[data-minhas]'); if (m){ soMinhas = !soMinhas; Array.prototype.forEach.call(document.querySelectorAll('[data-minhas]'), function(b){ b.setAttribute('aria-pressed', String(soMinhas)); b.classList.toggle('primary', soMinhas); }); render(); return; }
-    var g = e.target.closest && e.target.closest('[data-guia-paga]'); if (g){ e.stopPropagation(); var rg = acharRow(g.dataset.guiaPaga); if (!rg) return; var ga = iso(new Date()), etg = posEtapaDe(rg), anda = etg === 'gps' || etg === 'prazo_gps', pg = { guiaStatus: 'paga', guiaPagaEm: ga, posResp: meuNome(), posRespEmail: meuEmail(), atualizadoEm: new Date().toISOString() }; if (anda){ pg.posEtapa = 'nasc'; pg.posMudouEm = new Date().toISOString(); } var antesG = antesDe(rg, pg); patchRow(rg.id, pg).then(function(){ toast('GPS paga: ' + rg.nome + (anda ? ' foi para Aguardando Nascimento' : ''), 'Desfazer', function(){ patchRow(rg.id, antesG).catch(function(e3){ toast(errMsg(e3)); }); }); }).catch(function(e2){ toast(errMsg(e2)); }); return; }
+    var g = e.target.closest && e.target.closest('[data-guia-paga]'); if (g){ e.stopPropagation(); var rg = acharRow(g.dataset.guiaPaga); if (!rg) return; var ga = iso(new Date()), etg = posEtapaDe(rg), anda = POS_ORDEM.indexOf(etg) < POS_ORDEM.indexOf('nasc'), pg = { guiaStatus: 'paga', guiaPagaEm: ga, posResp: meuNome(), posRespEmail: meuEmail(), atualizadoEm: new Date().toISOString() }; if (anda){ pg.posEtapa = 'nasc'; pg.posMudouEm = new Date().toISOString(); } var antesG = antesDe(rg, pg); patchRow(rg.id, pg).then(function(){ toast('GPS paga: ' + rg.nome + (anda ? ' foi para Aguardando Nascimento' : ''), 'Desfazer', function(){ patchRow(rg.id, antesG).catch(function(e3){ toast(errMsg(e3)); }); }); }).catch(function(e2){ toast(errMsg(e2)); }); return; }
     if (e.target.closest && e.target.closest('#btn-avisos')) abrirAvisos();
   }, true);
   /* ---------- peças do quadro (as mesmas da aba Processos do BI de Vendas) ---------- */
@@ -4817,7 +4863,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       '<div class="kb-top"><p class="kb-nome" title="' + esc(r.nome || '') + '">' + esc(r.nome || 'Sem nome') + '</p>' +
         '<div class="kb-linhas">' + (o.linhas || []).filter(Boolean).join('') + '</div>' +
         (o.alertas || []).map(function(t){ return '<div class="kb-alerta">' + svgI('i-alert') + '<span>' + esc(t) + '</span></div>'; }).join('') + '</div>' +
-      (o.acoes ? '<div class="kb-acao">' + o.acoes + '</div>' : '') +
+      (o.acoes ? '<div class="kb-acao">' + o.acoes + '</div>' : '') + (o.acoes2 ? '<div class="kb-acao2">' + o.acoes2 + '</div>' : '') +
       '<div class="kb-rodape"><span class="kb-resp">' + (resp ? '<span class="kb-av" title="' + esc(resp) + '">' + esc(iniciais(resp)) + '</span><span>' + esc(primeiroNome(resp)) + '</span>' : '<span class="kb-av sem" title="Sem responsável">?</span>') + '</span>' +
         '<span class="kb-dir">' + (d != null ? '<span class="kb-dias' + (o.parado ? ' parado' : '') + '" title="Há ' + d + (d === 1 ? ' dia' : ' dias') + ' ' + esc(o.diasTit || 'nesta etapa') + '">' + svgI('i-clock') + d + ' d ' + esc(o.diasRot || 'na etapa') + (o.parado ? ' · parado' : '') + '</span>' : '') + kbPasta(r) + (o.mover || '') + '</span></div></article>';
   }
