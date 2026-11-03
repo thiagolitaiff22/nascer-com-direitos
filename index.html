@@ -1744,6 +1744,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 .kb-acao2{display:flex;gap:12px;justify-content:flex-end;padding:0 11px 6px}
+.kb-rep{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:11px}
 .kb-acao2 .kb-lnk{width:auto;font-size:10.5px;color:var(--ink-3)}
 .kb-acao2 .kb-lnk.verm:hover{color:hsl(var(--c-red))}
 /* senha gov.br na janela do card */
@@ -2817,7 +2818,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function desqualificada(r){ return r.leadStatus === 'desqualificado' && !r.contratoEm && !r.arquivado; }
   // INSS: requerimento feito, ainda sem ação judicial
   // contrato fechado com a documentação toda ok: sai de Contratos fechados e vai para o INSS redigir o requerimento
-  function prontoRequerer(r){ return naFila(r) && ['fazer_requerimento', 'redigindo', 'protocolar'].indexOf(r.filaEtapa) >= 0; }
+  function prontoRequerer(r){ return naFila(r) && filaEtapaDe(r) === 'protocolar'; }
   function noInss(r){ return !String(r.processo || '').trim() && !r.arquivado && requerido(r); }
   function passEtapaCl(r, f){
     if (!noControle(r)) return false;
@@ -2941,10 +2942,13 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   // documentos que o parceiro não fotografou (o aplicativo grava em faltaDocs)
   var DOC_FALTA = { procuracao: 'Procuração', rg_frente: 'RG', cpf: 'CPF', titulo: 'Título de eleitor', certidao: 'Certidão de nascimento', residencia: 'Comprovante de residência', autodeclaracao: 'Autodeclaração rural', rural: 'Provas de atividade rural', ctps: 'CTPS / contribuições', cliente: 'Foto da cliente' };
   // documentos que o aplicativo pede e o que veio de cada um (campoDocs = fotos enviadas pelo app)
-  var DOCS_APP = [['rg_frente', 'RG'], ['cpf', 'CPF'], ['titulo', 'Título de eleitor'], ['residencia', 'Comprovante de residência'], ['rural', 'Provas de atividade rural']];
+  var DOCS_APP = [['senha', 'Senha gov.br'], ['rg_frente', 'RG'], ['cpf', 'CPF'], ['titulo', 'Título de eleitor'], ['residencia', 'Comprovante de residência'], ['rural', 'Provas de atividade rural']];
+  DOC_FALTA.senha = 'Senha gov.br';
   function docsApp(r){
     var campo = Array.isArray(r.campoDocs) ? r.campoDocs : null, antigo = Array.isArray(r.faltaDocs) ? r.faltaDocs : null;
-    return DOCS_APP.map(function(d){
+    // o escritório atende segurada urbana: prova rural só conta para quem é segurada especial (ou se veio mesmo assim)
+    return DOCS_APP.filter(function(d){ return d[0] !== 'rural' || r.tipoSegurada === 'especial' || (campo && campo.indexOf('rural') >= 0); }).map(function(d){
+      if (d[0] === 'senha') return { k: 'senha', n: d[1], ok: !!r.senhaGovOk || !!(campo && campo.indexOf('senha') >= 0) };
       var ok = campo ? campo.indexOf(d[0]) >= 0 : (r.docsCompletos === true || (r.origem === 'campo' && antigo && antigo.indexOf(d[0]) < 0));   // cadastro antigo do app: vale o que não estava na lista de faltantes
       return { k: d[0], n: d[1], ok: !!ok };
     });
@@ -3166,6 +3170,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       var r = await SB.rpc('senha_gov_ler', { p_cliente: c.id }); if (r.error) throw r.error;
       if (cardAberto !== c) return;
       c.senha = r.data ? { fase: 'ok', valor: r.data } : { fase: 'vazia' };
+      var rl = acharRow(c.id); if (rl && !!r.data !== !!rl.senhaGovOk) patchRow(c.id, { senhaGovOk: !!r.data, atualizadoEm: new Date().toISOString() }).catch(function(){});
     } catch(err){ if (cardAberto !== c) return; c.senha = { fase: err && err.code === 'PGRST202' ? 'sem_cofre' : 'erro' }; }
     pintarSenha();
   }
@@ -3179,6 +3184,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       var r = await SB.rpc('senha_gov_gravar', { p_cliente: c.id, p_senha: nova }); if (r.error) throw r.error;
       if (cardAberto !== c) return;
       c.senha = { fase: 'ok', valor: nova }; pintarSenha();
+      var rs = acharRow(c.id); if (rs && !rs.senhaGovOk) patchRow(c.id, { senhaGovOk: true, atualizadoEm: new Date().toISOString() }).catch(function(){});
       toast('Senha do gov.br salva');
     } catch(err){ if (cardAberto === c){ c.senha = volta; pintarSenha(); } toast(errMsg(err)); }
   }
@@ -3814,7 +3820,8 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
         r.nb ? '<p>NB ' + esc(r.nb) + '</p>' : '', cri ? '<p>' + cri + '</p>' : '', linhaLugar(r),
         k === 'exigencia' && r.exigenciaObs ? '<p class="quebra" title="' + esc(r.exigenciaObs) + '">' + esc(r.exigenciaObs) + '</p>' : '',
         k === 'indeferido' && r.motivoIndeferimento ? '<p class="verm quebra" title="' + esc(r.motivoIndeferimento) + '">' + esc(r.motivoIndeferimento) + '</p>' : '',
-        k === 'concedido' ? '<p class="ok">' + (r.pagamento === 'pago' ? 'Pago' : 'Acompanhe o pagamento no Financeiro') + '</p>' : ''],
+        k === 'concedido' ? '<p class="ok">' + (r.repasse && r.repasse.data ? 'Acerto feito' : r.recebimento && r.recebimento.data ? 'Benefício pago em ' + fmtDate(r.recebimento.data) : 'Aguardando o pagamento do benefício') + '</p>' : ''],
+      acoes2: k === 'concedido' && isAdmin() ? '<span class="kb-rep">' + repasseCell(r) + '</span>' : '',
       alertas: al, acoes: acao,
       mover: kbMover('<select data-inss="' + id + '" aria-label="Situação no INSS de ' + esc(r.nome) + '">' + Object.keys(INSS).map(function(x){ return '<option value="' + x + '"' + (x === k ? ' selected' : '') + '>' + INSS[x][0] + '</option>'; }).join('') + '</select>') });
   }
@@ -4047,15 +4054,15 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   }
   function editBtn(r){ return '<button type="button" class="ico-btn" data-act="edit" data-id="' + esc(r.id) + '" title="Editar cadastro" aria-label="Editar ' + esc(r.nome) + '"><svg class="i"><use href="#i-pencil"/></svg></button>'; }
   /* ---------- Pós-venda (Kanban): regulariza a documentação de quem fechou contrato ---------- */
-  var POS_COLS = [['senha', 'Senha Meu INSS'], ['docs', 'Documentação Pessoal'], ['prazo_gps', 'Aguardando Prazo da GPS'], ['gps', 'Emitir/Pagar GPS'], ['nasc', 'Aguardando Nascimento'], ['cert', 'Solicitar Certidão de Nascimento'], ['ok', 'Documentação OK']];
-  var POS_ORDEM = POS_COLS.map(function(c){ return c[0]; }), POS_LEGADO = { recem: 'senha', falta_gov: 'senha', falta_doc: 'docs', rural: 'docs', guia: 'gps' };
+  var POS_COLS = [['docs', 'Coletando documentos'], ['prazo_gps', 'Aguardando Prazo da GPS'], ['gps', 'Emitir/Pagar GPS'], ['nasc', 'Aguardando Nascimento'], ['cert', 'Solicitar Certidão de Nascimento'], ['ok', 'Documentação OK']];
+  var POS_ORDEM = POS_COLS.map(function(c){ return c[0]; }), POS_LEGADO = { senha: 'docs', recem: 'docs', falta_gov: 'docs', falta_doc: 'docs', rural: 'docs', guia: 'gps' };
   var POS_SO_GESTANTE = { prazo_gps: 1, gps: 1, nasc: 1 };
   function posLane(r){ return nascido(r) ? 'nasc' : 'gest'; }
   // a coluna vem do que foi gravado, mais o que as datas mandam (só anda para frente)
   function posEtapaDe(r){
     var e = POS_LEGADO[r.posEtapa] || r.posEtapa;
     if (e === 'regularizada') e = r.certidaoRecebida ? 'ok' : 'nasc';
-    if (POS_ORDEM.indexOf(e) < 0) e = 'senha';
+    if (POS_ORDEM.indexOf(e) < 0) e = 'docs';
     var hj = iso(new Date()), mudou = diaLocal(r.posMudouEm), antes = function(a){ return POS_ORDEM.indexOf(e) < POS_ORDEM.indexOf(a); };
     // bebê já nascido (inclusive antes do contrato): vai para Solicitar Certidão; se alguém arrastou de volta depois do nascimento, respeita
     if (nascido(r)){
@@ -4065,6 +4072,8 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       return e;
     }
     var parto = String(r.dpp || '').slice(0, 10), g = gatilhoGps(r);
+    // documentação completa (com a senha gov.br): segue sozinha para a GPS
+    if (e === 'docs' && !faltamTxt(r)) e = 'prazo_gps';
     if (parto && parto <= hj && antes('cert') && (!mudou || mudou < parto)) return 'cert';
     // GPS paga: vai para Aguardando Nascimento de qualquer coluna anterior (só para a frente)
     if (gpsPaga(r) && antes('nasc')) return 'nasc';
@@ -4076,7 +4085,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function diasNoPos(r){
     var et = posEtapaDe(r), base = String(r.posMudouEm || r.contratoEm || '');
     if (et !== (POS_LEGADO[r.posEtapa] || r.posEtapa)){
-      var pulo = String((et === 'gps' ? gatilhoGps(r) : et === 'cert' ? (r.criancaNasc || r.dpp) : et === 'nasc' ? r.guiaPagaEm : '') || '');
+      var pulo = String((et === 'gps' ? gatilhoGps(r) : et === 'cert' ? (r.criancaNasc || r.dpp) : et === 'nasc' ? r.guiaPagaEm : et === 'prazo_gps' ? r.docsCompletosEm : '') || '');
       if (pulo.slice(0, 10) > base.slice(0, 10)) base = pulo;
     }
     var d = diasDesdeIso(base); return d == null ? 0 : d;
@@ -4132,20 +4141,28 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       }).join('') || '<tr><td colspan="9" class="empty">Nenhuma cliente neste filtro.</td></tr>') + '</tbody></table>');
   }
   /* ---------- Fila de protocolo: um botão por etapa ---------- */
-  var FILA_COLS = [['para_analisar', 'Para analisar'], ['analise', 'Em análise'], ['fazer_requerimento', 'Fazer requerimento'], ['redigindo', 'Redigindo requerimento'], ['protocolar', 'Protocolar', 'ok']];
-  var FILA_VAZIO = { para_analisar: 'Chega aqui quando vem do Pós-venda.', analise: 'Ninguém em análise.', fazer_requerimento: 'Aprovados esperando alguém redigir.', redigindo: 'Ninguém redigindo.', protocolar: 'Requerimentos prontos para dar entrada.' };
+  var FILA_COLS = [['conferir', 'Conferência'], ['protocolar', 'Protocolar', 'ok']];
+  var FILA_LEGADO = { para_analisar: 'conferir', analise: 'conferir', fazer_requerimento: 'protocolar', redigindo: 'protocolar' };
+  var FILA_VAZIO = { conferir: 'Chega aqui quando o Pós-venda encaminha. A Controladoria aprova ou devolve.', protocolar: 'Aprovadas: preparar o requerimento e protocolar no INSS.', para_analisar: 'Chega aqui quando vem do Pós-venda.', analise: 'Ninguém em análise.', fazer_requerimento: 'Aprovados esperando alguém redigir.', redigindo: 'Ninguém redigindo.', protocolar: 'Requerimentos prontos para dar entrada.' };
   var FILA_ORDEM = FILA_COLS.map(function(c){ return c[0]; }), filaQ = '';
-  function filaEtapaDe(r){ return FILA_ORDEM.indexOf(r.filaEtapa) >= 0 ? r.filaEtapa : 'para_analisar'; }
+  function filaEtapaDe(r){ var e = FILA_LEGADO[r.filaEtapa] || r.filaEtapa; return FILA_ORDEM.indexOf(e) >= 0 ? e : 'conferir'; }
   function podeAnalisar(){ if (isAdmin()) return true; var e = meuEmail(), u = (state.equipe || []).filter(function(x){ return String(x.email).toLowerCase() === e; })[0]; return !!u && u.cargo === 'operacional'; }
   function filaBotoes(r){
     var et = filaEtapaDe(r), id = esc(r.id);
-    if (et === 'para_analisar') return '<button type="button" class="kb-btn" data-fila="iniciar" data-id="' + id + '">' + svgI('i-search') + 'Iniciar análise</button>';
-    if (et === 'analise') return '<div class="kb-duplo"><button type="button" class="kb-btn" data-fila="aprovar" data-id="' + id + '">' + svgI('i-ok') + 'Aprovar</button><button type="button" class="kb-btn sec" data-fila="devolver" data-id="' + id + '">' + svgI('i-undo') + 'Devolver</button></div>';
+    if (et === 'conferir') return '<div class="kb-duplo"><button type="button" class="kb-btn" data-fila="aprovar" data-id="' + id + '">' + svgI('i-ok') + 'Aprovar</button><button type="button" class="kb-btn sec" data-fila="devolver" data-id="' + id + '">' + svgI('i-undo') + 'Devolver</button></div>';
     if (et === 'fazer_requerimento') return '<button type="button" class="kb-btn" data-fila="redigir" data-id="' + id + '">' + svgI('i-pencil') + 'Começar a redigir</button>';
     if (et === 'redigindo') return '<button type="button" class="kb-btn" data-fila="enviar" data-id="' + id + '">' + svgI('i-send') + 'Enviar para protocolo</button>';
     return '<button type="button" class="kb-btn" data-fila="protocolar" data-id="' + id + '">' + svgI('i-file') + 'Registrar protocolo</button>';
   }
   // como no BI de Vendas: registrar um problema (aparece em vermelho no cartão) e marcar a perda com motivo
+  // quem do Pós-venda fica com a cliente nova: a pessoa do cargo Pós-venda com menos clientes agora
+  function respPosAuto(){
+    var eq = (state.equipe || []).filter(function(u){ return u.ativo !== false && u.email && u.cargo === 'posvenda'; });
+    if (!eq.length) return null;
+    var carga = function(u){ var e = String(u.email).toLowerCase(); return state.rows.filter(function(r){ return noContratos(r) && String(r.posRespEmail || '').toLowerCase() === e; }).length; };
+    return eq.slice().sort(function(a, b){ return carga(a) - carga(b) || String(a.nome).localeCompare(String(b.nome), 'pt-BR'); })[0];
+  }
+  function respMantido(r){ return r.posResp ? { posResp: r.posResp, posRespEmail: r.posRespEmail || '' } : { posResp: meuNome(), posRespEmail: meuEmail() }; }
   function botoesCaso(r){ var id = esc(r.id); return '<button type="button" class="kb-lnk" data-pv-prob="' + id + '">' + (r.pvProblema ? 'Editar problema' : 'Registrar problema') + '</button><button type="button" class="kb-lnk verm" data-pv-perda="' + id + '">Marcar como perda</button>'; }
   document.addEventListener('click', async function(e){
     var bp = e.target.closest && e.target.closest('[data-pv-prob],[data-pv-perda],[data-pv-volta]'); if (!bp) return;
@@ -4171,10 +4188,10 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     return kbCard(r, { arrasta: true, resp: r.filaPor, dias: d == null ? 0 : d, parado: d != null && d > LIMITE_ETAPA.fila,
       alertas: r.pvProblema ? ['Problema: ' + r.pvProblema] : [], acoes2: botoesCaso(r),
       linhas: [linhaParto(r), linhaGps(r), linhaLugar(r), linhaDocs(r)],
-      acoes: filaBotoes(r) + (et !== 'para_analisar' ? '<button type="button" class="kb-lnk" data-fila="voltar" data-id="' + esc(r.id) + '">Voltar etapa</button>' : '') });
+      acoes: filaBotoes(r) + (et !== 'conferir' ? '<button type="button" class="kb-lnk" data-fila="voltar" data-id="' + esc(r.id) + '">Voltar etapa</button>' : '') });
   }
-  var FILA_SITS = [['', 'Status: todas'], ['ctrl', 'Com a Controladoria'], ['req', 'Requerimento'], ['prot', 'Protocolar'], ['par', 'Paradas há mais de 7 dias']];
-  function passaFila(r, f){ var e = filaEtapaDe(r); return !f || (f === 'ctrl' ? (e === 'para_analisar' || e === 'analise') : f === 'req' ? (e === 'fazer_requerimento' || e === 'redigindo') : f === 'prot' ? e === 'protocolar' : f === 'par' ? (diasParado(r) || 0) > LIMITE_ETAPA.fila : true); }
+  var FILA_SITS = [['', 'Status: todas'], ['ctrl', 'Na conferência'], ['prot', 'Para protocolar'], ['par', 'Paradas há mais de 7 dias']];
+  function passaFila(r, f){ var e = filaEtapaDe(r); return !f || (f === 'ctrl' ? e === 'conferir' : f === 'prot' ? e === 'protocolar' : f === 'par' ? (diasParado(r) || 0) > LIMITE_ETAPA.fila : true); }
   function renderFila(){
     var box = $('fila-list'); if (!box) return;
     var todos = state.rows.filter(naFila).filter(function(r){ return buscaOk(r, filaQ) && (!soMinhas || minha(r)) && passaFiltro(r); });
@@ -4200,13 +4217,13 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   }
   async function filaAcao(id, acao, destino){
     var r = acharRow(id); if (!r) return;
-    if ((acao === 'iniciar' || acao === 'aprovar' || acao === 'devolver') && !podeAnalisar()){ toast('A análise é feita pela Controladoria (cargo Operacional) ou por um gestor.'); return; }
+    if ((acao === 'aprovar' || acao === 'devolver') && !podeAnalisar()){ toast('A análise é feita pela Controladoria (cargo Operacional) ou por um gestor.'); return; }
     if (acao === 'protocolar'){ abrirRequerimento(r); return; }
     var et = filaEtapaDe(r), ag = new Date().toISOString();
     var antes = { pvAnalise: r.pvAnalise || '', filaEtapa: r.filaEtapa || '', filaMudouEm: r.filaMudouEm || '', filaPor: r.filaPor || '', analiseMotivo: r.analiseMotivo || '', analisePor: r.analisePor || '' };
     var p = { filaMudouEm: ag, filaPor: meuNome(), atualizadoEm: ag }, msg = '';
     if (acao === 'iniciar'){ p.filaEtapa = 'analise'; msg = 'Em análise'; }
-    else if (acao === 'aprovar'){ p.filaPor = ''; p.filaEtapa = 'fazer_requerimento'; p.pvAnalise = 'aprovado'; p.analisePor = meuNome(); p.analiseEm = ag; msg = 'Aprovada: fazer requerimento'; }
+    else if (acao === 'aprovar'){ p.filaPor = ''; p.filaEtapa = 'protocolar'; p.pvAnalise = 'aprovado'; p.analisePor = meuNome(); p.analiseEm = ag; msg = 'Aprovada: pronta para protocolar'; }
     else if (acao === 'devolver'){
       var mot = String(window.prompt('Por que está devolvendo ao Pós-venda? (obrigatório)', '') || '').trim();
       if (mot.length < 3){ if (mot) toast('Escreva o motivo da devolução.'); return; }
@@ -4214,12 +4231,12 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     }
     else if (acao === 'redigir'){ p.filaEtapa = 'redigindo'; msg = 'Redigindo requerimento'; }
     else if (acao === 'enviar'){ p.filaPor = ''; p.filaEtapa = 'protocolar'; msg = 'Pronta para protocolar'; }
-    else if (acao === 'voltar'){ p.filaEtapa = destino || FILA_ORDEM[Math.max(0, FILA_ORDEM.indexOf(et) - 1)]; if (FILA_ORDEM.indexOf(p.filaEtapa) < 2) p.pvAnalise = 'em_analise'; msg = 'Voltou uma etapa'; }
+    else if (acao === 'voltar'){ p.filaEtapa = destino || FILA_ORDEM[Math.max(0, FILA_ORDEM.indexOf(et) - 1)]; if (p.filaEtapa === 'conferir') p.pvAnalise = 'em_analise'; msg = 'Voltou para a conferência'; }
     try { await patchRow(id, p); toast(msg + ': ' + r.nome, 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); }); } catch(err){ toast(errMsg(err)); }
   }
   async function encaminharAnalise(id){
     var r = acharRow(id); if (!r) return;
-    var ag = new Date().toISOString(), p = { pvAnalise: 'em_analise', filaEtapa: 'para_analisar', filaMudouEm: ag, filaPor: '', analiseMotivo: '', encaminhadoEm: ag, posResp: meuNome(), posRespEmail: meuEmail(), atualizadoEm: ag };
+    var ag = new Date().toISOString(), p = { pvAnalise: 'em_analise', filaEtapa: 'conferir', filaMudouEm: ag, filaPor: '', analiseMotivo: '', encaminhadoEm: ag, posResp: respMantido(r).posResp, posRespEmail: respMantido(r).posRespEmail, atualizadoEm: ag };
     var faltam = docsApp(r).filter(function(x){ return !x.ok; });
     if (gpsVencida(r) && !window.confirm('A GPS de ' + (r.nome || 'a cliente') + ' venceu em ' + fmtDate(gpsVencida(r)) + ' e não está marcada como paga.\n\nEncaminhar mesmo assim?')) return;
     if (faltam.length){
@@ -4231,7 +4248,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   }
   async function receberCertidao(id){
     var r = acharRow(id); if (!r) return;
-    var ag = new Date().toISOString(), p = { certidaoRecebida: true, certidaoEm: iso(new Date()), posEtapa: 'ok', posMudouEm: ag, posResp: meuNome(), posRespEmail: meuEmail(), atualizadoEm: ag };
+    var ag = new Date().toISOString(), p = { certidaoRecebida: true, certidaoEm: iso(new Date()), posEtapa: 'ok', posMudouEm: ag, posResp: respMantido(r).posResp, posRespEmail: respMantido(r).posRespEmail, atualizadoEm: ag };
     if (!r.criancaNasc){
       var t = String(window.prompt('Data de nascimento da criança (dd/mm/aaaa):', '') || '').trim(), m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(t);
       if (!m){ if (t) toast('Data inválida. Use dd/mm/aaaa.'); return; }
@@ -4268,7 +4285,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     if (nascido(r) && POS_SO_GESTANTE[etapa]){ toast('Bebê já nascido não passa pela GPS nem por Aguardando Nascimento.'); render(); return; }
     if (etapa === 'ok' && !r.certidaoRecebida){ toast('Use "Recebi a certidão" na coluna Solicitar Certidão de Nascimento.'); render(); return; }
     var antes = { posEtapa: r.posEtapa || '', posMudouEm: r.posMudouEm || '' };
-    var mudanca = { posEtapa: etapa, posMudouEm: new Date().toISOString(), atualizadoEm: new Date().toISOString(), posResp: meuNome(), posRespEmail: meuEmail() };
+    var mudanca = Object.assign({ posEtapa: etapa, posMudouEm: new Date().toISOString(), atualizadoEm: new Date().toISOString() }, respMantido(r));
     try {
       await patchRow(id, mudanca);
       var nome = (POS_COLS.filter(function(c){ return c[0] === etapa; })[0] || [0, etapa])[1];
@@ -4435,7 +4452,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       var antes = { contratoEm: r.contratoEm || '', leadStatus: r.leadStatus || '', contratoPor: r.contratoPor || '', contratoPorEmail: r.contratoPorEmail || '', fatoGerador: r.fatoGerador || '', posEtapa: r.posEtapa || '', propostaAceita: !!r.propostaAceita, propostaObs: r.propostaObs || '' };
       this.disabled = true;
       try {
-        var pf = { contratoEm: data, leadStatus: 'fechado', posMudouEm: '', encaminhadoEm: '', filaMudouEm: '', filaPor: '', contratoPor: atendente, contratoPorEmail: atendenteEmail, pvAnalise: '', filaEtapa: '', propostaAceita: true, propostaObs: f.querySelector('#fc-prop').value.trim(), fatoGerador: fatoNovo, posEtapa: '', contatoPrazoEm: '', atualizadoEm: new Date().toISOString() };
+        var rpa = respPosAuto(), pf = { posResp: rpa ? rpa.nome || rpa.email : '', posRespEmail: rpa ? rpa.email : '', contratoEm: data, leadStatus: 'fechado', posMudouEm: '', encaminhadoEm: '', filaMudouEm: '', filaPor: '', contratoPor: atendente, contratoPorEmail: atendenteEmail, pvAnalise: '', filaEtapa: '', propostaAceita: true, propostaObs: f.querySelector('#fc-prop').value.trim(), fatoGerador: fatoNovo, posEtapa: '', contatoPrazoEm: '', atualizadoEm: new Date().toISOString() };
         antes = antesDe(r, pf);
         await patchRow(r.id, pf);
         f.remove();
@@ -4733,10 +4750,10 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       if (gpsTarefa(r)) add('Pagar a GPS', r, (prazoGps(r) ? 'vence ' + fmtDate(prazoGps(r)) + ' · parto ' + fmtDate(r.dpp) : 'sem data do parto') + comResp);
       if (noContratos(r) && r.fatoGerador === 'gestante' && !r.criancaNasc && !r.dpp) add('Informar a data do parto', r, 'gestante sem data prevista');
       if (noContratos(r) && posEtapaDe(r) === 'cert') add('Falar com a mãe: pedir a certidão', r, (r.criancaNasc ? 'nasceu em ' + fmtDate(r.criancaNasc) : 'parto previsto ' + fmtDate(r.dpp)) + comResp);
-      if (naFila(r) && filaEtapaDe(r) === 'para_analisar') add('Para a Controladoria analisar', r, 'encaminhada ' + fmtDate(diaLocal(r.encaminhadoEm)) + ' · prazo ' + prazoTarefa(r.encaminhadoEm, 2));
-      if (naFila(r) && filaEtapaDe(r) === 'analise') add('Analisar a documentação', r, 'prazo ' + prazoTarefa(r.filaMudouEm, 2) + (r.filaPor ? ' · responsável: ' + primeiroNome(r.filaPor) : ''));
-      if (naFila(r) && (filaEtapaDe(r) === 'fazer_requerimento' || filaEtapaDe(r) === 'redigindo')) add('Redigir o requerimento', r, 'prazo ' + prazoTarefa(r.filaMudouEm, 3) + (r.filaPor ? ' · responsável: ' + primeiroNome(r.filaPor) : ''));
-      if (naFila(r) && filaEtapaDe(r) === 'protocolar') add('Protocolar no INSS', r, 'prazo ' + prazoTarefa(r.filaMudouEm, 2));
+      if (naFila(r) && filaEtapaDe(r) === 'conferir') add('Conferir a documentação', r, 'encaminhada ' + fmtDate(diaLocal(r.encaminhadoEm)) + ' · prazo ' + prazoTarefa(r.filaMudouEm || r.encaminhadoEm, 2));
+      if (naFila(r) && filaEtapaDe(r) === 'protocolar') add('Protocolar no INSS', r, 'prazo ' + prazoTarefa(r.filaMudouEm, 3) + (r.filaPor ? ' · responsável: ' + primeiroNome(r.filaPor) : ''));
+      if (ganhou(r) && !(r.recebimento && r.recebimento.data)) add('Registrar o pagamento do benefício', r, origem(r) === 'inss' ? 'concedido' + (r.inssDecisaoEm ? ' em ' + fmtDate(r.inssDecisaoEm) : '') : 'ganho no Judicial');
+      if (ganhou(r) && r.recebimento && r.recebimento.data && !(r.repasse && r.repasse.data)) add('Fazer o acerto de honorários', r, 'benefício pago em ' + fmtDate(r.recebimento.data));
       if (noInss(r) && r.der && !String(r.protocoloInss || '').trim() && (diasDesdeIso(r.der) || 0) >= 7) add('Pôr o número do protocolo', r, 'requerido em ' + fmtDate(r.der) + ' e ainda sem número');
       if (noContratos(r) && faltamTxt(r) && (diasDesdeIso(r.contratoEm) || 0) >= 5 && (diasDesdeIso(r.ultimoContatoEm) == null || diasDesdeIso(r.ultimoContatoEm) >= 5)) add('Cobrar documentos da mãe', r, 'falta: ' + faltamTxt(r) + comResp);
       if (r.pvProblema && (noContratos(r) || naFila(r))) add('Problema registrado', r, r.pvProblema);
@@ -4754,7 +4771,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function abrirAvisos(){
     var l = avisosLista(), grupos = {};
     l.forEach(function(x){ (grupos[x.tipo] = grupos[x.tipo] || []).push(x); });
-    var ordem = ['Parto perto e sem contrato', 'Problema registrado', 'Pagar a GPS', 'Informar a data do parto', 'Falar com a mãe: pedir a certidão', 'Cobrar documentos da mãe', 'Devolvida pela Controladoria', 'Para a Controladoria analisar', 'Analisar a documentação', 'Redigir o requerimento', 'Protocolar no INSS', 'Pôr o número do protocolo', 'Exigência do INSS vencendo', 'Parada além do prazo', 'Cadastro repetido', 'Data para conferir'];
+    var ordem = ['Parto perto e sem contrato', 'Problema registrado', 'Pagar a GPS', 'Informar a data do parto', 'Falar com a mãe: pedir a certidão', 'Cobrar documentos da mãe', 'Devolvida pela Controladoria', 'Conferir a documentação', 'Protocolar no INSS', 'Pôr o número do protocolo', 'Registrar o pagamento do benefício', 'Fazer o acerto de honorários', 'Exigência do INSS vencendo', 'Parada além do prazo', 'Cadastro repetido', 'Data para conferir'];
     var f = document.createElement('div'); f.className = 'cid-sheet av-sheet';
     f.innerHTML = '<div><div class="av-cab"><b>Avisos</b><span>' + (l.length ? l.length + (l.length === 1 ? ' ponto para olhar' : ' pontos para olhar') : 'Nada pendente agora') + '</span></div><div class="lista av-lista">' +
       ordem.filter(function(k){ return grupos[k]; }).map(function(k){ return '<div class="av-g"><b>' + esc(k) + ' <span class="tnum">' + grupos[k].length + '</span></b>' + grupos[k].map(function(x){ return '<button type="button" data-av="' + esc(x.id) + '"><span>' + esc(x.nome) + '</span><small>' + esc(x.txt) + '</small></button>'; }).join('') + '</div>'; }).join('') +
@@ -4789,7 +4806,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     var falta = docsApp(r).filter(function(x){ return !x.ok; }).map(function(x){ return x.n; });
     var base = 'Olá, ' + n + '! Aqui é da equipe Nascer com Direitos. ';
     if (noContratos(r) && falta.length) return base + 'Para seguir com o seu salário-maternidade, ainda falta: ' + falta.join(', ') + '. Pode mandar a foto por aqui?';
-    if (noContratos(r) && posEtapaDe(r) === 'senha') return base + 'Precisamos regularizar o seu acesso ao Meu INSS (gov.br) para seguir com o pedido. Podemos falar agora?';
+    if (noContratos(r) && posEtapaDe(r) === 'docs' && !r.senhaGovOk) return base + 'Precisamos regularizar o seu acesso ao Meu INSS (gov.br) para seguir com o pedido. Podemos falar agora?';
     if (noContratos(r) && posEtapaDe(r) === 'cert') return base + 'O bebê já nasceu? Por favor, mande a foto da certidão de nascimento para darmos entrada no seu benefício.';
     return base + 'Podemos conversar sobre o seu salário-maternidade?';
   }
@@ -4822,7 +4839,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   document.addEventListener('click', function(e){
     var p = e.target.closest && e.target.closest('#rel-per button[data-p]'); if (p){ relPer = p.dataset.p; renderRelatorio(); return; }
     var m = e.target.closest && e.target.closest('[data-minhas]'); if (m){ soMinhas = !soMinhas; Array.prototype.forEach.call(document.querySelectorAll('[data-minhas]'), function(b){ b.setAttribute('aria-pressed', String(soMinhas)); b.classList.toggle('primary', soMinhas); }); render(); return; }
-    var g = e.target.closest && e.target.closest('[data-guia-paga]'); if (g){ e.stopPropagation(); var rg = acharRow(g.dataset.guiaPaga); if (!rg) return; var ga = iso(new Date()), etg = posEtapaDe(rg), anda = POS_ORDEM.indexOf(etg) < POS_ORDEM.indexOf('nasc'), pg = { guiaStatus: 'paga', guiaPagaEm: ga, posResp: meuNome(), posRespEmail: meuEmail(), atualizadoEm: new Date().toISOString() }; if (anda){ pg.posEtapa = 'nasc'; pg.posMudouEm = new Date().toISOString(); } var antesG = antesDe(rg, pg); patchRow(rg.id, pg).then(function(){ toast('GPS paga: ' + rg.nome + (anda ? ' foi para Aguardando Nascimento' : ''), 'Desfazer', function(){ patchRow(rg.id, antesG).catch(function(e3){ toast(errMsg(e3)); }); }); }).catch(function(e2){ toast(errMsg(e2)); }); return; }
+    var g = e.target.closest && e.target.closest('[data-guia-paga]'); if (g){ e.stopPropagation(); var rg = acharRow(g.dataset.guiaPaga); if (!rg) return; var ga = iso(new Date()), etg = posEtapaDe(rg), anda = POS_ORDEM.indexOf(etg) < POS_ORDEM.indexOf('nasc'), pg = { guiaStatus: 'paga', guiaPagaEm: ga, posResp: respMantido(rg).posResp, posRespEmail: respMantido(rg).posRespEmail, atualizadoEm: new Date().toISOString() }; if (anda){ pg.posEtapa = 'nasc'; pg.posMudouEm = new Date().toISOString(); } var antesG = antesDe(rg, pg); patchRow(rg.id, pg).then(function(){ toast('GPS paga: ' + rg.nome + (anda ? ' foi para Aguardando Nascimento' : ''), 'Desfazer', function(){ patchRow(rg.id, antesG).catch(function(e3){ toast(errMsg(e3)); }); }); }).catch(function(e2){ toast(errMsg(e2)); }); return; }
     if (e.target.closest && e.target.closest('#btn-avisos')) abrirAvisos();
   }, true);
   /* ---------- peças do quadro (as mesmas da aba Processos do BI de Vendas) ---------- */
@@ -4908,7 +4925,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       linhas: ['<p><button type="button" class="copia" data-copiar="' + esc(r.processo) + '" title="Copiar o número do processo">' + esc(r.processo) + svgI('i-copy') + '</button></p>',
         r.audData ? '<div class="kb-par"><span>Audiência ' + fmtDate(r.audData) + (r.audHora ? ' · ' + esc(r.audHora) : '') + '</span>' + (isFuture(r) ? relogio(r.audData) : '') + '</div>' : '',
         r.online ? '<p>Audiência online</p>' : '', '<div class="kb-tel">' + contatoCloser(r) + '</div>', linhaLugar(r),
-        res ? '<p>' + esc(res) + '</p>' : '', r.embargos === 'opostos' ? '<p class="verm">O INSS recorreu</p>' : '', r.previsao && r.pagamento !== 'pago' ? '<p>Pagamento previsto ' + fmtDate(r.previsao) + '</p>' : '',
+        res ? '<p>' + esc(res) + '</p>' : '', ganhou(r) && isAdmin() ? '<div class="kb-rep">' + repasseCell(r) + '</div>' : '', r.embargos === 'opostos' ? '<p class="verm">O INSS recorreu</p>' : '', r.previsao && r.pagamento !== 'pago' ? '<p>Pagamento previsto ' + fmtDate(r.previsao) + '</p>' : '',
         tribunalLinha(r)] });
   }
   function pintarJudicial(list){
@@ -5680,11 +5697,11 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     try { await patchRow(r.id, { previsao: inp.value || '', atualizadoEm: new Date().toISOString() }); toast(inp.value ? 'Previsão de pagamento: ' + fmtDate(inp.value) + ' · ' + r.nome : 'Previsão apagada · ' + r.nome); }
     catch(err){ inp.value = r.previsao || ''; toast(errMsg(err)); }
   });
-  $('fin-body').addEventListener('click', function(e){
+  ['fin-body', 'inss-list', 'list'].forEach(function(lst){ $(lst).addEventListener('click', function(e){
     var b = e.target.closest('[data-rep]'); if (!b) return; e.stopPropagation();
     var r = state.rows.filter(function(x){ return x.id === b.dataset.id; })[0]; if (!r) return;
     if (b.dataset.rep === 'caiu') abrirRec(r); else abrirRep(r);
-  }, true);
+  }, true); });
 
   /* valor por extenso (reais) */
   function extenso(v){
