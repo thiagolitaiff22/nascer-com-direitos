@@ -2089,6 +2089,12 @@ html[data-fx="novo"] .dn-fasesl b{font-weight:600;color:var(--ink)}
 html[data-fx="novo"] .content.dash-sem-cab > .ph{display:none}
 
 html[data-fx="novo"] .dn-topo .dn-alterna{order:5}
+
+/* Dashboard do fluxo novo: título na mesma linha do período */
+html[data-fx="novo"] .dn-h1{order:0;margin:0;display:inline-flex;align-items:center;gap:10px;font-size:20px;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+html[data-fx="novo"] .dn-h1-ico{width:36px;height:36px;display:grid;place-items:center;border:1px solid hsl(var(--c-line)/.7);border-radius:8px;background:hsl(var(--c-card));color:var(--ink-3)}
+html[data-fx="novo"] .dn-h1-ico .i{width:18px;height:18px}
+html[data-fx="novo"] .dn-sep{order:0;width:1px;height:24px;margin:0 6px;background:hsl(var(--c-line))}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -5647,7 +5653,7 @@ html[data-fx="novo"] .dn-topo .dn-alterna{order:5}
     var res = resumoFases(), html = '';
     var curta = function(d, ano){ var p = String(d).split('-'); return p[2] + '/' + p[1] + (ano ? '/' + p[0].slice(2) : ''); };
     var faixa = j.ini ? (j.ini === j.fim ? curta(j.fim, 1) : curta(j.ini, j.ini.slice(0, 4) !== j.fim.slice(0, 4)) + ' – ' + curta(j.fim, 1)) : 'todo o período';
-    html += '<div class="fbar dn-topo">' + dashPeriodo(j) + '<span class="tb-fim fb-count tnum">' + esc(faixa) + '</span><span class="dn-atual">' + svgI('i-sync') + 'Atualizado às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + '</span>' + '<div class="dn-alterna"><button type="button" data-dash-tudo aria-expanded="' + dashTudo + '" title="Mais indicadores, Financeiro e rankings">' + svgI('i-chev') + (dashTudo ? 'Resumir' : 'Mostrar tudo') + '</button></div>' + '</div>';
+    html += '<div class="fbar dn-topo"><h1 class="dn-h1"><span class="dn-h1-ico">' + svgI('i-grid') + '</span>Dashboard</h1><span class="dn-sep" aria-hidden="true"></span>' + dashPeriodo(j) + '<span class="tb-fim fb-count tnum">' + esc(faixa) + '</span><span class="dn-atual">' + svgI('i-sync') + 'Atualizado às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + '</span>' + '<div class="dn-alterna"><button type="button" data-dash-tudo aria-expanded="' + dashTudo + '" title="Mais indicadores, Financeiro e rankings">' + svgI('i-chev') + (dashTudo ? 'Resumir' : 'Mostrar tudo') + '</button></div>' + '</div>';
     html += dnSecao('Jornada da mãe', 'Quantas mães passaram por cada marco no período escolhido, comparado com o período anterior de mesmo tamanho.', '<div class="dn-grade">' +
       dnCard('i-users', 'Mães que entraram', ent.length, 'qualificadas e com contrato' + dnVar(ent.length, entA)) +
       dnCard('i-cash', 'GPS pagas', gps, 'urbanas · ' + plural(urbEnt, 'entrou', 'entraram') + ' no período' + dnVar(gps, gpsA)) +
