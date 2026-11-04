@@ -2154,6 +2154,51 @@ html[data-fx="novo"] .parcn-pausa{margin-left:6px;padding:1px 6px;border-radius:
 .dn-pino.esc path{stroke:var(--ink);stroke-width:2}
 .dn-mapa.com-pinos .dn-mapa-leg i{background:linear-gradient(90deg,hsl(var(--c-pri)/.16),hsl(var(--c-pri)/.6))}
 #parc-novo .dn-quem li span{white-space:nowrap}
+
+/* Parceiros do fluxo novo, versão limpa: uma linha por parceiro e tabela por estado no mapa */
+html[data-fx="novo"] .parcn-tab td,html[data-fx="novo"] .parcn-tab th{white-space:nowrap}
+html[data-fx="novo"] .parcn-tab td.nome{max-width:280px}
+html[data-fx="novo"] .parcn-nome{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:middle;font-weight:600;color:var(--ink)}
+html[data-fx="novo"] .parcn-tab td.parcn-txt{font-size:12.5px;color:var(--ink-2,var(--ink))}
+html[data-fx="novo"] .parcn-zero{color:var(--ink-3);opacity:.7}
+html[data-fx="novo"] .parcn-tab td.parcn-ac{width:1%;padding-right:12px}
+html[data-fx="novo"] .parcn-acoes{display:flex;justify-content:flex-end;gap:4px}
+html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
+.pm-lista{display:flex;flex-direction:column}
+.pm-cab,.pm-lin{display:grid;grid-template-columns:minmax(0,1fr) 84px 64px;align-items:center;gap:8px;padding:9px 12px}
+.pm-cab{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);border-bottom:1px solid hsl(var(--c-line)/.8)}
+.pm-cab span:not(:first-child),.pm-lin b{text-align:right}
+.pm-lin{width:100%;border:0;border-bottom:1px solid hsl(var(--c-line)/.45);border-radius:0;background:none;font:inherit;font-size:13px;color:var(--ink);text-align:left;cursor:pointer}
+.pm-lin:last-child{border-bottom:0}
+.pm-lin:hover{background:hsl(var(--c-sec)/.6)}
+.pm-lin.esc{background:hsl(var(--c-pri)/.08);box-shadow:inset 3px 0 0 hsl(var(--c-pri))}
+.pm-lin b{font-weight:600}
+.pm-uf{display:flex;align-items:center;gap:10px;min-width:0}
+.pm-uf > span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pm-uf img{width:22px;height:15px;flex:none;object-fit:cover;border:1px solid hsl(var(--c-line))}
+#parc-novo .dn-quem ul{gap:0}
+#parc-novo .dn-quem li.pm-item{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,auto) 64px;gap:12px;align-items:center;padding:7px 0;border-top:1px solid hsl(var(--c-line)/.45);font-size:13px}
+#parc-novo .dn-quem li.pm-item:first-child{border-top:0}
+#parc-novo .dn-quem li.pm-item .nome-abrir,#parc-novo .dn-quem li.pm-item .pm-n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+#parc-novo .dn-quem li.pm-item small{font-size:12px;color:var(--ink-3);white-space:nowrap}
+#parc-novo .dn-quem li.pm-item > span.tnum{margin:0;text-align:right;font-size:12px;color:var(--ink-3)}
+
+.pm-det{display:flex;flex-direction:column}
+.pm-det-cab{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:2px 12px 10px}
+.pm-det-cab .pm-uf b{font-size:14px;font-weight:600}
+.pm-det-cab .pm-uf small{font-size:12px;color:var(--ink-3)}
+.pm-det-cab button{width:28px;height:28px;border:0;border-radius:6px;background:none;color:var(--ink-3);cursor:pointer;display:grid;place-items:center}
+.pm-det-cab button:hover{background:hsl(var(--c-sec));color:var(--ink)}
+.pm-det-cab button .i{width:15px;height:15px}
+.pm-cab.pm-cab3,.pm-itens li.pm-item{grid-template-columns:minmax(0,1fr) minmax(0,130px) 56px}
+.pm-itens{list-style:none;margin:0;padding:0}
+.pm-itens li.pm-item{display:grid;gap:8px;align-items:center;padding:9px 12px;border-bottom:1px solid hsl(var(--c-line)/.45);font-size:13px}
+.pm-itens li.pm-item:last-child{border-bottom:0}
+.pm-itens li.pm-item .nome-abrir,.pm-itens li.pm-item .pm-n{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0;border:0;background:none;font:inherit;font-weight:500;color:var(--ink);text-align:left;cursor:pointer}
+.pm-itens li.pm-item .pm-n{cursor:default}
+.pm-itens li.pm-item .nome-abrir:hover{color:hsl(var(--c-pri));text-decoration:underline}
+.pm-itens li.pm-item small{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;color:var(--ink-3)}
+.pm-itens li.pm-item b{text-align:right;font-weight:600}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -5692,7 +5737,9 @@ html[data-fx="novo"] .parcn-pausa{margin-left:6px;padding:1px 6px;border-radius:
       }).join('') + '</svg>';
     }
     var ufs = Object.keys(porUf).sort(function(a, b){ return porUf[b] - porUf[a] || a.localeCompare(b); });
-    var listaHtml = ufs.length ? ufs.map(function(uf){
+    var listaHtml = o.compacto ? (ufs.length ? '<div class="pm-lista"><div class="pm-cab"><span>Estado</span>' + o.colunas.map(function(c){ return '<span>' + esc(c) + '</span>'; }).join('') + '</div>' +
+      ufs.map(function(uf){ return '<button type="button" class="pm-lin' + (sel === uf + '|*' ? ' esc' : '') + '" ' + at + '="' + uf + '|*"><span class="pm-uf">' + flagUfImg(uf) + '<span>' + esc(NOME_UF[uf] || uf) + '</span></span><b class="tnum">' + porUf[uf] + '</b>' + (o.n2 ? '<b class="tnum">' + o.n2(uf) + '</b>' : '') + '</button>'; }).join('') + '</div>' : '<p class="dn-vazio">' + esc(o.vazio) + '</p>')
+      : ufs.length ? ufs.map(function(uf){
       var cids = Object.keys(porCid).filter(function(c){ return porCid[c].uf === uf; }).map(function(c){ return porCid[c]; }).sort(function(a, b){ return b.rows.length - a.rows.length || a.cidade.localeCompare(b.cidade, 'pt'); });
       cidadesUfMapa(uf);
       return '<div class="dn-uf-bloco"><button type="button" class="dn-uf-lin' + (sel === uf + '|*' ? ' esc' : '') + '" ' + at + '="' + uf + '|*"><span>' + flagUfImg(uf) + '<b>' + esc(NOME_UF[uf] || uf) + '</b> <small>· ' + uf + '</small></span><b class="tnum">' + porUf[uf] + '</b></button>' +
@@ -5705,7 +5752,14 @@ html[data-fx="novo"] .parcn-pausa{margin-left:6px;padding:1px 6px;border-radius:
       esc2 = '<div class="dn-quem"><div class="dn-quem-cab"><b>' + esc(p[1] === '*' ? (NOME_UF[p[0]] || p[0]) : p[1] + '/' + p[0]) + ' (' + quem.length + ')</b><button type="button" ' + o.fechar + ' aria-label="Fechar lista">' + svgI('i-x') + '</button></div><ul>' +
         quem.map(function(r){ return o.item(r, p[1] === '*'); }).join('') + '</ul></div>';
     }
-    return '<div class="card dn-mapa' + (o.pinos ? ' com-pinos' : '') + '"><div class="dn-mapa-esq">' + svg + '<p class="dn-mapa-leg"><i></i>' + esc(o.leg) + '</p></div><div class="dn-mapa-dir">' + listaHtml + (semUf && o.semUf ? '<p class="dn-vazio">' + esc(o.semUf(semUf)) + '</p>' : '') + esc2 + '</div></div>';
+    var dir = listaHtml + (semUf && o.semUf ? '<p class="dn-vazio">' + esc(o.semUf(semUf)) + '</p>' : '') + esc2;
+    if (o.compacto && sel){   // estado escolhido: a lista dele ocupa o lugar da tabela de estados
+      var ps = sel.split('|'), doUf = lista.filter(function(r){ return o.uf(r) === ps[0]; });
+      if (o.ordem) doUf.sort(o.ordem);
+      dir = '<div class="pm-det"><div class="pm-det-cab"><span class="pm-uf">' + flagUfImg(ps[0]) + '<b>' + esc(NOME_UF[ps[0]] || ps[0]) + '</b><small>' + plural(doUf.length, o.um, o.muitos) + '</small></span><button type="button" ' + o.fechar + ' title="Voltar para todos os estados" aria-label="Voltar para todos os estados">' + svgI('i-x') + '</button></div>' +
+        '<div class="pm-cab pm-cab3"><span>' + esc(o.colItem) + '</span><span>Cidade</span><span>Mães</span></div><ul class="pm-itens">' + doUf.map(function(r){ return o.item(r, true); }).join('') + '</ul></div>';
+    }
+    return '<div class="card dn-mapa' + (o.pinos ? ' com-pinos' : '') + '"><div class="dn-mapa-esq">' + svg + '<p class="dn-mapa-leg"><i></i>' + esc(o.leg) + '</p></div><div class="dn-mapa-dir">' + dir + '</div></div>';
   }
   function dnMapa(lista){
     return mapaBr(lista, { uf: ufDaCliente, cid: soCidade, sel: mapaEscolha, attr: 'data-mapa', fechar: 'data-mapa-fechar', um: 'mãe', muitos: 'mães', aria: 'Mapa do Brasil com as mães por estado', leg: 'mais mães, cor mais forte', vazio: 'Nenhuma mãe com cidade ou estado no período.',
@@ -5788,17 +5842,19 @@ html[data-fx="novo"] .parcn-pausa{margin-left:6px;padding:1px 6px;border-radius:
         : dnCard('i-check', 'Benefícios concedidos', comResp.filter(ganhou).length, 'das mães indicadas')) + '</div>';
     var ehP = parcAba === 'parc', noMapa = (ehP ? ativos : prosAt);
     var maesDoPros = function(p){ var ids = parcs.filter(function(x){ return x.prospectadorId === p.id; }).map(function(x){ return x.id; }); if (p.tambemParceiro) ids.push(p.id); return maesDe(ids).length; };
-    var maesUf = function(uf){ var n = 0; noMapa.forEach(function(p){ if (parcUf(p) === uf) n += ehP ? maesDe([p.id]).length : maesDoPros(p); }); return ' · ' + plural(n, 'mãe', 'mães'); };
+    var maesNoUf = function(uf){ var n = 0; noMapa.forEach(function(p){ if (parcUf(p) === uf) n += ehP ? maesDe([p.id]).length : maesDoPros(p); }); return n; };
+    var maesUf = function(uf){ return ' · ' + plural(maesNoUf(uf), 'mãe', 'mães'); };
     html += '<div class="parcn-topo">' + '<div class="parcn-seg" role="group" aria-label="Lista">' +
       '<button type="button" data-parcn-aba="parc" aria-pressed="' + ehP + '">Parceiros <span class="tnum">' + parcs.length + '</span></button>' +
       '<button type="button" data-parcn-aba="pros" aria-pressed="' + !ehP + '">Prospectadores <span class="tnum">' + pros.length + '</span></button></div>' + '</div>';
     html += dnSecao(ehP ? 'Onde estão os parceiros' : 'Onde estão os prospectadores', (ehP ? 'Parceiros ativos' : 'Prospectadores ativos') + ' por estado e cidade. Clique no marcador, no estado ou na cidade para ver quem são.', mapaBr(noMapa, {
-      uf: parcUf, cid: function(p){ return p.cidadeParc || p.regiao || ''; }, sel: parcMapa, attr: 'data-pmapa', fechar: 'data-pmapa-fechar', pinos: true, extraUf: maesUf,
+      uf: parcUf, cid: function(p){ return p.cidadeParc || p.regiao || ''; }, sel: parcMapa, attr: 'data-pmapa', fechar: 'data-pmapa-fechar', pinos: true, extraUf: maesUf, compacto: true, colunas: [ehP ? 'Parceiros' : 'Prospect.', 'Mães'], n2: maesNoUf, colItem: ehP ? 'Parceiro' : 'Prospectador',
+      ordem: function(a, b){ var ma = ehP ? maesDe([a.id]).length : maesDoPros(a), mb = ehP ? maesDe([b.id]).length : maesDoPros(b); return mb - ma || parcNome(a).localeCompare(parcNome(b), 'pt'); },
       um: ehP ? 'parceiro' : 'prospectador', muitos: ehP ? 'parceiros' : 'prospectadores', aria: 'Mapa do Brasil com os ' + (ehP ? 'parceiros' : 'prospectadores') + ' por estado',
       leg: ehP ? 'mais parceiros, cor mais forte' : 'mais prospectadores, cor mais forte', vazio: ehP ? 'Nenhum parceiro ativo com estado informado.' : 'Nenhum prospectador ativo com estado informado.',
       semUf: function(n){ return plural(n, ehP ? 'parceiro' : 'prospectador', ehP ? 'parceiros' : 'prospectadores') + ' sem estado informado (edite para aparecer no mapa).'; },
       item: function(p, est){ var c = p.cidadeParc || p.regiao || '', m = ehP ? maesDe([p.id]).length : maesDoPros(p);
-        return '<li>' + (adm ? '<button type="button" class="nome-abrir" data-parcn-edit="' + esc(p.id) + '">' + esc(parcNome(p)) + '</button>' : '<b>' + esc(parcNome(p)) + '</b>') + (est && c ? '<small> · ' + esc(c) + '</small>' : '') + '<span class="tnum">' + plural(m, 'mãe', 'mães') + '</span></li>'; }
+        return '<li class="pm-item">' + (adm ? '<button type="button" class="nome-abrir" data-parcn-edit="' + esc(p.id) + '" title="Editar">' + esc(parcNome(p)) + '</button>' : '<span class="pm-n">' + esc(parcNome(p)) + '</span>') + '<small>' + esc(c || '—') + '</small><b class="tnum">' + m + '</b></li>'; }
     }));
     html += '<div class="fbar parcn-bar">' +
       '<div class="search tb-busca"><svg class="i"><use href="#i-search"/></svg><input id="parcn-q" type="search" autocomplete="off" placeholder="' + (ehP ? 'Buscar parceiro, CNPJ, cidade…' : 'Buscar prospectador…') + '" value="' + esc(parcNQ) + '"></div>' +
@@ -5808,31 +5864,35 @@ html[data-fx="novo"] .parcn-pausa{margin-left:6px;padding:1px 6px;border-radius:
       (adm ? '<button type="button" class="btn primary parcn-novo" data-parcn-novo="' + parcAba + '">' + svgI('i-plus') + (ehP ? 'Novo parceiro' : 'Novo prospectador') + '</button>' : '') + '</div>';
     var sit = function(p){ return parcNSit === 'todos' || (parcNSit === 'ativos' ? p.ativo !== false : p.ativo === false); };
     var bate = function(txt){ return !parcNQ || semAcento(txt).indexOf(semAcento(parcNQ)) >= 0; };
-    var acoes = function(p){ var id = esc(p.id); return '<td><div class="cad-acoes">' + (adm ? '<button type="button" class="btn" data-parcn-app="' + id + '" title="Login e senha no aplicativo">' + svgI('i-phone') + 'Aplicativo</button><button type="button" class="ico-btn" data-parcn-edit="' + id + '" title="Editar" aria-label="Editar ' + esc(parcNome(p)) + '"><svg class="i"><use href="#i-pencil"/></svg></button>' : '') + '</div></td>'; };
-    var pausa = function(p){ return p.ativo === false ? ' <span class="parcn-pausa">Pausado</span>' : ''; };
+    var nada = function(t){ return '<span class="parcn-zero">' + (t || '—') + '</span>'; };
+    var td = function(v, cls){ return '<td' + (cls ? ' class="' + cls + '"' : '') + '>' + v + '</td>'; };
+    var num = function(n){ return td(n ? n : nada('0'), 'dir tnum'); };
+    var din = function(v, forte){ return td(v ? moedaTxt(v) : nada(), 'dir tnum' + (forte && v ? ' parcn-pend' : '')); };
+    var acoes = function(p){ var id = esc(p.id), nm = esc(parcNome(p));
+      return td(adm ? '<div class="parcn-acoes"><button type="button" class="ico-btn" data-parcn-app="' + id + '" title="Login e senha no aplicativo" aria-label="Aplicativo de ' + nm + '"><svg class="i"><use href="#i-phone"/></svg></button><button type="button" class="ico-btn" data-parcn-edit="' + id + '" title="Editar" aria-label="Editar ' + nm + '"><svg class="i"><use href="#i-pencil"/></svg></button></div>' : '', 'parcn-ac'); };
+    var nomeTd = function(p, nome){ return td('<span class="parcn-nome" title="' + esc(nome) + '">' + esc(nome) + '</span>' + (p.ativo === false ? '<span class="parcn-pausa">Pausado</span>' : ''), 'nome'); };
+    var cab = function(cols){ return '<thead><tr>' + cols.map(function(c){ return '<th' + (c[1] ? ' class="dir"' : '') + '>' + c[0] + '</th>'; }).join('') + '<th></th></tr></thead>'; };
     if (ehP){
       var dados = parcs.filter(function(p){ return sit(p) && (!parcNTipo || parcTipo(p) === parcNTipo) && (!parcNPros || (parcNPros === '-' ? !p.prospectadorId : p.prospectadorId === parcNPros)) && bate([parcNome(p), p.nome, p.documento, parcLocal(p), p.prospectadorId ? prospName(p.prospectadorId) : ''].join(' ')); })
         .map(function(p){ var m = maesDe([p.id]), l = linDe(p.id, 'parc'); return { p: p, maes: m.length, mes: doMes(m), conc: m.filter(ganhou).length, pago: soma(l.filter(function(x){ return x.pago; })), pend: soma(l.filter(function(x){ return !x.pago; })) }; })
         .sort(function(a, b){ return b.mes - a.mes || b.maes - a.maes || parcNome(a.p).localeCompare(parcNome(b.p), 'pt'); });
-      html += '<div class="card list"><table class="kb-tab parcn-tab"><thead><tr><th>Parceiro</th><th>Quem fechou</th><th>Comissão do parceiro</th><th class="dir">Mães</th><th class="dir">No mês</th><th class="dir">Concedidas</th>' + (adm ? '<th class="dir">Repasse pago</th><th class="dir">A pagar</th>' : '') + '<th></th></tr></thead><tbody>' +
+      var colsP = [['Parceiro'], ['Tipo'], ['Cidade'], ['Fechado por'], ['Mães', 1], ['No mês', 1], ['Concedidas', 1]].concat(adm ? [['Repasse pago', 1], ['A pagar', 1]] : []);
+      html += '<div class="card list"><table class="kb-tab parcn-tab">' + cab(colsP) + '<tbody>' +
         (dados.length ? dados.map(function(d){ var p = d.p, pr = p.prospectadorId ? prospById(p.prospectadorId) : null, loc = parcLocal(p);
-          return '<tr data-parcn="' + esc(p.id) + '"' + (p.ativo === false ? ' class="pausado"' : '') + '><td class="nome"><b>' + esc(parcNome(p)) + '</b>' + pausa(p) + '<small>' + esc(parcTipoNome(p)) + (loc ? ' · ' + esc(loc) : '') + (p.documento ? ' · ' + esc(p.documento) : '') + '</small></td>' +
-            '<td>' + (pr ? '<span class="parcn-quem">' + esc(pr.nome) + '</span><small>' + (parcValores(p.prosConf, p.prosLib) ? esc(parcValores(p.prosConf, p.prosLib)) : 'comissão dele não definida') + '</small>' : '<span class="parcn-dir">Escritório</span>') + '</td>' +
-            '<td><small class="parcn-com">' + (p.semGanho ? 'Sem ganhos' : esc(parcValores(p.comConf, p.comLib || p.valorIndicacao) || 'Não definida')) + '</small></td>' +
-            '<td class="dir tnum">' + d.maes + '</td><td class="dir tnum">' + d.mes + '</td><td class="dir tnum">' + d.conc + '</td>' +
-            (adm ? '<td class="dir tnum">' + moedaTxt(d.pago) + '</td><td class="dir tnum' + (d.pend ? ' parcn-pend' : '') + '">' + moedaTxt(d.pend) + '</td>' : '') + acoes(p) + '</tr>'; }).join('')
-          : '<tr><td colspan="9" class="empty">' + (parcs.length ? 'Nenhum parceiro neste filtro.' : 'Nenhum parceiro ainda.' + (adm ? ' Clique em <b>Novo parceiro</b> ou deixe o prospectador cadastrar pelo aplicativo.' : '')) + '</td></tr>') + '</tbody></table></div>';
+          return '<tr data-parcn="' + esc(p.id) + '"' + (p.ativo === false ? ' class="pausado"' : '') + '>' + nomeTd(p, parcNome(p)) + td(esc(parcTipoNome(p).split(' /')[0]), 'parcn-txt') + td(loc ? esc(loc) : nada(), 'parcn-txt') + td(pr ? esc(pr.nome) : nada('Escritório'), 'parcn-txt') +
+            num(d.maes) + num(d.mes) + num(d.conc) + (adm ? din(d.pago) + din(d.pend, true) : '') + acoes(p) + '</tr>'; }).join('')
+          : '<tr><td colspan="' + (colsP.length + 1) + '" class="empty">' + (parcs.length ? 'Nenhum parceiro neste filtro.' : 'Nenhum parceiro ainda.' + (adm ? ' Clique em <b>Novo parceiro</b> ou deixe o prospectador cadastrar pelo aplicativo.' : '')) + '</td></tr>') + '</tbody></table></div>';
     } else {
       var dp = pros.filter(function(p){ return sit(p) && bate([p.nome, p.documento, p.telefone, parcLocal(p)].join(' ')); })
         .map(function(p){ var seus = parcs.filter(function(x){ return x.prospectadorId === p.id; }), ids = seus.map(function(x){ return x.id; }); if (p.tambemParceiro) ids.push(p.id);
-          var m = maesDe(ids), l = linDe(p.id, 'pros'); return { p: p, parcs: seus.length, parcAt: seus.filter(function(x){ return x.ativo !== false; }).length, maes: m.length, mes: doMes(m), conc: m.filter(ganhou).length, pago: soma(l.filter(function(x){ return x.pago; })), pend: soma(l.filter(function(x){ return !x.pago; })) }; })
+          var m = maesDe(ids), l = linDe(p.id, 'pros'); return { p: p, parcAt: seus.filter(function(x){ return x.ativo !== false; }).length, maes: m.length, mes: doMes(m), conc: m.filter(ganhou).length, pago: soma(l.filter(function(x){ return x.pago; })), pend: soma(l.filter(function(x){ return !x.pago; })) }; })
         .sort(function(a, b){ return b.mes - a.mes || b.parcAt - a.parcAt || String(a.p.nome || '').localeCompare(String(b.p.nome || ''), 'pt'); });
-      html += '<div class="card list"><table class="kb-tab parcn-tab"><thead><tr><th>Prospectador</th><th class="dir">Parceiros</th><th class="dir">Mães</th><th class="dir">No mês</th><th class="dir">Concedidas</th>' + (adm ? '<th class="dir">Ganhos pagos</th><th class="dir">A pagar</th>' : '') + '<th></th></tr></thead><tbody>' +
+      var colsR = [['Prospectador'], ['Cidade'], ['Telefone'], ['Parceiros', 1], ['Mães', 1], ['No mês', 1], ['Concedidas', 1]].concat(adm ? [['Ganhos pagos', 1], ['A pagar', 1]] : []);
+      html += '<div class="card list"><table class="kb-tab parcn-tab">' + cab(colsR) + '<tbody>' +
         (dp.length ? dp.map(function(d){ var p = d.p, loc = parcLocal(p);
-          return '<tr data-parcn="' + esc(p.id) + '"' + (p.ativo === false ? ' class="pausado"' : '') + '><td class="nome"><b>' + esc(p.nome || 'Sem nome') + '</b>' + pausa(p) + '<small>' + [loc, p.telefone, p.tambemParceiro ? 'também indica mães' : ''].filter(Boolean).map(esc).join(' · ') + '</small></td>' +
-            '<td class="dir tnum">' + d.parcAt + (d.parcs > d.parcAt ? '<small>' + d.parcs + ' no total</small>' : '') + '</td><td class="dir tnum">' + d.maes + '</td><td class="dir tnum">' + d.mes + '</td><td class="dir tnum">' + d.conc + '</td>' +
-            (adm ? '<td class="dir tnum">' + moedaTxt(d.pago) + '</td><td class="dir tnum' + (d.pend ? ' parcn-pend' : '') + '">' + moedaTxt(d.pend) + '</td>' : '') + acoes(p) + '</tr>'; }).join('')
-          : '<tr><td colspan="8" class="empty">' + (pros.length ? 'Nenhum prospectador neste filtro.' : 'Nenhum prospectador ainda.' + (adm ? ' Clique em <b>Novo prospectador</b> para cadastrar quem vai fechar com as clínicas.' : '')) + '</td></tr>') + '</tbody></table></div>';
+          return '<tr data-parcn="' + esc(p.id) + '"' + (p.ativo === false ? ' class="pausado"' : '') + '>' + nomeTd(p, p.nome || 'Sem nome') + td(loc ? esc(loc) : nada(), 'parcn-txt') + td(p.telefone ? esc(p.telefone) : nada(), 'parcn-txt tnum') +
+            num(d.parcAt) + num(d.maes) + num(d.mes) + num(d.conc) + (adm ? din(d.pago) + din(d.pend, true) : '') + acoes(p) + '</tr>'; }).join('')
+          : '<tr><td colspan="' + (colsR.length + 1) + '" class="empty">' + (pros.length ? 'Nenhum prospectador neste filtro.' : 'Nenhum prospectador ainda.' + (adm ? ' Clique em <b>Novo prospectador</b> para cadastrar quem vai fechar com as clínicas.' : '')) + '</td></tr>') + '</tbody></table></div>';
     }
     box.innerHTML = html;
   }
