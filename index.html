@@ -5668,11 +5668,13 @@ html[data-fx="novo"] .dn-ind-x b{font-weight:600;color:var(--ink)}
     var pessoas = function(papel){ var s = {}; pagos.forEach(function(x){ if (x.papel === papel) s[x.pessoa.id] = 1; }); return Object.keys(s).length; }, nParc = pessoas('parc'), nPros = pessoas('pros');
     var quem = [nParc ? plural(nParc, 'parceiro', 'parceiros') : '', nPros ? plural(nPros, 'prospectador', 'prospectadores') : ''].filter(Boolean).join(' e ');
     var T = G + R, TA = pagasA + RA, prev = prox.length * gpsValor();
-    return '<div class="card dn-gastos">' +
-      dnInd('Total gasto', moedaTxt(T), 100, 'hsl(var(--c-pri))', 'guias + repasses no período' + dnVar(T, TA, true), 'Ainda a pagar: <b>' + moedaTxt(agora.length * gpsValor() + P) + '</b>') +
-      dnInd('Guias GPS', moedaTxt(G), T ? G / T * 100 : 0, 'var(--ser-2)', plural(pagas.length, 'guia paga', 'guias pagas') + ' · ' + moedaTxt(gpsValor()) + ' cada', agora.length ? 'Pagar agora: <b>' + plural(agora.length, 'guia', 'guias') + ' (' + moedaTxt(agora.length * gpsValor()) + ')</b>' : 'Nenhuma guia vencendo agora', 'gp') +
-      dnInd('Repasse a parceiros', moedaTxt(R), T ? R / T * 100 : 0, 'var(--dn-azul)', plural(pagos.length, 'pagamento', 'pagamentos') + (quem ? ' a ' + quem : ''), pend.length ? 'Pendente: <b>' + moedaTxt(P) + '</b> em ' + plural(pend.length, 'comissão', 'comissões') : 'Nenhuma comissão pendente', 'f') +
-      dnInd('Previsão de guias', moedaTxt(prev), T + prev ? prev / (T + prev) * 100 : 0, 'hsl(var(--c-line))', plural(prox.length, 'urbana ainda vai pagar', 'urbanas ainda vão pagar'), 'sai 5 dias antes do prazo de cada uma', 'gp') +
+    var linha2 = function(t){ return '<span class="dn-var">' + t + '</span>'; };
+    // mesmos cartões da Jornada da mãe (dnCard): ícone e título, valor, duas linhas curtas
+    return '<div class="dn-grade">' +
+      dnCard('i-scale', 'Total gasto', moedaTxt(T), 'guias + repasses no período' + dnVar(T, TA, true)) +
+      dnCard('i-cash', 'Guias GPS', moedaTxt(G), plural(pagas.length, 'guia paga', 'guias pagas') + ' · ' + moedaTxt(gpsValor()) + ' cada' + linha2(agora.length ? 'pagar agora: <b>' + plural(agora.length, 'guia', 'guias') + ' (' + moedaTxt(agora.length * gpsValor()) + ')</b>' : 'nenhuma vencendo agora'), '', '', 'gp') +
+      dnCard('i-users', 'Repasse a parceiros', moedaTxt(R), plural(pagos.length, 'pagamento', 'pagamentos') + (quem ? ' a ' + quem : '') + linha2(pend.length ? 'pendente: <b>' + moedaTxt(P) + '</b> em ' + plural(pend.length, 'comissão', 'comissões') : 'nenhuma comissão pendente'), '', '', 'f') +
+      dnCard('i-clock', 'Previsão de guias', moedaTxt(prev), plural(prox.length, 'urbana ainda vai pagar', 'urbanas ainda vão pagar') + linha2('a guia sai 5 dias antes do prazo'), '', '', 'gp') +
       '</div>';
   }
   function renderDashNovo(box){
