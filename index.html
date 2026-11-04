@@ -2084,6 +2084,11 @@ html[data-fx="novo"] .dn-fasesl button{height:34px;padding:0 12px;border:1px sol
 html[data-fx="novo"] .dn-fasesl button:hover{color:var(--ink);border-color:hsl(var(--c-pri)/.5)}
 html[data-fx="novo"] .dn-fasesl .i{width:14px;height:14px}
 html[data-fx="novo"] .dn-fasesl b{font-weight:600;color:var(--ink)}
+
+/* Dashboard do fluxo novo sem o cabeçalho grande */
+html[data-fx="novo"] .content.dash-sem-cab > .ph{display:none}
+
+html[data-fx="novo"] .dn-topo .dn-alterna{order:5}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -5642,7 +5647,7 @@ html[data-fx="novo"] .dn-fasesl b{font-weight:600;color:var(--ink)}
     var res = resumoFases(), html = '';
     var curta = function(d, ano){ var p = String(d).split('-'); return p[2] + '/' + p[1] + (ano ? '/' + p[0].slice(2) : ''); };
     var faixa = j.ini ? (j.ini === j.fim ? curta(j.fim, 1) : curta(j.ini, j.ini.slice(0, 4) !== j.fim.slice(0, 4)) + ' – ' + curta(j.fim, 1)) : 'todo o período';
-    html += '<div class="fbar dn-topo">' + dashPeriodo(j) + '<span class="tb-fim fb-count tnum">' + esc(faixa) + '</span><span class="dn-atual">' + svgI('i-sync') + 'Atualizado às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + '</span></div>';
+    html += '<div class="fbar dn-topo">' + dashPeriodo(j) + '<span class="tb-fim fb-count tnum">' + esc(faixa) + '</span><span class="dn-atual">' + svgI('i-sync') + 'Atualizado às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + '</span>' + '<div class="dn-alterna"><button type="button" data-dash-tudo aria-expanded="' + dashTudo + '" title="Mais indicadores, Financeiro e rankings">' + svgI('i-chev') + (dashTudo ? 'Resumir' : 'Mostrar tudo') + '</button></div>' + '</div>';
     html += dnSecao('Jornada da mãe', 'Quantas mães passaram por cada marco no período escolhido, comparado com o período anterior de mesmo tamanho.', '<div class="dn-grade">' +
       dnCard('i-users', 'Mães que entraram', ent.length, 'qualificadas e com contrato' + dnVar(ent.length, entA)) +
       dnCard('i-cash', 'GPS pagas', gps, 'urbanas · ' + plural(urbEnt, 'entrou', 'entraram') + ' no período' + dnVar(gps, gpsA)) +
@@ -5652,8 +5657,7 @@ html[data-fx="novo"] .dn-fasesl b{font-weight:600;color:var(--ink)}
         dnCard('i-x', 'Indeferidos', indef, indef ? 'vão para o Judicial' : 'nenhum no período', indef ? 'alerta' : '') +
         dnCard('i-scale', 'Taxa de concessão', dnPct(conc, conc + indef), conc + ' de ' + (conc + indef) + ' decididos') +
         dnCard('i-clock', 'Do parto ao requerimento', tMedio == null ? '—' : tMedio + ' d', tMedio == null ? 'sem requerimentos no período' : 'média de ' + plural(tempos.length, 'requerimento', 'requerimentos')) +
-        dnCard('i-users', 'Urbanas · Rurais', urbEnt + ' · ' + rurEnt, 'das que entraram no período') + '</div>' : '') +
-      '<div class="dn-alterna"><button type="button" data-dash-tudo aria-expanded="' + dashTudo + '" title="Mais indicadores, Financeiro e rankings">' + svgI('i-chev') + (dashTudo ? 'Resumir' : 'Mostrar tudo') + '</button></div>');
+        dnCard('i-users', 'Urbanas · Rurais', urbEnt + ' · ' + rurEnt, 'das que entraram no período') + '</div>' : ''));
     // fases numa linha fina, em vez de um balão por fase
     html += '<div class="dn-fasesl" aria-label="Onde estão as mães agora"><span class="dn-fasesl-r">Agora</span>' + fasesAtivas().map(function(f){ return '<button type="button" data-fn="' + f[0] + '" title="' + esc(res[f[0]][1]) + '">' + svgI(f[1]) + esc(TITULOS[f[0]][0]) + '<b class="tnum">' + res[f[0]][0] + '</b></button>'; }).join('') + '</div>';
     // evolução + origem
@@ -5926,6 +5930,7 @@ html[data-fx="novo"] .dn-fasesl b{font-weight:600;color:var(--ink)}
     $('mais-box').hidden = t !== 'k' || fluxoVista === 'novo';
     var c = $('conteudo');
     c.classList.remove('em-quadro', 'recolhido');
+    c.classList.toggle('dash-sem-cab', t === 'b' && fluxoVista === 'novo');   // Dashboard do fluxo novo sem o cabeçalho grande: começa na linha do período, como no BI de Vendas
     pintarFiltrar(); pintarLimpar();
     Array.prototype.forEach.call(document.querySelectorAll('.kb-ord'), function(s){ s.value = kbOrdem; });
   }
