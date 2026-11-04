@@ -2125,7 +2125,9 @@ html[data-fx="novo"] .parcn-seg button:hover{color:var(--ink)}
 html[data-fx="novo"] .parcn-seg button[aria-pressed="true"]{background:hsl(var(--c-pri)/.12);color:hsl(var(--c-pri));font-weight:600}
 html[data-fx="novo"] .parcn-seg button[aria-pressed="true"] span{color:hsl(var(--c-pri))}
 html[data-fx="novo"] .parcn-bar > .search{margin-left:0}
-html[data-fx="novo"] .parcn-bar .parcn-novo{order:3;height:36px}
+html[data-fx="novo"] .parcn-bar .parcn-novo{order:3;height:36px;margin-left:auto}
+html[data-fx="novo"] .parcn-topo{display:flex;align-items:center}
+html[data-fx="novo"] .parcn-topo .parcn-seg{margin-right:0}
 html[data-fx="novo"] .parcn-tab td{vertical-align:middle}
 html[data-fx="novo"] .parcn-tab td.nome b{font-weight:600}
 html[data-fx="novo"] .parcn-tab td small{display:block;margin-top:2px;font-size:11.5px;color:var(--ink-3);white-space:normal}
@@ -2143,6 +2145,15 @@ html[data-fx="novo"] .parcn-pausa{margin-left:6px;padding:1px 6px;border-radius:
 .parcn-dlg .field[hidden]{display:none}
 .parcn-dlg .chk{justify-content:flex-start;font-size:13px;font-weight:500;color:var(--ink)}
 .parcn-dlg .chk input{flex:none;width:16px!important;height:16px!important;min-height:0!important;margin:0!important;padding:0!important}
+
+/* marcadores do mapa (Parceiros do fluxo novo) */
+.dn-pino{cursor:pointer}
+.dn-pino path{fill:hsl(var(--c-pri));stroke:hsl(var(--c-card));stroke-width:1.5}
+.dn-pino text{font-size:10px;font-weight:700;fill:var(--on-primary,#fff);pointer-events:none;font-variant-numeric:tabular-nums}
+.dn-pino:hover path{filter:brightness(1.12)}
+.dn-pino.esc path{stroke:var(--ink);stroke-width:2}
+.dn-mapa.com-pinos .dn-mapa-leg i{background:linear-gradient(90deg,hsl(var(--c-pri)/.16),hsl(var(--c-pri)/.6))}
+#parc-novo .dn-quem li span{white-space:nowrap}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -5642,48 +5653,63 @@ html[data-fx="novo"] .parcn-pausa{margin-left:6px;padding:1px 6px;border-radius:
   }
   function mapaCarregar(){
     if (mapaGeo || mapaCarga) return; mapaCarga = true;
-    fetch('img/geo/br-uf.json').then(function(r){ return r.json(); }).then(function(j){ mapaGeo = j; renderDash(); }).catch(function(){ mapaCarga = false; });
+    fetch('img/geo/br-uf.json').then(function(r){ return r.json(); }).then(function(j){ mapaGeo = j; renderDash(); renderParcNovo(); }).catch(function(){ mapaCarga = false; });
   }
   function cidadesUfMapa(uf){
     var l = lerLS('nascer-cid2-' + uf); if (l || cidCarga[uf]) return l; cidCarga[uf] = 1;
     fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados/' + uf + '/municipios?orderBy=nome').then(function(r){ return r.json(); }).then(function(x){
-      var n = (x || []).map(function(m){ return { i: String(m.id), n: m.nome }; }); if (n.length){ try { localStorage.setItem('nascer-cid2-' + uf, JSON.stringify(n)); } catch(e){} renderDash(); }
+      var n = (x || []).map(function(m){ return { i: String(m.id), n: m.nome }; }); if (n.length){ try { localStorage.setItem('nascer-cid2-' + uf, JSON.stringify(n)); } catch(e){} renderDash(); renderParcNovo(); }
     }).catch(function(){});
     return null;
   }
   function soCidade(r){ var c = String(r.cidade || '').trim(), uf = ufDaCliente(r); return uf ? c.replace(new RegExp('[\\s/,.-]+' + uf + '$', 'i'), '').trim() : c; }
-  function dnMapa(lista){
+  // mapa do Brasil por estado e cidade (Dashboard: mães; Parceiros: parceiros/prospectadores, com marcadores)
+  function mapaBr(lista, o){
     mapaCarregar();
-    var porUf = {}, porCid = {};
-    lista.forEach(function(r){ var uf = ufDaCliente(r); if (!uf) return; porUf[uf] = (porUf[uf] || 0) + 1; var c = soCidade(r) || ''; var k = uf + '|' + c; (porCid[k] = porCid[k] || { uf: uf, cidade: c, rows: [] }).rows.push(r); });
+    var porUf = {}, porCid = {}, semUf = 0, at = o.attr, sel = o.sel || '';
+    lista.forEach(function(r){ var uf = o.uf(r); if (!uf){ semUf++; return; } porUf[uf] = (porUf[uf] || 0) + 1; var c = o.cid(r) || ''; var k = uf + '|' + c; (porCid[k] = porCid[k] || { uf: uf, cidade: c, rows: [] }).rows.push(r); });
     var max = Math.max.apply(null, Object.keys(porUf).map(function(k){ return porUf[k]; }).concat([1]));
-    var L = 520, A = 470, svg = '<div class="dn-mapa-vazio"></div>';
+    var L = 520, A = 470, svg = '<div class="dn-mapa-vazio"></div>', op0 = o.pinos ? 0.16 : 0.28, op1 = o.pinos ? 0.44 : 0.62;
+    var tit = function(uf, n){ return esc((NOME_UF[uf] || uf) + ': ' + plural(n, o.um, o.muitos) + (o.extraUf ? o.extraUf(uf) : '')); };
     if (mapaGeo){
       var minX = 180, maxX = -180, minY = 90, maxY = -90;
       var cada = function(g, fn){ (g.type === 'Polygon' ? [g.coordinates] : g.coordinates).forEach(function(poly){ poly.forEach(function(anel){ anel.forEach(fn); }); }); };
       mapaGeo.features.forEach(function(f){ cada(f.geometry, function(p){ if (p[0] < minX) minX = p[0]; if (p[0] > maxX) maxX = p[0]; if (p[1] < minY) minY = p[1]; if (p[1] > maxY) maxY = p[1]; }); });
       var k = Math.min((L - 12) / (maxX - minX), (A - 12) / (maxY - minY)), ox = (L - (maxX - minX) * k) / 2, oy = (A - (maxY - minY) * k) / 2;
-      var px = function(p){ return (ox + (p[0] - minX) * k).toFixed(1) + ',' + (oy + (maxY - p[1]) * k).toFixed(1); };
-      svg = '<svg viewBox="0 0 ' + L + ' ' + A + '" class="dn-mapa-svg" role="img" aria-label="Mapa do Brasil com as mães por estado">' + mapaGeo.features.map(function(f){
-        var uf = SIGLA_IBGE[f.properties.codarea], n = porUf[uf] || 0, d = (f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.coordinates).map(function(poly){ return poly.map(function(anel){ return 'M' + anel.map(px).join('L') + 'Z'; }).join(''); }).join('');
-        return '<path d="' + d + '" class="dn-uf' + (n ? ' tem' : '') + (mapaEscolha === uf + '|*' ? ' esc' : '') + '"' + (n ? ' data-mapa="' + uf + '|*" style="fill-opacity:' + (0.28 + 0.62 * n / max).toFixed(2) + '"' : '') + '><title>' + esc((NOME_UF[uf] || uf) + ': ' + plural(n, 'mãe', 'mães')) + '</title></path>';
+      var X = function(p){ return ox + (p[0] - minX) * k; }, Y = function(p){ return oy + (maxY - p[1]) * k; };
+      var px = function(p){ return X(p).toFixed(1) + ',' + Y(p).toFixed(1); }, pinos = [];
+      svg = '<svg viewBox="0 0 ' + L + ' ' + A + '" class="dn-mapa-svg" role="img" aria-label="' + esc(o.aria) + '">' + mapaGeo.features.map(function(f){
+        var uf = SIGLA_IBGE[f.properties.codarea], n = porUf[uf] || 0, polys = f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.coordinates;
+        var d = polys.map(function(poly){ return poly.map(function(anel){ return 'M' + anel.map(px).join('L') + 'Z'; }).join(''); }).join('');
+        if (o.pinos && n){   // marcador no centro do maior pedaço do estado
+          var melhor = null, area = 0;
+          polys.forEach(function(poly){ var an = poly[0], a = 0, cx = 0, cy = 0; for (var i = 0, j = an.length - 1; i < an.length; j = i++){ var xi = X(an[i]), yi = Y(an[i]), xj = X(an[j]), yj = Y(an[j]), cr = xj * yi - xi * yj; a += cr; cx += (xi + xj) * cr; cy += (yi + yj) * cr; } if (a && Math.abs(a) > area){ area = Math.abs(a); melhor = [cx / (3 * a), cy / (3 * a)]; } });
+          if (melhor) pinos.push({ uf: uf, n: n, x: melhor[0], y: melhor[1] });
+        }
+        return '<path d="' + d + '" class="dn-uf' + (n ? ' tem' : '') + (sel === uf + '|*' ? ' esc' : '') + '"' + (n ? ' ' + at + '="' + uf + '|*" style="fill-opacity:' + (op0 + op1 * n / max).toFixed(2) + '"' : '') + '><title>' + tit(uf, n) + '</title></path>';
+      }).join('') + pinos.sort(function(a, b){ return a.y - b.y; }).map(function(p){
+        return '<g class="dn-pino' + (sel === p.uf + '|*' ? ' esc' : '') + '" ' + at + '="' + p.uf + '|*" transform="translate(' + p.x.toFixed(1) + ' ' + p.y.toFixed(1) + ')"><title>' + tit(p.uf, p.n) + '</title><path d="M0 0C-2-6-10-10-10-18A10 10 0 1 1 10-18C10-10 2-6 0 0Z"/><text y="-14.5" text-anchor="middle">' + p.n + '</text></g>';
       }).join('') + '</svg>';
     }
     var ufs = Object.keys(porUf).sort(function(a, b){ return porUf[b] - porUf[a] || a.localeCompare(b); });
     var listaHtml = ufs.length ? ufs.map(function(uf){
       var cids = Object.keys(porCid).filter(function(c){ return porCid[c].uf === uf; }).map(function(c){ return porCid[c]; }).sort(function(a, b){ return b.rows.length - a.rows.length || a.cidade.localeCompare(b.cidade, 'pt'); });
       cidadesUfMapa(uf);
-      return '<div class="dn-uf-bloco"><button type="button" class="dn-uf-lin' + (mapaEscolha === uf + '|*' ? ' esc' : '') + '" data-mapa="' + uf + '|*"><span>' + flagUfImg(uf) + '<b>' + esc(NOME_UF[uf] || uf) + '</b> <small>· ' + uf + '</small></span><b class="tnum">' + porUf[uf] + '</b></button>' +
+      return '<div class="dn-uf-bloco"><button type="button" class="dn-uf-lin' + (sel === uf + '|*' ? ' esc' : '') + '" ' + at + '="' + uf + '|*"><span>' + flagUfImg(uf) + '<b>' + esc(NOME_UF[uf] || uf) + '</b> <small>· ' + uf + '</small></span><b class="tnum">' + porUf[uf] + '</b></button>' +
         cids.map(function(c){ var u = c.cidade ? bandeiraDaCidade(uf, c.cidade) : '', ch = uf + '|' + c.cidade;
-          return '<button type="button" class="dn-cid' + (mapaEscolha === ch ? ' esc' : '') + '" data-mapa="' + esc(ch) + '">' + (u ? '<img src="' + esc(u) + '" alt="Bandeira de ' + esc(c.cidade) + '" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'dn-semflag\'}))">' : '<span class="dn-semflag">' + svgI('i-pin') + '</span>') + '<span class="dn-cid-n">' + esc(c.cidade || 'Cidade não informada') + '</span><b class="tnum">' + c.rows.length + '</b></button>'; }).join('') + '</div>';
-    }).join('') : '<p class="dn-vazio">Nenhuma mãe com cidade ou estado no período.</p>';
+          return '<button type="button" class="dn-cid' + (sel === ch ? ' esc' : '') + '" ' + at + '="' + esc(ch) + '">' + (u ? '<img src="' + esc(u) + '" alt="Bandeira de ' + esc(c.cidade) + '" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'dn-semflag\'}))">' : '<span class="dn-semflag">' + svgI('i-pin') + '</span>') + '<span class="dn-cid-n">' + esc(c.cidade || 'Cidade não informada') + '</span><b class="tnum">' + c.rows.length + '</b></button>'; }).join('') + '</div>';
+    }).join('') : '<p class="dn-vazio">' + esc(o.vazio) + '</p>';
     var esc2 = '';
-    if (mapaEscolha){
-      var p = mapaEscolha.split('|'), quem = p[1] === '*' ? lista.filter(function(r){ return ufDaCliente(r) === p[0]; }) : ((porCid[mapaEscolha] || {}).rows || []);
-      esc2 = '<div class="dn-quem"><div class="dn-quem-cab"><b>' + esc(p[1] === '*' ? (NOME_UF[p[0]] || p[0]) : p[1] + '/' + p[0]) + ' (' + quem.length + ')</b><button type="button" data-mapa-fechar aria-label="Fechar lista">' + svgI('i-x') + '</button></div><ul>' +
-        quem.map(function(r){ return '<li><button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome || 'Sem nome') + '</button>' + (p[1] === '*' && soCidade(r) ? '<small> · ' + esc(soCidade(r)) + '</small>' : '') + '<span class="tnum">' + fmtDate(dataCad(r)) + '</span></li>'; }).join('') + '</ul></div>';
+    if (sel){
+      var p = sel.split('|'), quem = p[1] === '*' ? lista.filter(function(r){ return o.uf(r) === p[0]; }) : ((porCid[sel] || {}).rows || []);
+      esc2 = '<div class="dn-quem"><div class="dn-quem-cab"><b>' + esc(p[1] === '*' ? (NOME_UF[p[0]] || p[0]) : p[1] + '/' + p[0]) + ' (' + quem.length + ')</b><button type="button" ' + o.fechar + ' aria-label="Fechar lista">' + svgI('i-x') + '</button></div><ul>' +
+        quem.map(function(r){ return o.item(r, p[1] === '*'); }).join('') + '</ul></div>';
     }
-    return '<div class="card dn-mapa"><div class="dn-mapa-esq">' + svg + '<p class="dn-mapa-leg"><i></i>mais mães, cor mais forte</p></div><div class="dn-mapa-dir">' + listaHtml + esc2 + '</div></div>';
+    return '<div class="card dn-mapa' + (o.pinos ? ' com-pinos' : '') + '"><div class="dn-mapa-esq">' + svg + '<p class="dn-mapa-leg"><i></i>' + esc(o.leg) + '</p></div><div class="dn-mapa-dir">' + listaHtml + (semUf && o.semUf ? '<p class="dn-vazio">' + esc(o.semUf(semUf)) + '</p>' : '') + esc2 + '</div></div>';
+  }
+  function dnMapa(lista){
+    return mapaBr(lista, { uf: ufDaCliente, cid: soCidade, sel: mapaEscolha, attr: 'data-mapa', fechar: 'data-mapa-fechar', um: 'mãe', muitos: 'mães', aria: 'Mapa do Brasil com as mães por estado', leg: 'mais mães, cor mais forte', vazio: 'Nenhuma mãe com cidade ou estado no período.',
+      item: function(r, est){ return '<li><button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome || 'Sem nome') + '</button>' + (est && soCidade(r) ? '<small> · ' + esc(soCidade(r)) + '</small>' : '') + '<span class="tnum">' + fmtDate(dataCad(r)) + '</span></li>'; } });
   }
   // coluna de indicador (como o Indicador do BI de Vendas): título em caixa alta, valor, barrinha da parte e legenda
   function dnInd(rot, valor, pct, cor, legenda, extra, fn){
@@ -5727,7 +5753,7 @@ html[data-fx="novo"] .parcn-pausa{margin-left:6px;padding:1px 6px;border-radius:
   var PARC_TIPOS = [['maternidade', 'Maternidade / hospital'], ['clinica', 'Clínica'], ['consultorio', 'Consultório médico'], ['outro', 'Outra instituição'], ['agente', 'Agente de saúde'], ['pessoa', 'Pessoa']];
   function parcPessoa(t){ return t === 'agente' || t === 'pessoa'; }
   var UFS = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'];
-  var parcAba = 'parc', parcNQ = '', parcNSit = 'ativos', parcNTipo = '', parcNPros = '';
+  var parcAba = 'parc', parcNQ = '', parcNSit = 'ativos', parcNTipo = '', parcNPros = '', parcMapa = '';
   function parcTipo(p){ return p.tipoParceiro || (p.tipo === 'clinica' ? 'clinica' : 'pessoa'); }
   function parcTipoNome(p){ var t = parcTipo(p); return (PARC_TIPOS.filter(function(x){ return x[0] === t; })[0] || [0, 'Outro'])[1]; }
   function parcNome(p){ return p.tipo === 'clinica' && p.clinica ? p.clinica : (p.nome || 'Sem nome'); }
@@ -5760,10 +5786,21 @@ html[data-fx="novo"] .parcn-pausa{margin-left:6px;padding:1px 6px;border-radius:
       dnCard('i-baby', 'Mães indicadas no mês', doMes(comResp), plural(comResp.length, 'mãe', 'mães') + ' desde o início') +
       (adm ? dnCard('i-cash', 'Repasse pago no mês', moedaTxt(pagoMes), aPagar ? 'a pagar: ' + moedaTxt(aPagar) : 'nenhuma comissão pendente', '', 'Comissões de parceiros e prospectadores com baixa no Financeiro.', 'f')
         : dnCard('i-check', 'Benefícios concedidos', comResp.filter(ganhou).length, 'das mães indicadas')) + '</div>';
-    var ehP = parcAba === 'parc';
-    html += '<div class="fbar parcn-bar"><div class="parcn-seg" role="group" aria-label="Lista">' +
+    var ehP = parcAba === 'parc', noMapa = (ehP ? ativos : prosAt);
+    var maesDoPros = function(p){ var ids = parcs.filter(function(x){ return x.prospectadorId === p.id; }).map(function(x){ return x.id; }); if (p.tambemParceiro) ids.push(p.id); return maesDe(ids).length; };
+    var maesUf = function(uf){ var n = 0; noMapa.forEach(function(p){ if (parcUf(p) === uf) n += ehP ? maesDe([p.id]).length : maesDoPros(p); }); return ' · ' + plural(n, 'mãe', 'mães'); };
+    html += '<div class="parcn-topo">' + '<div class="parcn-seg" role="group" aria-label="Lista">' +
       '<button type="button" data-parcn-aba="parc" aria-pressed="' + ehP + '">Parceiros <span class="tnum">' + parcs.length + '</span></button>' +
-      '<button type="button" data-parcn-aba="pros" aria-pressed="' + !ehP + '">Prospectadores <span class="tnum">' + pros.length + '</span></button></div>' +
+      '<button type="button" data-parcn-aba="pros" aria-pressed="' + !ehP + '">Prospectadores <span class="tnum">' + pros.length + '</span></button></div>' + '</div>';
+    html += dnSecao(ehP ? 'Onde estão os parceiros' : 'Onde estão os prospectadores', (ehP ? 'Parceiros ativos' : 'Prospectadores ativos') + ' por estado e cidade. Clique no marcador, no estado ou na cidade para ver quem são.', mapaBr(noMapa, {
+      uf: parcUf, cid: function(p){ return p.cidadeParc || p.regiao || ''; }, sel: parcMapa, attr: 'data-pmapa', fechar: 'data-pmapa-fechar', pinos: true, extraUf: maesUf,
+      um: ehP ? 'parceiro' : 'prospectador', muitos: ehP ? 'parceiros' : 'prospectadores', aria: 'Mapa do Brasil com os ' + (ehP ? 'parceiros' : 'prospectadores') + ' por estado',
+      leg: ehP ? 'mais parceiros, cor mais forte' : 'mais prospectadores, cor mais forte', vazio: ehP ? 'Nenhum parceiro ativo com estado informado.' : 'Nenhum prospectador ativo com estado informado.',
+      semUf: function(n){ return plural(n, ehP ? 'parceiro' : 'prospectador', ehP ? 'parceiros' : 'prospectadores') + ' sem estado informado (edite para aparecer no mapa).'; },
+      item: function(p, est){ var c = p.cidadeParc || p.regiao || '', m = ehP ? maesDe([p.id]).length : maesDoPros(p);
+        return '<li>' + (adm ? '<button type="button" class="nome-abrir" data-parcn-edit="' + esc(p.id) + '">' + esc(parcNome(p)) + '</button>' : '<b>' + esc(parcNome(p)) + '</b>') + (est && c ? '<small> · ' + esc(c) + '</small>' : '') + '<span class="tnum">' + plural(m, 'mãe', 'mães') + '</span></li>'; }
+    }));
+    html += '<div class="fbar parcn-bar">' +
       '<div class="search tb-busca"><svg class="i"><use href="#i-search"/></svg><input id="parcn-q" type="search" autocomplete="off" placeholder="' + (ehP ? 'Buscar parceiro, CNPJ, cidade…' : 'Buscar prospectador…') + '" value="' + esc(parcNQ) + '"></div>' +
       '<select class="tb-sel' + (parcNSit !== 'ativos' ? ' ativo' : '') + '" id="parcn-sit" aria-label="Situação">' + [['ativos', 'Ativos'], ['pausados', 'Pausados'], ['todos', 'Todos']].map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === parcNSit ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
       (ehP ? '<select class="tb-sel' + (parcNTipo ? ' ativo' : '') + '" id="parcn-tipo" aria-label="Tipo"><option value="">Tipo: todos</option>' + PARC_TIPOS.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === parcNTipo ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
@@ -5881,7 +5918,9 @@ html[data-fx="novo"] .parcn-pausa{margin-left:6px;padding:1px 6px;border-radius:
   }
   document.addEventListener('click', function(e){
     if (!e.target.closest) return;
-    var ab = e.target.closest('[data-parcn-aba]'); if (ab){ parcAba = ab.dataset.parcnAba; parcNQ = ''; renderParcNovo(); return; }
+    var ab = e.target.closest('[data-parcn-aba]'); if (ab){ parcAba = ab.dataset.parcnAba; parcNQ = ''; parcMapa = ''; renderParcNovo(); return; }
+    if (e.target.closest('#parc-novo [data-pmapa-fechar]')){ parcMapa = ''; renderParcNovo(); return; }
+    var pm = e.target.closest('#parc-novo [data-pmapa]'); if (pm){ parcMapa = parcMapa === pm.dataset.pmapa ? '' : pm.dataset.pmapa; renderParcNovo(); return; }
     var nv = e.target.closest('[data-parcn-novo]'); if (nv){ if (nv.dataset.parcnNovo === 'pros') abrirProsNovo(null); else abrirParcNovo(null); return; }
     var fn = e.target.closest('#parc-novo [data-fn]'); if (fn){ showTab(fn.dataset.fn); return; }
     var ap = e.target.closest('[data-parcn-app]'); if (ap){ var pa = prospById(ap.dataset.parcnApp); if (pa) abrirLinkCampo(pa); return; }
