@@ -1900,6 +1900,9 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
 .fluxo-seg button[aria-pressed="true"]{background:hsl(var(--c-pri));color:hsl(var(--c-on));font-weight:600}
 .fluxo-seg button[aria-pressed="true"] b{opacity:.9}
 .app.collapsed .fluxo-seg{display:none}
+
+/* fluxo novo: ação da pendência como link (WhatsApp) */
+a.kb-btn{text-decoration:none;justify-content:center;gap:6px}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -1995,15 +1998,15 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
     <div class="fluxo-seg" role="group" aria-label="Qual fluxo ver"><button type="button" data-fluxo="novo" title="Mães que vêm do app novo, já qualificadas e com contrato: sem closer e sem Controladoria">Fluxo novo<b id="fx-n-novo" class="tnum"></b></button><button type="button" data-fluxo="antigo" title="Como funciona hoje: closer, Controladoria e Fila de protocolo">Fluxo antigo<b id="fx-n-antigo" class="tnum"></b></button></div>
     <nav class="nav" role="tablist" aria-orientation="vertical">
       <button class="tab" role="tab" id="tab-dash" aria-selected="false" type="button" title="Dashboard"><svg class="i"><use href="#i-grid"/></svg><span>Dashboard</span></button>
-      <div class="nav-lbl" aria-hidden="true">Comercial</div>
+      <div class="nav-lbl" id="lbl-com" aria-hidden="true">Comercial</div>
       <button class="tab" role="tab" id="tab-cad" aria-selected="false" type="button" title="Cadastro"><svg class="i"><use href="#i-phone"/></svg><span>Cadastro</span><b class="nav-n tnum" id="nn-d"></b></button>
       <button class="tab" role="tab" id="tab-desq" aria-selected="false" type="button" title="Perdas e desqualificados"><svg class="i"><use href="#i-bellx"/></svg><span>Perdas e desqualificados</span></button>
-      <div class="nav-lbl" aria-hidden="true">Pós-venda</div>
+      <div class="nav-lbl" id="lbl-pos" aria-hidden="true">Pós-venda</div>
       <button class="tab" role="tab" id="tab-ctr" aria-selected="false" type="button" title="Pós-venda"><svg class="i"><use href="#i-check"/></svg><span>Pós-venda</span><b class="nav-n tnum" id="nn-k"></b></button>
       <button class="tab" role="tab" id="tab-gps" aria-selected="false" type="button" title="GPS (urbana)" hidden><svg class="i"><use href="#i-cash"/></svg><span>GPS (urbana)</span><b class="nav-n tnum" id="nn-gp"></b></button>
       <button class="tab" role="tab" id="tab-nasc" aria-selected="false" type="button" title="Aguardando nascimento" hidden><svg class="i"><use href="#i-baby"/></svg><span>Aguardando parto</span><b class="nav-n tnum" id="nn-an"></b></button>
       <button class="tab" role="tab" id="tab-req" aria-selected="false" type="button" title="Requerimento" hidden><svg class="i"><use href="#i-file"/></svg><span>Requerimento</span><b class="nav-n tnum" id="nn-rq"></b></button>
-      <div class="nav-lbl" aria-hidden="true">Operacional</div>
+      <div class="nav-lbl" id="lbl-op" aria-hidden="true">Operacional</div>
       <button class="tab" role="tab" id="tab-fila" aria-selected="false" type="button" title="Fila de protocolo"><svg class="i"><use href="#i-file"/></svg><span>Fila de protocolo</span><b class="nav-n tnum" id="nn-h"></b></button>
       <button class="tab" role="tab" id="tab-inss" aria-selected="false" type="button" title="INSS"><svg class="i"><use href="#i-inss"/></svg><span>INSS</span><b class="nav-n tnum" id="nn-i"></b></button>
       <button class="tab" role="tab" id="tab-jud" aria-selected="false" type="button" title="Judicial"><svg class="i"><use href="#i-gavel"/></svg><span>Judicial</span><b class="nav-n tnum" id="nn-c"></b></button>
@@ -3291,7 +3294,7 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
       '<div class="docs-app"><b>Documentos juntados no app</b><div class="docs-chips">' + docsApp(r).map(function(x){ return '<span class="doc-chip ' + (x.ok ? 'ok' : 'no') + '">' + (x.ok ? '✓' : '–') + ' ' + esc(x.n) + '</span>'; }).join('') + '</div>' +
         (fl.length ? '<div class="docs-recebi"><span>Faltam: ' + esc(faltaTexto(r)) + '. Se chegou por outro meio, marque como recebido:</span><div>' + fl.map(function(k){ return '<button type="button" class="btn" data-act="recebido" data-id="' + esc(r.id) + '" data-doc="' + k + '"><svg class="i"><use href="#i-check"/></svg>Recebi ' + DOC_FALTA[k] + '</button>'; }).join('') + '</div></div>' : '') + '</div>' +
       '<div class="ficha-acoes"><button type="button" class="btn" data-act="edit" data-id="' + esc(r.id) + '"><svg class="i"><use href="#i-pencil"/></svg>Editar cadastro</button>' +
-      (fechado(r) ? '<button type="button" class="btn" data-act="voltar-cad" data-id="' + esc(r.id) + '" title="Desfaz o fechamento do contrato">↩ Voltar ao Cadastro</button>' : '') +
+      (fechado(r) && !doFluxoNovo(r) ? '<button type="button" class="btn" data-act="voltar-cad" data-id="' + esc(r.id) + '" title="Desfaz o fechamento do contrato">↩ Voltar ao Cadastro</button>' : '') +
       (r.pastaUrl ? '<a class="btn" style="text-decoration:none" href="' + esc(urlSegura(r.pastaUrl)) + '" target="_blank" rel="noopener"><svg class="i"><use href="#i-folder"/></svg>Pasta no Drive</a>' : '') +
       '</div></div>';
   }
@@ -3382,7 +3385,7 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
   }
   function fcDados(r){
     var t = faseDe(r), id = esc(r.id), resp = fcResp(r, t), etapaSel;
-    if (t === 'k' || ((t === 'gp' || t === 'an' || t === 'rq') && noContratos(r))) etapaSel = '<select data-pos="' + id + '">' + posColsDe(r).map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === posEtapaDe(r) ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '<option value="__cad">↩ Voltar ao Cadastro</option></select>';
+    if (t === 'k' || ((t === 'gp' || t === 'an' || t === 'rq') && noContratos(r))) etapaSel = '<select data-pos="' + id + '">' + posColsDe(r).map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === posEtapaDe(r) ? ' selected' : '') + '>' + esc(posNome(r, c)) + '</option>'; }).join('') + (doFluxoNovo(r) ? '' : '<option value="__cad">↩ Voltar ao Cadastro</option>') + '</select>';
     else if (t === 'd') etapaSel = '<select data-lead="' + id + '">' + Object.keys(LEAD).map(function(x){ return '<option value="' + x + '"' + (x === leadDe(r) ? ' selected' : '') + '>' + LEAD[x] + '</option>'; }).join('') + '</select>';
     else if (t === 'i') etapaSel = '<select data-inss="' + id + '">' + Object.keys(INSS).map(function(x){ return '<option value="' + x + '"' + (x === statusInss(r) ? ' selected' : '') + '>' + INSS[x][0] + '</option>'; }).join('') + '</select>';
     else etapaSel = '<input disabled value="' + esc(faseTexto(r).split(' · ')[1] || '—') + '">';
@@ -3406,7 +3409,7 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
         fcLeitura('Origem do contrato', parNome || '—') + fcLeitura('Cidade', cidadeCli(r)) + fcLeitura('Criança', r.crianca) +
         fcLeitura('Exigência', r.inssStatus === 'exigencia' ? (r.exigenciaObs || 'Sem descrição') + (r.exigenciaPrazo ? ' · prazo ' + fmtDate(r.exigenciaPrazo) : '') : '') + fcLeitura('Motivo', r.desqualMotivo || r.motivoIndeferimento || r.motivoArquivo) +
         fcLeitura('Resultado', r.resultado && RES[r.resultado] ? RES[r.resultado][0] : '') + fcLeitura('Pagamento', r.pagamento && PAG[r.pagamento] ? PAG[r.pagamento][0] : '') + fcLeitura('Penalidades', penalidadesTxt(r)) + '</div>' +
-      (fechado(r) ? '<button type="button" class="fc-volta" data-act="voltar-cad">↩ Voltar ao Cadastro</button>' : '') +
+      (fechado(r) && !doFluxoNovo(r) ? '<button type="button" class="fc-volta" data-act="voltar-cad">↩ Voltar ao Cadastro</button>' : '') +
       '<div class="fc-salvar"><button type="button" class="btn primary" data-fc-salvar>Atualizar dados</button></div></div>';
   }
   function fcArquivos(r){
@@ -4213,6 +4216,8 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
   var POS_COLS = [['senha', 'Senha Meu INSS'], ['docs', 'Documentação Pessoal'], ['prazo_gps', 'Aguardando Prazo da GPS'], ['gps', 'Emitir/Pagar GPS'], ['nasc', 'Aguardando Nascimento'], ['cert', 'Solicitar Certidão de Nascimento'], ['ok', 'Documentação OK']];
   var POS_ORDEM = POS_COLS.map(function(c){ return c[0]; }), POS_LEGADO = { recem: 'senha', falta_gov: 'senha', falta_doc: 'docs', rural: 'docs', guia: 'gps' };
   var POS_SO_GESTANTE = { prazo_gps: 1, gps: 1, nasc: 1 }, POS_SO_URBANA = { prazo_gps: 1, gps: 1 };
+  var POS_NOME_NOVO = { senha: 'Senha gov.br', docs: 'Documentos', prazo_gps: 'GPS · aguardando o prazo', gps: 'GPS · pagar agora', nasc: 'Aguardando parto', cert: 'Aguardando certidão', ok: 'Pronta para requerer' };
+  function posNome(r, c){ return (doFluxoNovo(r) && POS_NOME_NOVO[c[0]]) || c[1]; }
   function posColsDe(r){ return POS_COLS.filter(function(c){ return !(nascido(r) && POS_SO_GESTANTE[c[0]]) && !(rural(r) && POS_SO_URBANA[c[0]]); }); }
   function posLane(r){ return nascido(r) ? 'nasc' : 'gest'; }
   // a coluna vem do que foi gravado, mais o que as datas mandam (só anda para frente)
@@ -4258,12 +4263,19 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
     if (atr) st.push(kbSt(atr.charAt(0).toUpperCase() + atr.slice(1)));
     if ((et === 'docs' || et === 'ok') && faltamTxt(r)) st.push(kbSt('Falta: ' + faltamTxt(r), 'lar'));
     var meta = [linhaPartoBv(r), linhaGps(r), linhaOrigem(r), linhaDocs(r)];
-    var opts = posColsDe(r).map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === et ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '<option value="__cad">↩ Voltar ao Cadastro</option>';
+    var opts = posColsDe(r).map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === et ? ' selected' : '') + '>' + esc(posNome(r, c)) + '</option>'; }).join('') + (doFluxoNovo(r) ? '' : '<option value="__cad">↩ Voltar ao Cadastro</option>');
     var acao = gpsTarefa(r) ? '<button type="button" class="kb-btn" data-guia-paga="' + id + '">' + svgI('i-cash') + 'Marcar GPS paga</button>'
       : et === 'cert' ? '<button type="button" class="kb-btn" data-pv-cert="' + id + '">' + svgI('i-check') + 'Recebi a certidão</button>'
       : et === 'ok' || r.pvAnalise === 'devolvido' ? (doFluxoNovo(r) ? '<button type="button" class="kb-btn" data-pv-enc="' + id + '" title="Pasta pronta: vai direto para a Fila de protocolo">' + svgI('i-file') + 'Encaminhar para protocolo</button>' : '<button type="button" class="kb-btn" data-pv-enc="' + id + '" title="Manda para a Controladoria: se estiver OK, vai para o protocolo; se não, volta para regularizar">' + svgI('i-file') + 'Encaminhar para análise</button>') : '';
-    return { etapa: (POS_COLS.filter(function(c){ return c[0] === et; })[0] || [0, ''])[1], etapaSel: '<select data-pos="' + id + '" aria-label="Etapa de ' + esc(r.nome) + '">' + opts + '</select>',
-      meta: meta, status: st, acao: acao, resp: r.posResp || r.contratoPor, dias: d, parado: d > 14, dataVal: nascido(r) ? 'Nasceu ' + (r.criancaNasc ? fmtDate(String(r.criancaNasc).slice(0, 10)) : '') : r.dpp ? fmtDate(String(r.dpp).slice(0, 10)) : 'Sem data',
+    if (doFluxoNovo(r) && faseDe(r) === 'k'){
+      var zpN = zapUrl(foneDe(r));
+      acao = !r.tipoSegurada ? tipoSeg(r)
+        : et === 'senha' ? '<button type="button" class="kb-btn" data-act="abrir" data-id="' + id + '" title="Abre a ficha: a senha gov.br fica logo abaixo do CPF">' + svgI('i-chave') + 'Cadastrar senha</button>'
+        : zpN ? '<a class="kb-btn" target="_blank" rel="noopener" href="' + esc(zpN + '?text=' + encodeURIComponent(msgCobranca(r))) + '" title="Abre o WhatsApp com a mensagem pronta; você confere e envia">' + svgI('i-zap') + 'Cobrar no WhatsApp</a>'
+        : '<button type="button" class="kb-btn" data-act="edit" data-id="' + id + '" title="Sem telefone: abra o cadastro e informe o WhatsApp da mãe">' + svgI('i-pencil') + 'Pôr o telefone</button>';
+    }
+    return { etapa: posNome(r, POS_COLS.filter(function(c){ return c[0] === et; })[0] || [et, '']), etapaSel: '<select data-pos="' + id + '" aria-label="Etapa de ' + esc(r.nome) + '">' + opts + '</select>',
+      meta: meta, status: st, acao: acao, resp: r.posResp || (doFluxoNovo(r) ? '' : r.contratoPor), dias: d, parado: d > 14, dataVal: nascido(r) ? 'Nasceu ' + (r.criancaNasc ? fmtDate(String(r.criancaNasc).slice(0, 10)) : '') : r.dpp ? fmtDate(String(r.dpp).slice(0, 10)) : 'Sem data',
       mover: kbMover('<select data-pos="' + id + '" aria-label="Mover ' + esc(r.nome) + '">' + opts + '</select>') };
   }
   function posCard(r){ var i = posInfo(r); return kbCard(r, { arrasta: true, rotulo: 'Salário-maternidade' + (tipoSmTxt(r) ? ' ' + tipoSmTxt(r).toLowerCase() : ''), resp: i.resp, dias: i.dias, parado: i.parado, meta: i.meta, status: i.status, problema: r.pvProblema, acoes: i.acao, caso: true }); }
@@ -4323,7 +4335,7 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
   }
   /* ---------- fluxo novo: GPS (urbana), Aguardando nascimento e Requerimento ---------- */
   var gpnQ = '', nanQ = '', rqnQ = '';
-  function selPos(r){ var id = esc(r.id); return '<select data-pos="' + id + '" aria-label="Etapa de ' + esc(r.nome) + '">' + posColsDe(r).map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === posEtapaDe(r) ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '</select>'; }
+  function selPos(r){ var id = esc(r.id); return '<select data-pos="' + id + '" aria-label="Etapa de ' + esc(r.nome) + '">' + posColsDe(r).map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === posEtapaDe(r) ? ' selected' : '') + '>' + esc(posNome(r, c)) + '</option>'; }).join('') + '</select>'; }
   function emDias(d){ var n = daysUntil(d); return n == null ? '' : n > 0 ? 'em ' + n + ' d' : n === 0 ? 'hoje' : 'há ' + (-n) + ' d'; }
   function gpsInfoN(r){
     var et = posEtapaDe(r), v = prazoGps(r), g = gpsGerar(r), st = [];
@@ -5254,7 +5266,7 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
     var v = brl(r.recebimento && r.recebimento.valor ? r.recebimento.valor : valorBenef(r));
     return { etapa: r.contatadoRetorno ? 'Contatada para novo benefício' : 'Paga e arquivada', meta: ['Benefício ' + v + ' · ' + (origem(r) === 'inss' ? 'INSS' : 'Judicial'), r.arquivadoEm ? 'Encerrado ' + fmtDate(String(r.arquivadoEm).slice(0, 10)) : ''], status: [],
       acao: '<button type="button" class="kb-btn ' + (r.contatadoRetorno ? 'sec' : '') + '" data-act="contato" data-id="' + esc(r.id) + '" title="Mãe já atendida: pode ter direito de novo com outro filho">' + svgI('i-phone') + (r.contatadoRetorno ? 'Contatada: desmarcar' : 'Marcar contatada') + '</button>',
-      resp: r.posResp || r.contratoPor, dias: null, dataVal: r.arquivadoEm ? fmtDate(String(r.arquivadoEm).slice(0, 10)) : '—' };
+      resp: r.posResp || (doFluxoNovo(r) ? '' : r.contratoPor), dias: null, dataVal: r.arquivadoEm ? fmtDate(String(r.arquivadoEm).slice(0, 10)) : '—' };
   }
   function arqCard(r){ var i = arqInfo(r); return kbCard(r, { resp: i.resp, meta: i.meta, acoes: i.acao }); }
   /* ---------- Dashboard: números por período, gráfico de cadastros e contratos e rankings ---------- */
@@ -5301,8 +5313,8 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
     var fimA = y(s.a[n - 1]), fimB = y(s.b[n - 1]);
     if (Math.abs(fimA - fimB) < 14){ var c = (fimA + fimB) / 2, cima = s.a[n - 1] >= s.b[n - 1]; fimA = c + (cima ? -7 : 7); fimB = c + (cima ? 7 : -7); }
     var ponto = function(v, cor){ return '<circle cx="' + x(n - 1) + '" cy="' + y(v) + '" r="4" fill="var(' + cor + ')" class="dash-p"/>'; };
-    return '<div class="dash-graf"><svg class="dash-svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Cadastros e contratos por ' + (s.mensal ? 'mês' : 'dia') + '" data-ml="' + ml + '" data-pw="' + pw + '" data-n="' + n + '">' + grade + rotX + linha(s.a, '--ser-1') + linha(s.b, '--ser-2') + ponto(s.a[n - 1], '--ser-1') + ponto(s.b[n - 1], '--ser-2') +
-      '<text class="dash-rot" x="' + (W - mr + 10) + '" y="' + (fimA + 3.5) + '">Cadastros</text><text class="dash-rot" x="' + (W - mr + 10) + '" y="' + (fimB + 3.5) + '">Contratos</text>' +
+    return '<div class="dash-graf"><svg class="dash-svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + (s.na || 'Cadastros') + ' e ' + String(s.nb || 'Contratos').toLowerCase() + ' por ' + (s.mensal ? 'mês' : 'dia') + '" data-ml="' + ml + '" data-pw="' + pw + '" data-n="' + n + '">' + grade + rotX + linha(s.a, '--ser-1') + linha(s.b, '--ser-2') + ponto(s.a[n - 1], '--ser-1') + ponto(s.b[n - 1], '--ser-2') +
+      '<text class="dash-rot" x="' + (W - mr + 10) + '" y="' + (fimA + 3.5) + '">' + (s.na || 'Cadastros') + '</text><text class="dash-rot" x="' + (W - mr + 10) + '" y="' + (fimB + 3.5) + '">' + (s.nb || 'Contratos') + '</text>' +
       '<g class="dash-mira" hidden><line class="dash-cruz" y1="' + mt + '" y2="' + (mt + ph) + '"/><circle class="dash-p" r="4" fill="var(--ser-1)" data-y="a"/><circle class="dash-p" r="4" fill="var(--ser-2)" data-y="b"/></g></svg><div class="dash-tip" hidden></div></div>';
   }
   function dashRanking(tit, cab, linhas, vazio){
@@ -5319,22 +5331,36 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
     var pos = rows.filter(noContratos);
     html += '<div class="fbar"><div class="seg-bi" role="group" aria-label="Período">' + DASH_PERIODOS.map(function(p){ return '<button type="button" data-dash-per="' + p[0] + '" aria-pressed="' + (p[0] === dashPer) + '">' + p[1] + '</button>'; }).join('') + '</div><span class="tb-fim fb-count tnum">' + esc(faixa) + '</span></div>';
     html += dashSecao('Clientes por fase', 'agora', '<div class="stats">' + fasesAtivas().map(function(f){ return dashCard(f[0], f[1], TITULOS[f[0]][0], res[f[0]][0], res[f[0]][1]); }).join('') + '</div>');
-    html += dashSecao('Comercial', 'no período', '<div class="stats">' +
+    var novoF = fluxoVista === 'novo';
+    if (novoF) html += dashSecao('Entrada', 'no período', '<div class="stats">' +
+      dashCard('k', 'i-users', 'Mães que entraram', cads.length, 'qualificadas e com contrato') +
+      dashCard('gp', 'i-cash', 'Urbanas', cads.filter(function(r){ return tipoChave(r) === 'urbana'; }).length, 'pagam a GPS') +
+      dashCard('an', 'i-baby', 'Rurais', cads.filter(rural).length, 'prova rural, sem GPS') +
+      dashCard('k', 'i-alert', 'Com pendência agora', res.k[0], 'senha, documento, prova rural ou tipo') + '</div>');
+    else html += dashSecao('Comercial', 'no período', '<div class="stats">' +
       dashCard('d', 'i-phone', 'Mães cadastradas', cads.length, 'cadastradas no período') +
       dashCard('k', 'i-check', 'Contratos fechados', ctrs.length, 'fechados no período') +
       dashCard('d', 'i-users', 'Taxa de fechamento', taxa == null ? '—' : taxa + '%', taxa == null ? 'sem cadastros no período' : doGrupo + ' das ' + cads.length + ' cadastradas já fecharam') +
       dashCard('q', 'i-bellx', 'Perdas e desqualificados', perdas.length, 'encerrados no período') + '</div>');
-    var todasDatas = rows.map(dataCad).concat(rows.map(function(r){ return String(r.contratoEm || '').slice(0, 10); }));
+    var reqs = rows.filter(function(r){ return no(r.der); });
+    var todasDatas = rows.map(dataCad).concat(rows.map(function(r){ return String((novoF ? r.der : r.contratoEm) || '').slice(0, 10); }));
     var baldes = dashBaldes(j, todasDatas.filter(Boolean)), corte = j.mensal ? 7 : 10;
     var conta = function(lista, data){ return baldes.map(function(b){ return lista.filter(function(r){ return diaLocal(data(r)).slice(0, corte) === b.k; }).length; }); };
-    dashSerie = { mensal: j.mensal, rot: baldes.map(function(b){ return b.rot; }), a: conta(cads, dataCad), b: conta(ctrs, function(r){ return r.contratoEm; }) };
+    dashSerie = novoF ? { mensal: j.mensal, na: 'Entradas', nb: 'Requerimentos', rot: baldes.map(function(b){ return b.rot; }), a: conta(cads, dataCad), b: conta(reqs, function(r){ return r.der; }) }
+      : { mensal: j.mensal, na: 'Cadastros', nb: 'Contratos', rot: baldes.map(function(b){ return b.rot; }), a: conta(cads, dataCad), b: conta(ctrs, function(r){ return r.contratoEm; }) };
     var soma = function(v){ return v.reduce(function(a, x){ return a + x; }, 0); };
-    var cabGraf = '<div class="dash-graf-cab"><div class="dash-leg"><span><i style="background:var(--ser-1)"></i>Cadastros <b class="tnum">' + soma(dashSerie.a) + '</b></span><span><i style="background:var(--ser-2)"></i>Contratos <b class="tnum">' + soma(dashSerie.b) + '</b></span></div><div class="seg-bi" role="group" aria-label="Forma de ver"><button type="button" data-dash-tab="0" aria-pressed="' + !dashTabela + '">Gráfico</button><button type="button" data-dash-tab="1" aria-pressed="' + dashTabela + '">Tabela</button></div></div>';
+    var cabGraf = '<div class="dash-graf-cab"><div class="dash-leg"><span><i style="background:var(--ser-1)"></i>' + dashSerie.na + ' <b class="tnum">' + soma(dashSerie.a) + '</b></span><span><i style="background:var(--ser-2)"></i>' + dashSerie.nb + ' <b class="tnum">' + soma(dashSerie.b) + '</b></span></div><div class="seg-bi" role="group" aria-label="Forma de ver"><button type="button" data-dash-tab="0" aria-pressed="' + !dashTabela + '">Gráfico</button><button type="button" data-dash-tab="1" aria-pressed="' + dashTabela + '">Tabela</button></div></div>';
     var corpoGraf = dashTabela
-      ? '<div class="dash-tab-box"><table class="kb-tab dash-tab"><thead><tr><th>' + (j.mensal ? 'Mês' : 'Dia') + '</th><th class="dir">Cadastros</th><th class="dir">Contratos</th></tr></thead><tbody>' + dashSerie.rot.map(function(r, i){ return '<tr><td class="tnum">' + esc(r) + '</td><td class="dir tnum">' + dashSerie.a[i] + '</td><td class="dir tnum">' + dashSerie.b[i] + '</td></tr>'; }).reverse().join('') + '</tbody></table></div>'
+      ? '<div class="dash-tab-box"><table class="kb-tab dash-tab"><thead><tr><th>' + (j.mensal ? 'Mês' : 'Dia') + '</th><th class="dir">' + dashSerie.na + '</th><th class="dir">' + dashSerie.nb + '</th></tr></thead><tbody>' + dashSerie.rot.map(function(r, i){ return '<tr><td class="tnum">' + esc(r) + '</td><td class="dir tnum">' + dashSerie.a[i] + '</td><td class="dir tnum">' + dashSerie.b[i] + '</td></tr>'; }).reverse().join('') + '</tbody></table></div>'
       : dashGrafico(dashSerie, Math.floor(box.clientWidth - 28));
-    html += dashSecao('Cadastros e contratos', 'por ' + (j.mensal ? 'mês' : 'dia'), '<div class="card dash-graf-card">' + cabGraf + corpoGraf + '</div>');
-    html += dashSecao('Pós-venda, protocolo e INSS', 'no período', '<div class="stats">' +
+    html += dashSecao(novoF ? 'Entradas e requerimentos' : 'Cadastros e contratos', 'por ' + (j.mensal ? 'mês' : 'dia'), '<div class="card dash-graf-card">' + cabGraf + corpoGraf + '</div>');
+    if (novoF) html += dashSecao('GPS e INSS', 'no período', '<div class="stats">' +
+      dashCard('gp', 'i-alert', 'GPS a pagar', rows.filter(gpsTarefa).length, 'prazo chegou') +
+      dashCard('gp', 'i-cash', 'GPS pagas', rows.filter(function(r){ return no(r.guiaPagaEm); }).length, 'no período') +
+      dashCard('i', 'i-inss', 'Requerimentos feitos', reqs.length, 'no período') +
+      dashCard('i', 'i-check', 'Concedidos', rows.filter(function(r){ return r.inssStatus === 'concedido' && no(r.inssDecisaoEm); }).length, 'decididos no período') +
+      dashCard('i', 'i-x', 'Indeferidos', rows.filter(function(r){ return r.inssStatus === 'indeferido' && no(r.inssDecisaoEm); }).length, 'decididos no período') + '</div>');
+    else html += dashSecao('Pós-venda, protocolo e INSS', 'no período', '<div class="stats">' +
       dashCard('k', 'i-alert', 'GPS a pagar', pos.filter(gpsTarefa).length, 'agora no Pós-venda') +
       dashCard('h', 'i-file', fluxoVista === 'novo' ? 'Encaminhadas para protocolo' : 'Encaminhadas para análise', rows.filter(function(r){ return no(r.encaminhadoEm); }).length, 'no período') +
       dashCard('i', 'i-inss', 'Protocolos no INSS', rows.filter(function(r){ return no(r.der); }).length, 'no período') +
@@ -5353,7 +5379,9 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
     cads.forEach(function(r){ if (!r.responsavelId) return; var p = porParc[r.responsavelId] = porParc[r.responsavelId] || [0, 0]; p[0]++; if (r.contratoEm) p[1]++; });
     var rkC = Object.keys(porCloser).map(function(n){ return [n, porCloser[n]]; }).sort(function(a, b){ return b[1] - a[1] || a[0].localeCompare(b[0], 'pt'); }).slice(0, 8);
     var rkP = Object.keys(porParc).map(function(id){ var p = prospById(id); return [p ? (p.tipo === 'clinica' && p.clinica ? p.clinica : p.nome) : 'Parceiro removido', porParc[id][0], porParc[id][1]]; }).sort(function(a, b){ return b[1] - a[1] || b[2] - a[2] || a[0].localeCompare(b[0], 'pt'); }).slice(0, 8);
-    html += dashSecao('Rankings', 'no período', '<div class="dash-duo">' + dashRanking('Contratos por closer', ['Closer', 'Contratos'], rkC, 'Nenhum contrato fechado no período.') + dashRanking('Mães por parceiro', ['Parceiro', 'Mães', 'Contratos'], rkP, 'Nenhuma mãe de parceiro no período.') + '</div>');
+    var porResp = {}; rows.filter(function(r){ return fechado(r) || naFila(r); }).forEach(function(r){ var n = r.posResp || 'Sem responsável'; porResp[n] = (porResp[n] || 0) + 1; });
+    var rkR = Object.keys(porResp).map(function(n){ return [n, porResp[n]]; }).sort(function(a, b){ return b[1] - a[1] || a[0].localeCompare(b[0], 'pt'); }).slice(0, 8);
+    html += dashSecao('Rankings', 'no período', '<div class="dash-duo">' + (novoF ? dashRanking('Clientes em andamento por responsável', ['Responsável', 'Clientes'], rkR, 'Ninguém em andamento.') : dashRanking('Contratos por closer', ['Closer', 'Contratos'], rkC, 'Nenhum contrato fechado no período.')) + dashRanking('Mães por parceiro', ['Parceiro', 'Mães', 'Contratos'], rkP, 'Nenhuma mãe de parceiro no período.') + '</div>');
     box.innerHTML = html;
   }
   $('dash-box').addEventListener('click', function(e){
@@ -5373,7 +5401,7 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
     ca.setAttribute('cx', x); ca.setAttribute('cy', y(dashSerie.a[i])); cb.setAttribute('cx', x); cb.setAttribute('cy', y(dashSerie.b[i]));
     var tip = svg.parentNode.querySelector('.dash-tip');
     tip.hidden = false;
-    tip.innerHTML = '<b>' + esc(dashSerie.rot[i]) + '</b><span><i style="background:var(--ser-1)"></i>Cadastros<b class="tnum">' + dashSerie.a[i] + '</b></span><span><i style="background:var(--ser-2)"></i>Contratos<b class="tnum">' + dashSerie.b[i] + '</b></span>';
+    tip.innerHTML = '<b>' + esc(dashSerie.rot[i]) + '</b><span><i style="background:var(--ser-1)"></i>' + (dashSerie.na || 'Cadastros') + '<b class="tnum">' + dashSerie.a[i] + '</b></span><span><i style="background:var(--ser-2)"></i>' + (dashSerie.nb || 'Contratos') + '<b class="tnum">' + dashSerie.b[i] + '</b></span>';
     var lg = tip.offsetWidth, W = +svg.getAttribute('width');
     tip.style.left = (x + 12 + lg > W ? x - lg - 12 : x + 12) + 'px';
     tip.style.top = Math.min(H - tip.offsetHeight - 26, 14) + 'px';
@@ -5412,7 +5440,7 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
   function trocarFluxo(f){
     if (f === fluxoVista) return;
     fluxoVista = f; guardar('nascer-fluxo', f); filtrarFluxo();
-    if (f === 'novo' && (telaAberta === 'd' || telaAberta === 'h')) showTab(telaAberta === 'd' ? 'k' : 'rq');
+    if (f === 'novo' && (telaAberta === 'd' || telaAberta === 'h' || telaAberta === 'q')) showTab(telaAberta === 'h' ? 'rq' : 'k');
     if (f !== 'novo' && (telaAberta === 'gp' || telaAberta === 'an' || telaAberta === 'rq')) showTab('k');
     render();
   }
@@ -5485,6 +5513,9 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
     var nv = fluxoVista === 'novo';
     ['tab-cad', 'tab-fila'].forEach(function(i){ if ($(i)) $(i).hidden = nv; });
     ['tab-gps', 'tab-nasc', 'tab-req'].forEach(function(i){ if ($(i)) $(i).hidden = !nv; });
+    // fluxo novo: uma seção só, na ordem da jornada; desqualificada nem entra, então não há Comercial nem Perdas
+    ['lbl-com', 'tab-desq', 'lbl-op'].forEach(function(i){ if ($(i)) $(i).hidden = nv; });
+    if ($('lbl-pos')) $('lbl-pos').textContent = nv ? 'Jornada da mãe' : 'Pós-venda';
     pintarFluxoSeg();
   }
   var ORDENS = [['', '↕ Prazo mais perto'], ['atividade', '↕ Última atividade'], ['nome', '↕ Nome (A–Z)'], ['etapa', '↕ Tempo na etapa'], ['cadastro', '↕ Cadastro mais recente']];
@@ -5493,13 +5524,13 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
     var t = telaAberta, tit = TITULOS[t]; if (!tit) return;
     var res = telaDoFunil(t) ? resumoFases()[t] : null;
     $('pg-tit').textContent = tit[0];
-    $('pg-sub').textContent = (t === 'e' ? '' : (fluxoVista === 'novo' ? 'Fluxo novo · ' : 'Fluxo antigo · ')) + (res ? res[2] : t === 'q' ? desqResumo() : tit[1]);
+    $('pg-sub').textContent = (t === 'e' ? '' : (fluxoVista === 'novo' ? 'Fluxo novo · ' : 'Fluxo antigo · ')) + (res ? res[2] : t === 'q' ? desqResumo() : t === 'b' && fluxoVista === 'novo' ? 'Como está a jornada das mães: fases, entradas, GPS, requerimentos e resultados' : tit[1]);
     var bt = VIEWS[t] && $(VIEWS[t][0]), u = bt && bt.querySelector('use'); if (u) $('pg-ico').setAttribute('href', u.getAttribute('href'));
     var fluxo = telaDoFunil(t);
     $('vista-seg').hidden = true;
     Array.prototype.forEach.call($('vista-seg').querySelectorAll('button'), function(b){ b.setAttribute('aria-pressed', String(b.dataset.vista === vistaDe(t))); });
     $('btn-novo').hidden = !(t === 'd' || t === 'k' || t === 'h' || t === 'i' || t === 'c');
-    $('mais-box').hidden = t !== 'k';
+    $('mais-box').hidden = t !== 'k' || fluxoVista === 'novo';
     var c = $('conteudo');
     c.classList.remove('em-quadro', 'recolhido');
     Array.prototype.forEach.call(document.querySelectorAll('[data-filtrar]'), function(b){ b.classList.toggle('on', !!(kbF.uf || kbF.parc)); });
@@ -5604,9 +5635,9 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
   function faseNovoPos(r){ var e = posEtapaDe(r); return e === 'prazo_gps' || e === 'gps' ? 'gp' : e === 'nasc' ? 'an' : e === 'cert' || e === 'ok' ? 'rq' : 'k'; }
   function faseTexto(r){
     var t = faseDe(r), n = TITULOS[t] ? TITULOS[t][0] : '';
-    if (t === 'gp' || t === 'an' || t === 'rq') return n + ' · ' + (naFila(r) ? 'Protocolar' : ((POS_COLS.filter(function(c){ return c[0] === posEtapaDe(r); })[0] || [0, ''])[1]));
+    if (t === 'gp' || t === 'an' || t === 'rq') return n + ' · ' + (naFila(r) ? 'Pronta para requerer' : posNome(r, POS_COLS.filter(function(c){ return c[0] === posEtapaDe(r); })[0] || [0, '']));
     if (t === 'd') return n + ' · ' + LEAD[leadDe(r)];
-    if (t === 'k') return n + ' · ' + ((POS_COLS.filter(function(c){ return c[0] === posEtapaDe(r); })[0] || [0, ''])[1]);
+    if (t === 'k') return n + ' · ' + posNome(r, POS_COLS.filter(function(c){ return c[0] === posEtapaDe(r); })[0] || [0, '']);
     if (t === 'h') return n + ' · ' + ((FILA_COLS.filter(function(c){ return c[0] === filaEtapaDe(r); })[0] || [0, ''])[1]);
     if (t === 'i') return n + ' · ' + INSS[statusInss(r)][0];
     if (t === 'c') return n + ' · ' + nomeEtapa(etapa(r));
@@ -7136,7 +7167,7 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
     state.editBase = r ? JSON.parse(JSON.stringify(r)) : null;
     $('form').classList.toggle('novo', !r || !!compacto); // cadastro inicial: só os dados do cliente
     $('form').classList.toggle('com-pasta', !!(r && (comPasta || !r.pastaUrl)));   // sem pasta ligada: mostra o campo para colar o link
-    $('f-title').textContent = r ? 'Editar cliente' : 'Novo cadastro (orgânico)';
+    $('f-title').textContent = r ? 'Editar cliente' : fluxoVista === 'novo' ? 'Nova mãe (fluxo novo: vai direto ao Pós-venda)' : 'Novo cadastro (orgânico)';
     $('f-nome').value = r ? r.nome || '' : '';
     $('f-cpf').value = r ? r.cpf || '' : '';
     $('f-rg').value = r ? r.rg || '' : '';
@@ -7590,13 +7621,13 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
     g: ['Parceiros', 'Estados de atuação, responsável de cada um e os parceiros que cadastram as clientes'],
     e: ['Configurações', 'Equipe, integrações e parceiros'],
     gp: ['GPS (urbana)', 'Guia da segurada facultativa: cronômetro até o prazo, guia gerada pelo NIT e pagamento'],
-    an: ['Aguardando nascimento', 'GPS paga ou prova rural completa: esperando o parto; a IA fala com a mãe uma semana antes'],
+    an: ['Aguardando parto', 'GPS paga ou prova rural completa: esperando o parto; a IA fala com a mãe uma semana antes'],
     rq: ['Requerimento', 'Certidão de nascimento e requerimento no INSS']
   };
   function showTab(which){
     state.view = which;
     if ((which === 'e' || which === 'f') && !isAdmin()) which = 'b';
-    if (fluxoVista === 'novo' && (which === 'd' || which === 'h')) which = which === 'd' ? 'k' : 'rq';   // fluxo novo não tem Cadastro nem Fila
+    if (fluxoVista === 'novo' && (which === 'd' || which === 'h' || which === 'q')) which = which === 'h' ? 'rq' : 'k';   // fluxo novo não tem Cadastro, Fila nem Perdas
     if (fluxoVista !== 'novo' && (which === 'gp' || which === 'an' || which === 'rq')) which = 'k';
     telaAberta = which; if (telaDoFunil(which)) ultimaFase = which;
     Object.keys(VIEWS).forEach(function(k){ $(VIEWS[k][0]).setAttribute('aria-selected', VIEWS[k][0] === VIEWS[which][0] ? 'true' : 'false'); $(VIEWS[k][1]).hidden = k !== which; });
