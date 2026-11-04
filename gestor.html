@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="img/icone-180.png">
 <title>Gestor · Nascer com Direitos</title>
 <style>
-:root{--bg:#f6f3f9;--card:#fff;--ink:#22172c;--ink2:#5b4072;--ink3:#8868a2;--line:#dfd1e9;--gold:#7633b2;--gold2:#662e99;--soft:#ece2f4;--ok:#2e8b57;--warn:#c0861b;--bad:#c0392b;--sh:0 2px 10px rgba(52,30,70,.07);--gx:max(18px,env(safe-area-inset-left))}
+:root{--bg:#f6f3f9;--card:#fff;--ink:#22172c;--ink2:#5b4072;--ink3:#8868a2;--line:#dfd1e9;--gold:#7633b2;--gold2:#662e99;--soft:#ece2f4;--ok:#2e8b57;--warn:#752ab1;--bad:#c0392b;--sh:0 2px 10px rgba(52,30,70,.07);--gx:max(18px,env(safe-area-inset-left))}
 @media (prefers-color-scheme:dark){:root{--bg:#110d14;--card:#18111d;--ink:#e7daf1;--ink2:#a683c2;--ink3:#7c5e95;--line:#291e33;--soft:#1e1428;--sh:none}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 -apple-system,"Segoe UI",system-ui,Roboto,sans-serif}
@@ -68,7 +68,7 @@ main{max-width:760px;margin:0 auto;padding:14px var(--gx) calc(96px + env(safe-a
 .num b{display:block;font-size:15px}
 .num small{display:block;font-size:10.5px;color:var(--ink3)}
 .tag{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--soft);color:var(--gold2)}
-.tag.ok{background:#e4f4ea;color:#1f6b3d}.tag.warn{background:#fdf0d5;color:#8a5a00}.tag.bad{background:#fbe3e1;color:#a02e24}
+.tag.ok{background:#e4f4ea;color:#1f6b3d}.tag.warn{background:#ebddf5;color:#4a1a70}.tag.bad{background:#fbe3e1;color:#a02e24}
 .vazio{text-align:center;color:var(--ink2);padding:30px 10px}
 .fab{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:calc(84px + env(safe-area-inset-bottom));z-index:7;height:52px;border:0;border-radius:26px;padding:0 20px;background:linear-gradient(135deg,#853fc3,#662e99);color:#fff;font-weight:700;box-shadow:0 8px 20px rgba(52,30,70,.3);cursor:pointer}
 /* folha */
@@ -131,7 +131,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 .prio-l{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
 .prio-n{min-width:0}.prio-n b{display:block;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.prio-n span{font-size:12px;color:var(--ink3)}
 .cron{flex:none;font-variant-numeric:tabular-nums;font-weight:800;font-size:14px;padding:5px 9px;border-radius:8px;background:rgba(120,120,120,.15)}
-.cron.crit{color:#e5604d;background:rgba(229,96,77,.15)}.cron.warn{color:#d9a441;background:rgba(217,164,65,.15)}.cron.ok{color:#5fb27a;background:rgba(95,178,122,.15)}
+.cron.crit{color:#e5604d;background:rgba(229,96,77,.15)}.cron.warn{color:#9546d4;background:rgba(149,70,212,.15)}.cron.ok{color:#5fb27a;background:rgba(95,178,122,.15)}
 </style>
 </head>
 <body>
@@ -394,7 +394,7 @@ function tentarParceiro(cpf, senha){
   }
   function rosca(fatias){
     var tot = fatias.reduce(function(s, f){ return s + f.v; }, 0), R = 52, C = 2 * Math.PI * R, off = 0;
-    var cores = ['#7633b2', '#2e8b57', '#4a7fc1', '#c0861b', '#8868a2', '#c0392b'];
+    var cores = ['#7633b2', '#2e8b57', '#4a7fc1', '#752ab1', '#8868a2', '#c0392b'];
     var arcos = tot ? fatias.map(function(f, i){
       var len = C * f.v / tot, s = '<circle r="' + R + '" cx="70" cy="70" fill="none" stroke="' + cores[i % cores.length] + '" stroke-width="22" stroke-dasharray="' + len + ' ' + (C - len) + '" stroke-dashoffset="' + (-off) + '" transform="rotate(-90 70 70)"/>';
       off += len; return s;
