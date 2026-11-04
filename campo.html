@@ -448,6 +448,7 @@ body{font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-w
 .topo .quem b{font-size:16px;font-weight:700;letter-spacing:-.01em}
 .topo .quem span{font-size:12.5px;color:var(--ink2)}
 #modo[hidden]{display:none!important}
+.so-gest{margin:-2px 0 8px;font-size:13px;color:var(--ink2)}
 .seg-nasc{display:flex;gap:6px;margin:0 0 10px}.seg-nasc button{flex:1;padding:11px 8px;border-radius:12px;border:1px solid var(--gline);background:var(--card);color:var(--ink2);font:inherit;font-size:14px;font-weight:700}
 .seg-nasc button[aria-pressed="true"]{background:var(--gold,#a07a45);color:#fff;border-color:transparent}
 .abas button{font-size:10.5px!important;letter-spacing:-.01em}
@@ -899,7 +900,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 62;
+  var APP_VERSAO = 63;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -935,7 +936,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     if (a < 2000 || a > 2100 || dt.getFullYear() !== a || dt.getMonth() !== mes - 1 || dt.getDate() !== d) return '';
     return m[3] + '-' + m[2] + '-' + m[1];
   }
-  function gestante(){ return lsGet('campo_nasceu') !== '1'; }   // gestante: data prevista do parto; bebê já nasceu: data de nascimento
+  function gestante(){ return true; }   // o escritório atende só gestantes: sempre a data prevista do parto
   // telefone no padrão (DDD) 00000-0000
   function maskFone(v){ var d = String(v || '').replace(/\D/g, '').slice(0, 11); if (!d) return ''; if (d.length <= 2) return '(' + d; if (d.length <= 6) return '(' + d.slice(0, 2) + ') ' + d.slice(2); if (d.length <= 10) return '(' + d.slice(0, 2) + ') ' + d.slice(2, 6) + '-' + d.slice(6); return '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7); }
   function ufDoApp(){ return String((quem && quem.regiaoId) || '').slice(0, 2).toUpperCase(); }
@@ -1565,7 +1566,7 @@ button,a,label,[role=button]{touch-action:manipulation}
         '<label class="fone cid-campo' + (lsGet('campo_cidade') ? '' : ' falta') + '" id="l-cidade"><svg viewBox="0 0 24 24"><use href="#i-casa"/></svg><img class="cid-flag" id="cidade-flag" alt="" hidden><input id="cidade" autocomplete="off" autocapitalize="words" placeholder="Cidade da cliente" value="' + esc(lsGet('campo_cidade')) + '"' + (ufDoApp() ? ' readonly' : '') + '>' + (ufDoApp() ? '<svg class="cid-seta" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '') + '</label>' +
         '<label class="fone' + (cpfOk(lsGet('campo_cpf')) ? '' : ' falta') + '" id="l-cpf"><svg viewBox="0 0 24 24"><use href="#i-id"/></svg><input id="cpf" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="CPF da cliente" value="' + esc(maskCpf(lsGet('campo_cpf'))) + '"></label>' +
       '</div>' +
-      '<div class="rot">A criança</div><div class="seg-nasc" id="seg-nasc"><button type="button" data-n="0" aria-pressed="' + gest + '">Ainda gestante</button><button type="button" data-n="1" aria-pressed="' + !gest + '">Já nasceu</button></div><div class="dados">' +
+      '<div class="rot">Gestação</div><p class="so-gest">Atendemos só gestantes: o bebê ainda não pode ter nascido.</p><div class="dados">' +
         (gest ?
         '<label class="fone' + (lsGet('campo_dpp') ? '' : ' falta') + '" id="l-dpp"><svg viewBox="0 0 24 24"><use href="#i-cal"/></svg><span class="rc">Data prevista do parto</span><input id="dpp" type="text" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="dd/mm/aaaa" value="' + esc(isoParaBr(lsGet('campo_dpp'))) + '"></label>' :
         '<label class="fone' + (lsGet('campo_crianca_nasc') ? '' : ' falta') + '" id="l-cnasc"><svg viewBox="0 0 24 24"><use href="#i-cal"/></svg><span class="rc">Data de nascimento do bebê</span><input id="cnasc" type="text" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="dd/mm/aaaa" value="' + esc(isoParaBr(lsGet('campo_crianca_nasc'))) + '"></label>') +
@@ -2537,7 +2538,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     if (gestante()){
       var dp = new Date(lsGet('campo_dpp') + 'T12:00:00'), hjp = new Date(); hjp.setHours(12, 0, 0, 0);
       var faltamP = Math.round((dp - hjp) / 86400000);
-      if (faltamP < 0){ var mp0 = 'A data prevista do parto já passou. Se o bebê nasceu, marque "Já nasceu" e informe a data de nascimento.'; falar(mp0); alert(mp0); if ($('dpp')) $('dpp').focus(); return; }
+      if (faltamP < 0){ var mp0 = 'A data prevista do parto já passou. Atendemos só gestantes: confira a data.'; falar(mp0); alert(mp0); if ($('dpp')) $('dpp').focus(); return; }
       if (faltamP > 300){ var mp1 = 'A data prevista do parto está longe demais (mais de 10 meses). Confira o ano.'; falar(mp1); alert(mp1); if ($('dpp')) $('dpp').focus(); return; }
     }
     // bebê já nascido: só até 3 meses de vida (e a data não pode ser no futuro)

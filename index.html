@@ -3784,7 +3784,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     var id = esc(r.id), k = leadDe(r), par = prospById(r.responsavelId), parNome = par ? (par.tipo === 'clinica' && par.clinica ? par.clinica : par.nome) : (r.criadoPorNome ? 'Cadastro de ' + r.criadoPorNome : (r.origem === 'organico' ? 'Orgânico' : 'Sem parceiro'));
     var falt = dadosFaltando(r), dc = String(r.dataCadastro || r.criadoEm || '').slice(0, 10), nd = dc ? -daysUntil(dc) : null;
     var pn = prioridadeNasc(r), dp = r.dpp ? daysUntil(r.dpp) : null, atr = k === 'novo' && nd >= 2 ? 'sem ligação' : atrasoTxt(r).replace('parada há ', 'parada ');
-    var parto = nascido(r) ? '<div class="cad-l1">Bebê já nasceu</div>' + (r.criancaNasc ? '<small>' + fmtDate(String(r.criancaNasc).slice(0, 10)) + '</small>' : '')
+    var parto = nascido(r) ? '<div class="cad-l1">Bebê já nasceu</div><small class="verm" title="O escritório atende só gestantes">Fora do perfil</small>'
       : !r.dpp ? '<button type="button" class="kb-inline" data-act="edit" data-id="' + id + '">Informar data</button>'
       : '<div class="cad-l1">' + fmtDate(String(r.dpp).slice(0, 10)) + '</div>' + (pn != null ? '<small class="verm">Prioridade: ' + (pn === 0 ? 'é hoje' : pn + (pn === 1 ? ' dia' : ' dias')) + '</small>' : dp < 0 ? '<small class="verm">Já nasceu? Confirmar</small>' : '');
     return '<tr data-linha="' + id + '"><td class="nome"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + id + '">' + esc(r.nome || 'Sem nome') + '</button>' +
@@ -4448,7 +4448,11 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     confirmarFechamento(r);
   });
   /* Fechar contrato pede confirmação: quem fechou e a data */
+  // o escritório atende só gestantes, com o parto ainda por vir
+  function foraDoPerfil(r){ if (r.fatoGerador !== 'gestante' || r.criancaNasc) return 'bebê já nascido'; if (!r.dpp) return 'sem data prevista do parto'; var n = daysUntil(r.dpp); return n != null && n < 0 ? 'data do parto já passou' : ''; }
   function confirmarFechamento(r){
+    var fp = foraDoPerfil(r);
+    if (fp){ toast(fp === 'sem data prevista do parto' ? 'Informe a data prevista do parto antes de fechar o contrato.' : 'O escritório atende só gestantes: este cadastro está com ' + fp + '. Corrija a data prevista do parto ou desqualifique.'); if (fp === 'sem data prevista do parto') openForm(r); return; }
     var meu = String((state.me && state.me.email) || '').toLowerCase();
     var quem = (state.equipe || []).filter(function(u){ return u.ativo !== false && u.email; }).sort(function(a, b){ return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
     var f = document.createElement('div'); f.className = 'cid-sheet';
@@ -4456,7 +4460,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       '<label class="mini" style="display:block;margin:6px 0 4px">Atendente que fez o fechamento</label><select id="fc-quem" style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;margin-bottom:10px"><option value="">Escolha a atendente</option>' +
       quem.map(function(u){ return '<option value="' + esc(u.email) + '"' + (String(u.email).toLowerCase() === (String(r.atendenteEmail || '').toLowerCase() || meu) ? ' selected' : '') + '>' + esc(u.nome || u.email) + '</option>'; }).join('') + '<option value="__outra">Outra atendente (digitar o nome)</option></select>' +
       '<input id="fc-outra" placeholder="Nome da atendente" hidden style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;margin:-4px 0 10px">' +
-      '<label class="mini" style="display:block;margin:0 0 4px">A criança</label><select id="fc-fato" style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;margin-bottom:10px"><option value="gestante"' + (r.fatoGerador === 'gestante' ? ' selected' : '') + '>Ainda gestante</option><option value="parto"' + (r.fatoGerador !== 'gestante' ? ' selected' : '') + '>Já nasceu (cobrar documentação rural)</option></select>' +
+      '<input type="hidden" id="fc-fato" value="gestante">' +
       '<label class="mini" style="display:block;margin:0 0 4px">Data do fechamento</label><input type="date" id="fc-data" value="' + iso(new Date()) + '">' +
       '<label style="display:flex;gap:10px;align-items:flex-start;margin:0 0 6px;font-size:14px;line-height:1.35"><input type="checkbox" id="fc-aceita"' + (r.propostaAceita ? ' checked' : '') + ' style="margin-top:3px;width:18px;height:18px;flex:none"><span><b>A cliente aceitou a proposta</b><br><span class="mini">Marque somente se ela aceitou a proposta na ligação.</span></span></label>' +
       '<input id="fc-prop" value="' + esc(r.propostaObs || '') + '" placeholder="Detalhe da proposta aceita (opcional)" style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;margin:0 0 12px">' +
@@ -6830,6 +6834,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     $('f-tipo').value = r ? r.tipoSegurada || '' : '';
     $('f-ativ').value = r ? r.atividade || '' : '';
     $('f-fato').value = r && FATOS[r.fatoGerador] ? r.fatoGerador : (r ? 'parto' : 'gestante'); syncSeg();
+    $('f-seg-box').hidden = !r;   // cadastro novo é sempre de gestante; editar continua permitindo registrar o nascimento
     $('f-crianca').value = r ? r.crianca || '' : '';
     $('f-cnasc').value = r ? r.criancaNasc || '' : '';
     $('f-dpp').value = r ? r.dpp || '' : '';
@@ -6939,6 +6944,8 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     }
     // datas que não fazem sentido (erro de digitação)
     if ($('f-fato').value === 'gestante' && $('f-dpp').value && !$('f-cnasc').value){ var ndpp = daysUntil($('f-dpp').value); if (ndpp != null && ndpp < -45){ toast('A data prevista do parto já passou há ' + (-ndpp) + ' dias. Se o bebê nasceu, marque "Já nasceu" e informe a data de nascimento.'); $('f-dpp').focus(); return; } if (ndpp != null && ndpp > 300){ toast('Data prevista do parto muito distante. Confira o ano.'); $('f-dpp').focus(); return; } }
+    if (!state.editing && $('f-fato').value !== 'gestante'){ toast('O escritório atende só gestantes.'); return; }
+    if (!state.editing && $('f-dpp').value && daysUntil($('f-dpp').value) < 0){ toast('A data prevista do parto já passou. O escritório atende só gestantes: confira a data.'); $('f-dpp').focus(); return; }
     if (!state.editing && $('f-cnasc').value && $('f-fato').value !== 'gestante'){ var nn3 = daysUntil($('f-cnasc').value); if (nn3 != null && nn3 < -90){ toast('Só cadastramos bebês com até 3 meses de nascidos. Este tem ' + Math.floor(-nn3 / 30) + ' meses.'); $('f-cnasc').focus(); return; } }
     if ($('f-cnasc').value && $('f-fato').value !== 'gestante'){ var nn = daysUntil($('f-cnasc').value); if (nn != null && nn > 0){ toast('A data de nascimento está no futuro. Confira a data.'); $('f-cnasc').focus(); return; } }
     if (!state.editing){
