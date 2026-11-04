@@ -1753,6 +1753,19 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
 .fc-guia-acoes{display:flex;flex-wrap:wrap;gap:7.5px;margin:4px 0 6px}
 .fc-guia-acoes .btn{height:30px;font-size:11.25px;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
 .fc-guia-acoes .i{width:14px;height:14px}
+/* cartão no formato do BI de Vendas */
+.kb-rot{margin:2px 0 0;font-size:10.5px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
+.kb-cron.azul{background:hsl(212 80% 60%/.15);color:hsl(212 85% 68%)}
+:root[data-theme="light"] .kb-cron.azul{color:hsl(212 70% 42%)}
+.kb-prob{display:flex;align-items:flex-start;gap:6px;margin-top:8px;padding:7px 8px;border:1px solid hsl(var(--c-red)/.45);border-radius:4px;background:hsl(var(--c-red)/.1);color:hsl(var(--c-red));font-size:11.25px;font-weight:500;line-height:1.35}
+.kb-prob > .i{width:13px;height:13px;flex:none;margin-top:1px}
+.kb-prob span{flex:1;min-width:0;overflow-wrap:anywhere}
+.kb-prob button{flex:none;width:20px;height:20px;padding:0;border:0;background:none;color:inherit;opacity:.75;cursor:pointer;display:grid;place-items:center}
+.kb-prob button:hover{opacity:1}
+.kb-prob button .i{width:12px;height:12px}
+.kb-esq{display:inline-flex;align-items:center;gap:8px;min-width:0}
+.kb-ic.kb-perda:hover{color:hsl(var(--c-red))}
+#ctr-stats{flex-wrap:nowrap}
 /* cartão limpo */
 .kb-tit2{display:flex;align-items:flex-start;gap:8px}
 .kb-tit2 .kb-nome{flex:1;min-width:0;font-weight:600}
@@ -1844,6 +1857,8 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-baby" viewBox="0 0 24 24"><circle cx="12" cy="7.5" r="3.5"/><path d="M5 21v-2.5a7 7 0 0 1 14 0V21"/><path d="M9 15.5c1.8 1.2 4.2 1.2 6 0"/></symbol>
   <symbol id="i-inss" viewBox="0 0 24 24"><path d="M3 21h18M5 21V10M19 21V10M9 21v-7M15 21v-7M12 3 3 8h18z"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></symbol>
+  <symbol id="i-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></symbol>
   <symbol id="i-chave" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3 20 3"/><path d="M16 7l3 3"/></symbol>
   <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
   <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
@@ -1987,6 +2002,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       </section>
 
       <section id="view-ctr" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18.75px">
+        <div class="stats" id="ctr-stats"></div>
         <div class="fbar">
           <div class="search tb-busca"><svg class="i"><use href="#i-search"/></svg><input id="ctr-q" type="search" autocomplete="off" placeholder="Buscar cliente, CPF…"></div>
           <select id="ctr-sit" class="tb-sel" aria-label="Situação no Pós-venda"></select>
@@ -4067,15 +4083,15 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   }
   function editBtn(r){ return '<button type="button" class="ico-btn" data-act="edit" data-id="' + esc(r.id) + '" title="Editar cadastro" aria-label="Editar ' + esc(r.nome) + '"><svg class="i"><use href="#i-pencil"/></svg></button>'; }
   /* ---------- Pós-venda (Kanban): regulariza a documentação de quem fechou contrato ---------- */
-  var POS_COLS = [['docs', 'Coletando documentos'], ['prazo_gps', 'Aguardando Prazo da GPS'], ['gps', 'Emitir/Pagar GPS'], ['nasc', 'Aguardando Nascimento'], ['cert', 'Solicitar Certidão de Nascimento'], ['ok', 'Documentação OK']];
-  var POS_ORDEM = POS_COLS.map(function(c){ return c[0]; }), POS_LEGADO = { senha: 'docs', recem: 'docs', falta_gov: 'docs', falta_doc: 'docs', rural: 'docs', guia: 'gps' };
+  var POS_COLS = [['senha', 'Senha Meu INSS'], ['docs', 'Documentação Pessoal'], ['prazo_gps', 'Aguardando Prazo da GPS'], ['gps', 'Emitir/Pagar GPS'], ['nasc', 'Aguardando Nascimento'], ['cert', 'Solicitar Certidão de Nascimento'], ['ok', 'Documentação OK']];
+  var POS_ORDEM = POS_COLS.map(function(c){ return c[0]; }), POS_LEGADO = { recem: 'senha', falta_gov: 'senha', falta_doc: 'docs', rural: 'docs', guia: 'gps' };
   var POS_SO_GESTANTE = { prazo_gps: 1, gps: 1, nasc: 1 };
   function posLane(r){ return nascido(r) ? 'nasc' : 'gest'; }
   // a coluna vem do que foi gravado, mais o que as datas mandam (só anda para frente)
   function posEtapaDe(r){
     var e = POS_LEGADO[r.posEtapa] || r.posEtapa;
     if (e === 'regularizada') e = r.certidaoRecebida ? 'ok' : 'nasc';
-    if (POS_ORDEM.indexOf(e) < 0) e = 'docs';
+    if (POS_ORDEM.indexOf(e) < 0) e = 'senha';
     var hj = iso(new Date()), mudou = diaLocal(r.posMudouEm), antes = function(a){ return POS_ORDEM.indexOf(e) < POS_ORDEM.indexOf(a); };
     // bebê já nascido (inclusive antes do contrato): vai para Solicitar Certidão; se alguém arrastou de volta depois do nascimento, respeita
     if (nascido(r)){
@@ -4085,7 +4101,8 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       return e;
     }
     var parto = String(r.dpp || '').slice(0, 10), g = gatilhoGps(r);
-    // documentação completa (com a senha gov.br): segue sozinha para a GPS
+    // senha gov.br no cofre: segue para a Documentação Pessoal; documentação completa: segue sozinha para a GPS
+    if (e === 'senha' && r.senhaGovOk) e = 'docs';
     if (e === 'docs' && !faltamTxt(r)) e = 'prazo_gps';
     if (parto && parto <= hj && antes('cert') && (!mudou || mudou < parto)) return 'cert';
     // GPS paga: vai para Aguardando Nascimento de qualquer coluna anterior (só para a frente)
@@ -4106,14 +4123,11 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function iniciais(n){ var p = String(n || '?').trim().split(/\s+/); return ((p[0] || '?').charAt(0) + (p.length > 1 ? p[p.length - 1].charAt(0) : '')).toUpperCase(); }
   function posInfo(r){
     var et = posEtapaDe(r), atr = atrasoTxt(r), d = diasNoPos(r), st = [], id = esc(r.id);
-    if (r.pvProblema) st.push(kbSt('Problema: ' + r.pvProblema));
     if (r.pvAnalise === 'devolvido') st.push(kbSt('Devolvida pela Controladoria' + (r.analiseMotivo ? ': ' + r.analiseMotivo : '')));
     if (tarefaPos(r)) st.push(kbSt(tarefaPos(r).replace(/^Tarefa: /, ''), 'lar'));
     if (atr) st.push(kbSt(atr.charAt(0).toUpperCase() + atr.slice(1)));
     if ((et === 'docs' || et === 'ok') && faltamTxt(r)) st.push(kbSt('Falta: ' + faltamTxt(r), 'lar'));
-    var meta = [metaParto(r)];
-    if (!nascido(r) && (et === 'prazo_gps' || et === 'gps')) meta.push(gpsPaga(r) ? '<span class="ok">GPS paga</span>' : prazoGps(r) ? 'GPS até ' + fmtDate(prazoGps(r)) : '');
-    if (et === 'docs' || et === 'ok') meta.push(metaDocs(r));
+    var meta = [linhaPartoBv(r), linhaGps(r), linhaOrigem(r), linhaDocs(r)];
     var opts = POS_COLS.filter(function(c){ return !nascido(r) || !POS_SO_GESTANTE[c[0]]; }).map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === et ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '<option value="__cad">↩ Voltar ao Cadastro</option>';
     var acao = gpsTarefa(r) ? '<button type="button" class="kb-btn" data-guia-paga="' + id + '">' + svgI('i-cash') + 'Marcar GPS paga</button>'
       : et === 'cert' ? '<button type="button" class="kb-btn" data-pv-cert="' + id + '">' + svgI('i-check') + 'Recebi a certidão</button>'
@@ -4122,11 +4136,27 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       meta: meta, status: st, acao: acao, resp: r.posResp || r.contratoPor, dias: d, parado: d > 14, dataVal: nascido(r) ? 'Nasceu ' + (r.criancaNasc ? fmtDate(String(r.criancaNasc).slice(0, 10)) : '') : r.dpp ? fmtDate(String(r.dpp).slice(0, 10)) : 'Sem data',
       mover: kbMover('<select data-pos="' + id + '" aria-label="Mover ' + esc(r.nome) + '">' + opts + '</select>') };
   }
-  function posCard(r){ var i = posInfo(r); return kbCard(r, { arrasta: true, resp: i.resp, dias: i.dias, parado: i.parado, meta: i.meta, status: i.status, acoes: i.acao, mover: i.mover, mais: botoesCasoItens(r) }); }
-  var CTR_SITS = [['', 'Status: todas'], ['gest', 'Gestantes'], ['nasc', 'Bebê já nasceu'], ['atr', 'Atrasadas'], ['gps', 'GPS a pagar'], ['docs', 'Documentos faltando'], ['dev', 'Devolvidas pela Controladoria']];
-  function passaCtr(r, f){ return !f || (f === 'gest' ? !nascido(r) : f === 'nasc' ? nascido(r) : f === 'atr' ? atrasada(r) : f === 'gps' ? gpsTarefa(r) : f === 'docs' ? !!faltamTxt(r) : f === 'dev' ? r.pvAnalise === 'devolvido' : true); }
+  function posCard(r){ var i = posInfo(r); return kbCard(r, { arrasta: true, rotulo: 'Salário-maternidade', resp: i.resp, dias: i.dias, parado: i.parado, meta: i.meta, status: i.status, problema: r.pvProblema, acoes: i.acao, caso: true }); }
+  // parto com o relógio azul (como no BI de Vendas); sem data, o atalho para informar
+  function linhaPartoBv(r){
+    if (nascido(r)) return '<p>Bebê nasceu' + (r.criancaNasc ? ' · ' + fmtDate(String(r.criancaNasc).slice(0, 10)) : '') + '</p>';
+    if (!r.dpp) return '<p><button type="button" class="kb-inline" data-act="edit" data-id="' + esc(r.id) + '">Informar data do parto</button></p>';
+    return '<div class="kb-par"><span>Parto ' + fmtDate(String(r.dpp).slice(0, 10)) + '</span>' + relogio(r.dpp, 'azul') + '</div>';
+  }
+  var CTR_SITS = [['', 'Status: todas'], ['completa', 'Pastas completas'], ['gest', 'Gestantes'], ['nasc', 'Bebê já nasceu'], ['atr', 'Atrasadas'], ['gps', 'GPS a pagar'], ['docs', 'Documentos faltando'], ['dev', 'Devolvidas pela Controladoria']];
+  function passaCtr(r, f){ return !f || (f === 'completa' ? !faltamTxt(r) : f === 'gest' ? !nascido(r) : f === 'nasc' ? nascido(r) : f === 'atr' ? atrasada(r) : f === 'gps' ? gpsTarefa(r) : f === 'docs' ? !!faltamTxt(r) : f === 'dev' ? r.pvAnalise === 'devolvido' : true); }
   function renderContratos(){
     var box = $('ctr-list'); if (!box) return;
+    (function(){
+      var pos = state.rows.filter(noContratos), fila = state.rows.filter(naFila);
+      var compl = pos.filter(function(r){ return !faltamTxt(r); }).length, atrDoc = pos.filter(function(r){ return /documenta/.test(atrasoTxt(r)); }).length;
+      var atrProt = fila.filter(function(r){ if (filaEtapaDe(r) !== 'protocolar') return false; var b = parseDate(diaLocal(r.filaMudouEm)); if (!b) return false; b.setDate(b.getDate() + 3); return iso(b) < iso(new Date()); }).length;
+      $('ctr-stats').innerHTML = cardLista('data-ctr-kpi', 'i-users', 'Clientes no pós-venda', pos.length, plural(pos.filter(gpsTarefa).length, 'com GPS a pagar', 'com GPS a pagar'), '', 'x') +
+        cardLista('data-ctr-kpi', 'i-check', 'Pastas completas', compl, 'todos os documentos recebidos', 'completa', ctrSit) +
+        cardLista('data-ctr-kpi', 'i-alert', 'Documentação atrasada', atrDoc, 'passou do prazo de coleta', 'atr', ctrSit) +
+        cardLista('data-ctr-kpi', 'i-clock', 'Atrasados para protocolar', atrProt, 'pasta pronta, passou do prazo', 'h-prot', '') +
+        cardLista('data-ctr-kpi', 'i-file', 'Na fila de protocolo', fila.length, 'esperando o protocolo', 'h', '');
+    })();
     var emPos = state.rows.filter(noContratos).filter(function(r){ return buscaOk(r, ctrQ2) && (!soMinhas || minha(r)) && passaFiltro(r); });
     var n = function(f){ return emPos.filter(function(r){ return passaCtr(r, f); }).length; };
     $('ctr-sit').innerHTML = CTR_SITS.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === ctrSit ? ' selected' : '') + '>' + o[1] + ' · ' + n(o[0]) + '</option>'; }).join('');
@@ -4168,8 +4198,12 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   }
   function respMantido(r){ return r.posResp ? { posResp: r.posResp, posRespEmail: r.posRespEmail || '' } : { posResp: meuNome(), posRespEmail: meuEmail() }; }
   function botoesCasoItens(r){ var id = esc(r.id); return ['<button type="button" data-pv-prob="' + id + '">' + (r.pvProblema ? 'Editar problema' : 'Registrar problema') + '</button>', '<button type="button" class="verm" data-pv-perda="' + id + '">Marcar como perda</button>']; }
+  // origem como no BI de Vendas: "Indicação" (veio de parceiro) ou "Orgânico", e o estado
+  function linhaOrigem(r){ var uf = String(r.cidadeUf || '').slice(0, 2).toUpperCase(), o = r.responsavelId ? 'Indicação' : 'Orgânico', p = r.responsavelId ? prospById(r.responsavelId) : null; return '<p title="' + esc(p ? 'Parceiro: ' + (p.tipo === 'clinica' && p.clinica ? p.clinica : p.nome) : o) + '">' + o + (uf ? ' · ' + esc(uf) : '') + '</p>'; }
   function botoesCaso(r){ var id = esc(r.id); return '<button type="button" class="kb-lnk" data-pv-prob="' + id + '">' + (r.pvProblema ? 'Editar problema' : 'Registrar problema') + '</button><button type="button" class="kb-lnk verm" data-pv-perda="' + id + '">Marcar como perda</button>'; }
   document.addEventListener('click', async function(e){
+    var bo = e.target.closest && e.target.closest('[data-pv-prob-ok]');
+    if (bo){ e.stopPropagation(); var ro = acharRow(bo.dataset.pvProbOk); if (!ro) return; var ao = { pvProblema: ro.pvProblema || '' }; try { await patchRow(ro.id, { pvProblema: '', atualizadoEm: new Date().toISOString() }); toast('Problema resolvido: ' + ro.nome, 'Desfazer', function(){ patchRow(ro.id, ao).catch(function(e2){ toast(errMsg(e2)); }); }); } catch(err){ toast(errMsg(err)); } return; }
     var bp = e.target.closest && e.target.closest('[data-pv-prob],[data-pv-perda],[data-pv-volta]'); if (!bp) return;
     e.stopPropagation();
     var r = acharRow(bp.dataset.pvProb || bp.dataset.pvPerda || bp.dataset.pvVolta); if (!r) return;
@@ -4190,16 +4224,15 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   }, true);
   function filaInfo(r){
     var et = filaEtapaDe(r), d = diasParado(r), st = [];
-    if (r.pvProblema) st.push(kbSt('Problema: ' + r.pvProblema));
     if (et === 'conferir') st.push(kbSt('Conferir até ' + prazoTarefa(r.filaMudouEm || r.encaminhadoEm, 2), 'lar'));
     if (et === 'protocolar') st.push(kbSt('Protocolar até ' + prazoTarefa(r.filaMudouEm, 3), 'lar'));
-    return { etapa: (FILA_COLS.filter(function(c){ return c[0] === et; })[0] || [0, ''])[1], meta: [metaParto(r), metaDocs(r)], status: st, acao: filaBotoes(r).replace('kb-duplo', 'kb-par'),
+    return { etapa: (FILA_COLS.filter(function(c){ return c[0] === et; })[0] || [0, ''])[1], meta: [linhaPartoBv(r), linhaOrigem(r), linhaDocs(r)], status: st, acao: filaBotoes(r).replace('kb-duplo', 'kb-par'),
       resp: r.filaPor, dias: d == null ? 0 : d, parado: d != null && d > LIMITE_ETAPA.fila, dataVal: r.dpp ? fmtDate(String(r.dpp).slice(0, 10)) : '—' };
   }
   function filaCard(r){
     var i = filaInfo(r), et = filaEtapaDe(r);
-    return kbCard(r, { arrasta: true, resp: i.resp, dias: i.dias, parado: i.parado, meta: i.meta, status: i.status, acoes: filaBotoes(r),
-      mais: [et !== 'conferir' ? '<button type="button" data-fila="voltar" data-id="' + esc(r.id) + '">Voltar para a conferência</button>' : ''].concat(botoesCasoItens(r)) });
+    return kbCard(r, { arrasta: true, rotulo: 'Salário-maternidade', resp: i.resp, dias: i.dias, parado: i.parado, meta: i.meta, status: i.status, problema: r.pvProblema, acoes: filaBotoes(r), caso: true,
+      mais: [et !== 'conferir' ? '<button type="button" data-fila="voltar" data-id="' + esc(r.id) + '">Voltar para a conferência</button>' : ''] });
   }
   var FILA_SITS = [['', 'Status: todas'], ['ctrl', 'Na conferência'], ['prot', 'Para protocolar'], ['par', 'Paradas há mais de 7 dias']];
   function passaFila(r, f){ var e = filaEtapaDe(r); return !f || (f === 'ctrl' ? e === 'conferir' : f === 'prot' ? e === 'protocolar' : f === 'par' ? (diasParado(r) || 0) > LIMITE_ETAPA.fila : true); }
@@ -4376,6 +4409,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     el.addEventListener('keydown', function(e){ if (e.key !== 'Enter' && e.key !== ' ') return; var c = e.target.closest('[' + attr + ']'); if (!c) return; e.preventDefault(); set(c.getAttribute(attr)); render(); });
   }
   $('ctr-sit').addEventListener('change', function(){ ctrSit = this.value; renderContratos(); });
+  filtroCards($('ctr-stats'), 'data-ctr-kpi', function(v){ if (v === 'h' || v === 'h-prot'){ filaSit = v === 'h-prot' ? 'prot' : ''; showTab('h'); return; } ctrSit = ctrSit === v ? '' : v; }, renderContratos);
   $('ctr-q').addEventListener('input', function(){ ctrQ2 = this.value.trim(); renderContratos(); });
   document.addEventListener('click', function(e){ if (e.target.closest && e.target.closest('select[data-lead],select[data-ctr],select[data-guia]')) e.stopPropagation(); }, true);
   document.addEventListener('change', async function(e){
@@ -4815,7 +4849,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     var falta = docsApp(r).filter(function(x){ return !x.ok; }).map(function(x){ return x.n; });
     var base = 'Olá, ' + n + '! Aqui é da equipe Nascer com Direitos. ';
     if (noContratos(r) && falta.length) return base + 'Para seguir com o seu salário-maternidade, ainda falta: ' + falta.join(', ') + '. Pode mandar a foto por aqui?';
-    if (noContratos(r) && posEtapaDe(r) === 'docs' && !r.senhaGovOk) return base + 'Precisamos regularizar o seu acesso ao Meu INSS (gov.br) para seguir com o pedido. Podemos falar agora?';
+    if (noContratos(r) && posEtapaDe(r) === 'senha') return base + 'Precisamos regularizar o seu acesso ao Meu INSS (gov.br) para seguir com o pedido. Podemos falar agora?';
     if (noContratos(r) && posEtapaDe(r) === 'cert') return base + 'O bebê já nasceu? Por favor, mande a foto da certidão de nascimento para darmos entrada no seu benefício.';
     return base + 'Podemos conversar sobre o seu salário-maternidade?';
   }
@@ -4885,18 +4919,21 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   // cartão: nome, linhas cinzas, alertas em vermelho, botão da etapa e rodapé com responsável e tempo na etapa
   // cartão limpo: nome e responsável; até duas informações curtas; um aviso só (o mais importante, os outros no +N); um botão; rodapé com dias e menu ⋯
   function kbSt(t, tom){ t = String(t || ''); return { t: t.charAt(0).toUpperCase() + t.slice(1), tom: tom || 'verm' }; }
+  // cartão no formato do BI de Vendas: nome, produto, linhas com relógios, problema em destaque, aviso, botão da etapa e rodapé com responsável, dias, pasta, problema e perda
   function kbCard(r, o){
-    var resp = o.resp || '', d = o.dias, st = (o.status || []).concat((o.alertas || []).map(function(t){ return kbSt(t); })).filter(function(s){ return s && s.t; });
-    var meta = (o.meta || o.linhas || []).filter(Boolean), s0 = st[0];
-    var mais = (o.mais || []).filter(Boolean);
-    return '<article class="kb-card" data-linha="' + esc(r.id) + '"' + (o.arrasta ? ' draggable="true" data-arrasta="' + esc(r.id) + '"' : '') + '>' +
-      '<div class="kb-top"><div class="kb-tit2"><p class="kb-nome" title="' + esc(r.nome || '') + '">' + esc(r.nome || 'Sem nome') + '</p>' +
-        (resp ? '<span class="kb-av" title="Responsável: ' + esc(resp) + '">' + esc(iniciais(resp)) + '</span>' : '<span class="kb-av sem" title="Sem responsável">?</span>') + '</div>' +
-        (meta.length ? '<div class="kb-meta">' + meta.map(function(m){ return '<div class="kb-mi">' + m + '</div>'; }).join('') + '</div>' : '') +
-        (s0 ? '<p class="kb-st ' + s0.tom + '" title="' + esc(st.map(function(s){ return s.t; }).join('\n')) + '"><i></i><span>' + esc(s0.t) + '</span>' + (st.length > 1 ? '<b>+' + (st.length - 1) + '</b>' : '') + '</p>' : '') + '</div>' +
+    var resp = o.resp || '', d = o.dias, id = esc(r.id), st = (o.status || []).concat((o.alertas || []).map(function(t){ return kbSt(t); })).filter(function(s){ return s && s.t; });
+    var meta = (o.meta || o.linhas || []).filter(Boolean), mais = (o.mais || []).filter(Boolean);
+    return '<article class="kb-card" data-linha="' + id + '"' + (o.arrasta ? ' draggable="true" data-arrasta="' + id + '"' : '') + '>' +
+      '<div class="kb-top"><p class="kb-nome" title="' + esc(r.nome || '') + '">' + esc(r.nome || 'Sem nome') + '</p>' + (o.rotulo ? '<p class="kb-rot">' + esc(o.rotulo) + '</p>' : '') +
+        (meta.length ? '<div class="kb-linhas">' + meta.join('') + '</div>' : '') +
+        (o.problema ? '<div class="kb-prob">' + svgI('i-alert') + '<span>' + esc(o.problema) + '</span><button type="button" data-pv-prob="' + id + '" title="Editar o problema" aria-label="Editar o problema">' + svgI('i-pencil') + '</button><button type="button" data-pv-prob-ok="' + id + '" title="Problema resolvido" aria-label="Problema resolvido">' + svgI('i-ok') + '</button></div>' : '') +
+        st.slice(0, 2).map(function(s){ return '<p class="kb-st ' + s.tom + '"><i></i><span>' + esc(s.t) + '</span></p>'; }).join('') + '</div>' +
       (o.acoes ? '<div class="kb-acao">' + o.acoes + '</div>' : '') +
-      '<div class="kb-rodape"><span class="kb-dias' + (o.parado ? ' parado' : '') + '"' + (d != null ? ' title="Há ' + d + (d === 1 ? ' dia' : ' dias') + ' ' + esc(o.diasTit || 'nesta etapa') + '"' : '') + '>' + (d != null ? svgI('i-clock') + d + ' d ' + esc(o.diasRot || 'na etapa') : '') + '</span>' +
-        '<span class="kb-dir">' + kbPasta(r) + (o.mover || '') + (mais.length ? '<span class="kb-mais"><button type="button" class="kb-ic" data-kbmais aria-label="Mais ações" title="Mais ações">' + svgI('i-more') + '</button><span class="kb-mais-pop">' + mais.join('') + '</span></span>' : '') + '</span></div></article>';
+      '<div class="kb-rodape"><span class="kb-esq">' + (resp ? '<span class="kb-av" title="Responsável: ' + esc(resp) + '">' + esc(iniciais(resp)) + '</span>' : '<span class="kb-av sem" title="Sem responsável">?</span>') +
+        (d != null ? '<span class="kb-dias' + (o.parado ? ' parado' : '') + '" title="Há ' + d + (d === 1 ? ' dia' : ' dias') + ' ' + esc(o.diasTit || 'nesta etapa') + '">' + svgI('i-clock') + d + ' d ' + esc(o.diasRot || 'nesta etapa') + '</span>' : '') + '</span>' +
+        '<span class="kb-dir">' + kbPasta(r) +
+          (o.caso ? '<button type="button" class="kb-ic" data-pv-prob="' + id + '" title="' + (r.pvProblema ? 'Editar o problema' : 'Registrar problema') + '" aria-label="Registrar problema">' + svgI('i-flag') + '</button><button type="button" class="kb-ic kb-perda" data-pv-perda="' + id + '" title="Marcar como perda" aria-label="Marcar como perda">' + svgI('i-ban') + '</button>' : '') +
+          (o.mover || '') + (mais.length ? '<span class="kb-mais"><button type="button" class="kb-ic" data-kbmais aria-label="Mais ações" title="Mais ações">' + svgI('i-more') + '</button><span class="kb-mais-pop">' + mais.join('') + '</span></span>' : '') + '</span></div></article>';
   }
   // menu ⋯ do cartão: abre e fecha sem abrir a janela da cliente
   document.addEventListener('click', function(e){
@@ -4917,7 +4954,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     pintarLista(box, '<table class="kb-tab kb-lista"><colgroup><col><col style="width:200px"><col style="width:140px"><col style="width:120px"><col style="width:84px"><col style="width:230px"></colgroup>' +
       '<thead><tr><th>Cliente</th><th>Etapa</th><th>' + esc(dataRot) + '</th><th>Responsável</th><th>Na etapa</th><th></th></tr></thead><tbody>' +
       (lista.slice(0, 300).map(function(r){
-        var i = info(r), s = (i.status || []).filter(function(x){ return x && x.t; })[0], id = esc(r.id);
+        var i = info(r), s = (r.pvProblema && (noContratos(r) || naFila(r)) ? [kbSt('Problema: ' + r.pvProblema)] : []).concat(i.status || []).filter(function(x){ return x && x.t; })[0], id = esc(r.id);
         return '<tr data-linha="' + id + '"><td class="nome"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + id + '">' + esc(r.nome || 'Sem nome') + '</button>' +
             (s ? '<small class="' + s.tom + '" title="' + esc(s.t) + '">' + esc(s.t) + '</small>' : '<small>' + esc(cidadeCli(r) || '') + '</small>') + '</td>' +
           '<td>' + (i.etapaSel || esc(i.etapa || '')) + '</td><td class="tnum">' + (i.dataVal || '—') + '</td><td>' + esc(primeiroNome(i.resp) || '—') + '</td>' +
