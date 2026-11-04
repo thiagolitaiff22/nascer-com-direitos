@@ -2000,6 +2000,9 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
       <button class="tab" role="tab" id="tab-desq" aria-selected="false" type="button" title="Perdas e desqualificados"><svg class="i"><use href="#i-bellx"/></svg><span>Perdas e desqualificados</span></button>
       <div class="nav-lbl" aria-hidden="true">Pós-venda</div>
       <button class="tab" role="tab" id="tab-ctr" aria-selected="false" type="button" title="Pós-venda"><svg class="i"><use href="#i-check"/></svg><span>Pós-venda</span><b class="nav-n tnum" id="nn-k"></b></button>
+      <button class="tab" role="tab" id="tab-gps" aria-selected="false" type="button" title="GPS (urbana)" hidden><svg class="i"><use href="#i-cash"/></svg><span>GPS (urbana)</span><b class="nav-n tnum" id="nn-gp"></b></button>
+      <button class="tab" role="tab" id="tab-nasc" aria-selected="false" type="button" title="Aguardando nascimento" hidden><svg class="i"><use href="#i-baby"/></svg><span>Aguardando parto</span><b class="nav-n tnum" id="nn-an"></b></button>
+      <button class="tab" role="tab" id="tab-req" aria-selected="false" type="button" title="Requerimento" hidden><svg class="i"><use href="#i-file"/></svg><span>Requerimento</span><b class="nav-n tnum" id="nn-rq"></b></button>
       <div class="nav-lbl" aria-hidden="true">Operacional</div>
       <button class="tab" role="tab" id="tab-fila" aria-selected="false" type="button" title="Fila de protocolo"><svg class="i"><use href="#i-file"/></svg><span>Fila de protocolo</span><b class="nav-n tnum" id="nn-h"></b></button>
       <button class="tab" role="tab" id="tab-inss" aria-selected="false" type="button" title="INSS"><svg class="i"><use href="#i-inss"/></svg><span>INSS</span><b class="nav-n tnum" id="nn-i"></b></button>
@@ -2081,6 +2084,39 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
         <div class="list" id="ctr-list"></div>
       </section>
 
+      <section id="view-gps" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18.75px">
+        <div class="stats" id="gpn-stats"></div>
+        <div class="fbar">
+          <div class="search tb-busca"><svg class="i"><use href="#i-search"/></svg><input id="gpn-q" type="search" autocomplete="off" placeholder="Buscar cliente, CPF…"></div>
+          <button type="button" class="fb-lnk" data-filtrar aria-haspopup="true"><svg class="i"><use href="#i-filter"/></svg>Filtrar</button>
+          <select class="tb-sel kb-ord" aria-label="Ordenar" title="Ordenar"></select>
+          <button type="button" class="fb-lnk minhas-btn" data-minhas aria-pressed="false" title="Mostra só as clientes em que você é o responsável">Minhas clientes</button>
+        </div>
+        <div class="kb-info" id="gpn-info"></div>
+        <div class="list" id="gpn-list"></div>
+      </section>
+      <section id="view-nasc" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18.75px">
+        <div class="stats" id="nan-stats"></div>
+        <div class="fbar">
+          <div class="search tb-busca"><svg class="i"><use href="#i-search"/></svg><input id="nan-q" type="search" autocomplete="off" placeholder="Buscar cliente, CPF…"></div>
+          <button type="button" class="fb-lnk" data-filtrar aria-haspopup="true"><svg class="i"><use href="#i-filter"/></svg>Filtrar</button>
+          <select class="tb-sel kb-ord" aria-label="Ordenar" title="Ordenar"></select>
+          <button type="button" class="fb-lnk minhas-btn" data-minhas aria-pressed="false" title="Mostra só as clientes em que você é o responsável">Minhas clientes</button>
+        </div>
+        <div class="kb-info" id="nan-info"></div>
+        <div class="list" id="nan-list"></div>
+      </section>
+      <section id="view-req" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18.75px">
+        <div class="stats" id="rqn-stats"></div>
+        <div class="fbar">
+          <div class="search tb-busca"><svg class="i"><use href="#i-search"/></svg><input id="rqn-q" type="search" autocomplete="off" placeholder="Buscar cliente, CPF…"></div>
+          <button type="button" class="fb-lnk" data-filtrar aria-haspopup="true"><svg class="i"><use href="#i-filter"/></svg>Filtrar</button>
+          <select class="tb-sel kb-ord" aria-label="Ordenar" title="Ordenar"></select>
+          <button type="button" class="fb-lnk minhas-btn" data-minhas aria-pressed="false" title="Mostra só as clientes em que você é o responsável">Minhas clientes</button>
+        </div>
+        <div class="kb-info" id="rqn-info"></div>
+        <div class="list" id="rqn-list"></div>
+      </section>
       <section id="view-dash" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18.75px">
         <div id="dash-box"></div>
       </section>
@@ -3346,7 +3382,7 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
   }
   function fcDados(r){
     var t = faseDe(r), id = esc(r.id), resp = fcResp(r, t), etapaSel;
-    if (t === 'k') etapaSel = '<select data-pos="' + id + '">' + posColsDe(r).map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === posEtapaDe(r) ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '<option value="__cad">↩ Voltar ao Cadastro</option></select>';
+    if (t === 'k' || ((t === 'gp' || t === 'an' || t === 'rq') && noContratos(r))) etapaSel = '<select data-pos="' + id + '">' + posColsDe(r).map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === posEtapaDe(r) ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '<option value="__cad">↩ Voltar ao Cadastro</option></select>';
     else if (t === 'd') etapaSel = '<select data-lead="' + id + '">' + Object.keys(LEAD).map(function(x){ return '<option value="' + x + '"' + (x === leadDe(r) ? ' selected' : '') + '>' + LEAD[x] + '</option>'; }).join('') + '</select>';
     else if (t === 'i') etapaSel = '<select data-inss="' + id + '">' + Object.keys(INSS).map(function(x){ return '<option value="' + x + '"' + (x === statusInss(r) ? ' selected' : '') + '>' + INSS[x][0] + '</option>'; }).join('') + '</select>';
     else etapaSel = '<input disabled value="' + esc(faseTexto(r).split(' · ')[1] || '—') + '">';
@@ -4237,12 +4273,25 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
     if (!r.dpp) return '<p><button type="button" class="kb-inline" data-act="edit" data-id="' + esc(r.id) + '">Informar data do parto</button></p>';
     return '<div class="kb-par"><span>Parto ' + fmtDate(String(r.dpp).slice(0, 10)) + '</span>' + relogio(r.dpp, 'azul') + '</div>';
   }
+  // fluxo novo: o Pós-venda só mostra quem tem pendência (senha, documento, prova rural, rural ou urbano)
+  function posDaTela(r){ return noContratos(r) && (fluxoVista !== 'novo' || faseDe(r) === 'k'); }
+  var CTR_SITS_NOVO = [['', 'Status: todas'], ['semsenha', 'Sem senha gov.br'], ['docs', 'Documentos faltando'], ['rprova', 'Prova rural faltando'], ['semtipo', 'Sem rural/urbano'], ['urb', 'Urbanas'], ['rur', 'Rurais'], ['atr', 'Atrasadas']];
+  function ctrSitsAtivos(){ return fluxoVista === 'novo' ? CTR_SITS_NOVO : CTR_SITS; }
   var CTR_SITS = [['', 'Status: todas'], ['urb', 'Urbanas (com GPS)'], ['rur', 'Rurais (prova rural)'], ['semtipo', 'Sem rural/urbano'], ['completa', 'Pastas completas'], ['gest', 'Gestantes'], ['nasc', 'Bebê já nasceu'], ['atr', 'Atrasadas'], ['gps', 'GPS a pagar'], ['docs', 'Documentos faltando'], ['dev', 'Devolvidas pela Controladoria']];
-  function passaCtr(r, f){ return !f || (f === 'urb' ? tipoChave(r) === 'urbana' : f === 'rur' ? rural(r) : f === 'semtipo' ? !r.tipoSegurada : f === 'completa' ? !faltamTxt(r) : f === 'gest' ? !nascido(r) : f === 'nasc' ? nascido(r) : f === 'atr' ? atrasada(r) : f === 'gps' ? gpsTarefa(r) : f === 'docs' ? !!faltamTxt(r) : f === 'dev' ? r.pvAnalise === 'devolvido' : true); }
+  function passaCtr(r, f){ return !f || (f === 'semsenha' ? posEtapaDe(r) === 'senha' : f === 'rprova' ? rural(r) && faltaDocs(r).indexOf('rural') >= 0 : f === 'urb' ? tipoChave(r) === 'urbana' : f === 'rur' ? rural(r) : f === 'semtipo' ? !r.tipoSegurada : f === 'completa' ? !faltamTxt(r) : f === 'gest' ? !nascido(r) : f === 'nasc' ? nascido(r) : f === 'atr' ? atrasada(r) : f === 'gps' ? gpsTarefa(r) : f === 'docs' ? !!faltamTxt(r) : f === 'dev' ? r.pvAnalise === 'devolvido' : true); }
   function renderContratos(){
     var box = $('ctr-list'); if (!box) return;
     (function(){
-      var pos = state.rows.filter(noContratos), fila = state.rows.filter(naFila);
+      var pos = state.rows.filter(posDaTela), fila = state.rows.filter(naFila);
+      if (fluxoVista === 'novo'){
+        var nTipo = pos.filter(function(r){ return !r.tipoSegurada; }).length;
+        $('ctr-stats').innerHTML = cardLista('data-ctr-kpi', 'i-users', 'Com pendência', pos.length, 'o resto do fluxo anda sozinho', '', 'x') +
+          cardLista('data-ctr-kpi', 'i-chave', 'Sem senha gov.br', pos.filter(function(r){ return passaCtr(r, 'semsenha'); }).length, 'recuperar a senha', 'semsenha', ctrSit) +
+          cardLista('data-ctr-kpi', 'i-file', 'Documentos faltando', pos.filter(function(r){ return passaCtr(r, 'docs'); }).length, 'a mãe não mandou', 'docs', ctrSit) +
+          cardLista('data-ctr-kpi', 'i-alert', 'Prova rural faltando', pos.filter(function(r){ return passaCtr(r, 'rprova'); }).length, 'só as rurais', 'rprova', ctrSit) +
+          cardLista('data-ctr-kpi', 'i-users', 'Sem rural/urbano', nTipo, 'o escritório decide', 'semtipo', ctrSit);
+        return;
+      }
       var compl = pos.filter(function(r){ return !faltamTxt(r); }).length, atrDoc = pos.filter(function(r){ return /documenta/.test(atrasoTxt(r)); }).length;
       var atrProt = fila.filter(function(r){ if (filaEtapaDe(r) !== 'protocolar') return false; var b = parseDate(diaLocal(r.filaMudouEm)); if (!b) return false; b.setDate(b.getDate() + 3); return iso(b) < iso(new Date()); }).length;
       $('ctr-stats').innerHTML = cardLista('data-ctr-kpi', 'i-users', 'Clientes no pós-venda', pos.length, plural(pos.filter(gpsTarefa).length, 'com GPS a pagar', 'com GPS a pagar'), '', 'x') +
@@ -4251,11 +4300,15 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
         cardLista('data-ctr-kpi', 'i-clock', 'Atrasados para protocolar', atrProt, 'pasta pronta, passou do prazo', 'h-prot', '') +
         cardLista('data-ctr-kpi', 'i-file', 'Na fila de protocolo', fila.length, 'esperando o protocolo', 'h', '');
     })();
-    var emPos = state.rows.filter(noContratos).filter(function(r){ return buscaOk(r, ctrQ2) && (!soMinhas || minha(r)) && passaFiltro(r); });
+    var emPos = state.rows.filter(posDaTela).filter(function(r){ return buscaOk(r, ctrQ2) && (!soMinhas || minha(r)) && passaFiltro(r); });
     var n = function(f){ return emPos.filter(function(r){ return passaCtr(r, f); }).length; };
-    $('ctr-sit').innerHTML = CTR_SITS.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === ctrSit ? ' selected' : '') + '>' + o[1] + ' · ' + n(o[0]) + '</option>'; }).join('');
+    $('ctr-sit').innerHTML = ctrSitsAtivos().map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === ctrSit ? ' selected' : '') + '>' + o[1] + ' · ' + n(o[0]) + '</option>'; }).join('');
     $('ctr-sit').classList.toggle('ativo', !!ctrSit);
     var nA = n('atr'), nG = n('gps'), nD = n('docs'), nV = n('dev');
+    if (fluxoVista === 'novo'){ var nS = n('semsenha'), nR = n('rprova'), nT = n('semtipo'); nG = 0; nV = 0;
+      $('ctr-chips').innerHTML = (nS ? fbChip('ver', 'i-chave', plural(nS, 'sem senha gov.br', 'sem senha gov.br'), 'ctr:semsenha', 'ctr:' + ctrSit) : '') + (nD ? fbChip('ver', 'i-file', plural(nD, 'sem documento', 'sem documento'), 'ctr:docs', 'ctr:' + ctrSit) : '') +
+        (nR ? fbChip('ver', 'i-alert', plural(nR, 'sem prova rural', 'sem prova rural'), 'ctr:rprova', 'ctr:' + ctrSit) : '') + (nT ? fbChip('ver', 'i-users', plural(nT, 'sem rural/urbano', 'sem rural/urbano'), 'ctr:semtipo', 'ctr:' + ctrSit) : '') + (nS || nD || nR || nT ? '' : FB_NADA);
+    } else
     $('ctr-chips').innerHTML = (nA ? fbChip('lar', 'i-clock', plural(nA, 'atrasada', 'atrasadas'), 'ctr:atr', 'ctr:' + ctrSit) : '') + (nG ? fbChip('ver', 'i-cash', plural(nG, 'GPS a pagar', 'GPS a pagar'), 'ctr:gps', 'ctr:' + ctrSit) : '') +
       (nD ? fbChip('ver', 'i-file', plural(nD, 'sem documento', 'sem documento'), 'ctr:docs', 'ctr:' + ctrSit) : '') + (nV ? fbChip('ver', 'i-undo', plural(nV, 'devolvida', 'devolvidas'), 'ctr:dev', 'ctr:' + ctrSit) : '') + (nA || nG || nD || nV ? '' : FB_NADA);
     var lista = emPos.filter(function(r){ return passaCtr(r, ctrSit); });
@@ -4268,6 +4321,68 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
     }
     tabelaFase(box, lista, posInfo, 'Parto', 'Nenhuma cliente neste filtro.');
   }
+  /* ---------- fluxo novo: GPS (urbana), Aguardando nascimento e Requerimento ---------- */
+  var gpnQ = '', nanQ = '', rqnQ = '';
+  function selPos(r){ var id = esc(r.id); return '<select data-pos="' + id + '" aria-label="Etapa de ' + esc(r.nome) + '">' + posColsDe(r).map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === posEtapaDe(r) ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '</select>'; }
+  function emDias(d){ var n = daysUntil(d); return n == null ? '' : n > 0 ? 'em ' + n + ' d' : n === 0 ? 'hoje' : 'há ' + (-n) + ' d'; }
+  function gpsInfoN(r){
+    var et = posEtapaDe(r), v = prazoGps(r), g = gpsGerar(r), st = [];
+    if (!nitOk(r.nit)) st.push(kbSt('Falta o NIT da mãe: sem ele a guia não sai', 'lar'));
+    else if (et === 'gps') st.push(v && v < iso(new Date()) ? kbSt('Prazo da GPS passou em ' + fmtDate(v) + ': pagar já') : kbSt('Guia pronta: pagar até ' + fmtDate(v), 'lar'));
+    else st.push(kbSt('Guia pronta · paga no prazo (Asaas, quando ligado)', 'ok'));
+    return { etapa: et === 'gps' ? 'Pagar agora' : 'Aguardando o prazo', etapaSel: selPos(r), status: st, resp: r.posResp, dias: diasNoPos(r), parado: false,
+      dataVal: v ? fmtDate(v) + ' · ' + emDias(v) : 'sem data do parto',
+      acao: gpsTarefa(r) ? '<button type="button" class="kb-btn" data-guia-paga="' + esc(r.id) + '">' + svgI('i-cash') + 'Marcar GPS paga</button>' : (g ? '<button type="button" class="kb-btn" data-gpn-copia="' + esc(g.digitos) + '">' + svgI('i-copy') + 'Copiar código</button>' : '') };
+  }
+  function nascInfoN(r){
+    var d = daysUntil(r.dpp), aviso = r.dpp ? (function(){ var x = parseDate(String(r.dpp).slice(0, 10)); if (!x) return ''; x.setDate(x.getDate() - 7); return iso(x); })() : '';
+    var st = [!r.dpp ? kbSt('Sem data prevista do parto') : d != null && d <= 7 ? kbSt('Semana do parto: a IA está falando com a mãe', 'lar') : kbSt('A IA fala com a mãe em ' + fmtDate(aviso), 'info')];
+    return { etapa: 'Aguardando nascimento', etapaSel: selPos(r), status: st, resp: r.posResp, dias: diasNoPos(r), parado: false,
+      dataVal: r.dpp ? fmtDate(String(r.dpp).slice(0, 10)) + ' · ' + emDias(r.dpp) : '—', acao: '' };
+  }
+  function reqInfoN(r){
+    var id = esc(r.id), fila = naFila(r), et = fila ? 'fila' : posEtapaDe(r), falta = faltamTxt(r), st = [];
+    if (et === 'cert') st.push(kbSt('A IA pede à mãe a foto da certidão', 'info'));
+    else if (falta) st.push(kbSt('Falta: ' + falta, 'lar'));
+    else st.push(kbSt('Pasta completa: pronta para o requerimento', 'ok'));
+    var prot = '<button type="button" class="kb-btn" data-rqn-prot="' + id + '" title="Requerimento feito no Meu INSS: registrar o número do protocolo (vai ser automático)">' + svgI('i-file') + 'Registrar protocolo</button>';
+    return { etapa: et === 'cert' ? 'Aguardando certidão' : 'Pronta para requerer', etapaSel: fila ? '' : selPos(r), status: st, resp: r.posResp, dias: fila ? (diasDesdeIso(r.filaMudouEm || r.encaminhadoEm) || 0) : diasNoPos(r), parado: false,
+      dataVal: r.criancaNasc ? 'Nasceu ' + fmtDate(String(r.criancaNasc).slice(0, 10)) : r.dpp ? fmtDate(String(r.dpp).slice(0, 10)) : '—',
+      acao: et === 'cert' ? '<button type="button" class="kb-btn" data-pv-cert="' + id + '">' + svgI('i-check') + 'Recebi a certidão</button>' : prot };
+  }
+  function listaNovo(fase, q){ return state.rows.filter(function(r){ return faseDe(r) === fase && buscaOk(r, q) && (!soMinhas || minha(r)) && passaFiltro(r); }); }
+  function statsNovo(id, cards){ var el = $(id); if (el) el.innerHTML = cards.map(function(c){ return '<div class="card stat"><div class="stat-h"><svg class="i"><use href="#' + c[0] + '"/></svg>' + c[1] + '</div><div class="stat-v tnum">' + c[2] + '</div><div class="stat-c">' + c[3] + '</div></div>'; }).join(''); }
+  function renderGpsNovo(){
+    var box = $('gpn-list'); if (!box) return;
+    var todos = state.rows.filter(function(r){ return faseDe(r) === 'gp'; });
+    statsNovo('gpn-stats', [['i-cash', 'Na GPS', todos.length, 'urbanas esperando a guia'], ['i-alert', 'Pagar agora', todos.filter(gpsTarefa).length, 'prazo chegou'], ['i-users', 'Sem NIT', todos.filter(function(r){ return !nitOk(r.nit); }).length, 'sem NIT a guia não sai'], ['i-clock', 'Aguardando o prazo', todos.filter(function(r){ return posEtapaDe(r) === 'prazo_gps'; }).length, 'a guia sai 5 dias antes']]);
+    var l = ordenar(listaNovo('gp', gpnQ), function(a, b){ return String(prazoGps(a) || '9999').localeCompare(String(prazoGps(b) || '9999')); });
+    kbInfo('gpn', 'gp', l.length, 'cliente', 'clientes');
+    tabelaFase(box, l, gpsInfoN, 'Prazo da GPS', 'Nenhuma urbana esperando a GPS.');
+  }
+  function renderNascNovo(){
+    var box = $('nan-list'); if (!box) return;
+    var todos = state.rows.filter(function(r){ return faseDe(r) === 'an'; });
+    var sem = todos.filter(function(r){ var d = daysUntil(r.dpp); return d != null && d <= 7; }).length, mes = todos.filter(function(r){ var d = daysUntil(r.dpp); return d != null && d <= 30; }).length;
+    statsNovo('nan-stats', [['i-baby', 'Aguardando nascimento', todos.length, 'GPS paga ou prova rural completa'], ['i-alert', 'Parto em até 7 dias', sem, 'a IA já está falando com a mãe'], ['i-cal', 'Parto em até 30 dias', mes, 'no próximo mês'], ['i-users', 'Rurais', todos.filter(rural).length, 'sem GPS, com prova rural']]);
+    var l = ordenar(listaNovo('an', nanQ), function(a, b){ return String(a.dpp || '9999').localeCompare(String(b.dpp || '9999')); });
+    kbInfo('nan', 'an', l.length, 'gestante', 'gestantes');
+    tabelaFase(box, l, nascInfoN, 'Parto previsto', 'Nenhuma gestante aguardando o nascimento.');
+  }
+  function renderReqNovo(){
+    var box = $('rqn-list'); if (!box) return;
+    var todos = state.rows.filter(function(r){ return faseDe(r) === 'rq'; }), ce = todos.filter(function(r){ return noContratos(r) && posEtapaDe(r) === 'cert'; }).length;
+    statsNovo('rqn-stats', [['i-file', 'No requerimento', todos.length, 'bebê nasceu'], ['i-baby', 'Esperando certidão', ce, 'a IA pede à mãe'], ['i-check', 'Prontas para requerer', todos.length - ce, 'pasta completa'], ['i-inss', 'Requerimento', 'Manual', 'vai ser automático']]);
+    var l = ordenar(listaNovo('rq', rqnQ), function(a, b){ return String(a.criancaNasc || a.dpp || '9999').localeCompare(String(b.criancaNasc || b.dpp || '9999')); });
+    kbInfo('rqn', 'rq', l.length, 'cliente', 'clientes');
+    tabelaFase(box, l, reqInfoN, 'Nascimento', 'Ninguém no requerimento agora.');
+  }
+  [['gpn-q', function(v){ gpnQ = v; renderGpsNovo(); }], ['nan-q', function(v){ nanQ = v; renderNascNovo(); }], ['rqn-q', function(v){ rqnQ = v; renderReqNovo(); }]].forEach(function(x){ var el = $(x[0]); if (el) el.addEventListener('input', function(){ x[1](this.value.trim()); }); });
+  ['gpn-list', 'nan-list', 'rqn-list'].forEach(function(lid){ var el = $(lid); if (!el) return; el.addEventListener('click', async function(e){
+    var c = e.target.closest('[data-pv-cert]'); if (c){ receberCertidao(c.dataset.pvCert); return; }
+    var p = e.target.closest('[data-rqn-prot]'); if (p){ var r = acharRow(p.dataset.rqnProt); if (r) abrirRequerimento(r); return; }
+    var cp = e.target.closest('[data-gpn-copia]'); if (cp){ try { await copiarTexto(cp.dataset.gpnCopia); toast('Código de barras da GPS copiado'); } catch(err){ toast('Não foi possível copiar.'); } return; }
+  }); ligarLista(lid.replace('-list', ''), function(){ return null; }, render); });
   /* ---------- Fila de protocolo: um botão por etapa ---------- */
   var FILA_COLS = [['conferir', 'Conferência'], ['protocolar', 'Protocolar', 'ok']];
   var FILA_LEGADO = { para_analisar: 'conferir', analise: 'conferir', fazer_requerimento: 'protocolar', redigindo: 'protocolar' };
@@ -4905,6 +5020,7 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
       if (gpsTarefa(r)) add(!nitOk(r.nit) ? 'Pegar o NIT para a GPS' : 'Pagar a GPS', r, (prazoGps(r) ? 'vence ' + fmtDate(prazoGps(r)) + ' · parto ' + fmtDate(r.dpp) : 'sem data do parto') + comResp);
       if (noContratos(r) && r.fatoGerador === 'gestante' && !r.criancaNasc && !r.dpp) add('Informar a data do parto', r, 'gestante sem data prevista');
       if (noContratos(r) && !r.tipoSegurada) add('Informar se é rural ou urbano', r, 'urbano paga a GPS; rural precisa da prova rural' + comResp);
+      if (doFluxoNovo(r) && noContratos(r) && posEtapaDe(r) === 'ok') add('Fazer o requerimento no INSS', r, 'pasta pronta' + (r.criancaNasc ? ' · nasceu em ' + fmtDate(r.criancaNasc) : '') + comResp);
       if (noContratos(r) && posEtapaDe(r) === 'cert') add('Falar com a mãe: pedir a certidão', r, (r.criancaNasc ? 'nasceu em ' + fmtDate(r.criancaNasc) : 'parto previsto ' + fmtDate(r.dpp)) + comResp);
       if (naFila(r) && filaEtapaDe(r) === 'conferir') add('Conferir a documentação', r, 'encaminhada ' + fmtDate(diaLocal(r.encaminhadoEm)) + ' · prazo ' + prazoTarefa(r.filaMudouEm || r.encaminhadoEm, 2));
       if (naFila(r) && filaEtapaDe(r) === 'protocolar') add('Protocolar no INSS', r, 'prazo ' + prazoTarefa(r.filaMudouEm, 3) + (r.filaPor ? ' · responsável: ' + primeiroNome(r.filaPor) : ''));
@@ -4927,7 +5043,7 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
   function abrirAvisos(){
     var l = avisosLista(), grupos = {};
     l.forEach(function(x){ (grupos[x.tipo] = grupos[x.tipo] || []).push(x); });
-    var ordem = ['Parto perto e sem contrato', 'Problema registrado', 'Pegar o NIT para a GPS', 'Pagar a GPS', 'Informar se é rural ou urbano', 'Informar a data do parto', 'Falar com a mãe: pedir a certidão', 'Cobrar documentos da mãe', 'Devolvida pela Controladoria', 'Conferir a documentação', 'Protocolar no INSS', 'Pôr o número do protocolo', 'Registrar o pagamento do benefício', 'Fazer o acerto de honorários', 'Exigência do INSS vencendo', 'Parada além do prazo', 'Cadastro repetido', 'Data para conferir'];
+    var ordem = ['Parto perto e sem contrato', 'Problema registrado', 'Pegar o NIT para a GPS', 'Pagar a GPS', 'Informar se é rural ou urbano', 'Informar a data do parto', 'Falar com a mãe: pedir a certidão', 'Cobrar documentos da mãe', 'Devolvida pela Controladoria', 'Conferir a documentação', 'Fazer o requerimento no INSS', 'Protocolar no INSS', 'Pôr o número do protocolo', 'Registrar o pagamento do benefício', 'Fazer o acerto de honorários', 'Exigência do INSS vencendo', 'Parada além do prazo', 'Cadastro repetido', 'Data para conferir'];
     var f = document.createElement('div'); f.className = 'cid-sheet av-sheet';
     f.innerHTML = '<div><div class="av-cab"><b>Avisos</b><span>' + (l.length ? l.length + (l.length === 1 ? ' ponto para olhar' : ' pontos para olhar') : 'Nada pendente agora') + '</span></div><div class="lista av-lista">' +
       ordem.filter(function(k){ return grupos[k]; }).map(function(k){ return '<div class="av-g"><b>' + esc(k) + ' <span class="tnum">' + grupos[k].length + '</span></b>' + grupos[k].map(function(x){ return '<button type="button" data-av="' + esc(x.id) + '"><span>' + esc(x.nome) + '</span><small>' + esc(x.txt) + '</small></button>'; }).join('') + '</div>'; }).join('') +
@@ -5202,7 +5318,7 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
     var doGrupo = cads.filter(function(r){ return r.contratoEm; }).length, taxa = cads.length ? Math.round(doGrupo / cads.length * 100) : null;
     var pos = rows.filter(noContratos);
     html += '<div class="fbar"><div class="seg-bi" role="group" aria-label="Período">' + DASH_PERIODOS.map(function(p){ return '<button type="button" data-dash-per="' + p[0] + '" aria-pressed="' + (p[0] === dashPer) + '">' + p[1] + '</button>'; }).join('') + '</div><span class="tb-fim fb-count tnum">' + esc(faixa) + '</span></div>';
-    html += dashSecao('Clientes por fase', 'agora', '<div class="stats">' + FASES.map(function(f){ return dashCard(f[0], f[1], TITULOS[f[0]][0], res[f[0]][0], res[f[0]][1]); }).join('') + '</div>');
+    html += dashSecao('Clientes por fase', 'agora', '<div class="stats">' + fasesAtivas().map(function(f){ return dashCard(f[0], f[1], TITULOS[f[0]][0], res[f[0]][0], res[f[0]][1]); }).join('') + '</div>');
     html += dashSecao('Comercial', 'no período', '<div class="stats">' +
       dashCard('d', 'i-phone', 'Mães cadastradas', cads.length, 'cadastradas no período') +
       dashCard('k', 'i-check', 'Contratos fechados', ctrs.length, 'fechados no período') +
@@ -5270,7 +5386,11 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
   var dashRedim = 0;
   window.addEventListener('resize', function(){ clearTimeout(dashRedim); dashRedim = setTimeout(renderDash, 150); });
   /* ---------- balões das fases: um por etapa do caminho da cliente ---------- */
-  var FASES = [['d', 'i-phone'], ['k', 'i-check'], ['h', 'i-file'], ['i', 'i-inss'], ['c', 'i-gavel'], ['r', 'i-box']];
+  var FASES_ANT = [['d', 'i-phone'], ['k', 'i-check'], ['h', 'i-file'], ['i', 'i-inss'], ['c', 'i-gavel'], ['r', 'i-box']];
+  // fluxo novo (padrão definido em 04/11/2026): sem Cadastro e sem Fila; GPS, nascimento e requerimento têm tela própria
+  var FASES_NOVO = [['k', 'i-check'], ['gp', 'i-cash'], ['an', 'i-baby'], ['rq', 'i-file'], ['i', 'i-inss'], ['c', 'i-gavel'], ['r', 'i-box']];
+  var FASES = FASES_ANT.concat([['gp', 'i-cash'], ['an', 'i-baby'], ['rq', 'i-file']]);
+  function fasesAtivas(){ return fluxoVista === 'novo' ? FASES_NOVO : FASES_ANT; }
   function lerGuardado(k, pad){ try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? pad : v; } catch(e){ return pad; } }
   function guardar(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
   /* ---------- dois fluxos (como Advogados | Educação no BI de Vendas) ----------
@@ -5292,7 +5412,8 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
   function trocarFluxo(f){
     if (f === fluxoVista) return;
     fluxoVista = f; guardar('nascer-fluxo', f); filtrarFluxo();
-    if (f === 'novo' && telaAberta === 'd') showTab('k');
+    if (f === 'novo' && (telaAberta === 'd' || telaAberta === 'h')) showTab(telaAberta === 'd' ? 'k' : 'rq');
+    if (f !== 'novo' && (telaAberta === 'gp' || telaAberta === 'an' || telaAberta === 'rq')) showTab('k');
     render();
   }
   document.addEventListener('click', function(e){ var b = e.target.closest && e.target.closest('button[data-fluxo]'); if (b) trocarFluxo(b.dataset.fluxo); });
@@ -5322,7 +5443,7 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
   function vistaDe(t){ return 'lista'; }   // cada fase é uma tela do menu lateral, sempre em lista (o Kanban saiu a pedido em 04/11/2026)
   function telaDoFunil(t){ return FASES.some(function(f){ return f[0] === t; }); }
   function resumoFases(){
-    var rows = state.rows, cad = rows.filter(noCadastro), pos = rows.filter(noContratos), fila = rows.filter(naFila), ins = rows.filter(noInss), jud = rows.filter(noControle), arq = rows.filter(function(r){ return r.arquivado; });
+    var rows = state.rows, cad = rows.filter(noCadastro), pos = rows.filter(posDaTela), fila = rows.filter(naFila), ins = rows.filter(noInss), jud = rows.filter(noControle), arq = rows.filter(function(r){ return r.arquivado; });
     var prio = cad.filter(function(r){ return prioridadeNasc(r) != null; }).length, lig = cad.filter(function(r){ return leadDe(r) === 'novo'; }).length, parCad = cad.filter(atrasada).length;
     var atr = pos.filter(atrasada).length, par = fila.filter(function(r){ return (diasParado(r) || 0) > LIMITE_ETAPA.fila; }).length;
     var exi = ins.filter(function(r){ return statusInss(r) === 'exigencia'; }).length, lat = ins.filter(analiseAtrasada).length;
@@ -5333,7 +5454,10 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
       h: [fila.length, par ? plural(par, 'parada', 'paradas') : 'Tudo em dia', plural(fila.length, 'na fila', 'na fila') + ' · ' + plural(par, 'parada', 'paradas')],
       i: [ins.length, exi ? plural(exi, 'em exigência', 'em exigência') : lat ? plural(lat, 'análise atrasada', 'análises atrasadas') : 'requerimentos no INSS', plural(ins.length, 'requerimento', 'requerimentos') + ' · ' + plural(exi, 'exigência', 'exigências')],
       c: [jud.length, marc ? plural(marc, 'audiência marcada', 'audiências marcadas') : 'ações em andamento', plural(jud.length, 'ação', 'ações') + ' · ' + plural(marc, 'audiência marcada', 'audiências marcadas')],
-      r: [pagos, contatar ? plural(contatar, 'para contatar', 'para contatar') : plural(pagos, 'paga', 'pagas'), plural(pagos, 'paga', 'pagas') + ' · ' + plural(contatar, 'para contatar', 'para contatar')]
+      r: [pagos, contatar ? plural(contatar, 'para contatar', 'para contatar') : plural(pagos, 'paga', 'pagas'), plural(pagos, 'paga', 'pagas') + ' · ' + plural(contatar, 'para contatar', 'para contatar')],
+      gp: (function(){ var l = rows.filter(function(r){ return faseDe(r) === 'gp'; }), pg = l.filter(gpsTarefa).length, sn = l.filter(function(r){ return !nitOk(r.nit); }).length; return [l.length, pg ? plural(pg, 'para pagar agora', 'para pagar agora') : sn ? plural(sn, 'sem NIT', 'sem NIT') : 'Aguardando o prazo', plural(l.length, 'cliente', 'clientes') + ' · ' + plural(pg, 'GPS para pagar', 'GPS para pagar') + ' · ' + plural(sn, 'sem NIT', 'sem NIT')]; })(),
+      an: (function(){ var l = rows.filter(function(r){ return faseDe(r) === 'an'; }), sm = l.filter(function(r){ var d = daysUntil(r.dpp); return d != null && d <= 7; }).length; return [l.length, sm ? plural(sm, 'parto em até 7 dias', 'partos em até 7 dias') : 'Aguardando', plural(l.length, 'gestante', 'gestantes') + ' · ' + plural(sm, 'parto em até 7 dias', 'partos em até 7 dias')]; })(),
+      rq: (function(){ var l = rows.filter(function(r){ return faseDe(r) === 'rq'; }), ce = l.filter(function(r){ return noContratos(r) && posEtapaDe(r) === 'cert'; }).length, pr = l.length - ce; return [l.length, pr ? plural(pr, 'pronta para requerer', 'prontas para requerer') : ce ? plural(ce, 'esperando certidão', 'esperando certidão') : 'Tudo em dia', plural(ce, 'esperando certidão', 'esperando certidão') + ' · ' + plural(pr, 'pronta para requerer', 'prontas para requerer')]; })()
     };
   }
   function filtrosDaTela(){
@@ -5358,7 +5482,9 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
     var res = resumoFases();
     FASES.forEach(function(f){ var el = $('nn-' + f[0]); if (el){ el.textContent = res[f[0]][0] || ''; el.title = res[f[0]][1]; } });
     // fluxo novo não tem Cadastro (sem closer): a tela só existe no fluxo antigo
-    if ($('tab-cad')) $('tab-cad').hidden = fluxoVista === 'novo';
+    var nv = fluxoVista === 'novo';
+    ['tab-cad', 'tab-fila'].forEach(function(i){ if ($(i)) $(i).hidden = nv; });
+    ['tab-gps', 'tab-nasc', 'tab-req'].forEach(function(i){ if ($(i)) $(i).hidden = !nv; });
     pintarFluxoSeg();
   }
   var ORDENS = [['', '↕ Prazo mais perto'], ['atividade', '↕ Última atividade'], ['nome', '↕ Nome (A–Z)'], ['etapa', '↕ Tempo na etapa'], ['cadastro', '↕ Cadastro mais recente']];
@@ -5473,9 +5599,12 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
     else if (de === 'i' && fase === 'c'){ openForm(r); setTimeout(function(){ $('f-proc').scrollIntoView({ block: 'center' }); $('f-proc').focus(); }, 60); toast('Preencha o número do processo e a data do ajuizamento'); }
     else toast('Essa passagem não é permitida por aqui.');
   }
-  function faseDe(r){ if (r.arquivado) return arquivadoPago(r) ? 'r' : 'q'; if (String(r.processo || '').trim()) return 'c'; if (requerido(r)) return 'i'; if (naFila(r)) return 'h'; if (noContratos(r)) return 'k'; if (desqualificada(r) || perdidoAuto(r)) return 'q'; return 'd'; }
+  function faseDe(r){ if (r.arquivado) return arquivadoPago(r) ? 'r' : 'q'; if (String(r.processo || '').trim()) return 'c'; if (requerido(r)) return 'i'; if (naFila(r)) return doFluxoNovo(r) ? 'rq' : 'h'; if (noContratos(r)) return doFluxoNovo(r) ? faseNovoPos(r) : 'k'; if (desqualificada(r) || perdidoAuto(r)) return 'q'; return 'd'; }
+  // fluxo novo: senha/documentos ficam no Pós-venda; GPS, nascimento e certidão/requerimento ganham tela própria
+  function faseNovoPos(r){ var e = posEtapaDe(r); return e === 'prazo_gps' || e === 'gps' ? 'gp' : e === 'nasc' ? 'an' : e === 'cert' || e === 'ok' ? 'rq' : 'k'; }
   function faseTexto(r){
     var t = faseDe(r), n = TITULOS[t] ? TITULOS[t][0] : '';
+    if (t === 'gp' || t === 'an' || t === 'rq') return n + ' · ' + (naFila(r) ? 'Protocolar' : ((POS_COLS.filter(function(c){ return c[0] === posEtapaDe(r); })[0] || [0, ''])[1]));
     if (t === 'd') return n + ' · ' + LEAD[leadDe(r)];
     if (t === 'k') return n + ' · ' + ((POS_COLS.filter(function(c){ return c[0] === posEtapaDe(r); })[0] || [0, ''])[1]);
     if (t === 'h') return n + ' · ' + ((FILA_COLS.filter(function(c){ return c[0] === filaEtapaDe(r); })[0] || [0, ''])[1]);
@@ -5507,7 +5636,7 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
   });
   $('bg-res').addEventListener('mousedown', function(e){ e.preventDefault(); var b = e.target.closest('[data-bg]'); if (!b) return; var r = acharNaBase(b.dataset.bg); $('bg-res').hidden = true; $('bg-q').blur(); if (r) abrirNoFluxo(r); });
   function abrirNoFluxo(r){ var f = doFluxoNovo(r) ? 'novo' : 'antigo'; if (f !== fluxoVista) trocarFluxo(f); abrirCard(r.id, noCadastro(r)); }
-  function render(){ pintarAvisosBtn(); renderRelatorio(); pintarCard(); renderEstadosCfg(); renderRegioes(); renderContratos(); renderFila(); renderDesq(); renderCad(); renderInss(); renderList(); renderRet(); renderProsp(); renderEquipe(); renderFin(); renderDash(); renderFunil(); pintarPagina(); medirQuadros(); }
+  function render(){ renderGpsNovo(); renderNascNovo(); renderReqNovo(); pintarAvisosBtn(); renderRelatorio(); pintarCard(); renderEstadosCfg(); renderRegioes(); renderContratos(); renderFila(); renderDesq(); renderCad(); renderInss(); renderList(); renderRet(); renderProsp(); renderEquipe(); renderFin(); renderDash(); renderFunil(); pintarPagina(); medirQuadros(); }
   var clQ = '';
   // stage of each process, derived from what is already recorded (no extra typing)
   var ETAPAS = [
@@ -7443,7 +7572,7 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
     } catch(err){ toast(errMsg(err)); }
     finally { $('av-save').disabled = false; }
   });
-  var VIEWS = { b: ['tab-dash', 'view-dash'], d: ['tab-cad', 'view-cad'], i: ['tab-inss', 'view-inss'], k: ['tab-ctr', 'view-ctr'], q: ['tab-desq', 'view-desq'], h: ['tab-fila', 'view-fila'], c: ['tab-jud', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-ret', 'view-ret'], g: ['tab-parc', 'view-parc'], e: ['tab-equipe', 'view-equipe'] };
+  var VIEWS = { b: ['tab-dash', 'view-dash'], d: ['tab-cad', 'view-cad'], i: ['tab-inss', 'view-inss'], k: ['tab-ctr', 'view-ctr'], q: ['tab-desq', 'view-desq'], h: ['tab-fila', 'view-fila'], c: ['tab-jud', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-ret', 'view-ret'], g: ['tab-parc', 'view-parc'], e: ['tab-equipe', 'view-equipe'], gp: ['tab-gps', 'view-gps'], an: ['tab-nasc', 'view-nasc'], rq: ['tab-req', 'view-req'] };
   var TITULOS = {
     b: ['Dashboard', 'Como está o escritório: clientes por fase, contratos, protocolos e resultados'],
     d: ['Cadastro', 'Clientes ainda sem requerimento no INSS: dados, documentos e prazo'],
@@ -7459,12 +7588,16 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
     r: ['Arquivados', 'Benefícios pagos · mães que podem ter um novo benefício'],
     t: ['Contestações', 'Audiência, resultado e teses da contestação do INSS'],
     g: ['Parceiros', 'Estados de atuação, responsável de cada um e os parceiros que cadastram as clientes'],
-    e: ['Configurações', 'Equipe, integrações e parceiros']
+    e: ['Configurações', 'Equipe, integrações e parceiros'],
+    gp: ['GPS (urbana)', 'Guia da segurada facultativa: cronômetro até o prazo, guia gerada pelo NIT e pagamento'],
+    an: ['Aguardando nascimento', 'GPS paga ou prova rural completa: esperando o parto; a IA fala com a mãe uma semana antes'],
+    rq: ['Requerimento', 'Certidão de nascimento e requerimento no INSS']
   };
   function showTab(which){
     state.view = which;
     if ((which === 'e' || which === 'f') && !isAdmin()) which = 'b';
-    if (which === 'd' && fluxoVista === 'novo') which = 'k';   // fluxo novo não tem Cadastro
+    if (fluxoVista === 'novo' && (which === 'd' || which === 'h')) which = which === 'd' ? 'k' : 'rq';   // fluxo novo não tem Cadastro nem Fila
+    if (fluxoVista !== 'novo' && (which === 'gp' || which === 'an' || which === 'rq')) which = 'k';
     telaAberta = which; if (telaDoFunil(which)) ultimaFase = which;
     Object.keys(VIEWS).forEach(function(k){ $(VIEWS[k][0]).setAttribute('aria-selected', VIEWS[k][0] === VIEWS[which][0] ? 'true' : 'false'); $(VIEWS[k][1]).hidden = k !== which; });
     try { sessionStorage.setItem('qe-view', which); } catch(e){}
