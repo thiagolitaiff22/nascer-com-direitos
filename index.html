@@ -2076,6 +2076,14 @@ html[data-fx="novo"] #dash-box{display:flex;flex-direction:column;gap:22px}
 .dn-quem li small{color:var(--ink-3)}
 .dn-quem li span{margin-left:auto;font-size:11px;color:var(--ink-3)}
 @media (max-width:1100px){ .dn-grade{grid-template-columns:repeat(2,minmax(0,1fr))} .dn-evo,.dn-mapa{grid-template-columns:1fr} }
+
+/* Dashboard do fluxo novo mais limpo: fases numa linha fina */
+html[data-fx="novo"] .dn-fasesl{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+html[data-fx="novo"] .dn-fasesl-r{font-size:12px;font-weight:600;color:var(--ink-3);margin-right:2px}
+html[data-fx="novo"] .dn-fasesl button{height:34px;padding:0 12px;border:1px solid hsl(var(--c-line)/.7);border-radius:6px;background:hsl(var(--c-card));font:inherit;font-size:12px;color:var(--ink-3);display:inline-flex;align-items:center;gap:8px;cursor:pointer;white-space:nowrap}
+html[data-fx="novo"] .dn-fasesl button:hover{color:var(--ink);border-color:hsl(var(--c-pri)/.5)}
+html[data-fx="novo"] .dn-fasesl .i{width:14px;height:14px}
+html[data-fx="novo"] .dn-fasesl b{font-weight:600;color:var(--ink)}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -5645,8 +5653,9 @@ html[data-fx="novo"] #dash-box{display:flex;flex-direction:column;gap:22px}
         dnCard('i-scale', 'Taxa de concessão', dnPct(conc, conc + indef), conc + ' de ' + (conc + indef) + ' decididos') +
         dnCard('i-clock', 'Do parto ao requerimento', tMedio == null ? '—' : tMedio + ' d', tMedio == null ? 'sem requerimentos no período' : 'média de ' + plural(tempos.length, 'requerimento', 'requerimentos')) +
         dnCard('i-users', 'Urbanas · Rurais', urbEnt + ' · ' + rurEnt, 'das que entraram no período') + '</div>' : '') +
-      '<div class="dn-alterna"><button type="button" data-dash-tudo aria-expanded="' + dashTudo + '">' + svgI('i-chev') + (dashTudo ? 'Resumir' : 'Mostrar tudo') + '</button></div>');
-    html += dnSecao('Onde estão as mães agora', 'Quantas estão em cada fase hoje. Clique para abrir a fase.', '<div class="dn-grade dn-fases">' + fasesAtivas().map(function(f){ return dnCard(f[1], TITULOS[f[0]][0], res[f[0]][0], esc(res[f[0]][1]), '', '', f[0]); }).join('') + '</div>');
+      '<div class="dn-alterna"><button type="button" data-dash-tudo aria-expanded="' + dashTudo + '" title="Mais indicadores, Financeiro e rankings">' + svgI('i-chev') + (dashTudo ? 'Resumir' : 'Mostrar tudo') + '</button></div>');
+    // fases numa linha fina, em vez de um balão por fase
+    html += '<div class="dn-fasesl" aria-label="Onde estão as mães agora"><span class="dn-fasesl-r">Agora</span>' + fasesAtivas().map(function(f){ return '<button type="button" data-fn="' + f[0] + '" title="' + esc(res[f[0]][1]) + '">' + svgI(f[1]) + esc(TITULOS[f[0]][0]) + '<b class="tnum">' + res[f[0]][0] + '</b></button>'; }).join('') + '</div>';
     // evolução + origem
     var baldes = dashBaldes(j, rows.map(dataCad).concat(rows.map(function(r){ return String(r.der || '').slice(0, 10); })).filter(Boolean)), corte = j.mensal ? 7 : 10;
     var serie = function(lista, data){ return baldes.map(function(b){ return lista.filter(function(r){ return diaLocal(data(r)).slice(0, corte) === b.k; }).length; }); };
@@ -5658,7 +5667,7 @@ html[data-fx="novo"] #dash-box{display:flex;flex-direction:column;gap:22px}
       '<div class="dn-leg"><p><i style="background:var(--ser-1)"></i><span>Indicação de parceiro</span><b class="tnum">' + ind + '</b><small class="tnum">' + dnPct(ind, ent.length) + '</small></p><p><i style="background:var(--ser-2)"></i><span>Orgânico</span><b class="tnum">' + org + '</b><small class="tnum">' + dnPct(org, ent.length) + '</small></p></div>' +
       '<p class="dn-rodape">' + dnPct(ind, ent.length) + ' vieram de parceiros</p>' : '<div class="dn-vazio">Nenhuma mãe entrou no período</div>') + '</div>';
     html += dnSecao('Evolução e origem', '', '<div class="dn-evo"><div class="card dash-graf-card">' + cab + dashGrafico(dashSerie, Math.floor(box.clientWidth * 0.64 - 40)) + '</div>' + rosca + '</div>');
-    if (isAdmin()){
+    if (dashTudo && isAdmin()){
       var gan = rows.filter(function(r){ return ganhou(r) && (j.ini ? no(dataGanho(r)) : true); }), acert = rows.filter(function(r){ return ganhou(r) && r.repasse && r.repasse.data && (j.ini ? no(r.repasse.data) : true); });
       html += dnSecao('Financeiro', 'Benefícios ganhos no período (INSS e Judicial), honorários e o que já foi acertado.', '<div class="dn-grade">' +
         dnCard('i-check', 'Ganhos', gan.length, 'benefícios ganhos', '', '', 'f') +
@@ -5672,7 +5681,7 @@ html[data-fx="novo"] #dash-box{display:flex;flex-direction:column;gap:22px}
     rows.filter(function(r){ return fechado(r) || naFila(r); }).forEach(function(r){ var n = r.posResp || 'Sem responsável'; porResp[n] = (porResp[n] || 0) + 1; });
     var rkP = Object.keys(porParc).map(function(id){ var p = prospById(id); return [p ? (p.tipo === 'clinica' && p.clinica ? p.clinica : p.nome) : 'Parceiro removido', porParc[id]]; }).sort(function(a, b){ return b[1] - a[1] || a[0].localeCompare(b[0], 'pt'); }).slice(0, 8);
     var rkR = Object.keys(porResp).map(function(n){ return [n, porResp[n]]; }).sort(function(a, b){ return b[1] - a[1] || a[0].localeCompare(b[0], 'pt'); }).slice(0, 8);
-    html += dnSecao('Rankings', '', '<div class="dash-duo">' + dashRanking('Mães por parceiro', ['Parceiro', 'Mães'], rkP, 'Nenhuma mãe de parceiro no período.') + dashRanking('Em andamento por responsável', ['Responsável', 'Clientes'], rkR, 'Ninguém em andamento.') + '</div>');
+    if (dashTudo) html += dnSecao('Rankings', '', '<div class="dash-duo">' + dashRanking('Mães por parceiro', ['Parceiro', 'Mães'], rkP, 'Nenhuma mãe de parceiro no período.') + dashRanking('Em andamento por responsável', ['Responsável', 'Clientes'], rkR, 'Ninguém em andamento.') + '</div>');
     box.innerHTML = html;
     if (perAberto) pintarCalendario();
   }
