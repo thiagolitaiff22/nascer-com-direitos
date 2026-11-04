@@ -1753,6 +1753,25 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
 .fc-guia-acoes{display:flex;flex-wrap:wrap;gap:7.5px;margin:4px 0 6px}
 .fc-guia-acoes .btn{height:30px;font-size:11.25px;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
 .fc-guia-acoes .i{width:14px;height:14px}
+/* Jornada */
+.jr-mapa{display:flex;gap:14px;overflow-x:auto;padding-bottom:6px}
+.jr-grupo{flex:none;display:flex;flex-direction:column;gap:6px}
+.jr-fase{margin:0;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
+.jr-cols{display:flex;gap:6px}
+.jr-col{width:118px;min-height:78px;padding:8px 10px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border:1px solid transparent;border-radius:6px;background:hsl(var(--c-sec)/.6);color:var(--ink);font:inherit;cursor:pointer}
+.jr-col:hover{border-color:hsl(var(--c-fg)/.25)}
+.jr-col.sel{border-color:var(--primary);background:hsl(var(--c-pri)/.12)}
+.jr-col.vazio b{color:var(--ink-3)}
+.jr-nome{font-size:11px;line-height:1.3;color:var(--ink-3);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;min-height:28px}
+.jr-col b{font-size:20px;font-weight:600;line-height:1.1}
+.jr-trav{font-size:10.5px;color:hsl(var(--c-red));white-space:nowrap}
+.jr-col.jr-alerta b{color:hsl(var(--c-red))}
+.jr-barra{display:inline-flex;gap:2px}
+.jr-barra i{width:10px;height:6px;border-radius:3px;background:hsl(var(--c-line))}
+.jr-barra i.ok{background:hsl(var(--c-green)/.85)}
+.jr-barra i.ag{background:hsl(var(--c-gold))}
+.jr-barra i.at{background:hsl(var(--c-red))}
+.jr-barra i.fim{background:hsl(var(--c-line)/.6)}
 /* cartão no formato do BI de Vendas */
 .kb-rot{margin:2px 0 0;font-size:10.5px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
 .kb-cron.azul{background:hsl(212 80% 60%/.15);color:hsl(212 85% 68%)}
@@ -1999,6 +2018,17 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
         </div>
         <div class="kb-info" id="cad-info"></div>
         <div class="card list" id="cad-list"></div>
+      </section>
+
+      <section id="view-jornada" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:14px">
+        <div class="fbar">
+          <div class="search tb-busca"><svg class="i"><use href="#i-search"/></svg><input id="jr-q" type="search" autocomplete="off" placeholder="Buscar cliente, CPF…"></div>
+          <button type="button" class="fb-lnk" data-filtrar aria-haspopup="true"><svg class="i"><use href="#i-filter"/></svg>Filtrar</button>
+          <span class="tb-fim fb-count tnum" id="jr-total"></span>
+        </div>
+        <div class="jr-mapa" id="jr-mapa"></div>
+        <div class="kb-info" id="jr-info"></div>
+        <div class="card list" id="jr-list"></div>
       </section>
 
       <section id="view-ctr" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18.75px">
@@ -5028,6 +5058,81 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       resp: r.posResp || r.contratoPor, dias: null, dataVal: r.arquivadoEm ? fmtDate(String(r.arquivadoEm).slice(0, 10)) : '—' };
   }
   function arqCard(r){ var i = arqInfo(r); return kbCard(r, { resp: i.resp, meta: i.meta, acoes: i.acao }); }
+  /* ---------- Jornada: uma coluna por etapa, com o total e as travadas; a lista abre ao clicar ---------- */
+  var jrQ = '', jrSel = 'trav';
+  function jornadaColunas(){
+    return [
+      { fase: 'Cadastro', cols: [['d', 'Cadastro']] },
+      { fase: 'Pós-venda', cols: POS_COLS.map(function(c){ return ['k:' + c[0], c[1]]; }) },
+      { fase: 'Fila de protocolo', cols: FILA_COLS.map(function(c){ return ['h:' + c[0], c[1]]; }) },
+      { fase: 'INSS', cols: ['analise', 'exigencia', 'concedido', 'indeferido'].map(function(k){ return ['i:' + k, INSS[k][0]]; }) },
+      { fase: 'Judicial', cols: JUD_COLS.map(function(c){ return ['c:' + c[0], c[1]]; }) },
+      { fase: 'Encerradas', cols: [['r', 'Arquivados'], ['q', 'Perdas e desqualificados']] }
+    ];
+  }
+  // em qual coluna da jornada a cliente está
+  function etapaJornada(r){
+    var t = faseDe(r);
+    if (t === 'k') return 'k:' + posEtapaDe(r);
+    if (t === 'h') return 'h:' + filaEtapaDe(r);
+    if (t === 'i'){ var k = statusInss(r); return 'i:' + (k === 'redigir' ? 'analise' : k); }
+    if (t === 'c') return 'c:' + etapa(r);
+    return t;
+  }
+  // travada = o fluxo parou e precisa de uma pessoa; o texto diz por quê
+  function travadaMotivo(r){
+    var t = faseDe(r);
+    if (t === 'r' || t === 'q') return '';
+    if (r.pvProblema && (t === 'k' || t === 'h')) return 'Problema: ' + r.pvProblema;
+    if (t === 'k' && r.pvAnalise === 'devolvido') return 'Devolvida pela Controladoria' + (r.analiseMotivo ? ': ' + r.analiseMotivo : '');
+    if (t === 'i'){
+      if (statusInss(r) === 'exigencia'){ var n = daysUntil(r.exigenciaPrazo); if (!r.exigenciaPrazo) return 'Exigência sem prazo informado'; if (n != null && n <= 5) return n < 0 ? 'Prazo da exigência vencido' : 'Exigência vence em ' + n + (n === 1 ? ' dia' : ' dias'); }
+      return analiseAtrasada(r) ? 'Análise do INSS passou de ' + INSS_PRAZO_ANALISE + ' dias' : '';
+    }
+    if (t === 'c') return r.embargos === 'opostos' ? 'O INSS recorreu' : '';
+    var a = atrasoTxt(r); return a ? a.charAt(0).toUpperCase() + a.slice(1) : '';
+  }
+  function diasJornada(r){ var t = faseDe(r); return t === 'k' ? diasNoPos(r) : t === 'i' ? diasNaEtapa(r) : t === 'c' ? diasDesdeIso(r.protocolo || r.atualizadoEm) : t === 'r' || t === 'q' ? null : diasParado(r); }
+  function respJornada(r){ var t = faseDe(r); return t === 'd' ? r.atendente : t === 'h' ? r.filaPor : t === 'i' ? (r.filaPor || r.posResp || r.contratoPor) : t === 'c' ? prospName(respAviso(r)) : (r.posResp || r.contratoPor); }
+  // barra de progresso: Cadastro, as 7 etapas do Pós-venda, Conferência, Protocolar, INSS/Judicial, Recebido
+  var JR_PASSOS = ['Cadastro', 'Senha Meu INSS', 'Documentação Pessoal', 'Aguardando Prazo da GPS', 'Emitir/Pagar GPS', 'Aguardando Nascimento', 'Solicitar Certidão', 'Documentação OK', 'Conferência', 'Protocolar', 'INSS / Judicial', 'Benefício pago'];
+  function passoJornada(r){
+    var e = etapaJornada(r), p = e.split(':');
+    if (e === 'd') return 0;
+    if (p[0] === 'k') return 1 + POS_ORDEM.indexOf(p[1]);
+    if (p[0] === 'h') return 8 + FILA_ORDEM.indexOf(p[1]);
+    if (p[0] === 'i' || p[0] === 'c') return 10;
+    if (e === 'r') return 12;
+    return -1;
+  }
+  function barraJornada(r, trav){
+    var n = passoJornada(r);
+    return '<span class="jr-barra" title="' + esc(n < 0 ? 'Encerrada sem êxito' : n >= JR_PASSOS.length ? 'Concluída' : 'Etapa ' + (n + 1) + ' de ' + JR_PASSOS.length + ': ' + JR_PASSOS[n]) + '">' + JR_PASSOS.map(function(x, i){ return '<i class="' + (n < 0 ? 'fim' : i < n ? 'ok' : i === n ? (trav ? 'at' : 'ag') : '') + '"></i>'; }).join('') + '</span>';
+  }
+  function nomeColunaJr(k){ var achou = ''; jornadaColunas().forEach(function(g){ g.cols.forEach(function(c){ if (c[0] === k) achou = g.fase + ' · ' + c[1]; }); }); return achou; }
+  function renderJornada(){
+    var box = $('jr-list'); if (!box || $('view-jornada').hidden) return;
+    var base = state.rows.filter(passaFiltro), cont = {}, trv = {}, travTot = 0, ativas = 0;
+    base.forEach(function(r){ var k = etapaJornada(r); cont[k] = (cont[k] || 0) + 1; var m = travadaMotivo(r); if (m){ trv[k] = (trv[k] || 0) + 1; travTot++; } if (k !== 'r' && k !== 'q') ativas++; });
+    var tile = function(k, nome, n, t, extra){ return '<button type="button" class="jr-col' + (jrSel === k ? ' sel' : '') + (n ? '' : ' vazio') + (extra || '') + '" data-jr="' + esc(k) + '" title="' + esc(nome) + '"><span class="jr-nome">' + esc(nome) + '</span><b class="tnum">' + n + '</b><span class="jr-trav">' + (t ? plural(t, 'travada', 'travadas') : '&nbsp;') + '</span></button>'; };
+    $('jr-mapa').innerHTML = '<div class="jr-grupo"><p class="jr-fase">Visão geral</p><div class="jr-cols">' + tile('trav', 'Travadas', travTot, 0, ' jr-alerta') + tile('todas', 'Em andamento', ativas, 0) + '</div></div>' +
+      jornadaColunas().map(function(g){ return '<div class="jr-grupo"><p class="jr-fase">' + esc(g.fase) + '</p><div class="jr-cols">' + g.cols.map(function(c){ return tile(c[0], c[1], cont[c[0]] || 0, trv[c[0]] || 0); }).join('') + '</div></div>'; }).join('');
+    $('jr-total').textContent = plural(ativas, 'cliente em andamento', 'clientes em andamento');
+    var lista = base.filter(function(r){ var k = etapaJornada(r); return jrSel === 'trav' ? !!travadaMotivo(r) : jrSel === 'todas' ? (k !== 'r' && k !== 'q') : k === jrSel; }).filter(function(r){ return buscaCliente(r, jrQ); });
+    lista.sort(function(a, b){ var ta = travadaMotivo(a) ? 0 : 1, tb = travadaMotivo(b) ? 0 : 1; return ta - tb || (diasJornada(b) || 0) - (diasJornada(a) || 0) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); });
+    $('jr-info').innerHTML = 'Lista: <b>' + esc(jrSel === 'trav' ? 'Travadas' : jrSel === 'todas' ? 'Em andamento' : nomeColunaJr(jrSel)) + '</b> · ' + plural(lista.length, 'cliente', 'clientes') + (lista.length > 500 ? ' · mostrando as 500 primeiras' : '');
+    pintarLista(box, '<table class="kb-tab kb-lista jr-tab"><colgroup><col><col style="width:250px"><col style="width:170px"><col style="width:84px"><col style="width:120px"><col style="width:44px"></colgroup>' +
+      '<thead><tr><th>Cliente</th><th>Fase · etapa</th><th>Progresso</th><th>Na etapa</th><th>Responsável</th><th></th></tr></thead><tbody>' +
+      (lista.slice(0, 500).map(function(r){
+        var m = travadaMotivo(r), d = diasJornada(r), id = esc(r.id);
+        return '<tr data-linha="' + id + '"><td class="nome"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + id + '">' + esc(r.nome || 'Sem nome') + '</button>' + (m ? '<small class="verm" title="' + esc(m) + '">' + esc(m) + '</small>' : '<small>' + esc([cidadeCli(r), r.dpp && !nascido(r) ? 'parto ' + fmtDate(String(r.dpp).slice(0, 10)) : ''].filter(Boolean).join(' · ')) + '</small>') + '</td>' +
+          '<td>' + esc(faseTexto(r)) + '</td><td>' + barraJornada(r, !!m) + '</td><td class="tnum' + (m ? ' parado' : '') + '">' + (d != null ? d + ' d' : '—') + '</td><td>' + esc(primeiroNome(respJornada(r)) || '—') + '</td>' +
+          '<td>' + editBtn(r) + '</td></tr>';
+      }).join('') || '<tr><td colspan="6" class="empty">' + (jrSel === 'trav' ? 'Nada travado agora.' : 'Nenhuma cliente nesta etapa.') + '</td></tr>') + '</tbody></table>');
+  }
+  $('jr-mapa').addEventListener('click', function(e){ var c = e.target.closest('[data-jr]'); if (!c) return; jrSel = c.dataset.jr; renderJornada(); });
+  $('jr-q').addEventListener('input', function(){ jrQ = this.value.trim(); renderJornada(); });
+  ligarLista('jr', function(){ return {}; }, renderJornada);
   /* ---------- Dashboard: números por período, gráfico de cadastros e contratos e rankings ---------- */
   var DASH_PERIODOS = [['mes', 'Este mês'], ['30', '30 dias'], ['ano', 'Este ano'], ['tudo', 'Tudo']], DASH_MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
   var dashPer = lerGuardado('nascer-dash-per', 'mes'), dashTabela = false, dashSerie = null;
@@ -5089,7 +5194,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     var doGrupo = cads.filter(function(r){ return r.contratoEm; }).length, taxa = cads.length ? Math.round(doGrupo / cads.length * 100) : null;
     var pos = rows.filter(noContratos);
     html += '<div class="fbar"><div class="seg-bi" role="group" aria-label="Período">' + DASH_PERIODOS.map(function(p){ return '<button type="button" data-dash-per="' + p[0] + '" aria-pressed="' + (p[0] === dashPer) + '">' + p[1] + '</button>'; }).join('') + '</div><span class="tb-fim fb-count tnum">' + esc(faixa) + '</span></div>';
-    html += dashSecao('Clientes por fase', 'agora', '<div class="stats">' + FASES.map(function(f){ return dashCard(f[0], f[1], TITULOS[f[0]][0], res[f[0]][0], res[f[0]][1]); }).join('') + '</div>');
+    html += dashSecao('Clientes por fase', 'agora', '<div class="stats">' + FASES.filter(function(f){ return f[0] !== 'j'; }).map(function(f){ return dashCard(f[0], f[1], TITULOS[f[0]][0], res[f[0]][0], res[f[0]][1]); }).join('') + '</div>');
     html += dashSecao('Comercial', 'no período', '<div class="stats">' +
       dashCard('d', 'i-phone', 'Mães cadastradas', cads.length, 'cadastradas no período') +
       dashCard('k', 'i-check', 'Contratos fechados', ctrs.length, 'fechados no período') +
@@ -5157,10 +5262,10 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   var dashRedim = 0;
   window.addEventListener('resize', function(){ clearTimeout(dashRedim); dashRedim = setTimeout(renderDash, 150); });
   /* ---------- balões das fases: um por etapa do caminho da cliente ---------- */
-  var FASES = [['d', 'i-phone'], ['k', 'i-check'], ['h', 'i-file'], ['i', 'i-inss'], ['c', 'i-gavel'], ['r', 'i-box']];
+  var FASES = [['j', 'i-grid'], ['d', 'i-phone'], ['k', 'i-check'], ['h', 'i-file'], ['i', 'i-inss'], ['c', 'i-gavel'], ['r', 'i-box']];
   function lerGuardado(k, pad){ try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? pad : v; } catch(e){ return pad; } }
   function guardar(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
-  var vistas = lerGuardado('nascer-vistas', {}), topoRecolhido = !!lerGuardado('nascer-topo-recolhido', false), telaAberta = 'd', ultimaFase = 'd';
+  var vistas = lerGuardado('nascer-vistas', {}), topoRecolhido = !!lerGuardado('nascer-topo-recolhido', false), telaAberta = 'j', ultimaFase = 'j';
   function vistaDe(t){ return t === 'q' || t === 'd' ? 'lista' : (vistas[t] === 'lista' ? 'lista' : 'quadro'); }   // Cadastro é sempre em lista
   function telaDoFunil(t){ return FASES.some(function(f){ return f[0] === t; }); }
   function resumoFases(){
@@ -5168,8 +5273,10 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     var prio = cad.filter(function(r){ return prioridadeNasc(r) != null; }).length, lig = cad.filter(function(r){ return leadDe(r) === 'novo'; }).length, parCad = cad.filter(atrasada).length;
     var atr = pos.filter(atrasada).length, par = fila.filter(function(r){ return (diasParado(r) || 0) > LIMITE_ETAPA.fila; }).length;
     var exi = ins.filter(function(r){ return statusInss(r) === 'exigencia'; }).length, lat = ins.filter(analiseAtrasada).length;
+    var ativas = rows.filter(function(r){ var t = faseDe(r); return t !== 'r' && t !== 'q'; }), trav = ativas.filter(travadaMotivo).length;
     var marc = jud.filter(isFuture).length, pagos = arq.filter(arquivadoPago).length, contatar = arq.filter(function(r){ return arquivadoPago(r) && !r.contatadoRetorno; }).length;
     return {
+      j: [ativas.length, trav ? plural(trav, 'travada', 'travadas') : 'Nada travado', plural(ativas.length, 'cliente em andamento', 'clientes em andamento') + ' · ' + plural(trav, 'travada', 'travadas')],
       d: [cad.length, prio ? plural(prio, 'com parto perto', 'com parto perto') : lig ? plural(lig, 'para ligar', 'para ligar') : parCad ? plural(parCad, 'parada', 'paradas') : 'Tudo em dia', plural(cad.length, 'em cadastro', 'em cadastro') + (prio ? ' · ' + prio + ' prioridade' : '') + (lig ? ' · ' + lig + ' para ligar' : '')],
       k: [pos.length, atr ? plural(atr, 'atrasada', 'atrasadas') : 'Tudo em dia', plural(pos.length, 'cliente', 'clientes') + ' · ' + plural(atr, 'atrasada', 'atrasadas')],
       h: [fila.length, par ? plural(par, 'parada', 'paradas') : 'Tudo em dia', plural(fila.length, 'na fila', 'na fila') + ' · ' + plural(par, 'parada', 'paradas')],
@@ -5181,6 +5288,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function filtrosDaTela(){
     var t = telaAberta;
     if (kbF.uf || kbF.parc || soMinhas) return true;
+    if (t === 'j') return !!jrQ;
     if (t === 'd') return !!(cadQ || cadSit);
     if (t === 'k') return !!(ctrQ2 || ctrSit);
     if (t === 'h') return !!(filaQ || filaSit);
@@ -5190,9 +5298,9 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     return false;
   }
   function limparFiltros(){
-    kbF.uf = ''; kbF.parc = ''; cadQ = ''; cadSit = ''; ctrQ2 = ''; ctrSit = ''; filaQ = ''; filaSit = ''; inssQ = ''; inssSit = ''; judSit = ''; state.q = ''; state.r.q = ''; state.r.f = '';
+    kbF.uf = ''; kbF.parc = ''; cadQ = ''; cadSit = ''; jrQ = ''; ctrQ2 = ''; ctrSit = ''; filaQ = ''; filaSit = ''; inssQ = ''; inssSit = ''; judSit = ''; state.q = ''; state.r.q = ''; state.r.f = '';
     if (soMinhas){ soMinhas = false; Array.prototype.forEach.call(document.querySelectorAll('[data-minhas]'), function(b){ b.setAttribute('aria-pressed', 'false'); }); }
-    ['cad-q', 'ctr-q', 'fila-q', 'inss-q', 'bc-q', 'q', 'r-q'].forEach(function(id){ if ($(id)) $(id).value = ''; });
+    ['jr-q', 'cad-q', 'ctr-q', 'fila-q', 'inss-q', 'bc-q', 'q', 'r-q'].forEach(function(id){ if ($(id)) $(id).value = ''; });
     $('r-f').value = ''; render();
   }
   function renderFunil(){
@@ -5215,7 +5323,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     $('pg-sub').textContent = res ? tit[0] + ' · ' + res[2] : t === 'q' ? desqResumo() : tit[1];
     var bt = VIEWS[t] && $(VIEWS[t][0]), u = bt && bt.querySelector('use'); if (u) $('pg-ico').setAttribute('href', u.getAttribute('href'));
     var fluxo = telaDoFunil(t);
-    $('vista-seg').hidden = !fluxo || t === 'd';
+    $('vista-seg').hidden = !fluxo || t === 'd' || t === 'j';
     Array.prototype.forEach.call($('vista-seg').querySelectorAll('button'), function(b){ b.setAttribute('aria-pressed', String(b.dataset.vista === vistaDe(t))); });
     $('btn-novo').hidden = !(t === 'd' || t === 'k' || t === 'h' || t === 'i' || t === 'c');
     $('mais-box').hidden = t !== 'k';
@@ -5352,7 +5460,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     else if (e.key === 'Enter' && bgItens[bgMarcado]){ e.preventDefault(); var r = bgItens[bgMarcado]; $('bg-res').hidden = true; this.blur(); abrirCard(r.id, noCadastro(r)); }
   });
   $('bg-res').addEventListener('mousedown', function(e){ e.preventDefault(); var b = e.target.closest('[data-bg]'); if (!b) return; var r = acharRow(b.dataset.bg); $('bg-res').hidden = true; $('bg-q').blur(); if (r) abrirCard(r.id, noCadastro(r)); });
-  function render(){ pintarAvisosBtn(); renderRelatorio(); pintarCard(); renderEstadosCfg(); renderRegioes(); renderContratos(); renderFila(); renderDesq(); renderCad(); renderInss(); renderList(); renderRet(); renderProsp(); renderEquipe(); renderFin(); renderDash(); renderFunil(); pintarPagina(); medirQuadros(); }
+  function render(){ pintarAvisosBtn(); renderRelatorio(); pintarCard(); renderEstadosCfg(); renderRegioes(); renderContratos(); renderFila(); renderDesq(); renderCad(); renderInss(); renderList(); renderRet(); renderProsp(); renderEquipe(); renderFin(); renderDash(); renderJornada(); renderFunil(); pintarPagina(); medirQuadros(); }
   var clQ = '';
   // stage of each process, derived from what is already recorded (no extra typing)
   var ETAPAS = [
@@ -7286,8 +7394,9 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     } catch(err){ toast(errMsg(err)); }
     finally { $('av-save').disabled = false; }
   });
-  var VIEWS = { b: ['tab-dash', 'view-dash'], d: ['tab-proc', 'view-cad'], i: ['tab-proc', 'view-inss'], k: ['tab-proc', 'view-ctr'], q: ['tab-desq', 'view-desq'], h: ['tab-proc', 'view-fila'], c: ['tab-proc', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-proc', 'view-ret'], g: ['tab-parc', 'view-parc'], e: ['tab-equipe', 'view-equipe'] };
+  var VIEWS = { b: ['tab-dash', 'view-dash'], j: ['tab-proc', 'view-jornada'], d: ['tab-proc', 'view-cad'], i: ['tab-proc', 'view-inss'], k: ['tab-proc', 'view-ctr'], q: ['tab-desq', 'view-desq'], h: ['tab-proc', 'view-fila'], c: ['tab-proc', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-proc', 'view-ret'], g: ['tab-parc', 'view-parc'], e: ['tab-equipe', 'view-equipe'] };
   var TITULOS = {
+    j: ['Jornada', 'Todas as clientes e a etapa de cada uma'],
     b: ['Dashboard', 'Como está o escritório: clientes por fase, contratos, protocolos e resultados'],
     d: ['Cadastro', 'Clientes ainda sem requerimento no INSS: dados, documentos e prazo'],
     i: ['INSS', 'Requerimentos administrativos: análise, exigências, concessões e indeferimentos'],
@@ -7311,6 +7420,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     Object.keys(VIEWS).forEach(function(k){ $(VIEWS[k][0]).setAttribute('aria-selected', VIEWS[k][0] === VIEWS[which][0] ? 'true' : 'false'); $(VIEWS[k][1]).hidden = k !== which; });
     try { sessionStorage.setItem('qe-view', which); } catch(e){}
     if (which === 'b') renderDash();
+    if (which === 'j') renderJornada();
     renderFunil(); pintarPagina(); medirQuadros();
   }
   Object.keys(VIEWS).forEach(function(k){ if (!telaDoFunil(k)) $(VIEWS[k][0]).addEventListener('click', function(){ showTab(k); }); });
