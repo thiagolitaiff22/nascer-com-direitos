@@ -1846,6 +1846,26 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
 #desq-list .desq-motivo{font-size:11.25px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 #desq-list .cad-acoes{justify-content:flex-end}
 @media (max-width:1000px){.dash-duo{grid-template-columns:minmax(0,1fr)}}
+
+/* menu lateral com o fluxo (04/11/2026) e rural x urbano */
+.nav .tab .nav-n{margin-left:auto;padding-left:8px;font-size:11.5px;font-weight:600;color:hsl(var(--c-fg)/.55)}
+.nav .tab[aria-selected="true"] .nav-n{color:var(--primary)}
+.app.collapsed .nav .tab .nav-n{display:none}
+.nome-l{display:flex;align-items:center;gap:6px;min-width:0}
+.nome-l .nome-abrir{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sm-tipo{flex:none;display:inline-block;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:600;line-height:16px;letter-spacing:.02em;border:1px solid}
+.sm-tipo.urb{color:hsl(var(--c-gold));border-color:hsl(var(--c-gold)/.45);background:hsl(var(--c-gold)/.1)}
+.sm-tipo.rur{color:hsl(var(--c-green));border-color:hsl(var(--c-green)/.45);background:hsl(var(--c-green)/.1)}
+.sm-tipo.sem{color:hsl(var(--c-red));border-color:hsl(var(--c-red)/.45);background:hsl(var(--c-red)/.08)}
+.kb-tab select.sm-sel{width:100%;max-width:104px}
+.kb-tab select.sm-sel.rur{color:hsl(var(--c-green));font-weight:600}
+.kb-tab select.sm-sel.urb{color:hsl(var(--c-gold));font-weight:600}
+.kb-tab select.sm-sel.sem{color:hsl(var(--c-red))}
+.fc-tipo-seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 12px}
+.fc-tipo-seg button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px;border-radius:10px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;text-align:left;cursor:pointer}
+.fc-tipo-seg button b{font-size:14px}
+.fc-tipo-seg button span{font-size:12px;opacity:.75}
+.fc-tipo-seg button[aria-pressed="true"]{border-color:var(--primary);box-shadow:0 0 0 1px var(--primary) inset;background:hsl(var(--c-gold)/.12)}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -1940,8 +1960,17 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     </div>
     <nav class="nav" role="tablist" aria-orientation="vertical">
       <button class="tab" role="tab" id="tab-dash" aria-selected="false" type="button" title="Dashboard"><svg class="i"><use href="#i-grid"/></svg><span>Dashboard</span></button>
-      <button class="tab" role="tab" id="tab-proc" aria-selected="false" type="button" title="Processos"><svg class="i"><use href="#i-pasta"/></svg><span>Processos</span></button>
+      <div class="nav-lbl" aria-hidden="true">Comercial</div>
+      <button class="tab" role="tab" id="tab-cad" aria-selected="false" type="button" title="Cadastro"><svg class="i"><use href="#i-phone"/></svg><span>Cadastro</span><b class="nav-n tnum" id="nn-d"></b></button>
       <button class="tab" role="tab" id="tab-desq" aria-selected="false" type="button" title="Perdas e desqualificados"><svg class="i"><use href="#i-bellx"/></svg><span>Perdas e desqualificados</span></button>
+      <div class="nav-lbl" aria-hidden="true">Pós-venda</div>
+      <button class="tab" role="tab" id="tab-ctr" aria-selected="false" type="button" title="Pós-venda"><svg class="i"><use href="#i-check"/></svg><span>Pós-venda</span><b class="nav-n tnum" id="nn-k"></b></button>
+      <div class="nav-lbl" aria-hidden="true">Operacional</div>
+      <button class="tab" role="tab" id="tab-fila" aria-selected="false" type="button" title="Fila de protocolo"><svg class="i"><use href="#i-file"/></svg><span>Fila de protocolo</span><b class="nav-n tnum" id="nn-h"></b></button>
+      <button class="tab" role="tab" id="tab-inss" aria-selected="false" type="button" title="INSS"><svg class="i"><use href="#i-inss"/></svg><span>INSS</span><b class="nav-n tnum" id="nn-i"></b></button>
+      <button class="tab" role="tab" id="tab-jud" aria-selected="false" type="button" title="Judicial"><svg class="i"><use href="#i-gavel"/></svg><span>Judicial</span><b class="nav-n tnum" id="nn-c"></b></button>
+      <button class="tab" role="tab" id="tab-ret" aria-selected="false" type="button" title="Arquivados"><svg class="i"><use href="#i-box"/></svg><span>Arquivados</span><b class="nav-n tnum" id="nn-r"></b></button>
+      <div class="nav-lbl" aria-hidden="true">Gestão</div>
       <button class="tab admin-only" role="tab" id="tab-fin" aria-selected="false" type="button" title="Financeiro"><svg class="i"><use href="#i-cash"/></svg><span>Financeiro</span></button>
       <button class="tab" role="tab" id="tab-parc" aria-selected="false" type="button" title="Parceiros"><svg class="i"><use href="#i-users"/></svg><span>Parceiros</span></button>
       <button class="tab admin-only" role="tab" id="tab-equipe" aria-selected="false" type="button" title="Configurações"><svg class="i"><use href="#i-gear"/></svg><span>Configurações</span></button>
@@ -2369,7 +2398,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       <div class="field"><label for="f-contato">Contato (telefone / WhatsApp)</label><input id="f-contato" inputmode="tel" placeholder="(97) 00000-0000" class="tnum"></div>
       <div class="field"><label for="f-uf">Estado</label><div class="cid-wrap"><span id="f-uf-flag" class="cid-uf-flag"></span><select id="f-uf"></select></div></div>
       <div class="field"><label for="f-cidade">Cidade</label><div class="cid-wrap"><span id="f-cid-flag" class="cid-uf-flag"></span><input id="f-cidade" readonly autocomplete="off" placeholder="Escolher a cidade" style="cursor:pointer"></div></div>
-      <div class="field"><label for="f-tipo">Tipo de segurada</label><select id="f-tipo"><option value="">Não informado</option><option value="especial">Segurada especial (rural / pescadora)</option><option value="urbana">Empregada / urbana</option><option value="individual">Contribuinte individual / MEI / facultativa</option><option value="desempregada">Desempregada (período de graça)</option></select></div>
+      <div class="field"><label for="f-tipo">Salário-maternidade</label><select id="f-tipo"><option value="">Rural ou urbano? (escolher)</option><option value="urbana">Urbano · paga a GPS (facultativa)</option><option value="especial">Rural · segurada especial (prova rural)</option><option value="individual" hidden>Urbano · contribuinte individual (antigo)</option><option value="desempregada" hidden>Urbano · desempregada (antigo)</option></select><span class="hint">Urbano segue pela guia GPS; rural segue pela prova da atividade rural.</span></div>
       <div class="field" hidden><label for="f-ativ">Atividade</label><input id="f-ativ" placeholder="Ex.: agricultora, pescadora, doméstica" list="ativ-list"><datalist id="ativ-list"><option value="Agricultora"><option value="Pescadora artesanal"><option value="Extrativista"><option value="Doméstica"><option value="Comerciária"><option value="Autônoma"></datalist></div>
       <div class="field full"><label for="f-resp">Parceiro</label><select id="f-resp"><option value="">Sem parceiro</option></select><span class="hint">Quem trouxe a cliente. É ele quem vê a cliente no aplicativo e cuida do aviso da audiência.</span></div>
       <div class="field full" id="f-via-box" hidden><label>Avisada via outro cliente</label><div class="integ-row"><span id="f-via-nome" class="val"></span><button type="button" class="btn" id="f-via-tirar" style="padding:5px 10px;font-size:12.5px">Desfazer vínculo</button></div></div>
@@ -2717,7 +2746,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   var PAG = { aguardando: ['Aguardando pagamento', 'muted'], implantado: ['Benefício implantado', 'blue'], rpv: ['RPV expedida', 'blue'], pago: ['Pago', 'ok'] };
   // situação do requerimento no INSS
   var INSS = { redigir: ['Redigir requerimento', 'warn'], analise: ['Em análise', 'blue'], exigencia: ['Exigência', 'warn'], concedido: ['Concedido', 'ok'], indeferido: ['Indeferido', 'crit'] };
-  var TIPOS = { especial: 'Segurada especial (rural)', urbana: 'Empregada / urbana', individual: 'Contribuinte individual / MEI', desempregada: 'Desempregada (período de graça)' };
+  var TIPOS = { especial: 'Rural (segurada especial)', urbana: 'Urbano (paga a GPS)', individual: 'Urbano (contribuinte individual)', desempregada: 'Urbano (desempregada)' };
   var FATOS = { parto: 'Parto', gestante: 'Ainda gestante', adocao: 'Adoção', guarda: 'Guarda para adoção', natimorto: 'Natimorto', aborto: 'Aborto não criminoso' };
   var PRAZO_ANOS = 5;          // o direito de pedir prescreve em 5 anos contados do nascimento (ou adoção/guarda)
   var PRAZO_ALERTA_DIAS = 183; // avisa quando faltam uns 6 meses
@@ -3000,8 +3029,8 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   DOC_FALTA.senha = 'Senha gov.br'; DOC_FALTA.nit = 'NIT / PIS';
   function docsApp(r){
     var campo = Array.isArray(r.campoDocs) ? r.campoDocs : null, antigo = Array.isArray(r.faltaDocs) ? r.faltaDocs : null;
-    // o escritório atende segurada urbana: prova rural só conta para quem é segurada especial (ou se veio mesmo assim)
-    return DOCS_APP.filter(function(d){ return d[0] !== 'rural' || r.tipoSegurada === 'especial' || (campo && campo.indexOf('rural') >= 0); }).map(function(d){
+    // urbano: precisa do NIT (é dele que sai a GPS); rural (segurada especial): precisa da prova da atividade rural e não do NIT
+    return DOCS_APP.filter(function(d){ return d[0] === 'rural' ? (rural(r) || !!(campo && campo.indexOf('rural') >= 0)) : d[0] === 'nit' ? !rural(r) : true; }).map(function(d){
       if (d[0] === 'senha') return { k: 'senha', n: d[1], ok: !!r.senhaGovOk || !!(campo && campo.indexOf('senha') >= 0) };
       if (d[0] === 'nit') return { k: 'nit', n: d[1], ok: nitOk(r.nit) };
       var ok = campo ? campo.indexOf(d[0]) >= 0 : (r.docsCompletos === true || (r.origem === 'campo' && antigo && antigo.indexOf(d[0]) < 0));   // cadastro antigo do app: vale o que não estava na lista de faltantes
@@ -3264,14 +3293,15 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     return '<div class="fc-caixa"><div class="fc-cx-top"><div class="fc-cx-nome"><button type="button" class="fc-nome" data-act="edit" title="Abrir o cadastro">' + esc(r.nome || 'Cliente') + '</button><p class="fc-num tnum">' + esc(num) + '</p></div>' +
         (r.pastaUrl ? '<a class="fc-pasta" href="' + esc(urlSegura(r.pastaUrl)) + '" target="_blank" rel="noopener">' + svgI('i-folder') + 'Pasta no Drive</a>' : '<span class="fc-sem-pasta">Pasta ainda não criada no Drive</span>') + '</div>' +
       '<div class="fc-lin">' + svgI('i-users') + '<span>CPF</span>' + (cpf.length >= 11 ? '<b class="tnum">' + esc(r.cpf) + '</b>' + fcCopiar(cpf, 'Copiar o CPF') : '<em>Não cadastrado</em>') + '</div>' +
-      '<div class="fc-lin">' + svgI('i-users') + '<span>NIT</span>' + (nitOk(r.nit) ? '<b class="tnum">' + esc(nitFmt(r.nit)) + '</b>' + fcCopiar(digits(r.nit), 'Copiar o NIT') : '<em>' + (r.nit ? 'NIT inválido: ' + esc(r.nit) : 'Não cadastrado') + '</em>') + '</div>' + fcSenhaHtml() +
+      (rural(r) && !r.nit ? '<div class="fc-lin">' + svgI('i-users') + '<span>Salário-maternidade</span><b>Rural · segurada especial (sem GPS)</b></div>' : '<div class="fc-lin">' + svgI('i-users') + '<span>NIT</span>' + (nitOk(r.nit) ? '<b class="tnum">' + esc(nitFmt(r.nit)) + '</b>' + fcCopiar(digits(r.nit), 'Copiar o NIT') : '<em>' + (r.nit ? 'NIT inválido: ' + esc(r.nit) : 'Não cadastrado') + '</em>') + '</div>') + fcSenhaHtml() +
       '<div class="fc-lin">' + svgI('i-zap') + '<span>WhatsApp</span>' + (tel ? (zp ? '<a class="tnum" href="' + esc(zp) + '" target="_blank" rel="noopener" title="Abrir a conversa no WhatsApp">' + esc(fmtTel(tel)) + '</a>' : '<b class="tnum">' + esc(fmtTel(tel)) + '</b>') + fcCopiar(digits(tel), 'Copiar o WhatsApp') : '<em>Não cadastrado</em>') + '</div>' +
-      '<div class="fc-links"><a href="https://meu.inss.gov.br/" target="_blank" rel="noopener">' + svgI('i-inss') + 'Meu INSS</a><a href="https://sal.rfb.gov.br/calculo-contribuicao/contribuintes-2" target="_blank" rel="noopener">' + svgI('i-cash') + 'Gerar guia</a></div></div>';
+      '<div class="fc-links"><a href="https://meu.inss.gov.br/" target="_blank" rel="noopener">' + svgI('i-inss') + 'Meu INSS</a>' + (rural(r) ? '' : '<a href="https://sal.rfb.gov.br/calculo-contribuicao/contribuintes-2" target="_blank" rel="noopener">' + svgI('i-cash') + 'Gerar guia</a>') + '</div></div>';
   }
   // quem responde pela cliente em cada fase
   function fcResp(r, t){ return t === 'd' ? [r.atendente, r.atendenteEmail] : t === 'h' ? [r.filaPor, ''] : [r.posResp, r.posRespEmail]; }
   function fcGuia(r){
     if (!noContratos(r) || nascido(r)) return '';
+    if (rural(r)){ var pr = docsApp(r).filter(function(x){ return x.k === 'rural'; })[0]; return '<p class="fc-sec">Salário-maternidade rural</p><p class="fc-nota">Segurada especial: não paga GPS. O que garante o benefício é a prova da atividade rural' + (pr && pr.ok ? ' (já recebida).' : ' (ainda não chegou: cobrar da mãe).') + '</p>'; }
     var pago = gpsPaga(r), emitida = !!gpsGerar(r);
     return '<p class="fc-sec">Guia GPS (segurada facultativa)</p><div class="fc-guia">' +
       fcLeitura('Código de pagamento', GPS_CODIGO + ' · plano simplificado (11%)') + fcLeitura('Valor', moedaTxt(gpsValor())) + fcLeitura('Prazo', prazoGps(r) ? fmtDate(prazoGps(r)) : 'informe a data do parto') + fcLeitura('Situação', pago ? 'Paga' + (r.guiaPagaEm ? ' em ' + fmtDate(r.guiaPagaEm) : '') : emitida ? 'Guia pronta, aguardando pagamento' : 'Falta o NIT para gerar a guia') + '</div>' +
@@ -3281,7 +3311,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   }
   function fcDados(r){
     var t = faseDe(r), id = esc(r.id), resp = fcResp(r, t), etapaSel;
-    if (t === 'k') etapaSel = '<select data-pos="' + id + '">' + POS_COLS.filter(function(c){ return !nascido(r) || !POS_SO_GESTANTE[c[0]]; }).map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === posEtapaDe(r) ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '<option value="__cad">↩ Voltar ao Cadastro</option></select>';
+    if (t === 'k') etapaSel = '<select data-pos="' + id + '">' + posColsDe(r).map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === posEtapaDe(r) ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '<option value="__cad">↩ Voltar ao Cadastro</option></select>';
     else if (t === 'd') etapaSel = '<select data-lead="' + id + '">' + Object.keys(LEAD).map(function(x){ return '<option value="' + x + '"' + (x === leadDe(r) ? ' selected' : '') + '>' + LEAD[x] + '</option>'; }).join('') + '</select>';
     else if (t === 'i') etapaSel = '<select data-inss="' + id + '">' + Object.keys(INSS).map(function(x){ return '<option value="' + x + '"' + (x === statusInss(r) ? ' selected' : '') + '>' + INSS[x][0] + '</option>'; }).join('') + '</select>';
     else etapaSel = '<input disabled value="' + esc(faseTexto(r).split(' · ')[1] || '—') + '">';
@@ -3298,7 +3328,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       (requerido(r) ? '<label class="fc-c"><span class="fc-rot">Número do protocolo/requerimento</span><input id="fc-prot" value="' + esc(r.protocoloInss || '') + '"></label><label class="fc-c"><span class="fc-rot">Data do requerimento</span><input id="fc-der" type="date" value="' + esc(r.der || '') + '"></label><label class="fc-c"><span class="fc-rot">NB</span><input id="fc-nb" value="' + esc(r.nb || '') + '"></label>' : '') +
       (String(r.processo || '').trim() ? '<label class="fc-c"><span class="fc-rot">Número do processo (CNJ)</span><input id="fc-proc" value="' + esc(r.processo) + '"></label>' : '') +
       '<p class="fc-sec">Linha do tempo</p><div>' + fcLeitura('Data do cadastro', dc ? fmtDate(dc) : '—') + fcLeitura('Data do fechamento', r.contratoEm ? fmtDate(String(r.contratoEm).slice(0, 10)) : '—') + '</div>' +
-      '<p class="fc-sec">Fase do processo</p>' + (pode ? '<label class="fc-c"><span class="fc-rot">Responsável</span>' + respSel + '</label>' : '') +
+      '<p class="fc-sec">Fase do processo</p>' + (pode ? '<label class="fc-c"><span class="fc-rot">Responsável</span>' + respSel + '</label><label class="fc-c"><span class="fc-rot">Salário-maternidade*</span><select id="fc-tipo">' + tipoOpts(r.tipoSegurada) + '</select></label>' : '') +
       '<label class="fc-c"><span class="fc-rot">Fase*</span><input disabled value="' + esc(TITULOS[t] ? TITULOS[t][0] : '') + '"></label><label class="fc-c"><span class="fc-rot">Etapa*</span>' + etapaSel + '</label>' +
       (t === 'h' ? '<p class="fc-nota">Para avançar, use o botão do card.</p>' : '') +
       '<p class="fc-sec">Fechamento</p><div>' + fcLeitura('Situação', t === 'd' ? (LEAD[leadDe(r)] || '—') : t === 'q' ? (desqualificada(r) ? 'Desqualificado' : 'Perda') : 'Contrato fechado') + fcLeitura('Closer', r.contratoPor || r.atendente || '—') + fcLeitura('Proposta', r.propostaAceita ? 'Aceita pela cliente' + (r.propostaObs ? ' · ' + r.propostaObs : '') : '') +
@@ -3346,6 +3376,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       var lin = gg ? gg.digitos : '';
       if (lin !== digits(r.gpsLinha || '')){ p.gpsLinha = lin; p.gpsEmitidaEm = lin ? ag : ''; p.gpsValor = lin ? gg.valor : ''; p.gpsVencimento = lin ? gg.vencimento : ''; }
     }
+    if (q('#fc-tipo') && q('#fc-tipo').value !== (r.tipoSegurada || '')) p.tipoSegurada = q('#fc-tipo').value;
     if (q('#fc-proc')){ var proc = q('#fc-proc').value.trim(); if (!proc){ toast('Informe o número do processo.'); return; } p.processo = proc; }
     if (q('#fc-resp')){
       var sel = q('#fc-resp'), email = sel.value, nome = email ? (sel.selectedOptions[0] || {}).textContent || '' : '';
@@ -3784,20 +3815,21 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     var box = $('cad-list'); if (!box) return;
     var todos = state.rows.filter(noCadastro).filter(function(r){ return (!soMinhas || minha(r)) && passaFiltro(r); });
     var nPrio = todos.filter(function(r){ return prioridadeNasc(r) != null; }).length, nAtr = todos.filter(atrasada).length, nInc = todos.filter(function(r){ return dadosFaltando(r).length; }).length;
-    var nLead = function(k){ return todos.filter(function(r){ return leadDe(r) === k; }).length; };
+    var nLead = function(k){ return todos.filter(function(r){ return leadDe(r) === k; }).length; }, nTipo = function(k){ return todos.filter(function(r){ return tipoChave(r) === k; }).length; };
     var SITS = [['', 'Status: todas · ' + todos.length], ['prioridade', 'Prioridade (parto perto) · ' + nPrio], ['atrasadas', 'Paradas além do prazo · ' + nAtr], ['incompleto', 'Dados incompletos · ' + nInc],
+      ['t:urbana', 'Urbano (com GPS) · ' + nTipo('urbana')], ['t:especial', 'Rural (prova rural) · ' + nTipo('especial')], ['t:', 'Sem rural/urbano · ' + nTipo('')],
       ['l:novo', 'Para ligar (novos) · ' + nLead('novo')], ['l:retornar', 'Retornar depois · ' + nLead('retornar')], ['l:contato', 'Em contato · ' + nLead('contato')], ['l:proposta', 'Proposta aceita · ' + nLead('proposta')], ['l:sem_resposta', 'Sem resposta · ' + nLead('sem_resposta')]];
     $('cad-sit').innerHTML = SITS.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === cadSit ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
     $('cad-sit').classList.toggle('ativo', !!cadSit);
     $('cad-chips').innerHTML = (nPrio ? fbChip('ver', 'i-alert', plural(nPrio, 'com parto em até ' + PRIORIDADE_DIAS + ' dias', 'com parto em até ' + PRIORIDADE_DIAS + ' dias'), 'cad:prioridade', 'cad:' + cadSit) : '') + (nAtr ? fbChip('lar', 'i-clock', plural(nAtr, 'parada além do prazo', 'paradas além do prazo'), 'cad:atrasadas', 'cad:' + cadSit) : '') +
       (nInc ? fbChip('ver', 'i-users', plural(nInc, 'com dados incompletos', 'com dados incompletos'), 'cad:incompleto', 'cad:' + cadSit) : '') + (nPrio || nAtr || nInc ? '' : FB_NADA);
-    var lista = todos.filter(function(r){ return (!cadSit || (cadSit === 'atrasadas' ? atrasada(r) : cadSit === 'prioridade' ? prioridadeNasc(r) != null : cadSit === 'incompleto' ? dadosFaltando(r).length : leadDe(r) === cadSit.slice(2))) && buscaCliente(r, cadQ); });
+    var lista = todos.filter(function(r){ return (!cadSit || (cadSit === 'atrasadas' ? atrasada(r) : cadSit === 'prioridade' ? prioridadeNasc(r) != null : cadSit === 'incompleto' ? dadosFaltando(r).length : cadSit.slice(0, 2) === 't:' ? tipoChave(r) === cadSit.slice(2) : leadDe(r) === cadSit.slice(2))) && buscaCliente(r, cadQ); });
     // parto perto primeiro; depois a situação e o cadastro mais recente; no mesmo dia, em ordem alfabética
     lista = ordenar(lista, function(a, b){ var da = String(a.dataCadastro || a.criadoEm || '').slice(0, 10), db = String(b.dataCadastro || b.criadoEm || '').slice(0, 10); var pa = prioridadeNasc(a), pb = prioridadeNasc(b); if (pa != null || pb != null){ if (pa == null) return 1; if (pb == null) return -1; if (pa !== pb) return pa - pb; } return (LEAD_ORDEM[leadDe(a)] - LEAD_ORDEM[leadDe(b)]) || db.localeCompare(da) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); });
     kbInfo('cad', 'd', lista.length, 'cliente', 'clientes');
-    pintarLista(box, '<table class="kb-tab"><colgroup><col><col style="width:124px"><col style="width:140px"><col style="width:124px"><col style="width:164px"><col style="width:92px"><col style="width:256px"></colgroup>' +
-      '<thead><tr><th>Cliente</th><th>Telefone</th><th>Origem</th><th>Parto / bebê</th><th>Situação</th><th>Cadastro</th><th></th></tr></thead><tbody>' +
-      (lista.slice(0, 300).map(cadLinha).join('') || '<tr><td colspan="7" class="empty">' + (todos.length ? 'Nenhum cliente neste filtro.' : 'Nenhum cliente em cadastro. Clique em <b>Novo cadastro</b> para começar.') + '</td></tr>') + '</tbody></table>');
+    pintarLista(box, '<table class="kb-tab"><colgroup><col><col style="width:124px"><col style="width:140px"><col style="width:124px"><col style="width:112px"><col style="width:164px"><col style="width:92px"><col style="width:256px"></colgroup>' +
+      '<thead><tr><th>Cliente</th><th>Telefone</th><th>Origem</th><th>Parto / bebê</th><th title="Urbano: paga a GPS · Rural: segurada especial, prova rural">Rural / urbano</th><th>Situação</th><th>Cadastro</th><th></th></tr></thead><tbody>' +
+      (lista.slice(0, 300).map(cadLinha).join('') || '<tr><td colspan="8" class="empty">' + (todos.length ? 'Nenhum cliente neste filtro.' : 'Nenhum cliente em cadastro. Clique em <b>Novo cadastro</b> para começar.') + '</td></tr>') + '</tbody></table>');
   }
   function cadLinha(r){
     var id = esc(r.id), k = leadDe(r), par = prospById(r.responsavelId), parNome = par ? (par.tipo === 'clinica' && par.clinica ? par.clinica : par.nome) : (r.criadoPorNome ? 'Cadastro de ' + r.criadoPorNome : (r.origem === 'organico' ? 'Orgânico' : 'Sem parceiro'));
@@ -3811,6 +3843,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       '<td><div class="kb-tel">' + contatoCloser(r) + '</div></td>' +
       '<td>' + (cidadeCli(r) ? '<div class="kb-lugar cad-l1">' + ufFlag(r) + '<span title="' + esc(cidadeCli(r)) + '">' + esc(cidadeCli(r)) + '</span></div>' : '<div class="cad-l1">—</div>') + '<small title="' + esc(parNome) + '">' + esc(parNome) + '</small></td>' +
       '<td>' + parto + '</td>' +
+      '<td><select class="inss-sel sm-sel' + (r.tipoSegurada ? ' ' + (rural(r) ? 'rur' : 'urb') : ' sem') + '" data-tiposeg="' + id + '" aria-label="Salário-maternidade rural ou urbano: ' + esc(r.nome) + '">' + tipoOpts(r.tipoSegurada, true) + '</select></td>' +
       '<td><div class="cad-sit-box">' + leadSelect(r) + (contadorContato(r) ? '' : r.atendente ? '<small>' + esc(primeiroNome(r.atendente)) + '</small>' : '') + '</div></td>' +
       '<td><div class="cad-l1">' + (nd == null ? '—' : nd <= 0 ? 'hoje' : nd === 1 ? 'ontem' : 'há ' + nd + ' dias') + '</div>' + (atr ? '<small class="verm" title="' + esc(atr) + '">' + esc(atr) + '</small>' : '') + '</td>' +
       '<td><div class="cad-acoes"><button type="button" class="btn tent" data-act="tentativa" data-id="' + id + '" title="Ligou e não atendeu: conta uma tentativa. Com ' + LEAD_TENTATIVAS + ' vira Sem resposta">Não atendeu' + (r.tentativas > 0 ? ' · ' + r.tentativas + '/' + LEAD_TENTATIVAS : '') + '</button>' +
@@ -4016,9 +4049,24 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function naFila(r){ return fechado(r) && foiParaAnalise(r); }
   function noContratos(r){ return fechado(r) && !foiParaAnalise(r); }
   function nascido(r){ return r.fatoGerador !== 'gestante' || !!r.criancaNasc; }
+  // salário-maternidade rural (segurada especial: prova rural, sem GPS) ou urbano (facultativa: paga a GPS); quem separa é o closer
+  // sem a escolha, o cadastro antigo segue como urbano (era o padrão do escritório), com o aviso para informar
+  function rural(r){ return r.tipoSegurada === 'especial'; }
+  function tipoChave(r){ return rural(r) ? 'especial' : r.tipoSegurada ? 'urbana' : ''; }
+  function tipoSmTxt(r){ return rural(r) ? 'Rural' : r.tipoSegurada ? 'Urbano' : ''; }
+  function tipoPill(r){
+    var t = tipoSmTxt(r);
+    if (t) return '<span class="sm-tipo ' + (rural(r) ? 'rur' : 'urb') + '" title="' + (rural(r) ? 'Salário-maternidade rural: segurada especial, prova rural, sem GPS' : 'Salário-maternidade urbano: facultativa, paga a GPS') + '">' + t + '</span>';
+    return noContratos(r) ? '<span class="sm-tipo sem" title="Falta informar se o salário-maternidade é rural ou urbano">Rural ou urbano?</span>' : '';
+  }
+  function tipoOpts(v, curto){
+    var l = [['', curto ? '—' : 'Rural ou urbano? (escolher)'], ['urbana', curto ? 'Urbano' : 'Urbano · paga a GPS'], ['especial', curto ? 'Rural' : 'Rural · segurada especial']];
+    if (v && v !== 'urbana' && v !== 'especial') l.push([v, curto ? 'Urbano' : 'Urbano · ' + (TIPOS[v] || v)]);
+    return l.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === (v || '') ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('');
+  }
   // GPS: vence 2 meses antes do parto (30/04 vira 28/02); o cartão pula para Emitir/Pagar 5 dias antes de vencer
   function prazoGps(r){
-    if (nascido(r) || !r.dpp) return '';
+    if (nascido(r) || !r.dpp || rural(r)) return '';   // rural (segurada especial) não paga GPS
     var p = String(r.dpp).slice(0, 10).split('-').map(Number), ult = new Date(p[0], p[1] - 2, 0).getDate();
     return iso(new Date(p[0], p[1] - 3, Math.min(p[2], ult), 12));
   }
@@ -4026,11 +4074,11 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function gpsPaga(r){ return r.guiaStatus === 'paga'; }
   function gpsAPagar(r){ var g = gatilhoGps(r), hj = iso(new Date()); return !!g && !gpsPaga(r) && g <= hj && String(r.dpp).slice(0, 10) > hj; }
   // a tarefa da GPS nasce quando o prazo chega, mesmo com o cartão em Senha ou Documentação, ou quando ele está em Emitir/Pagar GPS
-  function gpsTarefa(r){ return noContratos(r) && !nascido(r) && !gpsPaga(r) && (gpsAPagar(r) || posEtapaDe(r) === 'gps'); }
+  function gpsTarefa(r){ return noContratos(r) && !nascido(r) && !rural(r) && !gpsPaga(r) && (gpsAPagar(r) || posEtapaDe(r) === 'gps'); }
   // o que o responsável precisa fazer agora: aparece no cartão, na janela e no sino até ser feito
   // gestante que fechou antes do prazo da GPS e não pagou: continua avisando depois do parto
   function gpsVencida(r){
-    if (gpsPaga(r) || !r.dpp || !r.contratoEm) return '';
+    if (gpsPaga(r) || !r.dpp || !r.contratoEm || rural(r)) return '';
     var p = String(r.dpp).slice(0, 10).split('-').map(Number), ult = new Date(p[0], p[1] - 2, 0).getDate(), v = iso(new Date(p[0], p[1] - 3, Math.min(p[2], ult), 12));
     return v < iso(new Date()) && String(r.contratoEm).slice(0, 10) <= v ? v : '';
   }
@@ -4038,6 +4086,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     if (!noContratos(r)) return '';
     if (gpsTarefa(r)) return (!nitOk(r.nit) ? 'Tarefa: pegar o NIT da mãe (a GPS sai sozinha)' : 'Tarefa: pagar a GPS (guia pronta)') + (prazoGps(r) ? ' até ' + fmtDate(prazoGps(r)) : '');
     if (gpsVencida(r) && String(r.dpp).slice(0, 10) <= iso(new Date())) return 'GPS não foi paga (venceu ' + fmtDate(gpsVencida(r)) + '): confira antes de encaminhar';
+    if (!r.tipoSegurada) return 'Tarefa: informar se é rural ou urbano';
     if (posEtapaDe(r) === 'cert') return 'Tarefa: falar com a mãe e pedir a certidão';
     if (!nascido(r) && !r.dpp) return 'Tarefa: informar a data do parto';
     return '';
@@ -4085,7 +4134,8 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   /* ---------- Pós-venda (Kanban): regulariza a documentação de quem fechou contrato ---------- */
   var POS_COLS = [['senha', 'Senha Meu INSS'], ['docs', 'Documentação Pessoal'], ['prazo_gps', 'Aguardando Prazo da GPS'], ['gps', 'Emitir/Pagar GPS'], ['nasc', 'Aguardando Nascimento'], ['cert', 'Solicitar Certidão de Nascimento'], ['ok', 'Documentação OK']];
   var POS_ORDEM = POS_COLS.map(function(c){ return c[0]; }), POS_LEGADO = { recem: 'senha', falta_gov: 'senha', falta_doc: 'docs', rural: 'docs', guia: 'gps' };
-  var POS_SO_GESTANTE = { prazo_gps: 1, gps: 1, nasc: 1 };
+  var POS_SO_GESTANTE = { prazo_gps: 1, gps: 1, nasc: 1 }, POS_SO_URBANA = { prazo_gps: 1, gps: 1 };
+  function posColsDe(r){ return POS_COLS.filter(function(c){ return !(nascido(r) && POS_SO_GESTANTE[c[0]]) && !(rural(r) && POS_SO_URBANA[c[0]]); }); }
   function posLane(r){ return nascido(r) ? 'nasc' : 'gest'; }
   // a coluna vem do que foi gravado, mais o que as datas mandam (só anda para frente)
   function posEtapaDe(r){
@@ -4101,9 +4151,11 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       return e;
     }
     var parto = String(r.dpp || '').slice(0, 10), g = gatilhoGps(r);
-    // senha gov.br no cofre: segue para a Documentação Pessoal; documentação completa: segue sozinha para a GPS
+    // rural não passa pela GPS: volta para a documentação (ou já espera o nascimento, se a pasta estiver completa)
+    if (rural(r) && POS_SO_URBANA[e]) e = faltamTxt(r) ? 'docs' : 'nasc';
+    // senha gov.br no cofre: segue para a Documentação Pessoal; documentação completa: segue sozinha para a GPS (urbano) ou para o nascimento (rural)
     if (e === 'senha' && r.senhaGovOk) e = 'docs';
-    if (e === 'docs' && !faltamTxt(r)) e = 'prazo_gps';
+    if (e === 'docs' && !faltamTxt(r)) e = rural(r) ? 'nasc' : 'prazo_gps';
     if (parto && parto <= hj && antes('cert') && (!mudou || mudou < parto)) return 'cert';
     // GPS paga: vai para Aguardando Nascimento de qualquer coluna anterior (só para a frente)
     if (gpsPaga(r) && antes('nasc')) return 'nasc';
@@ -4128,7 +4180,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     if (atr) st.push(kbSt(atr.charAt(0).toUpperCase() + atr.slice(1)));
     if ((et === 'docs' || et === 'ok') && faltamTxt(r)) st.push(kbSt('Falta: ' + faltamTxt(r), 'lar'));
     var meta = [linhaPartoBv(r), linhaGps(r), linhaOrigem(r), linhaDocs(r)];
-    var opts = POS_COLS.filter(function(c){ return !nascido(r) || !POS_SO_GESTANTE[c[0]]; }).map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === et ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '<option value="__cad">↩ Voltar ao Cadastro</option>';
+    var opts = posColsDe(r).map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === et ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '<option value="__cad">↩ Voltar ao Cadastro</option>';
     var acao = gpsTarefa(r) ? '<button type="button" class="kb-btn" data-guia-paga="' + id + '">' + svgI('i-cash') + 'Marcar GPS paga</button>'
       : et === 'cert' ? '<button type="button" class="kb-btn" data-pv-cert="' + id + '">' + svgI('i-check') + 'Recebi a certidão</button>'
       : et === 'ok' || r.pvAnalise === 'devolvido' ? '<button type="button" class="kb-btn" data-pv-enc="' + id + '" title="Manda para a Controladoria: se estiver OK, vai para o protocolo; se não, volta para regularizar">' + svgI('i-file') + 'Encaminhar para análise</button>' : '';
@@ -4136,15 +4188,15 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       meta: meta, status: st, acao: acao, resp: r.posResp || r.contratoPor, dias: d, parado: d > 14, dataVal: nascido(r) ? 'Nasceu ' + (r.criancaNasc ? fmtDate(String(r.criancaNasc).slice(0, 10)) : '') : r.dpp ? fmtDate(String(r.dpp).slice(0, 10)) : 'Sem data',
       mover: kbMover('<select data-pos="' + id + '" aria-label="Mover ' + esc(r.nome) + '">' + opts + '</select>') };
   }
-  function posCard(r){ var i = posInfo(r); return kbCard(r, { arrasta: true, rotulo: 'Salário-maternidade', resp: i.resp, dias: i.dias, parado: i.parado, meta: i.meta, status: i.status, problema: r.pvProblema, acoes: i.acao, caso: true }); }
+  function posCard(r){ var i = posInfo(r); return kbCard(r, { arrasta: true, rotulo: 'Salário-maternidade' + (tipoSmTxt(r) ? ' ' + tipoSmTxt(r).toLowerCase() : ''), resp: i.resp, dias: i.dias, parado: i.parado, meta: i.meta, status: i.status, problema: r.pvProblema, acoes: i.acao, caso: true }); }
   // parto com o relógio azul (como no BI de Vendas); sem data, o atalho para informar
   function linhaPartoBv(r){
     if (nascido(r)) return '<p>Bebê nasceu' + (r.criancaNasc ? ' · ' + fmtDate(String(r.criancaNasc).slice(0, 10)) : '') + '</p>';
     if (!r.dpp) return '<p><button type="button" class="kb-inline" data-act="edit" data-id="' + esc(r.id) + '">Informar data do parto</button></p>';
     return '<div class="kb-par"><span>Parto ' + fmtDate(String(r.dpp).slice(0, 10)) + '</span>' + relogio(r.dpp, 'azul') + '</div>';
   }
-  var CTR_SITS = [['', 'Status: todas'], ['completa', 'Pastas completas'], ['gest', 'Gestantes'], ['nasc', 'Bebê já nasceu'], ['atr', 'Atrasadas'], ['gps', 'GPS a pagar'], ['docs', 'Documentos faltando'], ['dev', 'Devolvidas pela Controladoria']];
-  function passaCtr(r, f){ return !f || (f === 'completa' ? !faltamTxt(r) : f === 'gest' ? !nascido(r) : f === 'nasc' ? nascido(r) : f === 'atr' ? atrasada(r) : f === 'gps' ? gpsTarefa(r) : f === 'docs' ? !!faltamTxt(r) : f === 'dev' ? r.pvAnalise === 'devolvido' : true); }
+  var CTR_SITS = [['', 'Status: todas'], ['urb', 'Urbanas (com GPS)'], ['rur', 'Rurais (prova rural)'], ['semtipo', 'Sem rural/urbano'], ['completa', 'Pastas completas'], ['gest', 'Gestantes'], ['nasc', 'Bebê já nasceu'], ['atr', 'Atrasadas'], ['gps', 'GPS a pagar'], ['docs', 'Documentos faltando'], ['dev', 'Devolvidas pela Controladoria']];
+  function passaCtr(r, f){ return !f || (f === 'urb' ? tipoChave(r) === 'urbana' : f === 'rur' ? rural(r) : f === 'semtipo' ? !r.tipoSegurada : f === 'completa' ? !faltamTxt(r) : f === 'gest' ? !nascido(r) : f === 'nasc' ? nascido(r) : f === 'atr' ? atrasada(r) : f === 'gps' ? gpsTarefa(r) : f === 'docs' ? !!faltamTxt(r) : f === 'dev' ? r.pvAnalise === 'devolvido' : true); }
   function renderContratos(){
     var box = $('ctr-list'); if (!box) return;
     (function(){
@@ -4411,7 +4463,16 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   $('ctr-sit').addEventListener('change', function(){ ctrSit = this.value; renderContratos(); });
   filtroCards($('ctr-stats'), 'data-ctr-kpi', function(v){ if (v === 'h' || v === 'h-prot'){ filaSit = v === 'h-prot' ? 'prot' : ''; showTab('h'); return; } ctrSit = ctrSit === v ? '' : v; }, renderContratos);
   $('ctr-q').addEventListener('input', function(){ ctrQ2 = this.value.trim(); renderContratos(); });
-  document.addEventListener('click', function(e){ if (e.target.closest && e.target.closest('select[data-lead],select[data-ctr],select[data-guia]')) e.stopPropagation(); }, true);
+  document.addEventListener('click', function(e){ if (e.target.closest && e.target.closest('select[data-lead],select[data-ctr],select[data-guia],select[data-tiposeg]')) e.stopPropagation(); }, true);
+  // o closer marca na lista do Cadastro se o salário-maternidade é rural ou urbano
+  document.addEventListener('change', function(e){
+    var s = e.target.closest && e.target.closest('select[data-tiposeg]'); if (!s) return;
+    var r = acharRow(s.dataset.tiposeg); if (!r) return;
+    var antes = { tipoSegurada: r.tipoSegurada || '' }, v = s.value;
+    patchRow(r.id, { tipoSegurada: v, atualizadoEm: new Date().toISOString() }).then(function(){
+      toast((v === 'especial' ? 'Rural (segurada especial, prova rural): ' : v ? 'Urbano (paga a GPS): ' : 'Sem rural/urbano: ') + r.nome, 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
+    }, function(err){ toast(errMsg(err)); });
+  });
   document.addEventListener('change', async function(e){
     var sl = e.target.closest && e.target.closest('select[data-lead],select[data-ctr],select[data-guia]'); if (!sl) return;
     var r = acharRow(sl.dataset.lead || sl.dataset.ctr || sl.dataset.guia); if (!r) return;
@@ -4474,6 +4535,9 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       quem.map(function(u){ return '<option value="' + esc(u.email) + '"' + (String(u.email).toLowerCase() === (String(r.atendenteEmail || '').toLowerCase() || meu) ? ' selected' : '') + '>' + esc(u.nome || u.email) + '</option>'; }).join('') + '<option value="__outra">Outra atendente (digitar o nome)</option></select>' +
       '<input id="fc-outra" placeholder="Nome da atendente" hidden style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;margin:-4px 0 10px">' +
       '<input type="hidden" id="fc-fato" value="gestante">' +
+      '<label class="mini" style="display:block;margin:0 0 4px">Salário-maternidade</label><div class="fc-tipo-seg" role="group" aria-label="Rural ou urbano">' +
+        '<button type="button" data-tp="urbana" aria-pressed="' + (!!r.tipoSegurada && !rural(r)) + '"><b>Urbano</b><span>Paga a GPS (facultativa)</span></button>' +
+        '<button type="button" data-tp="especial" aria-pressed="' + rural(r) + '"><b>Rural</b><span>Segurada especial: prova rural</span></button></div>' +
       '<label class="mini" style="display:block;margin:0 0 4px">Data do fechamento</label><input type="date" id="fc-data" value="' + iso(new Date()) + '">' +
       '<label style="display:flex;gap:10px;align-items:flex-start;margin:0 0 6px;font-size:14px;line-height:1.35"><input type="checkbox" id="fc-aceita"' + (r.propostaAceita ? ' checked' : '') + ' style="margin-top:3px;width:18px;height:18px;flex:none"><span><b>A cliente aceitou a proposta</b><br><span class="mini">Marque somente se ela aceitou a proposta na ligação.</span></span></label>' +
       '<input id="fc-prop" value="' + esc(r.propostaObs || '') + '" placeholder="Detalhe da proposta aceita (opcional)" style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;margin:0 0 12px">' +
@@ -4483,11 +4547,14 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     f.querySelector('[data-x]').onclick = function(){ f.remove(); };
     f.addEventListener('click', function(e){ if (e.target === f) f.remove(); });
     f.querySelector('#fc-quem').addEventListener('change', function(){ var o = f.querySelector('#fc-outra'); o.hidden = this.value !== '__outra'; if (!o.hidden) o.focus(); });
+    var tpEsc = r.tipoSegurada || '';
+    f.querySelector('.fc-tipo-seg').addEventListener('click', function(e){ var b = e.target.closest('[data-tp]'); if (!b) return; tpEsc = b.dataset.tp === 'urbana' && r.tipoSegurada && !rural(r) ? r.tipoSegurada : b.dataset.tp; Array.prototype.forEach.call(this.querySelectorAll('[data-tp]'), function(x){ x.setAttribute('aria-pressed', String(x === b)); }); });
     f.querySelector('[data-ok]').onclick = async function(){
       var sel = f.querySelector('#fc-quem'), data = f.querySelector('#fc-data').value || iso(new Date());
       if (!sel.value){ toast('Escolha a atendente que fez o fechamento.'); sel.focus(); return; }
       var nomeOutra = f.querySelector('#fc-outra').value.trim();
       if (sel.value === '__outra' && nomeOutra.length < 3){ toast('Digite o nome da atendente.'); f.querySelector('#fc-outra').focus(); return; }
+      if (!tpEsc){ toast('Escolha se o salário-maternidade é urbano (paga a GPS) ou rural (prova rural).'); return; }
       if (!f.querySelector('#fc-aceita').checked){ toast('Marque que a cliente aceitou a proposta para fechar o contrato.'); return; }
       var u = (state.equipe || []).filter(function(x){ return x.email === sel.value; })[0];
       var atendente = sel.value === '__outra' ? nomeOutra : ((u && u.nome) || sel.value), atendenteEmail = sel.value === '__outra' ? '' : sel.value;
@@ -4495,7 +4562,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       var antes = { contratoEm: r.contratoEm || '', leadStatus: r.leadStatus || '', contratoPor: r.contratoPor || '', contratoPorEmail: r.contratoPorEmail || '', fatoGerador: r.fatoGerador || '', posEtapa: r.posEtapa || '', propostaAceita: !!r.propostaAceita, propostaObs: r.propostaObs || '' };
       this.disabled = true;
       try {
-        var rpa = respPosAuto(), pf = { posResp: rpa ? rpa.nome || rpa.email : '', posRespEmail: rpa ? rpa.email : '', contratoEm: data, leadStatus: 'fechado', posMudouEm: '', encaminhadoEm: '', filaMudouEm: '', filaPor: '', contratoPor: atendente, contratoPorEmail: atendenteEmail, pvAnalise: '', filaEtapa: '', propostaAceita: true, propostaObs: f.querySelector('#fc-prop').value.trim(), fatoGerador: fatoNovo, posEtapa: '', contatoPrazoEm: '', atualizadoEm: new Date().toISOString() };
+        var rpa = respPosAuto(), pf = { posResp: rpa ? rpa.nome || rpa.email : '', posRespEmail: rpa ? rpa.email : '', contratoEm: data, leadStatus: 'fechado', posMudouEm: '', encaminhadoEm: '', filaMudouEm: '', filaPor: '', contratoPor: atendente, contratoPorEmail: atendenteEmail, pvAnalise: '', filaEtapa: '', propostaAceita: true, propostaObs: f.querySelector('#fc-prop').value.trim(), fatoGerador: fatoNovo, tipoSegurada: tpEsc, posEtapa: '', contatoPrazoEm: '', atualizadoEm: new Date().toISOString() };
         antes = antesDe(r, pf);
         await patchRow(r.id, pf);
         f.remove();
@@ -4792,6 +4859,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       var respPos = primeiroNome(r.posResp || r.contratoPor), comResp = respPos ? ' · responsável: ' + respPos : '';
       if (gpsTarefa(r)) add(!nitOk(r.nit) ? 'Pegar o NIT para a GPS' : 'Pagar a GPS', r, (prazoGps(r) ? 'vence ' + fmtDate(prazoGps(r)) + ' · parto ' + fmtDate(r.dpp) : 'sem data do parto') + comResp);
       if (noContratos(r) && r.fatoGerador === 'gestante' && !r.criancaNasc && !r.dpp) add('Informar a data do parto', r, 'gestante sem data prevista');
+      if (noContratos(r) && !r.tipoSegurada) add('Informar se é rural ou urbano', r, 'urbano paga a GPS; rural precisa da prova rural' + comResp);
       if (noContratos(r) && posEtapaDe(r) === 'cert') add('Falar com a mãe: pedir a certidão', r, (r.criancaNasc ? 'nasceu em ' + fmtDate(r.criancaNasc) : 'parto previsto ' + fmtDate(r.dpp)) + comResp);
       if (naFila(r) && filaEtapaDe(r) === 'conferir') add('Conferir a documentação', r, 'encaminhada ' + fmtDate(diaLocal(r.encaminhadoEm)) + ' · prazo ' + prazoTarefa(r.filaMudouEm || r.encaminhadoEm, 2));
       if (naFila(r) && filaEtapaDe(r) === 'protocolar') add('Protocolar no INSS', r, 'prazo ' + prazoTarefa(r.filaMudouEm, 3) + (r.filaPor ? ' · responsável: ' + primeiroNome(r.filaPor) : ''));
@@ -4814,7 +4882,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function abrirAvisos(){
     var l = avisosLista(), grupos = {};
     l.forEach(function(x){ (grupos[x.tipo] = grupos[x.tipo] || []).push(x); });
-    var ordem = ['Parto perto e sem contrato', 'Problema registrado', 'Pegar o NIT para a GPS', 'Pagar a GPS', 'Informar a data do parto', 'Falar com a mãe: pedir a certidão', 'Cobrar documentos da mãe', 'Devolvida pela Controladoria', 'Conferir a documentação', 'Protocolar no INSS', 'Pôr o número do protocolo', 'Registrar o pagamento do benefício', 'Fazer o acerto de honorários', 'Exigência do INSS vencendo', 'Parada além do prazo', 'Cadastro repetido', 'Data para conferir'];
+    var ordem = ['Parto perto e sem contrato', 'Problema registrado', 'Pegar o NIT para a GPS', 'Pagar a GPS', 'Informar se é rural ou urbano', 'Informar a data do parto', 'Falar com a mãe: pedir a certidão', 'Cobrar documentos da mãe', 'Devolvida pela Controladoria', 'Conferir a documentação', 'Protocolar no INSS', 'Pôr o número do protocolo', 'Registrar o pagamento do benefício', 'Fazer o acerto de honorários', 'Exigência do INSS vencendo', 'Parada além do prazo', 'Cadastro repetido', 'Data para conferir'];
     var f = document.createElement('div'); f.className = 'cid-sheet av-sheet';
     f.innerHTML = '<div><div class="av-cab"><b>Avisos</b><span>' + (l.length ? l.length + (l.length === 1 ? ' ponto para olhar' : ' pontos para olhar') : 'Nada pendente agora') + '</span></div><div class="lista av-lista">' +
       ordem.filter(function(k){ return grupos[k]; }).map(function(k){ return '<div class="av-g"><b>' + esc(k) + ' <span class="tnum">' + grupos[k].length + '</span></b>' + grupos[k].map(function(x){ return '<button type="button" data-av="' + esc(x.id) + '"><span>' + esc(x.nome) + '</span><small>' + esc(x.txt) + '</small></button>'; }).join('') + '</div>'; }).join('') +
@@ -4955,7 +5023,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       '<thead><tr><th>Cliente</th><th>Etapa</th><th>' + esc(dataRot) + '</th><th>Responsável</th><th>Na etapa</th><th></th></tr></thead><tbody>' +
       (lista.slice(0, 300).map(function(r){
         var i = info(r), s = (r.pvProblema && (noContratos(r) || naFila(r)) ? [kbSt('Problema: ' + r.pvProblema)] : []).concat(i.status || []).filter(function(x){ return x && x.t; })[0], id = esc(r.id);
-        return '<tr data-linha="' + id + '"><td class="nome"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + id + '">' + esc(r.nome || 'Sem nome') + '</button>' +
+        return '<tr data-linha="' + id + '"><td class="nome"><div class="nome-l"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + id + '">' + esc(r.nome || 'Sem nome') + '</button>' + tipoPill(r) + '</div>' +
             (s ? '<small class="' + s.tom + '" title="' + esc(s.t) + '">' + esc(s.t) + '</small>' : '<small>' + esc(cidadeCli(r) || '') + '</small>') + '</td>' +
           '<td>' + (i.etapaSel || esc(i.etapa || '')) + '</td><td class="tnum">' + (i.dataVal || '—') + '</td><td>' + esc(primeiroNome(i.resp) || '—') + '</td>' +
           '<td class="tnum' + (i.parado ? ' parado' : '') + '">' + (i.dias != null ? i.dias + ' d' : '—') + '</td>' +
@@ -4972,7 +5040,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function kbInfo(pref, tela, n, um, muitos){
     var el = $(pref + '-info'); if (!el) return;
     var nome = TITULOS[tela] ? TITULOS[tela][0] : '';
-    el.innerHTML = '<span>' + (vistaDe(tela) === 'lista' ? 'Lista' : 'Quadro') + ': <b>' + esc(nome) + '</b> · ' + n + ' ' + (n === 1 ? um : muitos) + '</span><span class="kb-dica">Clique num balão para trocar a fase.</span><button type="button" class="fb-lnk" data-recolher title="Recolher os balões para o quadro ganhar espaço"><svg class="i kb-gira" aria-hidden="true"><use href="#i-chev"/></svg>Recolher</button>';
+    el.innerHTML = '<span><b>' + esc(nome) + '</b> · ' + n + ' ' + (n === 1 ? um : muitos) + '</span>';
   }
   function fbChip(tom, ico, txt, sit, atual){ return '<button type="button" class="fb-al ' + tom + (atual === sit ? ' on' : '') + '" data-sit="' + sit + '">' + svgI(ico) + esc(txt) + '</button>'; }
   var FB_NADA = '<span class="fb-nada">Nada pedindo atenção agora.</span>';
@@ -5161,7 +5229,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function lerGuardado(k, pad){ try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? pad : v; } catch(e){ return pad; } }
   function guardar(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
   var vistas = lerGuardado('nascer-vistas', {}), topoRecolhido = !!lerGuardado('nascer-topo-recolhido', false), telaAberta = 'd', ultimaFase = 'd';
-  function vistaDe(t){ return t === 'q' || t === 'd' ? 'lista' : (vistas[t] === 'lista' ? 'lista' : 'quadro'); }   // Cadastro é sempre em lista
+  function vistaDe(t){ return 'lista'; }   // cada fase é uma tela do menu lateral, sempre em lista (o Kanban saiu a pedido em 04/11/2026)
   function telaDoFunil(t){ return FASES.some(function(f){ return f[0] === t; }); }
   function resumoFases(){
     var rows = state.rows, cad = rows.filter(noCadastro), pos = rows.filter(noContratos), fila = rows.filter(naFila), ins = rows.filter(noInss), jud = rows.filter(noControle), arq = rows.filter(function(r){ return r.arquivado; });
@@ -5196,32 +5264,25 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     $('r-f').value = ''; render();
   }
   function renderFunil(){
-    var box = $('funil'); if (!box) return;
-    box.hidden = !telaDoFunil(telaAberta); if (box.hidden) return;
+    var box = $('funil'); if (box) box.hidden = true;
     var res = resumoFases();
-    box.classList.toggle('rec', topoRecolhido);
-    box.innerHTML = topoRecolhido
-      ? FASES.map(function(f){ var x = res[f[0]]; return '<button type="button" class="fn-fina' + (f[0] === telaAberta ? ' ativo' : '') + '" data-fn="' + f[0] + '" title="' + esc(x[1]) + '">' + svgI(f[1]) + esc(TITULOS[f[0]][0]) + '<b>' + x[0] + '</b></button>'; }).join('') +
-        (filtrosDaTela() ? '<button type="button" class="fn-limpar" data-limpar title="Há busca ou filtro ligado: algumas clientes não aparecem">' + svgI('i-x') + 'Limpar filtros</button>' : '') +
-        '<button type="button" class="fb-lnk" data-recolher title="Mostrar os balões das fases">' + svgI('i-chev') + 'Mostrar</button>'
-      : FASES.map(function(f, i){ var x = res[f[0]]; return '<div class="fn-item"><div class="fn-balao' + (f[0] === telaAberta ? ' ativo' : '') + '" role="button" tabindex="0" data-fn="' + f[0] + '" title="Clique para abrir a fase; arraste uma cliente até o balão para mudar de fase."><p class="fn-t">' + svgI(f[1]) + '<span>' + esc(TITULOS[f[0]][0]) + '</span></p><p class="fn-v">' + x[0] + '</p><p class="fn-s">' + esc(x[1]) + '</p></div></div>' + (i < FASES.length - 1 ? '<div class="fn-sep" aria-hidden="true"></div>' : ''); }).join('');
+    FASES.forEach(function(f){ var el = $('nn-' + f[0]); if (el){ el.textContent = res[f[0]][0] || ''; el.title = res[f[0]][1]; } });
   }
   var ORDENS = [['', '↕ Prazo mais perto'], ['atividade', '↕ Última atividade'], ['nome', '↕ Nome (A–Z)'], ['etapa', '↕ Tempo na etapa'], ['cadastro', '↕ Cadastro mais recente']];
   Array.prototype.forEach.call(document.querySelectorAll('.kb-ord'), function(s){ s.innerHTML = ORDENS.map(function(o){ return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join(''); });
   function pintarPagina(){
     var t = telaAberta, tit = TITULOS[t]; if (!tit) return;
     var res = telaDoFunil(t) ? resumoFases()[t] : null;
-    $('pg-tit').textContent = res ? 'Processos' : tit[0];
-    $('pg-sub').textContent = res ? tit[0] + ' · ' + res[2] : t === 'q' ? desqResumo() : tit[1];
+    $('pg-tit').textContent = tit[0];
+    $('pg-sub').textContent = res ? res[2] : t === 'q' ? desqResumo() : tit[1];
     var bt = VIEWS[t] && $(VIEWS[t][0]), u = bt && bt.querySelector('use'); if (u) $('pg-ico').setAttribute('href', u.getAttribute('href'));
     var fluxo = telaDoFunil(t);
-    $('vista-seg').hidden = !fluxo || t === 'd';
+    $('vista-seg').hidden = true;
     Array.prototype.forEach.call($('vista-seg').querySelectorAll('button'), function(b){ b.setAttribute('aria-pressed', String(b.dataset.vista === vistaDe(t))); });
     $('btn-novo').hidden = !(t === 'd' || t === 'k' || t === 'h' || t === 'i' || t === 'c');
     $('mais-box').hidden = t !== 'k';
     var c = $('conteudo');
-    c.classList.toggle('em-quadro', fluxo && vistaDe(t) === 'quadro');
-    c.classList.toggle('recolhido', fluxo && topoRecolhido);
+    c.classList.remove('em-quadro', 'recolhido');
     Array.prototype.forEach.call(document.querySelectorAll('[data-filtrar]'), function(b){ b.classList.toggle('on', !!(kbF.uf || kbF.parc)); });
     Array.prototype.forEach.call(document.querySelectorAll('.kb-ord'), function(s){ s.value = kbOrdem; });
   }
@@ -6749,7 +6810,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
 
   /* ---------- form ---------- */
   var dlg = $('dlg'), delArmed = false;
-  var CAMPOS_HIST = { avisoRespId: 'Responsável pelo aviso', nome: 'Nome', cpf: 'CPF', rg: 'RG', endereco: 'Endereço', contato: 'Telefone', contatoVia: 'Avisado via cliente', audData: 'Data da audiência', audHora: 'Hora da audiência', online: 'Online', avisado: 'Aviso', situacao: 'Situação', meioAviso: 'Meio do aviso', avisadoA: 'Quem recebeu', avisadoEm: 'Data do aviso', responsavelId: 'Parceiro', processo: 'Processo', protocolo: 'Ajuizamento', nascimento: 'Nascimento da mãe', nit: 'NIT', tipoSegurada: 'Tipo de segurada', atividade: 'Atividade', fatoGerador: 'Fato gerador', crianca: 'Criança', criancaNasc: 'Nascimento da criança', dpp: 'Parto previsto', testemunhas: 'Testemunhas', der: 'DER', protocoloInss: 'Protocolo INSS', nb: 'NB', inssStatus: 'Situação no INSS', exigenciaPrazo: 'Prazo da exigência', exigenciaObs: 'Exigência', inssDecisaoEm: 'Decisão do INSS', motivoIndeferimento: 'Motivo do indeferimento', valorBeneficio: 'Valor do benefício', valorGuia: 'Valor da guia', comparecimento: 'Comparecimento', resultado: 'Resultado', concluso: 'Concluso', motivoConcluso: 'Motivo do concluso', embargos: 'Recurso do INSS', pagamento: 'Pagamento', obs: 'Observações', pastaUrl: 'Pasta', foraDaRegua: 'Fora da régua', docs: 'Documentos' };
+  var CAMPOS_HIST = { avisoRespId: 'Responsável pelo aviso', nome: 'Nome', cpf: 'CPF', rg: 'RG', endereco: 'Endereço', contato: 'Telefone', contatoVia: 'Avisado via cliente', audData: 'Data da audiência', audHora: 'Hora da audiência', online: 'Online', avisado: 'Aviso', situacao: 'Situação', meioAviso: 'Meio do aviso', avisadoA: 'Quem recebeu', avisadoEm: 'Data do aviso', responsavelId: 'Parceiro', processo: 'Processo', protocolo: 'Ajuizamento', nascimento: 'Nascimento da mãe', nit: 'NIT', tipoSegurada: 'Rural ou urbano', atividade: 'Atividade', fatoGerador: 'Fato gerador', crianca: 'Criança', criancaNasc: 'Nascimento da criança', dpp: 'Parto previsto', testemunhas: 'Testemunhas', der: 'DER', protocoloInss: 'Protocolo INSS', nb: 'NB', inssStatus: 'Situação no INSS', exigenciaPrazo: 'Prazo da exigência', exigenciaObs: 'Exigência', inssDecisaoEm: 'Decisão do INSS', motivoIndeferimento: 'Motivo do indeferimento', valorBeneficio: 'Valor do benefício', valorGuia: 'Valor da guia', comparecimento: 'Comparecimento', resultado: 'Resultado', concluso: 'Concluso', motivoConcluso: 'Motivo do concluso', embargos: 'Recurso do INSS', pagamento: 'Pagamento', obs: 'Observações', pastaUrl: 'Pasta', foraDaRegua: 'Fora da régua', docs: 'Documentos' };
   function valorHist(k, v){
     if (v === null || v === undefined || v === '') return '(vazio)';
     if (typeof v === 'boolean') return v ? 'sim' : 'não';
@@ -7286,7 +7347,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     } catch(err){ toast(errMsg(err)); }
     finally { $('av-save').disabled = false; }
   });
-  var VIEWS = { b: ['tab-dash', 'view-dash'], d: ['tab-proc', 'view-cad'], i: ['tab-proc', 'view-inss'], k: ['tab-proc', 'view-ctr'], q: ['tab-desq', 'view-desq'], h: ['tab-proc', 'view-fila'], c: ['tab-proc', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-proc', 'view-ret'], g: ['tab-parc', 'view-parc'], e: ['tab-equipe', 'view-equipe'] };
+  var VIEWS = { b: ['tab-dash', 'view-dash'], d: ['tab-cad', 'view-cad'], i: ['tab-inss', 'view-inss'], k: ['tab-ctr', 'view-ctr'], q: ['tab-desq', 'view-desq'], h: ['tab-fila', 'view-fila'], c: ['tab-jud', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-ret', 'view-ret'], g: ['tab-parc', 'view-parc'], e: ['tab-equipe', 'view-equipe'] };
   var TITULOS = {
     b: ['Dashboard', 'Como está o escritório: clientes por fase, contratos, protocolos e resultados'],
     d: ['Cadastro', 'Clientes ainda sem requerimento no INSS: dados, documentos e prazo'],
@@ -7313,8 +7374,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     if (which === 'b') renderDash();
     renderFunil(); pintarPagina(); medirQuadros();
   }
-  Object.keys(VIEWS).forEach(function(k){ if (!telaDoFunil(k)) $(VIEWS[k][0]).addEventListener('click', function(){ showTab(k); }); });
-  $('tab-proc').addEventListener('click', function(){ showTab(ultimaFase); });
+  Object.keys(VIEWS).forEach(function(k){ $(VIEWS[k][0]).addEventListener('click', function(){ showTab(k); }); });
 
   try { var sv = sessionStorage.getItem('qe-view'); showTab(sv && VIEWS[sv] ? sv : 'b'); } catch(e){ showTab('b'); }
 
