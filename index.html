@@ -1748,6 +1748,8 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
 .kb-acao2 .kb-lnk{width:auto;font-size:10.5px;color:var(--ink-3)}
 .kb-acao2 .kb-lnk.verm:hover{color:hsl(var(--c-red))}
 .fc-guia{margin-bottom:6px}
+.fc-gps-cod{margin:4px 0 8px;padding:9.4px 11px;border:1px solid var(--line-2);border-radius:6px}
+.fc-gps-cod b{display:block;margin:4px 0 6px;font-size:13px;letter-spacing:.02em;color:var(--ink);word-break:break-word}
 .fc-guia-acoes{display:flex;flex-wrap:wrap;gap:7.5px;margin:4px 0 6px}
 .fc-guia-acoes .btn{height:30px;font-size:11.25px;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
 .fc-guia-acoes .i{width:14px;height:14px}
@@ -3222,14 +3224,12 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function fcResp(r, t){ return t === 'd' ? [r.atendente, r.atendenteEmail] : t === 'h' ? [r.filaPor, ''] : [r.posResp, r.posRespEmail]; }
   function fcGuia(r){
     if (!noContratos(r) || nascido(r)) return '';
-    var pago = gpsPaga(r), emitida = linhaGpsOk(r.gpsLinha);
+    var pago = gpsPaga(r), emitida = !!gpsGerar(r);
     return '<p class="fc-sec">Guia GPS (segurada facultativa)</p><div class="fc-guia">' +
-      fcLeitura('Código de pagamento', GPS_CODIGO + ' · plano simplificado (11%)') + fcLeitura('Valor', moedaTxt(gpsValor())) + fcLeitura('Prazo', prazoGps(r) ? fmtDate(prazoGps(r)) : 'informe a data do parto') + fcLeitura('Situação', pago ? 'Paga' + (r.guiaPagaEm ? ' em ' + fmtDate(r.guiaPagaEm) : '') : emitida ? 'Emitida' + (r.gpsEmitidaEm ? ' em ' + fmtDate(diaLocal(r.gpsEmitidaEm)) : '') + ', aguardando pagamento' : 'Ainda não emitida') + '</div>' +
+      fcLeitura('Código de pagamento', GPS_CODIGO + ' · plano simplificado (11%)') + fcLeitura('Valor', moedaTxt(gpsValor())) + fcLeitura('Prazo', prazoGps(r) ? fmtDate(prazoGps(r)) : 'informe a data do parto') + fcLeitura('Situação', pago ? 'Paga' + (r.guiaPagaEm ? ' em ' + fmtDate(r.guiaPagaEm) : '') : emitida ? 'Guia pronta, aguardando pagamento' : 'Falta o NIT para gerar a guia') + '</div>' +
       '<label class="fc-c"><span class="fc-rot">NIT / PIS da mãe</span><input id="fc-nit" class="tnum" inputmode="numeric" placeholder="000.00000.00-0" value="' + esc(r.nit ? nitFmt(r.nit) : '') + '"></label>' +
       '<label class="fc-c"><span class="fc-rot">Competência da guia</span><input id="fc-gps-comp" type="month" value="' + esc(gpsCompetencia(r)) + '"></label>' +
-      '<label class="fc-c"><span class="fc-rot">Código de barras da guia emitida (48 números)</span><input id="fc-gps-linha" class="tnum" inputmode="numeric" placeholder="Cole aqui a linha digitável" value="' + esc(r.gpsLinha || '') + '"></label>' +
-      '<div class="fc-guia-acoes"><a class="btn" href="' + GPS_SAL + '" target="_blank" rel="noopener" title="No SAL: Facultativo, NIT, Não sou um robô, Consultar, competência e valor">' + svgI('i-cash') + 'Abrir o SAL da Receita</a>' + (nitOk(r.nit) ? '<button type="button" class="btn" data-fc-copia="' + esc(digits(r.nit)) + '">' + svgI('i-copy') + 'Copiar NIT</button>' : '') + '</div>' +
-      '<p class="fc-nota">No SAL: categoria Facultativo, NIT, "Não sou um robô", Consultar; competência ' + esc(compTxt(gpsCompetencia(r))) + ', código ' + GPS_CODIGO + ', valor ' + esc(moedaTxt(gpsValor())) + '. Salve o PDF na pasta da cliente e cole o código de barras acima.</p>';
+      (function(){ var g = gpsGerar(r); return g ? '<div class="fc-gps-cod"><span class="fc-rot">Código de barras da GPS (gerado pelo sistema)</span><b class="tnum">' + esc(g.linha) + '</b><div class="fc-guia-acoes"><button type="button" class="btn" data-fc-copia="' + esc(g.digitos) + '">' + svgI('i-copy') + 'Copiar código de barras</button></div><p class="fc-nota">Competência ' + esc(compTxt(g.competencia)) + ' · vence ' + fmtDate(g.vencimento) + ' · ' + esc(moedaTxt(g.valor)) + '. Pague até o vencimento: depois dele o valor muda (juros).</p></div>' : '<p class="fc-nota">Informe o NIT da mãe e clique em Atualizar dados: o código de barras da GPS sai na hora.</p>'; })();
   }
   function fcDados(r){
     var t = faseDe(r), id = esc(r.id), resp = fcResp(r, t), etapaSel;
@@ -3294,9 +3294,9 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       if (nit && !nitOk(nit)){ toast('O NIT não confere (11 números com dígito verificador). Confira no CNIS da cliente.'); q('#fc-nit').focus(); return; }
       p.nit = nit ? nitFmt(nit) : '';
       if (q('#fc-gps-comp').value) p.gpsCompetencia = q('#fc-gps-comp').value;
-      var lin = digits(q('#fc-gps-linha').value);
-      if (lin && !linhaGpsOk(lin)){ toast('O código de barras da guia não confere. Confira os 48 números.'); q('#fc-gps-linha').focus(); return; }
-      if (lin !== digits(r.gpsLinha || '')){ p.gpsLinha = lin; p.gpsEmitidaEm = lin ? ag : ''; p.gpsValor = lin ? gpsValor() : ''; }
+      var gg = gpsGerar(Object.assign({}, r, { nit: p.nit, gpsCompetencia: p.gpsCompetencia || r.gpsCompetencia }));
+      var lin = gg ? gg.digitos : '';
+      if (lin !== digits(r.gpsLinha || '')){ p.gpsLinha = lin; p.gpsEmitidaEm = lin ? ag : ''; p.gpsValor = lin ? gg.valor : ''; p.gpsVencimento = lin ? gg.vencimento : ''; }
     }
     if (q('#fc-proc')){ var proc = q('#fc-proc').value.trim(); if (!proc){ toast('Informe o número do processo.'); return; } p.processo = proc; }
     if (q('#fc-resp')){
@@ -3326,7 +3326,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     pintarCard();
     lerSenhaCard();
     el.addEventListener('keydown', function(e){ if (e.key === 'Enter' && e.target.id === 'fc-senha-in'){ e.preventDefault(); salvarSenhaCard(); } });
-    el.addEventListener('input', function(e){ if (e.target.id === 'fc-senha-in'){ cardAberto.senha.txt = e.target.value; return; } if (e.target.closest('#fc-obs,#fc-prot,#fc-der,#fc-nb,#fc-proc,#fc-resp,#fc-nit,#fc-gps-comp,#fc-gps-linha')) cardAberto.sujo = true; });
+    el.addEventListener('input', function(e){ if (e.target.id === 'fc-senha-in'){ cardAberto.senha.txt = e.target.value; return; } if (e.target.closest('#fc-obs,#fc-prot,#fc-der,#fc-nb,#fc-proc,#fc-resp,#fc-nit,#fc-gps-comp')) cardAberto.sujo = true; });
     el.addEventListener('click', async function(e){
       if (e.target === el || e.target.closest('[data-fc-x]')){ pedirFecharCard(); return; }
       var ab = e.target.closest('.fc-abas button');
@@ -4033,7 +4033,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   }
   function tarefaPos(r){
     if (!noContratos(r)) return '';
-    if (gpsTarefa(r)) return (!nitOk(r.nit) ? 'Tarefa: pegar o NIT da mãe e emitir a GPS' : !linhaGpsOk(r.gpsLinha) ? 'Tarefa: emitir a GPS (código ' + GPS_CODIGO + ')' : 'Tarefa: pagar a GPS emitida') + (prazoGps(r) ? ' até ' + fmtDate(prazoGps(r)) : '');
+    if (gpsTarefa(r)) return (!nitOk(r.nit) ? 'Tarefa: pegar o NIT da mãe (a GPS sai sozinha)' : 'Tarefa: pagar a GPS (guia pronta)') + (prazoGps(r) ? ' até ' + fmtDate(prazoGps(r)) : '');
     if (gpsVencida(r) && String(r.dpp).slice(0, 10) <= iso(new Date())) return 'GPS não foi paga (venceu ' + fmtDate(gpsVencida(r)) + '): confira antes de encaminhar';
     if (posEtapaDe(r) === 'cert') return 'Tarefa: falar com a mãe e pedir a certidão';
     if (!nascido(r) && !r.dpp) return 'Tarefa: informar a data do parto';
@@ -4773,7 +4773,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       if (noCadastro(r) && prioridadeNasc(r) != null) add('Parto perto e sem contrato', r, 'parto em ' + prioridadeNasc(r) + ' dias');
       if (r.inssStatus === 'exigencia' && r.exigenciaPrazo){ var n = daysUntil(r.exigenciaPrazo); if (n != null && n <= 5) add('Exigência do INSS vencendo', r, n < 0 ? 'prazo venceu há ' + (-n) + ' dias' : 'faltam ' + n + ' dias'); }
       var respPos = primeiroNome(r.posResp || r.contratoPor), comResp = respPos ? ' · responsável: ' + respPos : '';
-      if (gpsTarefa(r)) add(!linhaGpsOk(r.gpsLinha) ? 'Emitir a GPS' : 'Pagar a GPS', r, (prazoGps(r) ? 'vence ' + fmtDate(prazoGps(r)) + ' · parto ' + fmtDate(r.dpp) : 'sem data do parto') + comResp);
+      if (gpsTarefa(r)) add(!nitOk(r.nit) ? 'Pegar o NIT para a GPS' : 'Pagar a GPS', r, (prazoGps(r) ? 'vence ' + fmtDate(prazoGps(r)) + ' · parto ' + fmtDate(r.dpp) : 'sem data do parto') + comResp);
       if (noContratos(r) && r.fatoGerador === 'gestante' && !r.criancaNasc && !r.dpp) add('Informar a data do parto', r, 'gestante sem data prevista');
       if (noContratos(r) && posEtapaDe(r) === 'cert') add('Falar com a mãe: pedir a certidão', r, (r.criancaNasc ? 'nasceu em ' + fmtDate(r.criancaNasc) : 'parto previsto ' + fmtDate(r.dpp)) + comResp);
       if (naFila(r) && filaEtapaDe(r) === 'conferir') add('Conferir a documentação', r, 'encaminhada ' + fmtDate(diaLocal(r.encaminhadoEm)) + ' · prazo ' + prazoTarefa(r.filaMudouEm || r.encaminhadoEm, 2));
@@ -4797,7 +4797,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   function abrirAvisos(){
     var l = avisosLista(), grupos = {};
     l.forEach(function(x){ (grupos[x.tipo] = grupos[x.tipo] || []).push(x); });
-    var ordem = ['Parto perto e sem contrato', 'Problema registrado', 'Emitir a GPS', 'Pagar a GPS', 'Informar a data do parto', 'Falar com a mãe: pedir a certidão', 'Cobrar documentos da mãe', 'Devolvida pela Controladoria', 'Conferir a documentação', 'Protocolar no INSS', 'Pôr o número do protocolo', 'Registrar o pagamento do benefício', 'Fazer o acerto de honorários', 'Exigência do INSS vencendo', 'Parada além do prazo', 'Cadastro repetido', 'Data para conferir'];
+    var ordem = ['Parto perto e sem contrato', 'Problema registrado', 'Pegar o NIT para a GPS', 'Pagar a GPS', 'Informar a data do parto', 'Falar com a mãe: pedir a certidão', 'Cobrar documentos da mãe', 'Devolvida pela Controladoria', 'Conferir a documentação', 'Protocolar no INSS', 'Pôr o número do protocolo', 'Registrar o pagamento do benefício', 'Fazer o acerto de honorários', 'Exigência do INSS vencendo', 'Parada além do prazo', 'Cadastro repetido', 'Data para conferir'];
     var f = document.createElement('div'); f.className = 'cid-sheet av-sheet';
     f.innerHTML = '<div><div class="av-cab"><b>Avisos</b><span>' + (l.length ? l.length + (l.length === 1 ? ' ponto para olhar' : ' pontos para olhar') : 'Nada pendente agora') + '</span></div><div class="lista av-lista">' +
       ordem.filter(function(k){ return grupos[k]; }).map(function(k){ return '<div class="av-g"><b>' + esc(k) + ' <span class="tnum">' + grupos[k].length + '</span></b>' + grupos[k].map(function(x){ return '<button type="button" data-av="' + esc(x.id) + '"><span>' + esc(x.nome) + '</span><small>' + esc(x.txt) + '</small></button>'; }).join('') + '</div>'; }).join('') +
@@ -5587,6 +5587,18 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       else { for (i = bl.length - 1, x = 2; i >= 0; i--, x = x === 9 ? 2 : x + 1) s += +bl[i] * x; var r11 = s % 11, c = r11 === 0 || r11 === 1 ? 0 : 11 - r11; if (c !== dv) return false; }
     }
     return true;
+  }
+  // código de barras da GPS (arrecadação): 8 5 8 + DV + valor(11) + 0270 (INSS) + código(4) + NIT(14) + competência AAAAMM + 3.
+  // Conferido número por número com 8 guias emitidas pelo SAL. O SAL só calcula: a guia não tem número de emissão.
+  function gpsDv(s){ var soma = 0, p = 2; for (var i = s.length - 1; i >= 0; i--){ soma += +s[i] * p; p = p === 9 ? 2 : p + 1; } var r = soma % 11; return r === 0 || r === 1 ? 0 : 11 - r; }
+  function gpsGerar(r){
+    if (!nitOk(r.nit)) return null;
+    var comp = gpsCompetencia(r), valor = gpsValor();
+    var sem = '858' + String(Math.round(valor * 100)).padStart(11, '0') + '0270' + GPS_CODIGO + digits(r.nit).padStart(14, '0') + comp.replace('-', '') + '3';
+    var cod = sem.slice(0, 3) + gpsDv(sem) + sem.slice(3);
+    var blocos = [0, 1, 2, 3].map(function(b){ var bl = cod.slice(b * 11, b * 11 + 11); return bl + '-' + gpsDv(bl); });
+    var p = comp.split('-').map(Number), v = new Date(p[0], p[1], 15), ds = v.getDay(); if (ds === 6) v.setDate(17); else if (ds === 0) v.setDate(16);
+    return { codigo: cod, linha: blocos.join(' '), digitos: blocos.join('').replace(/-/g, ''), valor: valor, competencia: comp, vencimento: iso(v) };
   }
   var FIN_HONORARIOS = 0.3;   // honorários: 30% do benefício + o valor da guia
   var finSessao = '', finPag = '', finQ = '', finParte = 'receita';
