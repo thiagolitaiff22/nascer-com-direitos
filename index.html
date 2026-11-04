@@ -2095,6 +2095,23 @@ html[data-fx="novo"] .dn-h1{order:0;margin:0;display:inline-flex;align-items:cen
 html[data-fx="novo"] .dn-h1-ico{width:36px;height:36px;display:grid;place-items:center;border:1px solid hsl(var(--c-line)/.7);border-radius:8px;background:hsl(var(--c-card));color:var(--ink-3)}
 html[data-fx="novo"] .dn-h1-ico .i{width:18px;height:18px}
 html[data-fx="novo"] .dn-sep{order:0;width:1px;height:24px;margin:0 6px;background:hsl(var(--c-line))}
+
+/* Dashboard do fluxo novo: gastos (guias e repasses) num cartão só, em colunas */
+html[data-fx="novo"]{--dn-azul:hsl(217 75% 52%)}
+html[data-fx="novo"][data-theme="dark"]{--dn-azul:hsl(217 85% 66%)}
+html[data-fx="novo"] .dn-gastos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:4px 0;border-radius:10px}
+html[data-fx="novo"] .dn-ind{padding:14px 18px;border-left:1px solid hsl(var(--c-line)/.7)}
+html[data-fx="novo"] .dn-ind:first-child{border-left:0}
+html[data-fx="novo"] .dn-ind.clic{cursor:pointer}
+html[data-fx="novo"] .dn-ind.clic:hover .dn-ind-t{color:var(--ink)}
+html[data-fx="novo"] .dn-ind-t{margin:0;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+html[data-fx="novo"] .dn-ind-v{margin:8px 0 0;font-size:22px;font-weight:700;line-height:1;color:var(--ink);white-space:nowrap}
+html[data-fx="novo"] .dn-ind-barra{height:3px;margin-top:10px;border-radius:3px;background:hsl(var(--c-sec));overflow:hidden}
+html[data-fx="novo"] .dn-ind-barra i{display:block;height:100%;border-radius:3px}
+html[data-fx="novo"] .dn-ind-l{margin:8px 0 0;font-size:11.5px;line-height:1.45;color:var(--ink-3)}
+html[data-fx="novo"] .dn-ind-x{margin:4px 0 0;font-size:11.5px;color:var(--ink-3)}
+html[data-fx="novo"] .dn-ind-x b{font-weight:600;color:var(--ink)}
+@media (max-width:1100px){ html[data-fx="novo"] .dn-gastos{grid-template-columns:repeat(2,minmax(0,1fr))} html[data-fx="novo"] .dn-ind:nth-child(3){border-left:0} }
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -5636,6 +5653,28 @@ html[data-fx="novo"] .dn-sep{order:0;width:1px;height:24px;margin:0 6px;backgrou
     }
     return '<div class="card dn-mapa"><div class="dn-mapa-esq">' + svg + '<p class="dn-mapa-leg"><i></i>mais mães, cor mais forte</p></div><div class="dn-mapa-dir">' + listaHtml + esc2 + '</div></div>';
   }
+  // coluna de indicador (como o Indicador do BI de Vendas): título em caixa alta, valor, barrinha da parte e legenda
+  function dnInd(rot, valor, pct, cor, legenda, extra, fn){
+    return '<div class="dn-ind' + (fn ? ' clic' : '') + '"' + (fn ? ' role="button" tabindex="0" data-fn="' + fn + '"' : '') + '><p class="dn-ind-t">' + esc(rot) + '</p><p class="dn-ind-v tnum">' + valor + '</p><div class="dn-ind-barra"><i style="width:' + Math.max(0, Math.min(100, pct)).toFixed(1) + '%;background:' + cor + '"></i></div><p class="dn-ind-l">' + legenda + '</p>' + (extra ? '<p class="dn-ind-x">' + extra + '</p>' : '') + '</div>';
+  }
+  function dnGastos(rows, no, noAnt){
+    var valG = function(r){ return Number(r.gpsValor) > 0 ? Number(r.gpsValor) : gpsValor(); };
+    var pagas = rows.filter(function(r){ return no(r.guiaPagaEm); }), G = pagas.reduce(function(a, r){ return a + valG(r); }, 0);
+    var pagasA = rows.filter(function(r){ return noAnt(r.guiaPagaEm); }).reduce(function(a, r){ return a + valG(r); }, 0);
+    var agora = rows.filter(gpsTarefa), prox = rows.filter(function(r){ return noContratos(r) && !rural(r) && !nascido(r) && !gpsPaga(r) && !gpsTarefa(r) && prazoGps(r); });
+    var com = comLinhas(), pagos = com.filter(function(x){ return x.pago && no(x.pago.pagoEm); }), R = pagos.reduce(function(a, x){ return a + (Number(x.pago.valor) || x.valor); }, 0);
+    var RA = com.filter(function(x){ return x.pago && noAnt(x.pago.pagoEm); }).reduce(function(a, x){ return a + (Number(x.pago.valor) || x.valor); }, 0);
+    var pend = com.filter(function(x){ return !x.pago; }), P = pend.reduce(function(a, x){ return a + x.valor; }, 0);
+    var pessoas = function(papel){ var s = {}; pagos.forEach(function(x){ if (x.papel === papel) s[x.pessoa.id] = 1; }); return Object.keys(s).length; }, nParc = pessoas('parc'), nPros = pessoas('pros');
+    var quem = [nParc ? plural(nParc, 'parceiro', 'parceiros') : '', nPros ? plural(nPros, 'prospectador', 'prospectadores') : ''].filter(Boolean).join(' e ');
+    var T = G + R, TA = pagasA + RA, prev = prox.length * gpsValor();
+    return '<div class="card dn-gastos">' +
+      dnInd('Total gasto', moedaTxt(T), 100, 'hsl(var(--c-pri))', 'guias + repasses no período' + dnVar(T, TA, true), 'Ainda a pagar: <b>' + moedaTxt(agora.length * gpsValor() + P) + '</b>') +
+      dnInd('Guias GPS', moedaTxt(G), T ? G / T * 100 : 0, 'var(--ser-2)', plural(pagas.length, 'guia paga', 'guias pagas') + ' · ' + moedaTxt(gpsValor()) + ' cada', agora.length ? 'Pagar agora: <b>' + plural(agora.length, 'guia', 'guias') + ' (' + moedaTxt(agora.length * gpsValor()) + ')</b>' : 'Nenhuma guia vencendo agora', 'gp') +
+      dnInd('Repasse a parceiros', moedaTxt(R), T ? R / T * 100 : 0, 'var(--dn-azul)', plural(pagos.length, 'pagamento', 'pagamentos') + (quem ? ' a ' + quem : ''), pend.length ? 'Pendente: <b>' + moedaTxt(P) + '</b> em ' + plural(pend.length, 'comissão', 'comissões') : 'Nenhuma comissão pendente', 'f') +
+      dnInd('Previsão de guias', moedaTxt(prev), T + prev ? prev / (T + prev) * 100 : 0, 'hsl(var(--c-line))', plural(prox.length, 'urbana ainda vai pagar', 'urbanas ainda vão pagar'), 'sai 5 dias antes do prazo de cada uma', 'gp') +
+      '</div>';
+  }
   function renderDashNovo(box){
     var rows = state.rows, j = dashJanela(), no = function(d){ d = diaLocal(d); return !!d && (!j.ini || d >= j.ini) && d <= j.fim; };
     var ant = null;
@@ -5665,6 +5704,7 @@ html[data-fx="novo"] .dn-sep{order:0;width:1px;height:24px;margin:0 6px;backgrou
         dnCard('i-clock', 'Do parto ao requerimento', tMedio == null ? '—' : tMedio + ' d', tMedio == null ? 'sem requerimentos no período' : 'média de ' + plural(tempos.length, 'requerimento', 'requerimentos')) +
         dnCard('i-users', 'Urbanas · Rurais', urbEnt + ' · ' + rurEnt, 'das que entraram no período') + '</div>' : ''));
     // fases numa linha fina, em vez de um balão por fase
+    var dnGastosHtml = isAdmin() ? dnSecao('Gastos do período', 'Guias GPS pagas no período (11% do salário mínimo cada) e repasses a parceiros e prospectadores com baixa no período (Financeiro › Comissões). Ainda a pagar: guias que venceram agora e comissões sem baixa.', dnGastos(rows, no, noAnt)) : '';
     html += '<div class="dn-fasesl" aria-label="Onde estão as mães agora"><span class="dn-fasesl-r">Agora</span>' + fasesAtivas().map(function(f){ return '<button type="button" data-fn="' + f[0] + '" title="' + esc(res[f[0]][1]) + '">' + svgI(f[1]) + esc(TITULOS[f[0]][0]) + '<b class="tnum">' + res[f[0]][0] + '</b></button>'; }).join('') + '</div>';
     // evolução + origem
     var baldes = dashBaldes(j, rows.map(dataCad).concat(rows.map(function(r){ return String(r.der || '').slice(0, 10); })).filter(Boolean)), corte = j.mensal ? 7 : 10;
@@ -5676,6 +5716,7 @@ html[data-fx="novo"] .dn-sep{order:0;width:1px;height:24px;margin:0 6px;backgrou
     var rosca = '<div class="card dn-origem"><p class="dash-graf-t">Origem das mães</p><p class="dash-graf-s">Como as mães chegaram no período</p>' + (ent.length ? dnRosca([{ nome: 'Indicação de parceiro', n: ind, cor: '--ser-1' }, { nome: 'Orgânico', n: org, cor: '--ser-2' }], ent.length, 'mães') +
       '<div class="dn-leg"><p><i style="background:var(--ser-1)"></i><span>Indicação de parceiro</span><b class="tnum">' + ind + '</b><small class="tnum">' + dnPct(ind, ent.length) + '</small></p><p><i style="background:var(--ser-2)"></i><span>Orgânico</span><b class="tnum">' + org + '</b><small class="tnum">' + dnPct(org, ent.length) + '</small></p></div>' +
       '<p class="dn-rodape">' + dnPct(ind, ent.length) + ' vieram de parceiros</p>' : '<div class="dn-vazio">Nenhuma mãe entrou no período</div>') + '</div>';
+    html += dnGastosHtml;
     html += dnSecao('Evolução e origem', '', '<div class="dn-evo"><div class="card dash-graf-card">' + cab + dashGrafico(dashSerie, Math.floor(box.clientWidth * 0.64 - 40)) + '</div>' + rosca + '</div>');
     if (dashTudo && isAdmin()){
       var gan = rows.filter(function(r){ return ganhou(r) && (j.ini ? no(dataGanho(r)) : true); }), acert = rows.filter(function(r){ return ganhou(r) && r.repasse && r.repasse.data && (j.ini ? no(r.repasse.data) : true); });
