@@ -1994,6 +1994,88 @@ html[data-fx="novo"] .cal-nav.pro{right:16px}
 html[data-fx="novo"] .cal-nav.pro .i{transform:rotate(-90deg)}
 html[data-fx="novo"] [data-per-aplicar]:disabled{opacity:.5;cursor:default}
 html:not([data-fx="novo"]) .pf-campo{display:none}
+
+/* Dashboard do Fluxo novo (estilo do BI de Vendas) */
+html[data-fx="novo"] #dash-box{display:flex;flex-direction:column;gap:22px}
+.dn-topo{align-items:center}
+.dn-atual{order:4;margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-3)}
+.dn-atual .i{width:13px;height:13px}
+.dn-sec{display:flex;flex-direction:column;gap:10px}
+.dn-tit{margin:0;display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--ink)}
+.dn-info{display:inline-flex;color:var(--ink-3);cursor:help}
+.dn-info .i{width:14px;height:14px}
+.dn-grade{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.dn-fases{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.dn-card{padding:12px 14px;display:flex;flex-direction:column;min-height:112px;border-radius:10px}
+.dn-card.clic{cursor:pointer;transition:border-color .15s}
+.dn-card.clic:hover{border-color:hsl(var(--c-pri)/.5)}
+.dn-rot{margin:0;display:flex;align-items:flex-start;gap:8px;font-size:12px;font-weight:500;line-height:15px;color:var(--ink-3)}
+.dn-rot .i{width:16px;height:16px;flex:none}
+.dn-v{margin:8px 0 0;font-size:22px;font-weight:600;line-height:1;letter-spacing:-.01em;color:var(--ink);white-space:nowrap}
+.dn-v.ok{color:hsl(var(--c-green))}
+.dn-v.alerta{color:hsl(var(--c-red))}
+.dn-sub{margin:6px 0 0;font-size:11.5px;line-height:1.45;color:var(--ink-3)}
+.dn-var{display:block;margin-top:2px}
+.dn-var b{font-weight:600}
+.dn-var b.bom{color:hsl(var(--c-green))}
+.dn-var b.ruim{color:hsl(var(--c-red))}
+.dn-mais{margin-top:0}
+.dn-alterna{display:flex;justify-content:flex-end}
+.dn-alterna button{height:28px;padding:0 12px;border:1px solid hsl(var(--c-line));border-radius:6px;background:hsl(var(--c-card));font:inherit;font-size:12px;color:var(--ink-3);display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.dn-alterna button:hover{color:var(--ink)}
+.dn-alterna .i{width:13px;height:13px}
+.dn-alterna button[aria-expanded="true"] .i{transform:rotate(180deg)}
+.dn-evo{display:grid;grid-template-columns:minmax(0,2fr) minmax(260px,1fr);gap:10px}
+.dn-origem{padding:14px 16px;display:flex;flex-direction:column}
+.dn-rosca{position:relative;width:132px;height:132px;margin:14px auto 0}
+.dn-rosca-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.dn-rosca-c b{font-size:22px;font-weight:600;line-height:1;color:var(--ink)}
+.dn-rosca-c span{margin-top:4px;font-size:11px;color:var(--ink-3)}
+.dn-leg{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.dn-leg p{margin:0;display:flex;align-items:center;gap:8px;font-size:12px}
+.dn-leg i{width:8px;height:8px;border-radius:50%;flex:none}
+.dn-leg span{flex:1;color:var(--ink-3)}
+.dn-leg b{font-weight:600;color:var(--ink)}
+.dn-leg small{width:40px;text-align:right;color:var(--ink-3)}
+.dn-rodape{margin:auto 0 0;padding-top:12px;border-top:1px solid hsl(var(--c-line)/.7);font-size:11.5px;color:var(--ink-3)}
+.dn-vazio{flex:1;display:flex;align-items:center;justify-content:center;padding:28px 0;font-size:12px;color:var(--ink-3);text-align:center}
+.dn-mapa{padding:16px;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:20px;align-items:start}
+.dn-mapa-esq{position:relative}
+.dn-mapa-svg{display:block;width:100%;height:auto;max-height:440px}
+.dn-mapa-vazio{aspect-ratio:520/470;width:100%;border-radius:8px;background:hsl(var(--c-sec)/.6)}
+.dn-uf{fill:hsl(var(--c-sec));stroke:hsl(var(--c-card));stroke-width:1}
+.dn-uf.tem{fill:hsl(var(--c-pri));cursor:pointer}
+.dn-uf.tem:hover{stroke:var(--ink);stroke-width:1.2}
+.dn-uf.esc{stroke:var(--ink);stroke-width:1.6}
+.dn-mapa-leg{position:absolute;left:2px;bottom:2px;margin:0;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink-3)}
+.dn-mapa-leg i{width:28px;height:8px;border-radius:4px;background:linear-gradient(90deg,hsl(var(--c-pri)/.28),hsl(var(--c-pri)/.9))}
+.dn-mapa-dir{display:flex;flex-direction:column;gap:12px;max-height:470px;overflow:auto;padding-right:2px}
+.dn-uf-bloco{display:flex;flex-direction:column;gap:4px}
+.dn-uf-lin,.dn-cid{width:100%;display:flex;align-items:center;gap:10px;border:0;border-radius:6px;font:inherit;text-align:left;cursor:pointer;color:var(--ink)}
+.dn-uf-lin{justify-content:space-between;padding:6px 10px;background:none}
+.dn-uf-lin span{display:inline-flex;align-items:center;gap:8px;font-size:13px}
+.dn-uf-lin small{font-size:12px;color:var(--ink-3)}
+.dn-uf-lin img{width:22px;height:15px;object-fit:cover;border:1px solid hsl(var(--c-line))}
+.dn-uf-lin:hover{background:hsl(var(--c-sec)/.7)}
+.dn-cid{padding:6px 10px 6px 24px;background:hsl(var(--c-sec)/.45);font-size:13px}
+.dn-cid:hover{background:hsl(var(--c-sec))}
+.dn-cid img,.dn-semflag{width:40px;height:28px;flex:none;object-fit:cover;border:1px solid hsl(var(--c-line));background:hsl(var(--c-card))}
+.dn-semflag{display:grid;place-items:center;border-style:dashed;color:var(--ink-3)}
+.dn-semflag .i{width:14px;height:14px}
+.dn-cid-n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dn-cid b,.dn-uf-lin > b{font-size:13px;font-weight:600}
+.dn-uf-lin.esc,.dn-cid.esc{background:hsl(var(--c-sec));box-shadow:inset 0 0 0 1px hsl(var(--c-pri))}
+.dn-quem{border:1px solid hsl(var(--c-line));border-radius:8px;padding:10px 12px}
+.dn-quem-cab{display:flex;justify-content:space-between;align-items:center;font-size:12px}
+.dn-quem-cab button{border:0;background:none;color:var(--ink-3);cursor:pointer;display:grid;place-items:center}
+.dn-quem-cab .i{width:14px;height:14px}
+.dn-quem ul{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.dn-quem li{display:flex;align-items:center;gap:6px;font-size:13px}
+.dn-quem li .nome-abrir{padding:0;border:0;background:none;font:inherit;color:var(--ink);cursor:pointer;text-align:left}
+.dn-quem li .nome-abrir:hover{text-decoration:underline}
+.dn-quem li small{color:var(--ink-3)}
+.dn-quem li span{margin-left:auto;font-size:11px;color:var(--ink-3)}
+@media (max-width:1100px){ .dn-grade{grid-template-columns:repeat(2,minmax(0,1fr))} .dn-evo,.dn-mapa{grid-template-columns:1fr} }
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2035,6 +2117,8 @@ html:not([data-fx="novo"]) .pf-campo{display:none}
   <symbol id="i-repeat" viewBox="0 0 24 24"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></symbol>
   <symbol id="i-cash" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></symbol>
   <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V11M10 20V4M16 20v-7M22 20H2"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.2a2.5 2.5 0 0 1 4.8 1c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17h.01"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6-5.6-6-11a6 6 0 0 1 12 0c0 5.4-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/></symbol>
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
   <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
   <symbol id="i-mover" viewBox="0 0 24 24"><path d="M8 3 4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/></symbol>
@@ -5470,8 +5554,131 @@ html:not([data-fx="novo"]) .pf-campo{display:none}
     return '<div class="card dash-rank"><p class="dash-rank-t">' + esc(tit) + '</p><table class="kb-tab dash-tab"><thead><tr><th style="width:30px">#</th><th>' + esc(cab[0]) + '</th>' + cab.slice(1).map(function(c){ return '<th class="dir">' + esc(c) + '</th>'; }).join('') + '</tr></thead><tbody>' +
       (linhas.length ? linhas.map(function(l, i){ return '<tr><td class="tnum">' + (i + 1) + '</td><td class="nome" title="' + esc(l[0]) + '">' + esc(l[0]) + '</td>' + l.slice(1).map(function(v){ return '<td class="dir tnum">' + v + '</td>'; }).join('') + '</tr>'; }).join('') : '<tr><td colspan="' + (cab.length + 1) + '" class="empty">' + esc(vazio) + '</td></tr>') + '</tbody></table></div>';
   }
+  /* ---------- Dashboard do Fluxo novo (estilo do BI de Vendas) ---------- */
+  var dashTudo = !!lerGuardado('nascer-dash-tudo', false), mapaGeo = null, mapaCarga = false, mapaEscolha = '', cidCarga = {};
+  var NOME_UF = { AC: 'Acre', AL: 'Alagoas', AP: 'Amapá', AM: 'Amazonas', BA: 'Bahia', CE: 'Ceará', DF: 'Distrito Federal', ES: 'Espírito Santo', GO: 'Goiás', MA: 'Maranhão', MT: 'Mato Grosso', MS: 'Mato Grosso do Sul', MG: 'Minas Gerais', PA: 'Pará', PB: 'Paraíba', PR: 'Paraná', PE: 'Pernambuco', PI: 'Piauí', RJ: 'Rio de Janeiro', RN: 'Rio Grande do Norte', RS: 'Rio Grande do Sul', RO: 'Rondônia', RR: 'Roraima', SC: 'Santa Catarina', SP: 'São Paulo', SE: 'Sergipe', TO: 'Tocantins' };
+  var SIGLA_IBGE = { 11: 'RO', 12: 'AC', 13: 'AM', 14: 'RR', 15: 'PA', 16: 'AP', 17: 'TO', 21: 'MA', 22: 'PI', 23: 'CE', 24: 'RN', 25: 'PB', 26: 'PE', 27: 'AL', 28: 'SE', 29: 'BA', 31: 'MG', 32: 'ES', 33: 'RJ', 35: 'SP', 41: 'PR', 42: 'SC', 43: 'RS', 50: 'MS', 51: 'MT', 52: 'GO', 53: 'DF' };
+  function dnCard(ico, rot, valor, sub, tom, info, fn){
+    return '<div class="card dn-card' + (fn ? ' clic' : '') + '"' + (fn ? ' role="button" tabindex="0" data-fn="' + fn + '"' : '') + (info ? ' title="' + esc(info) + '"' : '') + '><p class="dn-rot">' + svgI(ico) + '<span>' + esc(rot) + '</span></p><p class="dn-v tnum' + (tom ? ' ' + tom : '') + '">' + valor + '</p><p class="dn-sub">' + sub + '</p></div>';
+  }
+  function dnVar(atual, antes, menorMelhor){
+    if (atual == null || antes == null || !antes) return '<span class="dn-var">sem base anterior</span>';
+    var v = (atual - antes) / antes * 100, bom = menorMelhor ? v < 0 : v > 0;
+    return '<span class="dn-var"><b class="' + (Math.abs(v) < 0.5 ? '' : bom ? 'bom' : 'ruim') + '">' + (v > 0 ? '+' : '') + (Math.round(v * 10) / 10).toLocaleString('pt-BR') + '%</b> vs anterior</span>';
+  }
+  function dnSecao(tit, info, html){ return '<section class="dn-sec"><h2 class="dn-tit">' + esc(tit) + (info ? '<span class="dn-info" title="' + esc(info) + '">' + svgI('i-help') + '</span>' : '') + '</h2>' + html + '</section>'; }
+  function dnPct(a, b){ return b ? Math.round(a / b * 100) + '%' : '—'; }
+  function dnRosca(partes, total, rotCentro){
+    var R0 = 54, C = 2 * Math.PI * R0, ac = 0, arcos = partes.filter(function(p){ return p.n > 0; }).map(function(p){ var l = total ? p.n / total * C : 0, g = partes.filter(function(x){ return x.n > 0; }).length > 1 ? 3 : 0; var s = '<circle cx="66" cy="66" r="' + R0 + '" fill="none" stroke="var(' + p.cor + ')" stroke-width="16" stroke-dasharray="' + Math.max(0, l - g).toFixed(2) + ' ' + C.toFixed(2) + '" stroke-dashoffset="' + (-ac).toFixed(2) + '" transform="rotate(-90 66 66)"><title>' + esc(p.nome) + ': ' + p.n + '</title></circle>'; ac += l; return s; }).join('');
+    return '<div class="dn-rosca"><svg viewBox="0 0 132 132" width="132" height="132" role="img" aria-label="' + esc(rotCentro) + '"><circle cx="66" cy="66" r="' + R0 + '" fill="none" stroke="hsl(var(--c-sec))" stroke-width="16"/>' + arcos + '</svg><div class="dn-rosca-c"><b class="tnum">' + total + '</b><span>' + esc(rotCentro) + '</span></div></div>';
+  }
+  function mapaCarregar(){
+    if (mapaGeo || mapaCarga) return; mapaCarga = true;
+    fetch('img/geo/br-uf.json').then(function(r){ return r.json(); }).then(function(j){ mapaGeo = j; renderDash(); }).catch(function(){ mapaCarga = false; });
+  }
+  function cidadesUfMapa(uf){
+    var l = lerLS('nascer-cid2-' + uf); if (l || cidCarga[uf]) return l; cidCarga[uf] = 1;
+    fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados/' + uf + '/municipios?orderBy=nome').then(function(r){ return r.json(); }).then(function(x){
+      var n = (x || []).map(function(m){ return { i: String(m.id), n: m.nome }; }); if (n.length){ try { localStorage.setItem('nascer-cid2-' + uf, JSON.stringify(n)); } catch(e){} renderDash(); }
+    }).catch(function(){});
+    return null;
+  }
+  function soCidade(r){ var c = String(r.cidade || '').trim(), uf = ufDaCliente(r); return uf ? c.replace(new RegExp('[\\s/,.-]+' + uf + '$', 'i'), '').trim() : c; }
+  function dnMapa(lista){
+    mapaCarregar();
+    var porUf = {}, porCid = {};
+    lista.forEach(function(r){ var uf = ufDaCliente(r); if (!uf) return; porUf[uf] = (porUf[uf] || 0) + 1; var c = soCidade(r) || ''; var k = uf + '|' + c; (porCid[k] = porCid[k] || { uf: uf, cidade: c, rows: [] }).rows.push(r); });
+    var max = Math.max.apply(null, Object.keys(porUf).map(function(k){ return porUf[k]; }).concat([1]));
+    var L = 520, A = 470, svg = '<div class="dn-mapa-vazio"></div>';
+    if (mapaGeo){
+      var minX = 180, maxX = -180, minY = 90, maxY = -90;
+      var cada = function(g, fn){ (g.type === 'Polygon' ? [g.coordinates] : g.coordinates).forEach(function(poly){ poly.forEach(function(anel){ anel.forEach(fn); }); }); };
+      mapaGeo.features.forEach(function(f){ cada(f.geometry, function(p){ if (p[0] < minX) minX = p[0]; if (p[0] > maxX) maxX = p[0]; if (p[1] < minY) minY = p[1]; if (p[1] > maxY) maxY = p[1]; }); });
+      var k = Math.min((L - 12) / (maxX - minX), (A - 12) / (maxY - minY)), ox = (L - (maxX - minX) * k) / 2, oy = (A - (maxY - minY) * k) / 2;
+      var px = function(p){ return (ox + (p[0] - minX) * k).toFixed(1) + ',' + (oy + (maxY - p[1]) * k).toFixed(1); };
+      svg = '<svg viewBox="0 0 ' + L + ' ' + A + '" class="dn-mapa-svg" role="img" aria-label="Mapa do Brasil com as mães por estado">' + mapaGeo.features.map(function(f){
+        var uf = SIGLA_IBGE[f.properties.codarea], n = porUf[uf] || 0, d = (f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.coordinates).map(function(poly){ return poly.map(function(anel){ return 'M' + anel.map(px).join('L') + 'Z'; }).join(''); }).join('');
+        return '<path d="' + d + '" class="dn-uf' + (n ? ' tem' : '') + (mapaEscolha === uf + '|*' ? ' esc' : '') + '"' + (n ? ' data-mapa="' + uf + '|*" style="fill-opacity:' + (0.28 + 0.62 * n / max).toFixed(2) + '"' : '') + '><title>' + esc((NOME_UF[uf] || uf) + ': ' + plural(n, 'mãe', 'mães')) + '</title></path>';
+      }).join('') + '</svg>';
+    }
+    var ufs = Object.keys(porUf).sort(function(a, b){ return porUf[b] - porUf[a] || a.localeCompare(b); });
+    var listaHtml = ufs.length ? ufs.map(function(uf){
+      var cids = Object.keys(porCid).filter(function(c){ return porCid[c].uf === uf; }).map(function(c){ return porCid[c]; }).sort(function(a, b){ return b.rows.length - a.rows.length || a.cidade.localeCompare(b.cidade, 'pt'); });
+      cidadesUfMapa(uf);
+      return '<div class="dn-uf-bloco"><button type="button" class="dn-uf-lin' + (mapaEscolha === uf + '|*' ? ' esc' : '') + '" data-mapa="' + uf + '|*"><span>' + flagUfImg(uf) + '<b>' + esc(NOME_UF[uf] || uf) + '</b> <small>· ' + uf + '</small></span><b class="tnum">' + porUf[uf] + '</b></button>' +
+        cids.map(function(c){ var u = c.cidade ? bandeiraDaCidade(uf, c.cidade) : '', ch = uf + '|' + c.cidade;
+          return '<button type="button" class="dn-cid' + (mapaEscolha === ch ? ' esc' : '') + '" data-mapa="' + esc(ch) + '">' + (u ? '<img src="' + esc(u) + '" alt="Bandeira de ' + esc(c.cidade) + '" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'dn-semflag\'}))">' : '<span class="dn-semflag">' + svgI('i-pin') + '</span>') + '<span class="dn-cid-n">' + esc(c.cidade || 'Cidade não informada') + '</span><b class="tnum">' + c.rows.length + '</b></button>'; }).join('') + '</div>';
+    }).join('') : '<p class="dn-vazio">Nenhuma mãe com cidade ou estado no período.</p>';
+    var esc2 = '';
+    if (mapaEscolha){
+      var p = mapaEscolha.split('|'), quem = p[1] === '*' ? lista.filter(function(r){ return ufDaCliente(r) === p[0]; }) : ((porCid[mapaEscolha] || {}).rows || []);
+      esc2 = '<div class="dn-quem"><div class="dn-quem-cab"><b>' + esc(p[1] === '*' ? (NOME_UF[p[0]] || p[0]) : p[1] + '/' + p[0]) + ' (' + quem.length + ')</b><button type="button" data-mapa-fechar aria-label="Fechar lista">' + svgI('i-x') + '</button></div><ul>' +
+        quem.map(function(r){ return '<li><button type="button" class="nome-abrir" data-act="abrir" data-id="' + esc(r.id) + '">' + esc(r.nome || 'Sem nome') + '</button>' + (p[1] === '*' && soCidade(r) ? '<small> · ' + esc(soCidade(r)) + '</small>' : '') + '<span class="tnum">' + fmtDate(dataCad(r)) + '</span></li>'; }).join('') + '</ul></div>';
+    }
+    return '<div class="card dn-mapa"><div class="dn-mapa-esq">' + svg + '<p class="dn-mapa-leg"><i></i>mais mães, cor mais forte</p></div><div class="dn-mapa-dir">' + listaHtml + esc2 + '</div></div>';
+  }
+  function renderDashNovo(box){
+    var rows = state.rows, j = dashJanela(), no = function(d){ d = diaLocal(d); return !!d && (!j.ini || d >= j.ini) && d <= j.fim; };
+    var ant = null;
+    if (j.ini){ var di = parseDate(j.ini), df = parseDate(j.fim), len = Math.round((df - di) / 864e5) + 1, af = new Date(di); af.setDate(af.getDate() - 1); var ai = new Date(af); ai.setDate(ai.getDate() - len + 1); ant = { ini: iso(ai), fim: iso(af) }; }
+    var noAnt = function(d){ d = diaLocal(d); return !!ant && !!d && d >= ant.ini && d <= ant.fim; };
+    var conta = function(f, campo){ return rows.filter(function(r){ return f(campo(r)); }).length; };
+    var ent = rows.filter(function(r){ return no(dataCad(r)); }), entA = ant ? conta(noAnt, dataCad) : null;
+    var gps = conta(no, function(r){ return r.guiaPagaEm; }), gpsA = ant ? conta(noAnt, function(r){ return r.guiaPagaEm; }) : null;
+    var req = rows.filter(function(r){ return no(r.der); }), reqA = ant ? conta(noAnt, function(r){ return r.der; }) : null;
+    var conc = rows.filter(function(r){ return r.inssStatus === 'concedido' && no(r.inssDecisaoEm); }).length, concA = ant ? rows.filter(function(r){ return r.inssStatus === 'concedido' && noAnt(r.inssDecisaoEm); }).length : null;
+    var indef = rows.filter(function(r){ return r.inssStatus === 'indeferido' && no(r.inssDecisaoEm); }).length;
+    var urbEnt = ent.filter(function(r){ return tipoChave(r) === 'urbana'; }).length, rurEnt = ent.filter(rural).length;
+    var tempos = req.filter(function(r){ return r.criancaNasc; }).map(function(r){ return Math.round((parseDate(String(r.der).slice(0, 10)) - parseDate(String(r.criancaNasc).slice(0, 10))) / 864e5); }).filter(function(n){ return n >= 0; });
+    var tMedio = tempos.length ? Math.round(tempos.reduce(function(a, b){ return a + b; }, 0) / tempos.length) : null;
+    var res = resumoFases(), html = '';
+    var curta = function(d, ano){ var p = String(d).split('-'); return p[2] + '/' + p[1] + (ano ? '/' + p[0].slice(2) : ''); };
+    var faixa = j.ini ? (j.ini === j.fim ? curta(j.fim, 1) : curta(j.ini, j.ini.slice(0, 4) !== j.fim.slice(0, 4)) + ' – ' + curta(j.fim, 1)) : 'todo o período';
+    html += '<div class="fbar dn-topo">' + dashPeriodo(j) + '<span class="tb-fim fb-count tnum">' + esc(faixa) + '</span><span class="dn-atual">' + svgI('i-sync') + 'Atualizado às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + '</span></div>';
+    html += dnSecao('Jornada da mãe', 'Quantas mães passaram por cada marco no período escolhido, comparado com o período anterior de mesmo tamanho.', '<div class="dn-grade">' +
+      dnCard('i-users', 'Mães que entraram', ent.length, 'qualificadas e com contrato' + dnVar(ent.length, entA)) +
+      dnCard('i-cash', 'GPS pagas', gps, 'urbanas · ' + plural(urbEnt, 'entrou', 'entraram') + ' no período' + dnVar(gps, gpsA)) +
+      dnCard('i-file', 'Requerimentos feitos', req.length, (tMedio != null ? 'em média ' + tMedio + ' dias após o parto' : 'no INSS no período') + dnVar(req.length, reqA)) +
+      dnCard('i-check', 'Benefícios concedidos', conc, dnPct(conc, conc + indef) + ' dos decididos' + dnVar(conc, concA), conc ? 'ok' : '') + '</div>' +
+      (dashTudo ? '<div class="dn-grade dn-mais">' +
+        dnCard('i-x', 'Indeferidos', indef, indef ? 'vão para o Judicial' : 'nenhum no período', indef ? 'alerta' : '') +
+        dnCard('i-scale', 'Taxa de concessão', dnPct(conc, conc + indef), conc + ' de ' + (conc + indef) + ' decididos') +
+        dnCard('i-clock', 'Do parto ao requerimento', tMedio == null ? '—' : tMedio + ' d', tMedio == null ? 'sem requerimentos no período' : 'média de ' + plural(tempos.length, 'requerimento', 'requerimentos')) +
+        dnCard('i-users', 'Urbanas · Rurais', urbEnt + ' · ' + rurEnt, 'das que entraram no período') + '</div>' : '') +
+      '<div class="dn-alterna"><button type="button" data-dash-tudo aria-expanded="' + dashTudo + '">' + svgI('i-chev') + (dashTudo ? 'Resumir' : 'Mostrar tudo') + '</button></div>');
+    html += dnSecao('Onde estão as mães agora', 'Quantas estão em cada fase hoje. Clique para abrir a fase.', '<div class="dn-grade dn-fases">' + fasesAtivas().map(function(f){ return dnCard(f[1], TITULOS[f[0]][0], res[f[0]][0], esc(res[f[0]][1]), '', '', f[0]); }).join('') + '</div>');
+    // evolução + origem
+    var baldes = dashBaldes(j, rows.map(dataCad).concat(rows.map(function(r){ return String(r.der || '').slice(0, 10); })).filter(Boolean)), corte = j.mensal ? 7 : 10;
+    var serie = function(lista, data){ return baldes.map(function(b){ return lista.filter(function(r){ return diaLocal(data(r)).slice(0, corte) === b.k; }).length; }); };
+    dashSerie = { mensal: j.mensal, na: 'Entradas', nb: 'Requerimentos', rot: baldes.map(function(b){ return b.rot; }), a: serie(ent, dataCad), b: serie(req, function(r){ return r.der; }) };
+    var soma = function(v){ return v.reduce(function(a, x){ return a + x; }, 0); };
+    var cab = '<div class="dash-graf-cab"><div><p class="dash-graf-t">Evolução no período</p><p class="dash-graf-s">Entradas e requerimentos por ' + (j.mensal ? 'mês' : 'dia') + '</p></div><div class="dash-graf-dir"><div class="dash-leg"><div><p><i style="background:var(--ser-1)"></i>Entradas</p><b class="tnum">' + soma(dashSerie.a) + '</b></div><div><p><i style="background:var(--ser-2)"></i>Requerimentos</p><b class="tnum">' + soma(dashSerie.b) + '</b></div></div></div></div>';
+    var ind = ent.filter(function(r){ return r.responsavelId; }).length, org = ent.length - ind;
+    var rosca = '<div class="card dn-origem"><p class="dash-graf-t">Origem das mães</p><p class="dash-graf-s">Como as mães chegaram no período</p>' + (ent.length ? dnRosca([{ nome: 'Indicação de parceiro', n: ind, cor: '--ser-1' }, { nome: 'Orgânico', n: org, cor: '--ser-2' }], ent.length, 'mães') +
+      '<div class="dn-leg"><p><i style="background:var(--ser-1)"></i><span>Indicação de parceiro</span><b class="tnum">' + ind + '</b><small class="tnum">' + dnPct(ind, ent.length) + '</small></p><p><i style="background:var(--ser-2)"></i><span>Orgânico</span><b class="tnum">' + org + '</b><small class="tnum">' + dnPct(org, ent.length) + '</small></p></div>' +
+      '<p class="dn-rodape">' + dnPct(ind, ent.length) + ' vieram de parceiros</p>' : '<div class="dn-vazio">Nenhuma mãe entrou no período</div>') + '</div>';
+    html += dnSecao('Evolução e origem', '', '<div class="dn-evo"><div class="card dash-graf-card">' + cab + dashGrafico(dashSerie, Math.floor(box.clientWidth * 0.64 - 40)) + '</div>' + rosca + '</div>');
+    if (isAdmin()){
+      var gan = rows.filter(function(r){ return ganhou(r) && (j.ini ? no(dataGanho(r)) : true); }), acert = rows.filter(function(r){ return ganhou(r) && r.repasse && r.repasse.data && (j.ini ? no(r.repasse.data) : true); });
+      html += dnSecao('Financeiro', 'Benefícios ganhos no período (INSS e Judicial), honorários e o que já foi acertado.', '<div class="dn-grade">' +
+        dnCard('i-check', 'Ganhos', gan.length, 'benefícios ganhos', '', '', 'f') +
+        dnCard('i-scale', 'Benefícios', moedaTxt(gan.reduce(function(a, r){ return a + valorBenef(r); }, 0)), 'soma dos benefícios ganhos', '', '', 'f') +
+        dnCard('i-cash', 'Honorários', moedaTxt(gan.reduce(function(a, r){ return a + honorarios(r); }, 0)), 'dos benefícios ganhos', '', '', 'f') +
+        dnCard('i-cash', 'Recebido', moedaTxt(acert.reduce(function(a, r){ return a + honorarios(r); }, 0)), plural(acert.length, 'acerto feito', 'acertos feitos'), '', '', 'f') + '</div>');
+    }
+    html += dnSecao('Mapa das mães', 'Mães que entraram no período, por estado e cidade. Clique no estado ou na cidade para ver quem são.', dnMapa(ent));
+    var porParc = {}, porResp = {};
+    ent.forEach(function(r){ if (!r.responsavelId) return; porParc[r.responsavelId] = (porParc[r.responsavelId] || 0) + 1; });
+    rows.filter(function(r){ return fechado(r) || naFila(r); }).forEach(function(r){ var n = r.posResp || 'Sem responsável'; porResp[n] = (porResp[n] || 0) + 1; });
+    var rkP = Object.keys(porParc).map(function(id){ var p = prospById(id); return [p ? (p.tipo === 'clinica' && p.clinica ? p.clinica : p.nome) : 'Parceiro removido', porParc[id]]; }).sort(function(a, b){ return b[1] - a[1] || a[0].localeCompare(b[0], 'pt'); }).slice(0, 8);
+    var rkR = Object.keys(porResp).map(function(n){ return [n, porResp[n]]; }).sort(function(a, b){ return b[1] - a[1] || a[0].localeCompare(b[0], 'pt'); }).slice(0, 8);
+    html += dnSecao('Rankings', '', '<div class="dash-duo">' + dashRanking('Mães por parceiro', ['Parceiro', 'Mães'], rkP, 'Nenhuma mãe de parceiro no período.') + dashRanking('Em andamento por responsável', ['Responsável', 'Clientes'], rkR, 'Ninguém em andamento.') + '</div>');
+    box.innerHTML = html;
+    if (perAberto) pintarCalendario();
+  }
   function renderDash(){
     var box = $('dash-box'); if (!box || $('view-dash').hidden) return;
+    if (fluxoVista === 'novo'){ renderDashNovo(box); return; }
     var rows = state.rows, j = dashJanela(), no = function(d){ d = diaLocal(d); return !!d && d >= j.ini && d <= j.fim; };
     var curta = function(d, ano){ var p = String(d).split('-'); return p[2] + '/' + p[1] + (ano ? '/' + p[0].slice(2) : ''); };
     var faixa = fluxoVista === 'novo' ? (j.ini ? (j.ini === j.fim ? curta(j.fim, 1) : curta(j.ini, j.ini.slice(0, 4) !== j.fim.slice(0, 4)) + ' – ' + curta(j.fim, 1)) : 'todo o período') : (j.ini ? fmtDate(j.ini) + ' a ' + fmtDate(j.fim) : 'desde o início');
@@ -5536,6 +5743,10 @@ html:not([data-fx="novo"]) .pf-campo{display:none}
     if (perAberto) pintarCalendario();
   }
   $('dash-box').addEventListener('click', function(e){
+    var dt = e.target.closest('[data-dash-tudo]'); if (dt){ dashTudo = !dashTudo; guardar('nascer-dash-tudo', dashTudo); renderDash(); return; }
+    var mf = e.target.closest('[data-mapa-fechar]'); if (mf){ mapaEscolha = ''; renderDash(); return; }
+    var mp = e.target.closest('[data-mapa]'); if (mp){ mapaEscolha = mapaEscolha === mp.dataset.mapa ? '' : mp.dataset.mapa; renderDash(); return; }
+    var ab0 = e.target.closest('[data-act="abrir"]'); if (ab0){ abrirCard(ab0.dataset.id); return; }
     var ab = e.target.closest('[data-per-abrir]');
     if (ab){ var pp = ab.parentNode.querySelector('.per-pop'); pp.hidden = !pp.hidden; perAberto = !pp.hidden; ab.setAttribute('aria-expanded', String(perAberto)); if (perAberto) pintarCalendario(); return; }
     var cd = e.target.closest('[data-cal-dia]');
