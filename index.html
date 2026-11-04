@@ -2113,6 +2113,36 @@ html[data-fx="novo"] .dn-ind-x{margin:4px 0 0;font-size:11.5px;color:var(--ink-3
 html[data-fx="novo"] .dn-ind-x b{font-weight:600;color:var(--ink)}
 @media (max-width:1100px){ html[data-fx="novo"] .dn-gastos{grid-template-columns:repeat(2,minmax(0,1fr))} html[data-fx="novo"] .dn-ind:nth-child(3){border-left:0} }
 
+
+/* Parceiros do fluxo novo */
+html:not([data-fx="novo"]) #parc-novo{display:none}
+html[data-fx="novo"] #view-parc > :not(#parc-novo){display:none!important}
+html[data-fx="novo"] #parc-novo{display:flex;flex-direction:column;gap:16px}
+html[data-fx="novo"] .parcn-seg{order:1;display:inline-flex;gap:2px;margin-right:auto;padding:3px;border:1px solid hsl(var(--c-line)/.7);border-radius:6px;background:hsl(var(--c-card))}
+html[data-fx="novo"] .parcn-seg button{height:28px;padding:0 12px;border:0;border-radius:4px;background:none;font:inherit;font-size:12px;color:var(--ink-3);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+html[data-fx="novo"] .parcn-seg button span{font-size:11px;color:var(--ink-3)}
+html[data-fx="novo"] .parcn-seg button:hover{color:var(--ink)}
+html[data-fx="novo"] .parcn-seg button[aria-pressed="true"]{background:hsl(var(--c-pri)/.12);color:hsl(var(--c-pri));font-weight:600}
+html[data-fx="novo"] .parcn-seg button[aria-pressed="true"] span{color:hsl(var(--c-pri))}
+html[data-fx="novo"] .parcn-bar > .search{margin-left:0}
+html[data-fx="novo"] .parcn-bar .parcn-novo{order:3;height:36px}
+html[data-fx="novo"] .parcn-tab td{vertical-align:middle}
+html[data-fx="novo"] .parcn-tab td.nome b{font-weight:600}
+html[data-fx="novo"] .parcn-tab td small{display:block;margin-top:2px;font-size:11.5px;color:var(--ink-3);white-space:normal}
+html[data-fx="novo"] .parcn-tab tr.pausado td{opacity:.6}
+html[data-fx="novo"] .parcn-tab tbody tr[data-parcn]{cursor:pointer}
+html[data-fx="novo"] .parcn-com{font-size:12px!important;color:var(--ink)!important;line-height:1.4}
+html[data-fx="novo"] .parcn-quem{font-weight:500}
+html[data-fx="novo"] .parcn-dir{color:var(--ink-3)}
+html[data-fx="novo"] .parcn-pend{color:hsl(var(--c-pri));font-weight:600}
+html[data-fx="novo"] .parcn-pausa{margin-left:6px;padding:1px 6px;border-radius:4px;background:hsl(var(--c-sec));font-size:10.5px;font-weight:500;color:var(--ink-3)}
+.parcn-dlg{width:min(640px,calc(100vw - 32px))}
+.parcn-dlg .parcn-nota{grid-column:1 / -1;margin:0;font-size:12px;line-height:1.5;color:var(--ink-3)}
+.parcn-dlg .parcn-nota b{font-weight:600;color:var(--ink)}
+.parcn-dlg .fin-valor{width:100%;text-align:left}
+.parcn-dlg .field[hidden]{display:none}
+.parcn-dlg .chk{justify-content:flex-start;font-size:13px;font-weight:500;color:var(--ink)}
+.parcn-dlg .chk input{flex:none;width:16px!important;height:16px!important;min-height:0!important;margin:0!important;padding:0!important}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2547,6 +2577,7 @@ html[data-fx="novo"] .dn-ind-x b{font-weight:600;color:var(--ink)}
 
 
       <section id="view-parc" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18px">
+        <div id="parc-novo"></div>
         <div class="sec-title" id="reg-titulo">Regiões de atuação</div>
         <div class="prosp-head" id="reg-intro">
           <p class="view-desc">Cada estado tem um responsável e os parceiros que atuam nele. Clique em um estado para ver os parceiros.</p>
@@ -5692,6 +5723,173 @@ html[data-fx="novo"] .dn-ind-x b{font-weight:600;color:var(--ink)}
       dnCard('i-clock', 'A receber', moedaTxt(soma(aRec)), plural(aRec.length, 'ganho sem acerto', 'ganhos sem acerto') + l2('desde o início'), '', '', 'f') +
       dnCard('i-scale', 'Resultado líquido', moedaTxt(liq), 'recebido − guias e repasses' + dnVar(liq, liqA != null && liqA > 0 && liq >= 0 ? liqA : null), liq > 0 ? 'ok' : liq < 0 ? 'alerta' : '', '', 'f') + '</div>';
   }
+  /* ---------- Parceiros do Fluxo novo: Brasil todo; prospectadores fecham com clínicas grandes ---------- */
+  var PARC_TIPOS = [['maternidade', 'Maternidade / hospital'], ['clinica', 'Clínica'], ['consultorio', 'Consultório médico'], ['outro', 'Outra instituição'], ['agente', 'Agente de saúde'], ['pessoa', 'Pessoa']];
+  function parcPessoa(t){ return t === 'agente' || t === 'pessoa'; }
+  var UFS = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'];
+  var parcAba = 'parc', parcNQ = '', parcNSit = 'ativos', parcNTipo = '', parcNPros = '';
+  function parcTipo(p){ return p.tipoParceiro || (p.tipo === 'clinica' ? 'clinica' : 'pessoa'); }
+  function parcTipoNome(p){ var t = parcTipo(p); return (PARC_TIPOS.filter(function(x){ return x[0] === t; })[0] || [0, 'Outro'])[1]; }
+  function parcNome(p){ return p.tipo === 'clinica' && p.clinica ? p.clinica : (p.nome || 'Sem nome'); }
+  function parcUf(p){ return String(p.ufParc || p.regiaoId || '').slice(0, 2).toUpperCase(); }
+  function parcLocal(p){ return [p.cidadeParc || p.regiao || '', parcUf(p)].filter(Boolean).join('/'); }
+  function parcValores(a, b){ a = Number(a) || 0; b = Number(b) || 0; if (!a && !b) return ''; return (a ? moedaTxt(a) + ' na entrada' : '') + (a && b ? ' · ' : '') + (b ? moedaTxt(b) + ' no benefício' : ''); }
+  function mascDoc(v){
+    var d = digits(v).slice(0, 14);
+    if (d.length <= 11) return d.replace(/^(\d{3})(\d)/, '$1.$2').replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3').replace(/\.(\d{3})(\d{1,2})$/, '.$1-$2');
+    return d.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{0,2}).*/, '$1.$2.$3/$4-$5');
+  }
+  function renderParcNovo(){
+    var box = $('parc-novo'); if (!box) return;
+    if (fluxoVista !== 'novo'){ if (box.innerHTML) box.innerHTML = ''; return; }
+    var rows = state.rows, mes = iso(new Date()).slice(0, 7), com = comLinhas(), adm = isAdmin();
+    var parcs = soParceiros(), pros = state.prosp.filter(ehProspectador);
+    var ativos = parcs.filter(function(p){ return p.ativo !== false; }), prosAt = pros.filter(function(p){ return p.ativo !== false; });
+    var maesDe = function(ids){ return rows.filter(function(r){ return r.responsavelId && ids.indexOf(r.responsavelId) >= 0; }); };
+    var doMes = function(l){ return l.filter(function(r){ return dataCad(r).slice(0, 7) === mes; }).length; };
+    var soma = function(l){ return l.reduce(function(a, x){ return a + (x.pago ? Number(x.pago.valor) || x.valor : x.valor); }, 0); };
+    var linDe = function(id, papel){ return com.filter(function(x){ return x.papel === papel && x.pessoa.id === id; }); };
+    var trazidos = ativos.filter(function(p){ return p.prospectadorId && prospById(p.prospectadorId); }).length;
+    var comResp = rows.filter(function(r){ return r.responsavelId; }), pagoMes = soma(com.filter(function(x){ return x.pago && String(x.pago.pagoEm || '').slice(0, 7) === mes; }));
+    var nPes = ativos.filter(function(p){ return parcPessoa(parcTipo(p)); }).length, nInst = ativos.length - nPes;
+    var tiposTxt = ativos.length ? [nInst ? plural(nInst, 'instituição', 'instituições') : '', nPes ? plural(nPes, 'pessoa', 'pessoas') : ''].filter(Boolean).join(' · ') : '';
+    var aPagar = soma(com.filter(function(x){ return !x.pago; }));
+    var html = '<div class="dn-grade">' +
+      dnCard('i-users', 'Parceiros ativos', ativos.length, tiposTxt || 'nenhum parceiro ainda', '', 'Clínicas, maternidades e parceiros do Brasil todo que indicam mães.') +
+      dnCard('i-flag', 'Prospectadores', prosAt.length, plural(trazidos, 'parceiro trazido por eles', 'parceiros trazidos por eles'), '', 'Pessoas escolhidas pelo escritório que vão às clínicas e fecham a parceria.') +
+      dnCard('i-baby', 'Mães indicadas no mês', doMes(comResp), plural(comResp.length, 'mãe', 'mães') + ' desde o início') +
+      (adm ? dnCard('i-cash', 'Repasse pago no mês', moedaTxt(pagoMes), aPagar ? 'a pagar: ' + moedaTxt(aPagar) : 'nenhuma comissão pendente', '', 'Comissões de parceiros e prospectadores com baixa no Financeiro.', 'f')
+        : dnCard('i-check', 'Benefícios concedidos', comResp.filter(ganhou).length, 'das mães indicadas')) + '</div>';
+    var ehP = parcAba === 'parc';
+    html += '<div class="fbar parcn-bar"><div class="parcn-seg" role="group" aria-label="Lista">' +
+      '<button type="button" data-parcn-aba="parc" aria-pressed="' + ehP + '">Parceiros <span class="tnum">' + parcs.length + '</span></button>' +
+      '<button type="button" data-parcn-aba="pros" aria-pressed="' + !ehP + '">Prospectadores <span class="tnum">' + pros.length + '</span></button></div>' +
+      '<div class="search tb-busca"><svg class="i"><use href="#i-search"/></svg><input id="parcn-q" type="search" autocomplete="off" placeholder="' + (ehP ? 'Buscar parceiro, CNPJ, cidade…' : 'Buscar prospectador…') + '" value="' + esc(parcNQ) + '"></div>' +
+      '<select class="tb-sel' + (parcNSit !== 'ativos' ? ' ativo' : '') + '" id="parcn-sit" aria-label="Situação">' + [['ativos', 'Ativos'], ['pausados', 'Pausados'], ['todos', 'Todos']].map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === parcNSit ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
+      (ehP ? '<select class="tb-sel' + (parcNTipo ? ' ativo' : '') + '" id="parcn-tipo" aria-label="Tipo"><option value="">Tipo: todos</option>' + PARC_TIPOS.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === parcNTipo ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
+        '<select class="tb-sel' + (parcNPros ? ' ativo' : '') + '" id="parcn-pros" aria-label="Quem fechou"><option value="">Quem fechou: todos</option><option value="-"' + (parcNPros === '-' ? ' selected' : '') + '>Direto com o escritório</option>' + pros.map(function(x){ return '<option value="' + esc(x.id) + '"' + (x.id === parcNPros ? ' selected' : '') + '>' + esc(x.nome) + '</option>'; }).join('') + '</select>' : '') +
+      (adm ? '<button type="button" class="btn primary parcn-novo" data-parcn-novo="' + parcAba + '">' + svgI('i-plus') + (ehP ? 'Novo parceiro' : 'Novo prospectador') + '</button>' : '') + '</div>';
+    var sit = function(p){ return parcNSit === 'todos' || (parcNSit === 'ativos' ? p.ativo !== false : p.ativo === false); };
+    var bate = function(txt){ return !parcNQ || semAcento(txt).indexOf(semAcento(parcNQ)) >= 0; };
+    var acoes = function(p){ var id = esc(p.id); return '<td><div class="cad-acoes">' + (adm ? '<button type="button" class="btn" data-parcn-app="' + id + '" title="Login e senha no aplicativo">' + svgI('i-phone') + 'Aplicativo</button><button type="button" class="ico-btn" data-parcn-edit="' + id + '" title="Editar" aria-label="Editar ' + esc(parcNome(p)) + '"><svg class="i"><use href="#i-pencil"/></svg></button>' : '') + '</div></td>'; };
+    var pausa = function(p){ return p.ativo === false ? ' <span class="parcn-pausa">Pausado</span>' : ''; };
+    if (ehP){
+      var dados = parcs.filter(function(p){ return sit(p) && (!parcNTipo || parcTipo(p) === parcNTipo) && (!parcNPros || (parcNPros === '-' ? !p.prospectadorId : p.prospectadorId === parcNPros)) && bate([parcNome(p), p.nome, p.documento, parcLocal(p), p.prospectadorId ? prospName(p.prospectadorId) : ''].join(' ')); })
+        .map(function(p){ var m = maesDe([p.id]), l = linDe(p.id, 'parc'); return { p: p, maes: m.length, mes: doMes(m), conc: m.filter(ganhou).length, pago: soma(l.filter(function(x){ return x.pago; })), pend: soma(l.filter(function(x){ return !x.pago; })) }; })
+        .sort(function(a, b){ return b.mes - a.mes || b.maes - a.maes || parcNome(a.p).localeCompare(parcNome(b.p), 'pt'); });
+      html += '<div class="card list"><table class="kb-tab parcn-tab"><thead><tr><th>Parceiro</th><th>Quem fechou</th><th>Comissão do parceiro</th><th class="dir">Mães</th><th class="dir">No mês</th><th class="dir">Concedidas</th>' + (adm ? '<th class="dir">Repasse pago</th><th class="dir">A pagar</th>' : '') + '<th></th></tr></thead><tbody>' +
+        (dados.length ? dados.map(function(d){ var p = d.p, pr = p.prospectadorId ? prospById(p.prospectadorId) : null, loc = parcLocal(p);
+          return '<tr data-parcn="' + esc(p.id) + '"' + (p.ativo === false ? ' class="pausado"' : '') + '><td class="nome"><b>' + esc(parcNome(p)) + '</b>' + pausa(p) + '<small>' + esc(parcTipoNome(p)) + (loc ? ' · ' + esc(loc) : '') + (p.documento ? ' · ' + esc(p.documento) : '') + '</small></td>' +
+            '<td>' + (pr ? '<span class="parcn-quem">' + esc(pr.nome) + '</span><small>' + (parcValores(p.prosConf, p.prosLib) ? esc(parcValores(p.prosConf, p.prosLib)) : 'comissão dele não definida') + '</small>' : '<span class="parcn-dir">Escritório</span>') + '</td>' +
+            '<td><small class="parcn-com">' + (p.semGanho ? 'Sem ganhos' : esc(parcValores(p.comConf, p.comLib || p.valorIndicacao) || 'Não definida')) + '</small></td>' +
+            '<td class="dir tnum">' + d.maes + '</td><td class="dir tnum">' + d.mes + '</td><td class="dir tnum">' + d.conc + '</td>' +
+            (adm ? '<td class="dir tnum">' + moedaTxt(d.pago) + '</td><td class="dir tnum' + (d.pend ? ' parcn-pend' : '') + '">' + moedaTxt(d.pend) + '</td>' : '') + acoes(p) + '</tr>'; }).join('')
+          : '<tr><td colspan="9" class="empty">' + (parcs.length ? 'Nenhum parceiro neste filtro.' : 'Nenhum parceiro ainda.' + (adm ? ' Clique em <b>Novo parceiro</b> ou deixe o prospectador cadastrar pelo aplicativo.' : '')) + '</td></tr>') + '</tbody></table></div>';
+    } else {
+      var dp = pros.filter(function(p){ return sit(p) && bate([p.nome, p.documento, p.telefone, parcLocal(p)].join(' ')); })
+        .map(function(p){ var seus = parcs.filter(function(x){ return x.prospectadorId === p.id; }), ids = seus.map(function(x){ return x.id; }); if (p.tambemParceiro) ids.push(p.id);
+          var m = maesDe(ids), l = linDe(p.id, 'pros'); return { p: p, parcs: seus.length, parcAt: seus.filter(function(x){ return x.ativo !== false; }).length, maes: m.length, mes: doMes(m), conc: m.filter(ganhou).length, pago: soma(l.filter(function(x){ return x.pago; })), pend: soma(l.filter(function(x){ return !x.pago; })) }; })
+        .sort(function(a, b){ return b.mes - a.mes || b.parcAt - a.parcAt || String(a.p.nome || '').localeCompare(String(b.p.nome || ''), 'pt'); });
+      html += '<div class="card list"><table class="kb-tab parcn-tab"><thead><tr><th>Prospectador</th><th class="dir">Parceiros</th><th class="dir">Mães</th><th class="dir">No mês</th><th class="dir">Concedidas</th>' + (adm ? '<th class="dir">Ganhos pagos</th><th class="dir">A pagar</th>' : '') + '<th></th></tr></thead><tbody>' +
+        (dp.length ? dp.map(function(d){ var p = d.p, loc = parcLocal(p);
+          return '<tr data-parcn="' + esc(p.id) + '"' + (p.ativo === false ? ' class="pausado"' : '') + '><td class="nome"><b>' + esc(p.nome || 'Sem nome') + '</b>' + pausa(p) + '<small>' + [loc, p.telefone, p.tambemParceiro ? 'também indica mães' : ''].filter(Boolean).map(esc).join(' · ') + '</small></td>' +
+            '<td class="dir tnum">' + d.parcAt + (d.parcs > d.parcAt ? '<small>' + d.parcs + ' no total</small>' : '') + '</td><td class="dir tnum">' + d.maes + '</td><td class="dir tnum">' + d.mes + '</td><td class="dir tnum">' + d.conc + '</td>' +
+            (adm ? '<td class="dir tnum">' + moedaTxt(d.pago) + '</td><td class="dir tnum' + (d.pend ? ' parcn-pend' : '') + '">' + moedaTxt(d.pend) + '</td>' : '') + acoes(p) + '</tr>'; }).join('')
+          : '<tr><td colspan="8" class="empty">' + (pros.length ? 'Nenhum prospectador neste filtro.' : 'Nenhum prospectador ainda.' + (adm ? ' Clique em <b>Novo prospectador</b> para cadastrar quem vai fechar com as clínicas.' : '')) + '</td></tr>') + '</tbody></table></div>';
+    }
+    box.innerHTML = html;
+  }
+  // janela de cadastro no mesmo padrão dos formulários do BI
+  function parcDialogo(titulo, corpo, okTxt, aoSalvar){
+    var d = document.createElement('dialog'); d.className = 'parcn-dlg';
+    d.innerHTML = '<form class="f" novalidate><div class="f-head"><div class="ph-tile" style="margin:0"><svg class="i"><use href="#i-users"/></svg></div><h2>' + esc(titulo) + '</h2></div><div class="f-body">' + corpo + '</div>' +
+      '<div class="f-foot"><span></span><div class="right"><button class="btn" type="button" data-x>Cancelar</button><button class="btn primary" type="submit" data-ok>' + esc(okTxt) + '</button></div></div></form>';
+    document.body.appendChild(d);
+    d.addEventListener('close', function(){ d.remove(); });
+    d.querySelector('[data-x]').onclick = function(){ d.close(); };
+    d.querySelectorAll('[data-tel]').forEach(function(el){ el.addEventListener('input', function(){ el.value = maskTel(el.value); }); });
+    d.querySelectorAll('[data-doc]').forEach(function(el){ el.addEventListener('input', function(){ el.value = mascDoc(el.value); }); });
+    d.querySelectorAll('[data-nome]').forEach(function(el){ el.addEventListener('blur', function(){ if (el.value.trim()) el.value = nomeProprio(el.value.trim()); }); });
+    d.querySelector('form').addEventListener('submit', async function(e){
+      e.preventDefault(); var b = d.querySelector('[data-ok]'); b.disabled = true;
+      try { if (await aoSalvar(function(s){ return d.querySelector(s); }) !== false) d.close(); }
+      catch(err){ toast(errMsg(err)); } finally { b.disabled = false; }
+    });
+    d.showModal(); var f1 = d.querySelector('input'); if (f1) f1.focus();
+    return d;
+  }
+  async function parcGravar(p, campos){
+    var agora = new Date().toISOString(); campos.atualizadoEm = agora;
+    var base = p ? Object.assign({}, p) : { criadoEm: agora, criadoPor: 'escritorio', palavrasEndereco: [] }; delete base.id;
+    var data = Object.assign(base, campos);
+    if (state.db) await pcol().doc(p ? p.id : undefined).set(data);
+    else { if (p) Object.assign(p, campos); else state.prosp = state.prosp.concat([Object.assign({ id: 'mp' + (++memId) }, data)]); render(); }
+  }
+  function campoUf(id, uf){ return '<select id="' + id + '"><option value="">Escolha</option>' + UFS.map(function(u){ return '<option' + (u === uf ? ' selected' : '') + '>' + u + '</option>'; }).join('') + '</select>'; }
+  function abrirParcNovo(p){
+    if (!isAdmin()){ toast('Só o administrador cadastra parceiros.'); return; }
+    var v = function(k){ return esc(p && p[k] != null ? p[k] : ''); }, t = p ? parcTipo(p) : 'clinica';
+    var resp = p ? (p.contatoNome != null ? p.contatoNome : (p.tipo === 'clinica' && p.nome !== p.clinica ? p.nome : '')) : '';
+    var pros = state.prosp.filter(ehProspectador).sort(function(a, b){ return String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); }), prSel = p ? p.prospectadorId || '' : '';
+    var corpo = '<p class="parcn-nota">Parceiro grande que indica mães, em qualquer estado. O prospectador também pode cadastrar pelo aplicativo.</p>' +
+      '<div class="field full"><label for="pn-nome">Nome do parceiro</label><input id="pn-nome" data-nome autocomplete="off" value="' + esc(p ? parcNome(p) : '') + '" placeholder="Ex.: Maternidade Santa Luzia"></div>' +
+      '<div class="field"><label for="pn-tipo">Tipo</label><select id="pn-tipo">' + PARC_TIPOS.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === t ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></div>' +
+      '<div class="field"><label for="pn-doc">CNPJ ou CPF</label><input id="pn-doc" data-doc inputmode="numeric" class="tnum" value="' + v('documento') + '" placeholder="00.000.000/0000-00"></div>' +
+      '<div class="field"><label for="pn-resp">Responsável (contato)</label><input id="pn-resp" data-nome autocomplete="off" value="' + esc(resp) + '" placeholder="Quem fala pelo parceiro"></div>' +
+      '<div class="field"><label for="pn-tel">Telefone / WhatsApp</label><input id="pn-tel" data-tel inputmode="tel" class="tnum" value="' + v('telefone') + '" placeholder="(92) 00000-0000"></div>' +
+      '<div class="field"><label for="pn-uf">Estado</label>' + campoUf('pn-uf', p ? parcUf(p) : '') + '</div>' +
+      '<div class="field"><label for="pn-cid">Cidade</label><input id="pn-cid" data-nome autocomplete="off" value="' + esc(p ? p.cidadeParc || p.regiao || '' : '') + '"></div>' +
+      '<div class="field full"><label for="pn-pix">Chave Pix (para o repasse)</label><input id="pn-pix" autocomplete="off" value="' + v('pix') + '" placeholder="CNPJ, e-mail, telefone ou chave aleatória"></div>' +
+      '<div class="field"><label for="pn-cconf">Parceiro recebe na entrada</label><input id="pn-cconf" class="fin-valor" inputmode="numeric" value="' + esc(moedaTxt(p && p.comConf || 0)) + '"><span class="hint">Quando a mãe entra com contrato assinado.</span></div>' +
+      '<div class="field"><label for="pn-clib">Parceiro recebe no benefício</label><input id="pn-clib" class="fin-valor" inputmode="numeric" value="' + esc(moedaTxt(p && (p.comLib || p.valorIndicacao) || 0)) + '"><span class="hint">Quando o benefício é concedido.</span></div>' +
+      '<div class="field full"><label for="pn-pros">Quem fechou a parceria</label><select id="pn-pros"><option value="">Escritório (direto, sem prospectador)</option>' + pros.map(function(x){ return '<option value="' + esc(x.id) + '"' + (x.id === prSel ? ' selected' : '') + '>' + esc(x.nome) + (x.ativo === false ? ' (pausado)' : '') + '</option>'; }).join('') + '</select></div>' +
+      '<div class="field pn-pc"><label for="pn-pconf">Prospectador recebe na entrada</label><input id="pn-pconf" class="fin-valor" inputmode="numeric" value="' + esc(moedaTxt(p && p.prosConf || 0)) + '"></div>' +
+      '<div class="field pn-pc"><label for="pn-plib">Prospectador recebe no benefício</label><input id="pn-plib" class="fin-valor" inputmode="numeric" value="' + esc(moedaTxt(p && p.prosLib || 0)) + '"></div>' +
+      '<div class="field full"><label class="chk"><input id="pn-ativo" type="checkbox"' + (!p || p.ativo !== false ? ' checked' : '') + '> Parceiro ativo</label><span class="hint">Pausado continua com as mães e o histórico, mas sai da lista de ativos.</span></div>';
+    var d = parcDialogo(p ? 'Editar parceiro' : 'Novo parceiro', corpo, p ? 'Salvar' : 'Cadastrar parceiro', async function(q){
+      var nome = nomeProprio(q('#pn-nome').value.trim()), tipo = q('#pn-tipo').value, rs = nomeProprio(q('#pn-resp').value.trim()), uf = q('#pn-uf').value, cid = nomeProprio(q('#pn-cid').value.trim()), pr = q('#pn-pros').value;
+      if (nome.length < 3){ toast('Informe o nome do parceiro.'); q('#pn-nome').focus(); return false; }
+      var emp = !parcPessoa(tipo);
+      await parcGravar(p, { tipoParceiro: tipo, tipo: emp ? 'clinica' : 'pessoa', clinica: emp ? nome : '', nome: emp ? (rs || nome) : nome, contatoNome: rs, documento: q('#pn-doc').value.trim(), telefone: q('#pn-tel').value.trim(),
+        ufParc: uf, regiaoId: uf || (p && p.regiaoId) || '', cidadeParc: cid, regiao: cid, pix: q('#pn-pix').value.trim(), comConf: moedaNum(q('#pn-cconf').value), comLib: moedaNum(q('#pn-clib').value),
+        prospectadorId: pr, prosConf: pr ? moedaNum(q('#pn-pconf').value) : 0, prosLib: pr ? moedaNum(q('#pn-plib').value) : 0, ativo: q('#pn-ativo').checked });
+      toast((p ? 'Parceiro atualizado: ' : 'Parceiro cadastrado: ') + nome);
+    });
+    var pc = function(){ var tem = !!d.querySelector('#pn-pros').value; d.querySelectorAll('.pn-pc').forEach(function(x){ x.hidden = !tem; }); };
+    d.querySelector('#pn-pros').addEventListener('change', pc); pc();
+  }
+  function abrirProsNovo(p){
+    if (!isAdmin()){ toast('Só o administrador cadastra prospectadores.'); return; }
+    var v = function(k){ return esc(p && p[k] != null ? p[k] : ''); };
+    var corpo = '<p class="parcn-nota">Pessoa escolhida pelo escritório que vai às clínicas grandes e fecha a parceria. Pelo aplicativo ela cadastra os parceiros que fechar e acompanha as mães deles.</p>' +
+      '<div class="field full"><label for="pp-nome">Nome completo</label><input id="pp-nome" data-nome autocomplete="off" value="' + v('nome') + '"></div>' +
+      '<div class="field"><label for="pp-doc">CPF</label><input id="pp-doc" data-doc inputmode="numeric" class="tnum" value="' + v('documento') + '" placeholder="000.000.000-00"></div>' +
+      '<div class="field"><label for="pp-tel">Telefone / WhatsApp</label><input id="pp-tel" data-tel inputmode="tel" class="tnum" value="' + v('telefone') + '" placeholder="(92) 00000-0000"></div>' +
+      '<div class="field"><label for="pp-uf">Estado onde mora</label>' + campoUf('pp-uf', p ? String(p.ufParc || '').toUpperCase() : '') + '</div>' +
+      '<div class="field"><label for="pp-cid">Cidade</label><input id="pp-cid" data-nome autocomplete="off" value="' + esc(p ? p.cidadeParc || '' : '') + '"></div>' +
+      '<div class="field full"><label for="pp-pix">Chave Pix (para os ganhos)</label><input id="pp-pix" autocomplete="off" value="' + v('pix') + '"></div>' +
+      '<div class="field full"><label class="chk"><input id="pp-tambem" type="checkbox"' + (p && p.tambemParceiro ? ' checked' : '') + '> Também indica mães direto</label><span class="hint">No aplicativo ele passa a poder alternar entre cadastrar parceiros e cadastrar mães.</span></div>' +
+      '<div class="field full"><label class="chk"><input id="pp-ativo" type="checkbox"' + (!p || p.ativo !== false ? ' checked' : '') + '> Prospectador ativo</label></div>' +
+      '<p class="parcn-nota">Quanto ele ganha é definido em cada parceiro que ele fechar (campo <b>Quem fechou a parceria</b>).</p>';
+    parcDialogo(p ? 'Editar prospectador' : 'Novo prospectador', corpo, p ? 'Salvar' : 'Cadastrar prospectador', async function(q){
+      var nome = nomeProprio(q('#pp-nome').value.trim()), uf = q('#pp-uf').value, cid = nomeProprio(q('#pp-cid').value.trim());
+      if (nome.length < 3){ toast('Informe o nome do prospectador.'); q('#pp-nome').focus(); return false; }
+      await parcGravar(p, { perfil: 'prospectador', tipo: 'pessoa', clinica: '', nome: nome, documento: q('#pp-doc').value.trim(), telefone: q('#pp-tel').value.trim(), ufParc: uf, cidadeParc: cid,
+        regiaoId: p ? p.regiaoId || '' : '', regiao: cid, pix: q('#pp-pix').value.trim(), tambemParceiro: q('#pp-tambem').checked, ativo: q('#pp-ativo').checked });
+      toast((p ? 'Prospectador atualizado: ' : 'Prospectador cadastrado: ') + nome + (p ? '' : '. Agora clique em Aplicativo para criar o login dele.'));
+    });
+  }
+  document.addEventListener('click', function(e){
+    if (!e.target.closest) return;
+    var ab = e.target.closest('[data-parcn-aba]'); if (ab){ parcAba = ab.dataset.parcnAba; parcNQ = ''; renderParcNovo(); return; }
+    var nv = e.target.closest('[data-parcn-novo]'); if (nv){ if (nv.dataset.parcnNovo === 'pros') abrirProsNovo(null); else abrirParcNovo(null); return; }
+    var fn = e.target.closest('#parc-novo [data-fn]'); if (fn){ showTab(fn.dataset.fn); return; }
+    var ap = e.target.closest('[data-parcn-app]'); if (ap){ var pa = prospById(ap.dataset.parcnApp); if (pa) abrirLinkCampo(pa); return; }
+    var ed = e.target.closest('[data-parcn-edit]') || (isAdmin() && !e.target.closest('button,a,select,input') ? e.target.closest('#parc-novo tr[data-parcn]') : null);
+    if (ed){ var pe = prospById(ed.dataset.parcnEdit || ed.dataset.parcn); if (pe){ if (ehProspectador(pe)) abrirProsNovo(pe); else abrirParcNovo(pe); } }
+  });
+  document.addEventListener('input', function(e){ if (e.target.id === 'parcn-q'){ parcNQ = e.target.value.trim(); var pos = e.target.selectionStart; renderParcNovo(); var q2 = $('parcn-q'); if (q2){ q2.focus(); try { q2.setSelectionRange(pos, pos); } catch(er){} } } });
+  document.addEventListener('change', function(e){ var id = e.target.id; if (id === 'parcn-sit') parcNSit = e.target.value; else if (id === 'parcn-tipo') parcNTipo = e.target.value; else if (id === 'parcn-pros') parcNPros = e.target.value; else return; renderParcNovo(); });
   function renderDashNovo(box){
     var rows = state.rows, j = dashJanela(), no = function(d){ d = diaLocal(d); return !!d && (!j.ini || d >= j.ini) && d <= j.fim; };
     var ant = null;
@@ -5980,7 +6178,7 @@ html[data-fx="novo"] .dn-ind-x b{font-weight:600;color:var(--ink)}
     var t = telaAberta, tit = TITULOS[t]; if (!tit) return;
     var res = telaDoFunil(t) ? resumoFases()[t] : null;
     $('pg-tit').textContent = tit[0];
-    $('pg-sub').textContent = (t === 'e' ? '' : (fluxoVista === 'novo' ? 'Fluxo novo · ' : 'Fluxo antigo · ')) + (res ? res[2] : t === 'q' ? desqResumo() : t === 'b' && fluxoVista === 'novo' ? 'Como está a jornada das mães: fases, entradas, GPS, requerimentos e resultados' : tit[1]);
+    $('pg-sub').textContent = (t === 'e' ? '' : (fluxoVista === 'novo' ? 'Fluxo novo · ' : 'Fluxo antigo · ')) + (res ? res[2] : t === 'q' ? desqResumo() : t === 'b' && fluxoVista === 'novo' ? 'Como está a jornada das mães: fases, entradas, GPS, requerimentos e resultados' : t === 'g' && fluxoVista === 'novo' ? 'Clínicas e parceiros grandes do Brasil todo, e os prospectadores que fecham com eles' : tit[1]);
     var bt = VIEWS[t] && $(VIEWS[t][0]), u = bt && bt.querySelector('use'); if (u) $('pg-ico').setAttribute('href', u.getAttribute('href'));
     var fluxo = telaDoFunil(t);
     $('vista-seg').hidden = true;
@@ -6129,7 +6327,7 @@ html[data-fx="novo"] .dn-ind-x b{font-weight:600;color:var(--ink)}
   });
   $('bg-res').addEventListener('mousedown', function(e){ e.preventDefault(); var b = e.target.closest('[data-bg]'); if (!b) return; var r = acharNaBase(b.dataset.bg); $('bg-res').hidden = true; $('bg-q').blur(); if (r) abrirNoFluxo(r); });
   function abrirNoFluxo(r){ var f = doFluxoNovo(r) ? 'novo' : 'antigo'; if (f !== fluxoVista) trocarFluxo(f); abrirCard(r.id, noCadastro(r)); }
-  function render(){ renderGpsNovo(); renderNascNovo(); renderReqNovo(); pintarAvisosBtn(); renderRelatorio(); pintarCard(); renderEstadosCfg(); renderRegioes(); renderContratos(); renderFila(); renderDesq(); renderCad(); renderInss(); renderList(); renderRet(); renderProsp(); renderEquipe(); renderFin(); renderDash(); renderFunil(); pintarPagina(); medirQuadros(); }
+  function render(){ renderParcNovo(); renderGpsNovo(); renderNascNovo(); renderReqNovo(); pintarAvisosBtn(); renderRelatorio(); pintarCard(); renderEstadosCfg(); renderRegioes(); renderContratos(); renderFila(); renderDesq(); renderCad(); renderInss(); renderList(); renderRet(); renderProsp(); renderEquipe(); renderFin(); renderDash(); renderFunil(); pintarPagina(); medirQuadros(); }
   var clQ = '';
   // stage of each process, derived from what is already recorded (no extra typing)
   var ETAPAS = [
