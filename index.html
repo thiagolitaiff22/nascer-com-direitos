@@ -2205,6 +2205,9 @@ html[data-fx="novo"] .field[hidden]{display:none!important}
 /* cadastro inicial no fluxo novo: só gestante, sem atendente (closer) e sem proposta */
 html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.novo .f-body > #f-atend-box,html[data-fx="novo"] #form.novo .f-body > #f-prop-box{display:none!important}
 .fc-doc-dica{margin-left:auto;font-size:11px;color:var(--ink-3);text-align:right}
+
+.parcn-dlg.curta{width:min(460px,calc(100vw - 32px))}
+.parcn-dlg.curta .f-body{grid-template-columns:1fr}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -3692,7 +3695,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.
     var t = faseDe(r), id = esc(r.id), resp = fcResp(r, t), etapaSel;
     if (t === 'k' || ((t === 'gp' || t === 'an' || t === 'rq') && noContratos(r))) etapaSel = '<select data-pos="' + id + '">' + posColsDe(r).map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === posEtapaDe(r) ? ' selected' : '') + '>' + esc(posNome(r, c)) + '</option>'; }).join('') + (doFluxoNovo(r) ? '' : '<option value="__cad">↩ Voltar ao Cadastro</option>') + '</select>';
     else if (t === 'd') etapaSel = '<select data-lead="' + id + '">' + Object.keys(LEAD).map(function(x){ return '<option value="' + x + '"' + (x === leadDe(r) ? ' selected' : '') + '>' + LEAD[x] + '</option>'; }).join('') + '</select>';
-    else if (t === 'i') etapaSel = '<select data-inss="' + id + '">' + Object.keys(INSS).map(function(x){ return '<option value="' + x + '"' + (x === statusInss(r) ? ' selected' : '') + '>' + INSS[x][0] + '</option>'; }).join('') + '</select>';
+    else if (t === 'i') etapaSel = '<select data-inss="' + id + '">' + inssOpcoes(r, statusInss(r)).map(function(x){ return '<option value="' + x + '"' + (x === statusInss(r) ? ' selected' : '') + '>' + INSS[x][0] + '</option>'; }).join('') + '</select>';
     else etapaSel = '<input disabled value="' + esc(faseTexto(r).split(' · ')[1] || '—') + '">';
     var eq = (state.equipe || []).filter(function(u){ return u.ativo !== false && u.email; }).sort(function(a, b){ return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
     var atual = String(resp[1] || '').toLowerCase(), nomeAt = String(resp[0] || '');
@@ -4242,10 +4245,11 @@ html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.
     if (f === 'vence') return exigenciaVence(r);
     return statusInss(r) === f;
   }
+  function inssOpcoes(r, k){ return Object.keys(INSS).filter(function(x){ return x !== 'redigir' || k === 'redigir' || !doFluxoNovo(r); }); }
   function inssSelect(r){
     var k = statusInss(r);
     return '<select class="inss-sel ' + INSS[k][1] + '" data-inss="' + esc(r.id) + '" aria-label="Situação no INSS de ' + esc(r.nome) + '">' +
-      Object.keys(INSS).map(function(x){ return '<option value="' + x + '"' + (x === k ? ' selected' : '') + '>' + INSS[x][0] + '</option>'; }).join('') + '</select>';
+      inssOpcoes(r, k).map(function(x){ return '<option value="' + x + '"' + (x === k ? ' selected' : '') + '>' + INSS[x][0] + '</option>'; }).join('') + '</select>';
   }
   function inssPasso(r){
     var k = statusInss(r);
@@ -4284,7 +4288,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.
     var todos = state.rows.filter(noInss).filter(function(r){ return (!soMinhas || minha(r)) && passaFiltro(r); }), conta = { redigir: 0, analise: 0, exigencia: 0, concedido: 0, indeferido: 0 };
     todos.forEach(function(r){ conta[statusInss(r)]++; });
     var atras = todos.filter(analiseAtrasada).length, vence = todos.filter(exigenciaVence).length;
-    var SITS = [['', 'Status: todas · ' + todos.length]].concat(Object.keys(INSS).map(function(k){ return [k, INSS[k][0] + ' · ' + conta[k]]; })).concat([['atrasada', 'Análise atrasada · ' + atras], ['vence', 'Exigência vencendo · ' + vence]]);
+    var SITS = [['', 'Status: todas · ' + todos.length]].concat(Object.keys(INSS).filter(function(k){ return k !== 'redigir' || fluxoVista !== 'novo' || conta.redigir; }).map(function(k){ return [k, INSS[k][0] + ' · ' + conta[k]]; })).concat([['atrasada', 'Análise atrasada · ' + atras], ['vence', 'Exigência vencendo · ' + vence]]);
     $('inss-sit').innerHTML = SITS.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === inssSit ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
     $('inss-sit').classList.toggle('ativo', !!inssSit);
     $('inss-chips').innerHTML = (atras ? fbChip('ver', 'i-clock', plural(atras, 'análise passou de ' + INSS_PRAZO_ANALISE + ' dias', 'análises passaram de ' + INSS_PRAZO_ANALISE + ' dias'), 'inss:atrasada', 'inss:' + inssSit) : '') + (vence ? fbChip('lar', 'i-alert', plural(vence, 'exigência com prazo em até 5 dias', 'exigências com prazo em até 5 dias'), 'inss:vence', 'inss:' + inssSit) : '') + (conta.indeferido ? fbChip('ver', 'i-gavel', plural(conta.indeferido, 'indeferido para o Judicial', 'indeferidos para o Judicial'), 'inss:indeferido', 'inss:' + inssSit) : '') + (atras || vence || conta.indeferido ? '' : FB_NADA);
@@ -4817,6 +4821,25 @@ html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.
   async function receberCertidao(id){
     var r = acharRow(id); if (!r) return;
     var ag = new Date().toISOString(), p = { certidaoRecebida: true, certidaoEm: iso(new Date()), posEtapa: 'ok', posMudouEm: ag, posResp: respMantido(r).posResp, posRespEmail: respMantido(r).posRespEmail, atualizadoEm: ag };
+    var gravar = async function(){
+      var antes = { certidaoRecebida: !!r.certidaoRecebida, certidaoEm: r.certidaoEm || '', posEtapa: r.posEtapa || '', posMudouEm: r.posMudouEm || '', criancaNasc: r.criancaNasc || '', fatoGerador: r.fatoGerador || '' };
+      await patchRow(id, p); toast('Certidão recebida: ' + r.nome + (doFluxoNovo(r) ? ' está pronta para o requerimento' : ' foi para Documentação OK'), 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
+    };
+    if (!r.criancaNasc && doFluxoNovo(r)){
+      var hoje = iso(new Date()), prev = String(r.dpp || '').slice(0, 10);
+      var dc = parcDialogo('Certidão de nascimento', '<p class="parcn-nota">Certidão de <b>' + esc(r.nome || 'Cliente') + '</b>. Informe a data em que a criança nasceu, como está na certidão.' + (prev ? ' Data prevista do parto: <b>' + fmtDate(prev) + '</b>.' : '') + '</p>' +
+        '<div class="field full"><label for="cn-data">Data de nascimento da criança</label><input id="cn-data" type="date" max="' + hoje + '"><span class="hint">Depois de registrar, ela fica pronta para o requerimento.</span></div>',
+        'Registrar certidão', async function(q){
+          var v = q('#cn-data').value;
+          if (!v){ toast('Informe a data de nascimento.'); q('#cn-data').focus(); return false; }
+          if (v > hoje){ toast('A data de nascimento está no futuro.'); q('#cn-data').focus(); return false; }
+          if (prev && Math.abs(daysUntil(v) - daysUntil(prev)) > 90){ toast('A data está a mais de 3 meses da data prevista do parto. Confira na certidão.'); q('#cn-data').focus(); return false; }
+          p.criancaNasc = v; p.fatoGerador = 'parto';
+          await gravar();
+        }, 'i-file');
+      dc.classList.add('curta');
+      return;
+    }
     if (!r.criancaNasc){
       var t = String(window.prompt('Data de nascimento da criança (dd/mm/aaaa):', '') || '').trim(), m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(t);
       if (!m){ if (t) toast('Data inválida. Use dd/mm/aaaa.'); return; }
@@ -4824,8 +4847,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.
       var dc = new Date(+m[3], +m[2] - 1, +m[1]); if (dc.getDate() !== +m[1] || dc.getMonth() !== +m[2] - 1){ toast('Essa data não existe. Confira o dia e o mês.'); return; }
       if (daysUntil(p.criancaNasc) > 0){ toast('A data de nascimento está no futuro.'); return; }
     }
-    var antes = { certidaoRecebida: !!r.certidaoRecebida, certidaoEm: r.certidaoEm || '', posEtapa: r.posEtapa || '', posMudouEm: r.posMudouEm || '', criancaNasc: r.criancaNasc || '', fatoGerador: r.fatoGerador || '' };
-    try { await patchRow(id, p); toast('Certidão recebida: ' + r.nome + (doFluxoNovo(r) ? ' está pronta para o requerimento' : ' foi para Documentação OK'), 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); }); } catch(err){ toast(errMsg(err)); }
+    try { await gravar(); } catch(err){ toast(errMsg(err)); }
   }
   $('ctr-list').addEventListener('click', function(e){
     var c = e.target.closest('[data-pv-cert]'); if (c){ receberCertidao(c.dataset.pvCert); return; }
@@ -5906,9 +5928,9 @@ html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.
     box.innerHTML = html;
   }
   // janela de cadastro no mesmo padrão dos formulários do BI
-  function parcDialogo(titulo, corpo, okTxt, aoSalvar){
+  function parcDialogo(titulo, corpo, okTxt, aoSalvar, ico){
     var d = document.createElement('dialog'); d.className = 'parcn-dlg';
-    d.innerHTML = '<form class="f" novalidate><div class="f-head"><div class="ph-tile" style="margin:0"><svg class="i"><use href="#i-users"/></svg></div><h2>' + esc(titulo) + '</h2></div><div class="f-body">' + corpo + '</div>' +
+    d.innerHTML = '<form class="f" novalidate><div class="f-head"><div class="ph-tile" style="margin:0"><svg class="i"><use href="#' + (ico || 'i-users') + '"/></svg></div><h2>' + esc(titulo) + '</h2></div><div class="f-body">' + corpo + '</div>' +
       '<div class="f-foot"><span></span><div class="right"><button class="btn" type="button" data-x>Cancelar</button><button class="btn primary" type="submit" data-ok>' + esc(okTxt) + '</button></div></div></form>';
     document.body.appendChild(d);
     d.addEventListener('close', function(){ d.remove(); });
