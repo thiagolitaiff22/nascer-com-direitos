@@ -1913,6 +1913,61 @@ a.kb-btn{text-decoration:none;justify-content:center;gap:6px}
 .dash-leg>div p{display:flex;align-items:center;gap:6px;margin:0;font-size:11px;color:var(--ink-3);white-space:nowrap}
 .dash-leg>div b{display:block;margin-top:2px;font-size:18px;font-weight:600;line-height:1.2;color:var(--ink)}
 .dash-tip{border-radius:12px;border-color:hsl(var(--c-line));background:hsl(var(--c-card));box-shadow:0 8px 24px -12px rgba(15,23,42,.25)}
+
+/* filtros no padrão do BI de Vendas (tela Processos): avisos à esquerda; busca, status, Filtrar e ordem à direita, mesma altura, borda e fundo */
+.fbar{gap:8px;font-size:12px}
+.fbar > .fb-chips > .fb-al,.fbar > .fb-chips > .fb-nada,.fbar > .fb-al{order:1}
+.fbar > *{order:2}
+.fbar > .tb-fim,.fbar > .fb-count{order:3}
+.fbar > .fb-div,.fbar > .minhas-btn{display:none}
+.fbar > .search,.fbar > .tb-busca{flex:1 1 150px;min-width:150px;max-width:240px;width:auto;margin-left:auto}
+.fbar:not(:has(.fb-chips)) > .search,.fbar:not(:has(.fb-chips)) > .tb-busca{margin-left:0}
+.fbar > .fb-limpar:not([hidden]) ~ .search,.fbar > .fb-limpar:not([hidden]) ~ .tb-busca{margin-left:0}
+.fbar .search input{height:36px;padding:0 12px 0 32px;border:1px solid hsl(var(--c-line)/.7);border-radius:6px;background:hsl(var(--c-card));font-size:12px;color:var(--ink)}
+.fbar .search input:focus{border-color:hsl(var(--c-pri));outline:none}
+.fbar .search svg{left:11px;width:14px;height:14px}
+.fbar .tb-sel{height:36px;max-width:210px;padding:0 10px;border:1px solid hsl(var(--c-line)/.7);border-radius:6px;background:hsl(var(--c-card));font-size:12px;color:var(--ink)}
+.fbar .tb-sel:hover{border-color:hsl(var(--c-line));background:hsl(var(--c-card))}
+.fbar .tb-sel.ativo{border-color:hsl(var(--c-pri));color:hsl(var(--c-pri))}
+.fbar .fb-lnk{height:36px;padding:0 12px;border:1px solid hsl(var(--c-line)/.7);border-radius:6px;background:hsl(var(--c-card));font-size:12px;color:var(--ink-3)}
+.fbar .fb-lnk:hover{color:var(--ink);background:hsl(var(--c-card))}
+.fbar .fb-lnk .i{width:14px;height:14px}
+.fbar .fb-lnk.on,.fbar .fb-lnk[aria-pressed="true"],.fbar .fb-lnk[aria-expanded="true"]{border-color:hsl(var(--c-pri));color:hsl(var(--c-pri));font-weight:500}
+.fbar .fb-al{height:30px;padding:0 10px;border-radius:6px;font-size:12px}
+.fbar .fb-limpar{order:2;margin-left:auto;height:32px;padding:0 10px;border:0;border-radius:6px;background:hsl(var(--c-pri)/.1);color:hsl(var(--c-pri));font-size:12px;font-weight:500;display:inline-flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
+.fbar .fb-limpar:hover{background:hsl(var(--c-pri)/.18)}
+.fbar .fb-limpar .i{width:13px;height:13px}
+.fbar .fb-limpar[hidden]{display:none}
+/* painel do Filtrar */
+.pop-filtro{position:static;width:auto;padding:16px;border:1px solid hsl(var(--c-line)/.7);border-radius:8px;background:hsl(var(--c-card));box-shadow:none;gap:12px}
+.pop-filtro[hidden]{display:none}
+.pf-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.pf-campo{display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:.025em;text-transform:uppercase;color:var(--ink-3)}
+.pop-filtro select{height:36px;border-radius:6px;border-color:hsl(var(--c-line)/.7);background:hsl(var(--c-bg));color:var(--ink)}
+.pop-filtro .pf-minhas{align-self:stretch;height:36px;padding:0 10px;border:1px solid hsl(var(--c-line)/.7);border-radius:6px;background:hsl(var(--c-bg));font-size:12px;text-transform:none;letter-spacing:0;text-decoration:none;text-align:left;color:var(--ink-3)}
+.pop-filtro .pf-minhas[aria-pressed="true"]{border-color:hsl(var(--c-pri));color:hsl(var(--c-pri));font-weight:500}
+/* período do Dashboard */
+.per-box{position:relative;order:1}
+.per-btn{height:36px;padding:0 12px;border:1px solid hsl(var(--c-line)/.7);border-radius:6px;background:hsl(var(--c-card));font:inherit;font-size:12px;font-weight:500;color:var(--ink);display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.per-btn .i{width:14px;height:14px;color:var(--ink-3)}
+.per-btn[aria-expanded="true"]{border-color:hsl(var(--c-pri))}
+.per-pop{position:absolute;z-index:60;left:0;top:calc(100% + 6px);width:min(420px,calc(100vw - 32px));border:1px solid hsl(var(--c-line));border-radius:10px;background:hsl(var(--c-card));box-shadow:0 12px 30px -12px rgba(15,23,42,.3)}
+.per-pop[hidden]{display:none}
+.per-atalhos{display:flex;flex-wrap:wrap;gap:6px;padding:12px;border-bottom:1px solid hsl(var(--c-line))}
+.per-atalhos button{height:32px;padding:0 12px;border:1px solid hsl(var(--c-line));border-radius:6px;background:none;font:inherit;font-size:12px;color:var(--ink-3);cursor:pointer}
+.per-atalhos button:hover{background:hsl(var(--c-sec))}
+.per-atalhos button[aria-pressed="true"]{background:hsl(var(--c-sec));color:var(--ink);font-weight:500}
+.per-faixa{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px}
+.per-faixa label{display:flex;flex-direction:column;gap:4px;font-size:11px;text-transform:uppercase;letter-spacing:.025em;color:var(--ink-3)}
+.per-faixa input{height:36px;padding:0 10px;border:1px solid hsl(var(--c-line));border-radius:6px;background:hsl(var(--c-bg));color:var(--ink);font:inherit;font-size:12px}
+.per-acoes{display:flex;justify-content:space-between;gap:8px;padding:12px;border-top:1px solid hsl(var(--c-line))}
+.per-acoes .btn{height:32px;font-size:12px}
+.fbar > .search,.fbar > .tb-busca{min-width:130px}
+.fbar .tb-sel{max-width:180px}
+.fbar .kb-ord{max-width:158px}
+@media (max-width:760px){
+  .fbar > .search,.fbar > .tb-busca{flex-basis:100%;max-width:none;margin-left:0}
+}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2051,7 +2106,7 @@ a.kb-btn{text-decoration:none;justify-content:center;gap:6px}
           <button class="btn primary" id="btn-novo" type="button"><svg class="i"><use href="#i-plus"/></svg>Novo cadastro</button>
         </div>
       </div>
-      <div class="pop-filtro" id="pop-filtro" hidden><label>Estado<select id="kbf-uf"></select></label><label>Parceiro<select id="kbf-parc"></select></label><button type="button" id="kbf-limpar">Limpar filtros</button></div>
+      <div class="pop-filtro" id="pop-filtro" hidden><div class="pf-grade"><label>Estado<select id="kbf-uf"></select></label><label>Parceiro<select id="kbf-parc"></select></label><div class="pf-campo"><span>Responsável</span><button type="button" class="pf-minhas" data-minhas aria-pressed="false" title="Mostra só as clientes em que você é o responsável">Só as minhas clientes</button></div></div><button type="button" id="kbf-limpar">Limpar filtros</button></div>
       <div class="banner" id="banner" hidden></div>
       <div class="funil" id="funil" hidden></div>
 
@@ -5280,18 +5335,36 @@ a.kb-btn{text-decoration:none;justify-content:center;gap:6px}
   }
   function arqCard(r){ var i = arqInfo(r); return kbCard(r, { resp: i.resp, meta: i.meta, acoes: i.acao }); }
   /* ---------- Dashboard: números por período, gráfico de cadastros e contratos e rankings ---------- */
-  var DASH_PERIODOS = [['mes', 'Este mês'], ['30', '30 dias'], ['ano', 'Este ano'], ['tudo', 'Tudo']], DASH_MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+  var DASH_PERIODOS = [['hoje', 'Hoje'], ['7', '7 dias'], ['30', '30 dias'], ['90', '90 dias'], ['mes', 'Este mês'], ['mesant', 'Mês anterior'], ['ano', 'Este ano'], ['tudo', 'Tudo']], DASH_MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
   var dashPer = lerGuardado('nascer-dash-per', 'mes'), dashTabela = false, dashSerie = null;
   function dataCad(r){ return diaLocal(r.dataCadastro || r.criadoEm); }
   function dataPerda(r){ return diaLocal(r.desqualEm || r.arquivadoEm || r.ultimoContatoEm || r.leadMudouEm); }
   function dataGanho(r){ return diaLocal((r.repasse && r.repasse.data) || (r.recebimento && r.recebimento.data) || r.inssDecisaoEm || r.arquivadoEm); }
   function dashJanela(){
-    var ag = new Date(), fim = iso(ag), ini;
-    if (dashPer === '30'){ var d = new Date(); d.setDate(d.getDate() - 29); ini = iso(d); }
+    var ag = new Date(), fim = iso(ag), ini, m = /^r:(\d{4}-\d{2}-\d{2}):(\d{4}-\d{2}-\d{2})$/.exec(String(dashPer));
+    var atras = function(n){ var d = new Date(); d.setDate(d.getDate() - n); return iso(d); };
+    if (m){ ini = m[1]; fim = m[2]; return { ini: ini, fim: fim, mensal: (parseDate(fim) - parseDate(ini)) / 864e5 > 92 }; }
+    if (dashPer === 'hoje') ini = fim;
+    else if (dashPer === '7') ini = atras(6);
+    else if (dashPer === '30') ini = atras(29);
+    else if (dashPer === '90') ini = atras(89);
+    else if (dashPer === 'mesant'){ var p = new Date(ag.getFullYear(), ag.getMonth() - 1, 1), u = new Date(ag.getFullYear(), ag.getMonth(), 0); ini = iso(p); fim = iso(u); }
     else if (dashPer === 'ano') ini = fim.slice(0, 4) + '-01-01';
     else if (dashPer === 'tudo') ini = '';
     else ini = fim.slice(0, 7) + '-01';
     return { ini: ini, fim: fim, mensal: dashPer === 'ano' || dashPer === 'tudo' };
+  }
+  function dashPerRotulo(){
+    var m = /^r:(\d{4}-\d{2}-\d{2}):(\d{4}-\d{2}-\d{2})$/.exec(String(dashPer)); if (m) return fmtDate(m[1]) + ' a ' + fmtDate(m[2]);
+    var p = DASH_PERIODOS.filter(function(x){ return x[0] === dashPer; })[0]; if (!p) return 'Este mês';
+    return /dias$/.test(p[1]) ? 'Últimos ' + p[1] : p[1];
+  }
+  function dashPeriodo(j){
+    var cust = /^r:/.test(String(dashPer));
+    return '<div class="per-box"><button type="button" class="per-btn" data-per-abrir aria-haspopup="true" aria-expanded="false">' + svgI('i-cal') + '<span>' + esc(dashPerRotulo()) + '</span>' + svgI('i-chev') + '</button>' +
+      '<div class="per-pop" hidden><div class="per-atalhos">' + DASH_PERIODOS.map(function(p){ return '<button type="button" data-dash-per="' + p[0] + '" aria-pressed="' + (p[0] === dashPer) + '">' + p[1] + '</button>'; }).join('') + '</div>' +
+      '<div class="per-faixa"><label>De<input type="date" id="per-de" value="' + esc(cust ? j.ini : (j.ini || '')) + '"></label><label>Até<input type="date" id="per-ate" value="' + esc(j.fim) + '"></label></div>' +
+      '<div class="per-acoes"><button type="button" class="btn" data-dash-per="mes">Limpar</button><button type="button" class="btn primary" data-per-aplicar>Aplicar</button></div></div></div>';
   }
   function dashBaldes(j, datas){
     var ini = j.ini || datas.reduce(function(a, d){ return d && d < a ? d : a; }, j.fim), out = [];
@@ -5357,7 +5430,7 @@ a.kb-btn{text-decoration:none;justify-content:center;gap:6px}
     var cads = rows.filter(function(r){ return no(dataCad(r)); }), ctrs = rows.filter(function(r){ return no(r.contratoEm); }), perdas = rows.filter(function(r){ return perdaOuDesq(r) && no(dataPerda(r)); });
     var doGrupo = cads.filter(function(r){ return r.contratoEm; }).length, taxa = cads.length ? Math.round(doGrupo / cads.length * 100) : null;
     var pos = rows.filter(noContratos);
-    html += '<div class="fbar"><div class="seg-bi" role="group" aria-label="Período">' + DASH_PERIODOS.map(function(p){ return '<button type="button" data-dash-per="' + p[0] + '" aria-pressed="' + (p[0] === dashPer) + '">' + p[1] + '</button>'; }).join('') + '</div><span class="tb-fim fb-count tnum">' + esc(faixa) + '</span></div>';
+    html += '<div class="fbar">' + dashPeriodo(j) + '<span class="tb-fim fb-count tnum">' + esc(faixa) + '</span></div>';
     html += dashSecao('Clientes por fase', 'agora', '<div class="stats">' + fasesAtivas().map(function(f){ return dashCard(f[0], f[1], TITULOS[f[0]][0], res[f[0]][0], res[f[0]][1]); }).join('') + '</div>');
     var novoF = fluxoVista === 'novo';
     if (novoF) html += dashSecao('Entrada', 'no período', '<div class="stats">' +
@@ -5413,6 +5486,10 @@ a.kb-btn{text-decoration:none;justify-content:center;gap:6px}
     box.innerHTML = html;
   }
   $('dash-box').addEventListener('click', function(e){
+    var ab = e.target.closest('[data-per-abrir]');
+    if (ab){ var pp = ab.parentNode.querySelector('.per-pop'); pp.hidden = !pp.hidden; ab.setAttribute('aria-expanded', String(!pp.hidden)); return; }
+    var ap = e.target.closest('[data-per-aplicar]');
+    if (ap){ var de = $('per-de').value, ate = $('per-ate').value; if (!de || !ate){ toast('Escolha as duas datas: de e até.'); return; } if (de > ate){ var tmp = de; de = ate; ate = tmp; } dashPer = 'r:' + de + ':' + ate; guardar('nascer-dash-per', dashPer); renderDash(); return; }
     var p = e.target.closest('[data-dash-per]');
     if (p){ dashPer = p.dataset.dashPer; guardar('nascer-dash-per', dashPer); renderDash(); return; }
     var t = e.target.closest('[data-dash-tab]');
@@ -5525,12 +5602,24 @@ a.kb-btn{text-decoration:none;justify-content:center;gap:6px}
     if (t === 'i') return !!(inssQ || inssSit);
     if (t === 'c') return !!(state.q || judSit);
     if (t === 'r') return !!(state.r.q || state.r.f);
+    if (t === 'gp') return !!gpnQ;
+    if (t === 'an') return !!nanQ;
+    if (t === 'rq') return !!rqnQ;
     return false;
   }
+  function pintarLimpar(){
+    var v = VIEWS[telaAberta], sec = v && $(v[1]), fb = sec && sec.querySelector('.fbar'); if (!fb) return;
+    var b = fb.querySelector('.fb-limpar');
+    if (!b){ b = document.createElement('button'); b.type = 'button'; b.className = 'fb-limpar'; b.title = 'Há busca ou filtro ligado: algumas clientes não aparecem'; b.innerHTML = svgI('i-x') + 'Limpar'; b.addEventListener('click', limparFiltros); fb.insertBefore(b, fb.firstChild); }
+    b.hidden = !filtrosDaTela();
+  }
+  document.addEventListener('input', function(e){ if (e.target.closest && e.target.closest('.fbar')) setTimeout(pintarLimpar, 0); });
+  document.addEventListener('change', function(e){ if (e.target.closest && e.target.closest('.fbar')) setTimeout(pintarLimpar, 0); });
   function limparFiltros(){
     kbF.uf = ''; kbF.parc = ''; cadQ = ''; cadSit = ''; ctrQ2 = ''; ctrSit = ''; filaQ = ''; filaSit = ''; inssQ = ''; inssSit = ''; judSit = ''; state.q = ''; state.r.q = ''; state.r.f = '';
     if (soMinhas){ soMinhas = false; Array.prototype.forEach.call(document.querySelectorAll('[data-minhas]'), function(b){ b.setAttribute('aria-pressed', 'false'); }); }
-    ['cad-q', 'ctr-q', 'fila-q', 'inss-q', 'bc-q', 'q', 'r-q'].forEach(function(id){ if ($(id)) $(id).value = ''; });
+    gpnQ = ''; nanQ = ''; rqnQ = '';
+    ['cad-q', 'ctr-q', 'fila-q', 'inss-q', 'bc-q', 'q', 'r-q', 'gpn-q', 'nan-q', 'rqn-q'].forEach(function(id){ if ($(id)) $(id).value = ''; });
     $('r-f').value = ''; render();
   }
   function renderFunil(){
@@ -5561,7 +5650,7 @@ a.kb-btn{text-decoration:none;justify-content:center;gap:6px}
     $('mais-box').hidden = t !== 'k' || fluxoVista === 'novo';
     var c = $('conteudo');
     c.classList.remove('em-quadro', 'recolhido');
-    Array.prototype.forEach.call(document.querySelectorAll('[data-filtrar]'), function(b){ b.classList.toggle('on', !!(kbF.uf || kbF.parc)); });
+    pintarFiltrar(); pintarLimpar();
     Array.prototype.forEach.call(document.querySelectorAll('.kb-ord'), function(s){ s.value = kbOrdem; });
   }
   // o quadro vai até o pé da janela: a barra de rolagem lateral fica à vista e a página não ganha rolagem
@@ -5575,7 +5664,7 @@ a.kb-btn{text-decoration:none;justify-content:center;gap:6px}
   window.addEventListener('resize', medirQuadros);
   setTimeout(medirQuadros, 400);
   function fecharPops(){
-    Array.prototype.forEach.call(document.querySelectorAll('.pop,.pop-filtro'), function(p){ p.hidden = true; });
+    Array.prototype.forEach.call(document.querySelectorAll('.pop'), function(p){ p.hidden = true; });
     Array.prototype.forEach.call(document.querySelectorAll('[aria-haspopup]'), function(b){ b.setAttribute('aria-expanded', 'false'); });
   }
   function ligarPop(btn, pop){ btn.addEventListener('click', function(e){ e.stopPropagation(); var abrir = pop.hidden; fecharPops(); pop.hidden = !abrir; btn.setAttribute('aria-expanded', String(abrir)); }); }
@@ -5603,6 +5692,7 @@ a.kb-btn{text-decoration:none;justify-content:center;gap:6px}
   document.addEventListener('click', function(e){
     if (!e.target.closest) return;
     if (!e.target.closest('.pop,.pop-filtro')) fecharPops();
+    if (!e.target.closest('.per-box')) Array.prototype.forEach.call(document.querySelectorAll('.per-pop'), function(x){ x.hidden = true; });
     var s = e.target.closest('[data-sit]'); if (s){ aplicarSit(s.dataset.sit); return; }
     var f = e.target.closest('[data-fn]'); if (f){ showTab(f.dataset.fn); return; }
     var c = e.target.closest('[data-recolher]'); if (c){ topoRecolhido = !topoRecolhido; guardar('nascer-topo-recolhido', topoRecolhido); renderFunil(); pintarPagina(); medirQuadros(); return; }
@@ -5610,24 +5700,25 @@ a.kb-btn{text-decoration:none;justify-content:center;gap:6px}
     var fl = e.target.closest('[data-filtrar]'); if (fl){ e.stopPropagation(); abrirFiltro(fl); return; }
   });
   document.addEventListener('keydown', function(e){
-    if (e.key === 'Escape'){ fecharPops(); var av = document.querySelector('.av-sheet'); if (av) av.remove(); }
+    if (e.key === 'Escape'){ fecharPops(); $('pop-filtro').hidden = true; var av = document.querySelector('.av-sheet'); if (av) av.remove(); }
     if ((e.key === 'Enter' || e.key === ' ') && e.target.dataset && e.target.dataset.fn){ e.preventDefault(); showTab(e.target.dataset.fn); }
   });
   document.addEventListener('change', function(e){ if (e.target.classList && e.target.classList.contains('kb-ord')){ kbOrdem = e.target.value; render(); } });
   /* botão Filtrar: estado e parceiro */
   function abrirFiltro(btn){
-    var p = $('pop-filtro'), abrir = p.hidden; fecharPops(); if (!abrir) return;
+    var p = $('pop-filtro'), fb = btn.closest('.fbar'), abrir = p.hidden || (fb && p.previousElementSibling !== fb); fecharPops();
+    if (!abrir){ p.hidden = true; pintarFiltrar(); return; }
+    if (fb) fb.parentNode.insertBefore(p, fb.nextSibling);   // o painel abre logo abaixo da linha de filtros da tela
     $('kbf-uf').innerHTML = '<option value="">Todos</option>' + (state.regioes || []).map(function(g){ var u = String(g.uf || g.id).toUpperCase(); return '<option value="' + esc(u) + '"' + (u === kbF.uf ? ' selected' : '') + '>' + esc(g.nome) + '</option>'; }).join('');
     $('kbf-parc').innerHTML = '<option value="">Todos</option>' + state.prosp.filter(function(x){ return !kbF.uf || x.regiaoId === kbF.uf; }).slice().sort(function(a, b){ return String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); }).map(function(x){ return '<option value="' + esc(x.id) + '"' + (x.id === kbF.parc ? ' selected' : '') + '>' + esc(x.nome) + '</option>'; }).join('');
-    p.hidden = false;
-    var r = btn.getBoundingClientRect();
-    p.style.left = Math.max(8, Math.min(r.left, window.innerWidth - p.offsetWidth - 8)) + 'px'; p.style.top = (r.bottom + 6) + 'px';
+    p.hidden = false; pintarFiltrar();
   }
+  function pintarFiltrar(){ var aberto = !$('pop-filtro').hidden; Array.prototype.forEach.call(document.querySelectorAll('[data-filtrar]'), function(b){ b.classList.toggle('on', !!(kbF.uf || kbF.parc || soMinhas)); b.setAttribute('aria-expanded', String(aberto)); }); }
   $('pop-filtro').addEventListener('change', function(e){
     if (e.target.id === 'kbf-uf'){ kbF.uf = e.target.value; kbF.parc = ''; } else if (e.target.id === 'kbf-parc') kbF.parc = e.target.value;
     render();
   });
-  $('kbf-limpar').addEventListener('click', function(){ kbF.uf = ''; kbF.parc = ''; fecharPops(); render(); });
+  $('kbf-limpar').addEventListener('click', function(){ kbF.uf = ''; kbF.parc = ''; if (soMinhas){ soMinhas = false; Array.prototype.forEach.call(document.querySelectorAll('[data-minhas]'), function(b){ b.setAttribute('aria-pressed', 'false'); }); } render(); });
   /* arrastar: entre as colunas do quadro ou até o balão de outra fase */
   function limparAlvos(){ Array.prototype.forEach.call(document.querySelectorAll('.kb-col.alvo,[data-fn].alvo'), function(x){ x.classList.remove('alvo'); }); }
   document.addEventListener('dragstart', function(e){ var c = e.target.closest && e.target.closest('[data-arrasta]'); if (!c) return; e.dataTransfer.setData('text/plain', c.dataset.arrasta); e.dataTransfer.effectAllowed = 'move'; c.classList.add('arrastando'); });
@@ -7658,6 +7749,7 @@ a.kb-btn{text-decoration:none;justify-content:center;gap:6px}
     if (fluxoVista === 'novo' && (which === 'd' || which === 'h' || which === 'q')) which = which === 'h' ? 'rq' : 'k';   // fluxo novo não tem Cadastro, Fila nem Perdas
     if (fluxoVista !== 'novo' && (which === 'gp' || which === 'an' || which === 'rq')) which = 'k';
     telaAberta = which; if (telaDoFunil(which)) ultimaFase = which;
+    $('pop-filtro').hidden = true;
     Object.keys(VIEWS).forEach(function(k){ $(VIEWS[k][0]).setAttribute('aria-selected', VIEWS[k][0] === VIEWS[which][0] ? 'true' : 'false'); $(VIEWS[k][1]).hidden = k !== which; });
     try { sessionStorage.setItem('qe-view', which); } catch(e){}
     if (which === 'b') renderDash();
