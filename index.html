@@ -3693,7 +3693,8 @@ html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.
   }
   function fcDados(r){
     var t = faseDe(r), id = esc(r.id), resp = fcResp(r, t), etapaSel;
-    if (t === 'k' || ((t === 'gp' || t === 'an' || t === 'rq') && noContratos(r))) etapaSel = '<select data-pos="' + id + '">' + posColsDe(r).map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === posEtapaDe(r) ? ' selected' : '') + '>' + esc(posNome(r, c)) + '</option>'; }).join('') + (doFluxoNovo(r) ? '' : '<option value="__cad">↩ Voltar ao Cadastro</option>') + '</select>';
+    if (doFluxoNovo(r) && (t === 'k' || t === 'gp' || t === 'an' || t === 'rq')) etapaSel = '<input disabled value="' + esc(t === 'k' ? pendNovoTxt(r) : (faseTexto(r).split(' · ').slice(1).join(' · ') || '—')) + '">';   // fluxo novo: as etapas andam sozinhas
+    else if (t === 'k' || ((t === 'gp' || t === 'an' || t === 'rq') && noContratos(r))) etapaSel = '<select data-pos="' + id + '">' + posColsDe(r).map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === posEtapaDe(r) ? ' selected' : '') + '>' + esc(posNome(r, c)) + '</option>'; }).join('') + (doFluxoNovo(r) ? '' : '<option value="__cad">↩ Voltar ao Cadastro</option>') + '</select>';
     else if (t === 'd') etapaSel = '<select data-lead="' + id + '">' + Object.keys(LEAD).map(function(x){ return '<option value="' + x + '"' + (x === leadDe(r) ? ' selected' : '') + '>' + LEAD[x] + '</option>'; }).join('') + '</select>';
     else if (t === 'i') etapaSel = '<select data-inss="' + id + '">' + inssOpcoes(r, statusInss(r)).map(function(x){ return '<option value="' + x + '"' + (x === statusInss(r) ? ' selected' : '') + '>' + INSS[x][0] + '</option>'; }).join('') + '</select>';
     else etapaSel = '<input disabled value="' + esc(faseTexto(r).split(' · ')[1] || '—') + '">';
@@ -4474,10 +4475,11 @@ html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.
   }
   function tarefaPos(r){
     if (!noContratos(r)) return '';
-    if (gpsTarefa(r)) return (!nitOk(r.nit) ? 'Tarefa: pegar o NIT da mãe (a GPS sai sozinha)' : 'Tarefa: pagar a GPS (guia pronta)') + (prazoGps(r) ? ' até ' + fmtDate(prazoGps(r)) : '');
+    if (gpsTarefa(r) && doFluxoNovo(r)){ if (!nitOk(r.nit)) return 'Tarefa: pegar o NIT da mãe (a GPS sai sozinha)' + (prazoGps(r) ? ' até ' + fmtDate(prazoGps(r)) : ''); if (prazoGps(r) && prazoGps(r) < iso(new Date())) return 'Tarefa: conferir o pagamento automático da GPS (prazo ' + fmtDate(prazoGps(r)) + ')'; }
+    else if (gpsTarefa(r)) return (!nitOk(r.nit) ? 'Tarefa: pegar o NIT da mãe (a GPS sai sozinha)' : 'Tarefa: pagar a GPS (guia pronta)') + (prazoGps(r) ? ' até ' + fmtDate(prazoGps(r)) : '');
     if (gpsVencida(r) && String(r.dpp).slice(0, 10) <= iso(new Date())) return 'GPS não foi paga (venceu ' + fmtDate(gpsVencida(r)) + '): confira antes de encaminhar';
     if (!r.tipoSegurada) return 'Tarefa: informar se é rural ou urbano';
-    if (posEtapaDe(r) === 'cert') return 'Tarefa: falar com a mãe e pedir a certidão';
+    if (posEtapaDe(r) === 'cert' && !doFluxoNovo(r)) return 'Tarefa: falar com a mãe e pedir a certidão';
     if (!nascido(r) && !r.dpp) return 'Tarefa: informar a data do parto';
     return '';
   }
@@ -4525,7 +4527,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.
   var POS_COLS = [['senha', 'Senha Meu INSS'], ['docs', 'Documentação Pessoal'], ['prazo_gps', 'Aguardando Prazo da GPS'], ['gps', 'Emitir/Pagar GPS'], ['nasc', 'Aguardando Nascimento'], ['cert', 'Solicitar Certidão de Nascimento'], ['ok', 'Documentação OK']];
   var POS_ORDEM = POS_COLS.map(function(c){ return c[0]; }), POS_LEGADO = { recem: 'senha', falta_gov: 'senha', falta_doc: 'docs', rural: 'docs', guia: 'gps' };
   var POS_SO_GESTANTE = { prazo_gps: 1, gps: 1, nasc: 1 }, POS_SO_URBANA = { prazo_gps: 1, gps: 1 };
-  var POS_NOME_NOVO = { senha: 'Senha gov.br', docs: 'Documentos', prazo_gps: 'GPS · aguardando o prazo', gps: 'GPS · pagar agora', nasc: 'Aguardando parto', cert: 'Aguardando certidão', ok: 'Pronta para requerer' };
+  var POS_NOME_NOVO = { senha: 'Senha gov.br', docs: 'Documentos', prazo_gps: 'GPS · aguardando o prazo', gps: 'GPS · pagamento automático', nasc: 'Aguardando parto', cert: 'Aguardando certidão', ok: 'Requerimento automático' };
   function posNome(r, c){ return (doFluxoNovo(r) && POS_NOME_NOVO[c[0]]) || c[1]; }
   function posColsDe(r){ return POS_COLS.filter(function(c){ return !(nascido(r) && POS_SO_GESTANTE[c[0]]) && !(rural(r) && POS_SO_URBANA[c[0]]); }); }
   function posLane(r){ return nascido(r) ? 'nasc' : 'gest'; }
@@ -4565,6 +4567,15 @@ html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.
     var d = diasDesdeIso(base); return d == null ? 0 : d;
   }
   function iniciais(n){ var p = String(n || '?').trim().split(/\s+/); return ((p[0] || '?').charAt(0) + (p.length > 1 ? p[p.length - 1].charAt(0) : '')).toUpperCase(); }
+  // pendência principal da mãe no Pós-venda do fluxo novo
+  function pendNovoTxt(r){
+    if (!r.tipoSegurada) return 'Rural ou urbano?';
+    if (!r.senhaGovOk) return 'Senha gov.br';
+    var f = faltaDocs(r);
+    if (f.indexOf('nit') >= 0 && f.length === 1) return 'NIT';
+    if (f.indexOf('rural') >= 0 && f.length === 1) return 'Prova rural';
+    return f.length ? 'Documentos' : 'Em dia';
+  }
   function posInfo(r){
     var et = posEtapaDe(r), atr = atrasoTxt(r), d = diasNoPos(r), st = [], id = esc(r.id);
     if (r.pvAnalise === 'devolvido') st.push(kbSt('Devolvida pela Controladoria' + (r.analiseMotivo ? ': ' + r.analiseMotivo : '')));
@@ -4583,7 +4594,8 @@ html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.
         : zpN ? '<a class="kb-btn" target="_blank" rel="noopener" href="' + esc(zpN + '?text=' + encodeURIComponent(msgCobranca(r))) + '" title="Abre o WhatsApp com a mensagem pronta; você confere e envia">' + svgI('i-zap') + 'Cobrar no WhatsApp</a>'
         : '<button type="button" class="kb-btn" data-act="edit" data-id="' + id + '" title="Sem telefone: abra o cadastro e informe o WhatsApp da mãe">' + svgI('i-pencil') + 'Pôr o telefone</button>';
     }
-    return { etapa: posNome(r, POS_COLS.filter(function(c){ return c[0] === et; })[0] || [et, '']), etapaSel: '<select data-pos="' + id + '" aria-label="Etapa de ' + esc(r.nome) + '">' + opts + '</select>',
+    var novoK = doFluxoNovo(r) && faseDe(r) === 'k';
+    return { etapa: novoK ? pendNovoTxt(r) : posNome(r, POS_COLS.filter(function(c){ return c[0] === et; })[0] || [et, '']), etapaSel: novoK ? '' : '<select data-pos="' + id + '" aria-label="Etapa de ' + esc(r.nome) + '">' + opts + '</select>',
       meta: meta, status: st, acao: acao, resp: r.posResp || (doFluxoNovo(r) ? '' : r.contratoPor), dias: d, parado: d > 14, dataVal: nascido(r) ? 'Nasceu ' + (r.criancaNasc ? fmtDate(String(r.criancaNasc).slice(0, 10)) : '') : r.dpp ? fmtDate(String(r.dpp).slice(0, 10)) : 'Sem data',
       mover: kbMover('<select data-pos="' + id + '" aria-label="Mover ' + esc(r.nome) + '">' + opts + '</select>') };
   }
@@ -4649,37 +4661,39 @@ html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.
   function gpsInfoN(r){
     var et = posEtapaDe(r), v = prazoGps(r), g = gpsGerar(r), st = [];
     var pendG = docsApp(r).filter(function(x){ return !x.ok && x.k !== 'nit'; }).map(function(x){ return x.n; });
+    var gat = gatilhoGps(r);
     if (!nitOk(r.nit)) st.push(kbSt('Falta o NIT da mãe: sem ele a guia não sai', 'lar'));
-    else if (et === 'gps') st.push(v && v < iso(new Date()) ? kbSt('Prazo da GPS passou em ' + fmtDate(v) + ': pagar já') : kbSt('Guia pronta: pagar até ' + fmtDate(v), 'lar'));
-    else st.push(kbSt('Guia pronta · paga no prazo (Asaas, quando ligado)', 'ok'));
+    else if (v && v < iso(new Date())) st.push(kbSt('Prazo passou em ' + fmtDate(v) + ': pagamento automático não confirmado'));
+    else if (gpsTarefa(r)) st.push(kbSt('Pagamento automático pelo Asaas até ' + fmtDate(v), 'lar'));
+    else st.push(kbSt('Guia pronta · o Asaas paga' + (gat ? ' em ' + fmtDate(gat) : ' no prazo'), 'ok'));
     if (pendG.length) st.push(kbSt('Pendência no Pós-venda: ' + pendG.join(', '), 'lar'));
-    return { etapa: gpsTarefa(r) ? 'Pagar agora' : 'Aguardando o prazo', etapaSel: selPos(r), status: st, resp: r.posResp, dias: diasNoPos(r), parado: false,
-      dataVal: v ? fmtDate(v) + ' · ' + emDias(v) : 'sem data do parto',
-      acao: gpsTarefa(r) ? '<button type="button" class="kb-btn" data-guia-paga="' + esc(r.id) + '">' + svgI('i-cash') + 'Marcar GPS paga</button>' : (g ? '<button type="button" class="kb-btn" data-gpn-copia="' + esc(g.digitos) + '">' + svgI('i-copy') + 'Copiar código</button>' : '') };
+    return { etapa: gpsTarefa(r) ? 'Pagamento automático' : 'Aguardando o prazo', etapaSel: '', status: st, resp: r.posResp, dias: diasNoPos(r), parado: false,
+      dataVal: v ? fmtDate(v) + ' · ' + emDias(v) : 'sem data do parto', acao: '' };
   }
   function nascInfoN(r){
     var d = daysUntil(r.dpp), aviso = r.dpp ? (function(){ var x = parseDate(String(r.dpp).slice(0, 10)); if (!x) return ''; x.setDate(x.getDate() - 7); return iso(x); })() : '';
     var st = [!r.dpp ? kbSt('Sem data prevista do parto') : d != null && d <= 7 ? kbSt('Semana do parto: a IA está falando com a mãe', 'lar') : kbSt('A IA fala com a mãe em ' + fmtDate(aviso), 'info')];
-    return { etapa: 'Aguardando nascimento', etapaSel: selPos(r), status: st, resp: r.posResp, dias: diasNoPos(r), parado: false,
+    return { etapa: 'Aguardando nascimento', etapaSel: '', status: st, resp: r.posResp, dias: diasNoPos(r), parado: false,
       dataVal: r.dpp ? fmtDate(String(r.dpp).slice(0, 10)) + ' · ' + emDias(r.dpp) : '—', acao: '' };
   }
   function reqInfoN(r){
     var id = esc(r.id), fila = naFila(r), et = fila ? 'fila' : posEtapaDe(r), falta = faltamTxt(r), st = [];
-    if (et === 'cert') st.push(kbSt('A IA pede à mãe a foto da certidão', 'info'));
+    if (et === 'cert') st.push(kbSt('A IA pede a certidão à mãe pelo WhatsApp', 'info'));
     else if (falta) st.push(kbSt('Falta: ' + falta, 'lar'));
-    else st.push(kbSt('Pasta completa: pronta para o requerimento', 'ok'));
-    if (!rural(r) && !gpsPaga(r)) st.push(kbSt('GPS não consta como paga: confira antes do protocolo'));
+    else st.push(kbSt('Requerimento automático no Meu INSS', 'ok'));
+    if (!rural(r) && !gpsPaga(r)) st.push(kbSt('GPS não consta como paga: conferir'));
     var prot = '<button type="button" class="kb-btn" data-rqn-prot="' + id + '" title="Requerimento feito no Meu INSS: registrar o número do protocolo (vai ser automático)">' + svgI('i-file') + 'Registrar protocolo</button>';
-    return { etapa: et === 'cert' ? 'Aguardando certidão' : 'Pronta para requerer', etapaSel: fila ? '' : selPos(r), status: st, resp: r.posResp, dias: fila ? (diasDesdeIso(r.filaMudouEm || r.encaminhadoEm) || 0) : diasNoPos(r), parado: false,
+    return { etapa: et === 'cert' ? 'Aguardando certidão' : 'Requerimento automático', etapaSel: '', status: st, resp: r.posResp, dias: fila ? (diasDesdeIso(r.filaMudouEm || r.encaminhadoEm) || 0) : diasNoPos(r), parado: false,
       dataVal: r.criancaNasc ? 'Nasceu ' + fmtDate(String(r.criancaNasc).slice(0, 10)) : r.dpp ? fmtDate(String(r.dpp).slice(0, 10)) : '—',
-      acao: et === 'cert' ? '<button type="button" class="kb-btn" data-pv-cert="' + id + '">' + svgI('i-check') + 'Recebi a certidão</button>' : prot };
+      acao: '' };
   }
   function listaNovo(fase, q){ return state.rows.filter(function(r){ return faseDe(r) === fase && buscaOk(r, q) && (!soMinhas || minha(r)) && passaFiltro(r); }); }
   function statsNovo(id, cards){ var el = $(id); if (el) el.innerHTML = cards.map(function(c){ return '<div class="card stat"><div class="stat-h"><svg class="i"><use href="#' + c[0] + '"/></svg>' + c[1] + '</div><div class="stat-v tnum">' + c[2] + '</div><div class="stat-c">' + c[3] + '</div></div>'; }).join(''); }
   function renderGpsNovo(){
     var box = $('gpn-list'); if (!box) return;
     var todos = state.rows.filter(function(r){ return faseDe(r) === 'gp'; });
-    statsNovo('gpn-stats', [['i-cash', 'Na GPS', todos.length, 'urbanas esperando a guia'], ['i-alert', 'Pagar agora', todos.filter(gpsTarefa).length, 'prazo chegou'], ['i-users', 'Sem NIT', todos.filter(function(r){ return !nitOk(r.nit); }).length, 'sem NIT a guia não sai'], ['i-clock', 'Aguardando o prazo', todos.filter(function(r){ return posEtapaDe(r) === 'prazo_gps'; }).length, 'a guia sai 5 dias antes']]);
+    var hojeG = iso(new Date());
+    statsNovo('gpn-stats', [['i-cash', 'Na GPS', todos.length, 'urbanas com a guia gerada'], ['i-zap', 'Pagando agora', todos.filter(gpsTarefa).length, 'o Asaas paga até o prazo'], ['i-alert', 'Prazo vencido', todos.filter(function(r){ var v = prazoGps(r); return v && v < hojeG; }).length, 'pagamento não confirmado'], ['i-clock', 'Aguardando o prazo', todos.filter(function(r){ return !gpsTarefa(r); }).length, 'paga 5 dias antes do prazo']]);
     var l = ordenar(listaNovo('gp', gpnQ), function(a, b){ return String(prazoGps(a) || '9999').localeCompare(String(prazoGps(b) || '9999')); });
     kbInfo('gpn', 'gp', l.length, 'cliente', 'clientes');
     tabelaFase(box, l, gpsInfoN, 'Prazo da GPS', 'Nenhuma urbana esperando a GPS.');
@@ -4696,7 +4710,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.
   function renderReqNovo(){
     var box = $('rqn-list'); if (!box) return;
     var todos = state.rows.filter(function(r){ return faseDe(r) === 'rq'; }), ce = todos.filter(function(r){ return noContratos(r) && posEtapaDe(r) === 'cert'; }).length;
-    statsNovo('rqn-stats', [['i-file', 'No requerimento', todos.length, 'bebê nasceu'], ['i-baby', 'Esperando certidão', ce, 'a IA pede à mãe'], ['i-check', 'Prontas para requerer', todos.length - ce, 'pasta completa'], ['i-inss', 'Requerimento', 'Manual', 'vai ser automático']]);
+    statsNovo('rqn-stats', [['i-file', 'No requerimento', todos.length, 'bebê nasceu'], ['i-baby', 'Esperando certidão', ce, 'a IA pede à mãe'], ['i-check', 'Com certidão', todos.length - ce, 'requerimento automático'], ['i-inss', 'Requerimento', 'Automático', 'feito pelo sistema no Meu INSS']]);
     var l = ordenar(listaNovo('rq', rqnQ), function(a, b){ return String(a.criancaNasc || a.dpp || '9999').localeCompare(String(b.criancaNasc || b.dpp || '9999')); });
     kbInfo('rqn', 'rq', l.length, 'cliente', 'clientes');
     tabelaFase(box, l, reqInfoN, 'Nascimento', 'Ninguém no requerimento agora.');
@@ -5816,7 +5830,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.
     // mesmos cartões da Jornada da mãe (dnCard): ícone e título, valor, duas linhas curtas
     return '<div class="dn-grade">' +
       dnCard('i-scale', 'Total gasto', moedaTxt(T), 'guias + repasses no período' + dnVar(T, TA, true)) +
-      dnCard('i-cash', 'Guias GPS', moedaTxt(G), plural(pagas.length, 'guia paga', 'guias pagas') + ' · ' + moedaTxt(gpsValor()) + ' cada' + linha2(agora.length ? 'pagar agora: <b>' + plural(agora.length, 'guia', 'guias') + ' (' + moedaTxt(agora.length * gpsValor()) + ')</b>' : 'nenhuma vencendo agora'), '', '', 'gp') +
+      dnCard('i-cash', 'Guias GPS', moedaTxt(G), plural(pagas.length, 'guia paga', 'guias pagas') + ' · ' + moedaTxt(gpsValor()) + ' cada' + linha2(agora.length ? 'pagando agora (automático): <b>' + plural(agora.length, 'guia', 'guias') + ' (' + moedaTxt(agora.length * gpsValor()) + ')</b>' : 'nenhuma vencendo agora'), '', '', 'gp') +
       dnCard('i-users', 'Repasse a parceiros', moedaTxt(R), plural(pagos.length, 'pagamento', 'pagamentos') + (quem ? ' a ' + quem : '') + linha2(pend.length ? 'pendente: <b>' + moedaTxt(P) + '</b> em ' + plural(pend.length, 'comissão', 'comissões') : 'nenhuma comissão pendente'), '', '', 'f') +
       dnCard('i-clock', 'Previsão de guias', moedaTxt(prev), plural(prox.length, 'urbana ainda vai pagar', 'urbanas ainda vão pagar') + linha2('a guia sai 5 dias antes do prazo'), '', '', 'gp') +
       '</div>';
@@ -6254,9 +6268,9 @@ html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.
       i: [ins.length, exi ? plural(exi, 'em exigência', 'em exigência') : lat ? plural(lat, 'análise atrasada', 'análises atrasadas') : 'requerimentos no INSS', plural(ins.length, 'requerimento', 'requerimentos') + ' · ' + plural(exi, 'exigência', 'exigências')],
       c: [jud.length, marc ? plural(marc, 'audiência marcada', 'audiências marcadas') : 'ações em andamento', plural(jud.length, 'ação', 'ações') + ' · ' + plural(marc, 'audiência marcada', 'audiências marcadas')],
       r: [pagos, contatar ? plural(contatar, 'para contatar', 'para contatar') : plural(pagos, 'paga', 'pagas'), plural(pagos, 'paga', 'pagas') + ' · ' + plural(contatar, 'para contatar', 'para contatar')],
-      gp: (function(){ var l = rows.filter(function(r){ return faseDe(r) === 'gp'; }), pg = l.filter(gpsTarefa).length, sn = l.filter(function(r){ return !nitOk(r.nit); }).length; return [l.length, pg ? plural(pg, 'para pagar agora', 'para pagar agora') : sn ? plural(sn, 'sem NIT', 'sem NIT') : 'Aguardando o prazo', plural(l.length, 'cliente', 'clientes') + ' · ' + plural(pg, 'GPS para pagar', 'GPS para pagar') + ' · ' + plural(sn, 'sem NIT', 'sem NIT')]; })(),
+      gp: (function(){ var l = rows.filter(function(r){ return faseDe(r) === 'gp'; }), pg = l.filter(gpsTarefa).length, sn = l.filter(function(r){ return !nitOk(r.nit); }).length; return [l.length, pg ? plural(pg, 'pagando agora', 'pagando agora') : sn ? plural(sn, 'sem NIT', 'sem NIT') : 'Aguardando o prazo', plural(l.length, 'cliente', 'clientes') + ' · ' + plural(pg, 'pagamento automático agora', 'pagamentos automáticos agora')]; })(),
       an: (function(){ var l = rows.filter(function(r){ return faseDe(r) === 'an'; }), sm = l.filter(function(r){ var d = daysUntil(r.dpp); return d != null && d <= 7; }).length; return [l.length, sm ? plural(sm, 'parto em até 7 dias', 'partos em até 7 dias') : 'Aguardando', plural(l.length, 'gestante', 'gestantes') + ' · ' + plural(sm, 'parto em até 7 dias', 'partos em até 7 dias')]; })(),
-      rq: (function(){ var l = rows.filter(function(r){ return faseDe(r) === 'rq'; }), ce = l.filter(function(r){ return noContratos(r) && posEtapaDe(r) === 'cert'; }).length, pr = l.length - ce; return [l.length, pr ? plural(pr, 'pronta para requerer', 'prontas para requerer') : ce ? plural(ce, 'esperando certidão', 'esperando certidão') : 'Tudo em dia', plural(ce, 'esperando certidão', 'esperando certidão') + ' · ' + plural(pr, 'pronta para requerer', 'prontas para requerer')]; })()
+      rq: (function(){ var l = rows.filter(function(r){ return faseDe(r) === 'rq'; }), ce = l.filter(function(r){ return noContratos(r) && posEtapaDe(r) === 'cert'; }).length, pr = l.length - ce; return [l.length, pr ? plural(pr, 'com requerimento automático', 'com requerimento automático') : ce ? plural(ce, 'esperando certidão', 'esperando certidão') : 'Tudo em dia', plural(ce, 'esperando certidão', 'esperando certidão') + ' · ' + plural(pr, 'com requerimento automático', 'com requerimento automático')]; })()
     };
   }
   function filtrosDaTela(){
@@ -6424,7 +6438,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.
   // fluxo novo: senha/documentos ficam no Pós-venda; GPS, nascimento e certidão/requerimento ganham tela própria
   function faseNovoPos(r){
     if (!r.tipoSegurada) return 'k';            // o escritório decide rural ou urbano antes de qualquer guia
-    if (gpsTarefa(r)) return 'gp';              // prazo da GPS chegou: vai para a GPS mesmo com pendência (a pendência aparece na linha)
+    if (gpsTarefa(r) && nitOk(r.nit)) return 'gp';   // prazo da GPS chegou e tem NIT: o pagamento automático segue mesmo com outra pendência (aparece na linha)
     if (faltamTxt(r)) return 'k';               // senha gov.br, documento, NIT ou prova rural faltando: Pós-venda resolve
     var e = posEtapaDe(r); return e === 'prazo_gps' || e === 'gps' ? 'gp' : e === 'nasc' ? 'an' : e === 'cert' || e === 'ok' ? 'rq' : 'k';
   }
@@ -8416,9 +8430,9 @@ html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.
     t: ['Contestações', 'Audiência, resultado e teses da contestação do INSS'],
     g: ['Parceiros', 'Estados de atuação, responsável de cada um e os parceiros que cadastram as clientes'],
     e: ['Configurações', 'Equipe, integrações e parceiros'],
-    gp: ['GPS (urbana)', 'Guia da segurada facultativa: cronômetro até o prazo, guia gerada pelo NIT e pagamento'],
+    gp: ['GPS (urbana)', 'Guia da segurada facultativa: gerada pelo NIT e paga automaticamente pelo Asaas, 5 dias antes do prazo'],
     an: ['Aguardando parto', 'GPS paga ou prova rural completa: esperando o parto; a IA fala com a mãe uma semana antes'],
-    rq: ['Requerimento', 'Certidão de nascimento e requerimento no INSS']
+    rq: ['Requerimento', 'A IA pede a certidão à mãe e o sistema faz o requerimento no Meu INSS']
   };
   function showTab(which){
     state.view = which;
