@@ -1524,7 +1524,7 @@ input[type=checkbox],input[type=radio]{accent-color:var(--primary)}
 .kb-tab .kb-par .kb-cron{margin-left:5px}
 .kb-tab td small{display:block;font-size:11px;line-height:1.35;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kb-tab td small.verm{color:hsl(var(--c-red))}
-#cad-list .kb-tab{table-layout:fixed;min-width:1020px}
+#cad-list .kb-tab{table-layout:fixed;min-width:1200px}
 #cad-list .kb-tab th,#cad-list .kb-tab td{padding-left:8px;padding-right:8px}
 #cad-list .kb-tab th:first-child,#cad-list .kb-tab td:first-child{padding-left:11px}
 #cad-list .lead-sel{width:100%}
@@ -1866,6 +1866,25 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
 .fc-tipo-seg button b{font-size:14px}
 .fc-tipo-seg button span{font-size:12px;opacity:.75}
 .fc-tipo-seg button[aria-pressed="true"]{border-color:var(--primary);box-shadow:0 0 0 1px var(--primary) inset;background:hsl(var(--c-gold)/.12)}
+
+/* listas em tela menor (tablet, notebook): a tabela rola de lado dentro do cartão em vez de espremer o nome */
+.card.list{overflow-x:auto;overflow-y:hidden}
+#cad-list{container-type:inline-size}
+@container (max-width: 1240px){
+  #cad-list .kb-tab{min-width:962px}
+  #cad-list col:nth-child(2){width:126px!important}
+  #cad-list col:nth-child(3){width:116px!important}
+  #cad-list col:nth-child(4){width:90px!important}
+  #cad-list col:nth-child(5){width:88px!important}
+  #cad-list col:nth-child(6){width:140px!important}
+  #cad-list col:nth-child(7){width:74px!important}
+  #cad-list col:nth-child(8){width:148px!important}
+  #cad-list .kb-tab th{white-space:normal;line-height:1.2}
+  #cad-list .cad-acoes{display:grid;grid-template-columns:auto 24px;gap:4px 6px;justify-content:end;align-items:center}
+  #cad-list .cad-acoes .btn.tent{grid-column:1;grid-row:1}
+  #cad-list .cad-acoes .btn.fechar{grid-column:1;grid-row:2}
+  #cad-list .cad-acoes .ico-btn{grid-column:2;grid-row:1 / span 2}
+}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
