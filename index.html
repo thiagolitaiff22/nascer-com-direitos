@@ -2042,7 +2042,7 @@ html[data-fx="novo"] #dash-box{display:flex;flex-direction:column;gap:22px}
 .dn-mapa{padding:16px;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:20px;align-items:start}
 .dn-mapa-esq{position:relative}
 .dn-mapa-svg{display:block;width:100%;height:auto;max-height:440px}
-.dn-mapa-vazio{aspect-ratio:520/470;width:100%;border-radius:8px;background:hsl(var(--c-sec)/.6)}
+.dn-mapa-vazio{aspect-ratio:520/470;width:100%;max-height:420px;border-radius:8px;background:hsl(var(--c-sec)/.6)}
 .dn-uf{fill:hsl(var(--c-sec));stroke:hsl(var(--c-card));stroke-width:1}
 .dn-uf.tem{fill:hsl(var(--c-pri));cursor:pointer}
 .dn-uf.tem:hover{stroke:var(--ink);stroke-width:1.2}
@@ -2112,6 +2112,28 @@ html[data-fx="novo"] .dn-ind-l{margin:8px 0 0;font-size:11.5px;line-height:1.45;
 html[data-fx="novo"] .dn-ind-x{margin:4px 0 0;font-size:11.5px;color:var(--ink-3)}
 html[data-fx="novo"] .dn-ind-x b{font-weight:600;color:var(--ink)}
 @media (max-width:1100px){ html[data-fx="novo"] .dn-gastos{grid-template-columns:repeat(2,minmax(0,1fr))} html[data-fx="novo"] .dn-ind:nth-child(3){border-left:0} }
+
+/* Dashboard do fluxo novo: Atenção agora */
+html[data-fx="novo"] .dn-at{padding:14px 16px;border-radius:10px}
+html[data-fx="novo"] .dn-at-cab{display:flex;align-items:center;justify-content:space-between;gap:12px}
+html[data-fx="novo"] .dn-at-cab p{margin:0;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+html[data-fx="novo"] .dn-at-cab b{font-size:13.5px;font-weight:600;color:var(--ink)}
+html[data-fx="novo"] .dn-at-cab span{font-size:11.5px;color:var(--ink-3)}
+html[data-fx="novo"] .dn-at-cab button{height:30px;padding:0 12px;border:1px solid hsl(var(--c-line));border-radius:6px;background:hsl(var(--c-card));font:inherit;font-size:12px;color:var(--ink-3);cursor:pointer;white-space:nowrap}
+html[data-fx="novo"] .dn-at-cab button:hover{color:var(--ink)}
+html[data-fx="novo"] .dn-at-lista{margin-top:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+html[data-fx="novo"] .dn-at-lin{display:flex;align-items:center;gap:12px;min-width:0;padding:10px 12px;border:1px solid hsl(var(--c-line)/.7);border-radius:8px;background:hsl(var(--c-card));font:inherit;text-align:left;cursor:pointer}
+html[data-fx="novo"] .dn-at-lin:hover{border-color:hsl(var(--c-pri)/.5)}
+html[data-fx="novo"] .dn-at-ico{width:32px;height:32px;flex:none;display:grid;place-items:center;border-radius:8px}
+html[data-fx="novo"] .dn-at-ico .i{width:16px;height:16px}
+html[data-fx="novo"] .dn-at-ico.crit{background:hsl(var(--c-red)/.12);color:hsl(var(--c-red))}
+html[data-fx="novo"] .dn-at-ico.warn{background:hsl(var(--c-pri)/.12);color:hsl(var(--c-pri))}
+html[data-fx="novo"] .dn-at-ico.info{background:hsl(var(--c-sec));color:var(--ink-3)}
+html[data-fx="novo"] .dn-at-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+html[data-fx="novo"] .dn-at-t b{font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .dn-at-t small{font-size:11.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .dn-at-q{flex:none;font-size:11.5px;color:var(--ink-3)}
+@media (max-width:900px){ html[data-fx="novo"] .dn-at-lista{grid-template-columns:1fr} }
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -5669,6 +5691,7 @@ html[data-fx="novo"] .dn-ind-x b{font-weight:600;color:var(--ink)}
     var quem = [nParc ? plural(nParc, 'parceiro', 'parceiros') : '', nPros ? plural(nPros, 'prospectador', 'prospectadores') : ''].filter(Boolean).join(' e ');
     var T = G + R, TA = pagasA + RA, prev = prox.length * gpsValor();
     var linha2 = function(t){ return '<span class="dn-var">' + t + '</span>'; };
+    dnGastos.ultimo = { T: T, TA: TA, R: R, pagos: pagos };
     // mesmos cartões da Jornada da mãe (dnCard): ícone e título, valor, duas linhas curtas
     return '<div class="dn-grade">' +
       dnCard('i-scale', 'Total gasto', moedaTxt(T), 'guias + repasses no período' + dnVar(T, TA, true)) +
@@ -5676,6 +5699,34 @@ html[data-fx="novo"] .dn-ind-x b{font-weight:600;color:var(--ink)}
       dnCard('i-users', 'Repasse a parceiros', moedaTxt(R), plural(pagos.length, 'pagamento', 'pagamentos') + (quem ? ' a ' + quem : '') + linha2(pend.length ? 'pendente: <b>' + moedaTxt(P) + '</b> em ' + plural(pend.length, 'comissão', 'comissões') : 'nenhuma comissão pendente'), '', '', 'f') +
       dnCard('i-clock', 'Previsão de guias', moedaTxt(prev), plural(prox.length, 'urbana ainda vai pagar', 'urbanas ainda vão pagar') + linha2('a guia sai 5 dias antes do prazo'), '', '', 'gp') +
       '</div>';
+  }
+  // o que vence logo: uma lista curta num cartão só (o resto fica no sino)
+  function dnAtencao(rows){
+    var it = [];
+    rows.forEach(function(r){
+      if (gpsTarefa(r)){ var v = prazoGps(r), d = v ? daysUntil(v) : null; it.push({ u: d == null ? 50 : d, ico: 'i-cash', tom: d != null && d < 0 ? 'crit' : 'warn', t: d == null ? 'GPS a pagar' : d < 0 ? 'GPS venceu há ' + (-d) + ' d' : d === 0 ? 'GPS vence hoje' : 'GPS vence em ' + d + ' d', r: r, q: v ? fmtDate(v) : '' }); }
+      if (r.inssStatus === 'exigencia' && exigenciaVence(r)){ var de = daysUntil(r.exigenciaPrazo); it.push({ u: de, ico: 'i-inss', tom: de < 0 ? 'crit' : 'warn', t: de < 0 ? 'Exigência do INSS venceu há ' + (-de) + ' d' : de === 0 ? 'Exigência do INSS vence hoje' : 'Exigência do INSS em ' + de + ' d', r: r, q: fmtDate(r.exigenciaPrazo) }); }
+      if (noContratos(r) && !nascido(r) && r.dpp){ var dp = daysUntil(r.dpp); if (dp != null && dp >= 0 && dp <= 7) it.push({ u: dp + 0.5, ico: 'i-baby', tom: 'info', t: dp === 0 ? 'Parto previsto para hoje' : 'Parto em ' + dp + ' d', r: r, q: fmtDate(String(r.dpp).slice(0, 10)) }); }
+      if (noContratos(r) && posEtapaDe(r) === 'ok'){ var dr = diasNoPos(r); it.push({ u: dr > 3 ? 4 : 9, ico: 'i-file', tom: dr > 3 ? 'warn' : 'info', t: 'Pronta para requerer' + (dr ? ' há ' + dr + ' d' : ''), r: r, q: '' }); }
+      if (faseDe(r) === 'k' && atrasada(r)){ var at = atrasoTxt(r); it.push({ u: 12, ico: 'i-alert', tom: 'warn', t: at.charAt(0).toUpperCase() + at.slice(1), r: r, q: '' }); }
+    });
+    it.sort(function(a, b){ return a.u - b.u || String(a.r.nome || '').localeCompare(String(b.r.nome || ''), 'pt'); });
+    var MAX = 6, mostra = it.slice(0, MAX);
+    return '<div class="card dn-at"><div class="dn-at-cab"><p><b>' + (it.length ? plural(it.length, 'ponto pedindo atenção', 'pontos pedindo atenção') : 'Tudo em dia') + '</b><span>' + (it.length ? 'o que vence primeiro aparece em cima' : 'nada vencendo nos próximos dias') + '</span></p>' + (it.length > MAX ? '<button type="button" data-dn-sino>Ver os outros ' + (it.length - MAX) + ' no sino</button>' : '') + '</div>' +
+      (mostra.length ? '<div class="dn-at-lista">' + mostra.map(function(x){ return '<button type="button" class="dn-at-lin" data-act="abrir" data-id="' + esc(x.r.id) + '"><span class="dn-at-ico ' + x.tom + '">' + svgI(x.ico) + '</span><span class="dn-at-t"><b>' + esc(x.t) + '</b><small>' + esc(x.r.nome || 'Sem nome') + ' · ' + esc(TITULOS[faseDe(x.r)] ? TITULOS[faseDe(x.r)][0] : '') + '</small></span>' + (x.q ? '<span class="dn-at-q tnum">' + esc(x.q) + '</span>' : '') + '</button>'; }).join('') + '</div>' : '') + '</div>';
+  }
+  function dnResultado(rows, no, noAnt, ant){
+    var soma = function(l){ return l.reduce(function(a, r){ return a + honorarios(r); }, 0); };
+    var gan = rows.filter(function(r){ return ganhou(r) && no(dataGanho(r)); }), ganA = ant ? rows.filter(function(r){ return ganhou(r) && noAnt(dataGanho(r)); }) : null;
+    var rec = rows.filter(function(r){ return ganhou(r) && r.repasse && r.repasse.data && no(r.repasse.data); }), recA = ant ? rows.filter(function(r){ return ganhou(r) && r.repasse && r.repasse.data && noAnt(r.repasse.data); }) : null;
+    var aRec = rows.filter(function(r){ return ganhou(r) && !(r.repasse && r.repasse.data); });
+    var g = dnGastos.ultimo || { T: 0, TA: 0 }, liq = soma(rec) - g.T, liqA = recA ? soma(recA) - g.TA : null;
+    var l2 = function(t){ return '<span class="dn-var">' + t + '</span>'; };
+    return '<div class="dn-grade">' +
+      dnCard('i-check', 'Honorários ganhos', moedaTxt(soma(gan)), plural(gan.length, 'benefício ganho', 'benefícios ganhos') + dnVar(soma(gan), ganA ? soma(ganA) : null), '', '', 'f') +
+      dnCard('i-cash', 'Recebido', moedaTxt(soma(rec)), plural(rec.length, 'acerto feito', 'acertos feitos') + ' no período' + dnVar(soma(rec), recA ? soma(recA) : null), '', '', 'f') +
+      dnCard('i-clock', 'A receber', moedaTxt(soma(aRec)), plural(aRec.length, 'ganho sem acerto', 'ganhos sem acerto') + l2('desde o início'), '', '', 'f') +
+      dnCard('i-scale', 'Resultado líquido', moedaTxt(liq), 'recebido − guias e repasses' + dnVar(liq, liqA != null && liqA > 0 && liq >= 0 ? liqA : null), liq > 0 ? 'ok' : liq < 0 ? 'alerta' : '', '', 'f') + '</div>';
   }
   function renderDashNovo(box){
     var rows = state.rows, j = dashJanela(), no = function(d){ d = diaLocal(d); return !!d && (!j.ini || d >= j.ini) && d <= j.fim; };
@@ -5706,8 +5757,8 @@ html[data-fx="novo"] .dn-ind-x b{font-weight:600;color:var(--ink)}
         dnCard('i-clock', 'Do parto ao requerimento', tMedio == null ? '—' : tMedio + ' d', tMedio == null ? 'sem requerimentos no período' : 'média de ' + plural(tempos.length, 'requerimento', 'requerimentos')) +
         dnCard('i-users', 'Urbanas · Rurais', urbEnt + ' · ' + rurEnt, 'das que entraram no período') + '</div>' : ''));
     // fases numa linha fina, em vez de um balão por fase
+    var dnAtencaoHtml = dnSecao('Atenção agora', 'O que vence logo: GPS no prazo, exigências do INSS, partos da semana, mães prontas para o requerimento e documentação atrasada. Clique para abrir a ficha.', dnAtencao(rows));
     var dnGastosHtml = isAdmin() ? dnSecao('Gastos do período', 'Guias GPS pagas no período (11% do salário mínimo cada) e repasses a parceiros e prospectadores com baixa no período (Financeiro › Comissões). Ainda a pagar: guias que venceram agora e comissões sem baixa.', dnGastos(rows, no, noAnt)) : '';
-    html += '<div class="dn-fasesl" aria-label="Onde estão as mães agora"><span class="dn-fasesl-r">Agora</span>' + fasesAtivas().map(function(f){ return '<button type="button" data-fn="' + f[0] + '" title="' + esc(res[f[0]][1]) + '">' + svgI(f[1]) + esc(TITULOS[f[0]][0]) + '<b class="tnum">' + res[f[0]][0] + '</b></button>'; }).join('') + '</div>';
     // evolução + origem
     var baldes = dashBaldes(j, rows.map(dataCad).concat(rows.map(function(r){ return String(r.der || '').slice(0, 10); })).filter(Boolean)), corte = j.mensal ? 7 : 10;
     var serie = function(lista, data){ return baldes.map(function(b){ return lista.filter(function(r){ return diaLocal(data(r)).slice(0, corte) === b.k; }).length; }); };
@@ -5718,23 +5769,20 @@ html[data-fx="novo"] .dn-ind-x b{font-weight:600;color:var(--ink)}
     var rosca = '<div class="card dn-origem"><p class="dash-graf-t">Origem das mães</p><p class="dash-graf-s">Como as mães chegaram no período</p>' + (ent.length ? dnRosca([{ nome: 'Indicação de parceiro', n: ind, cor: '--ser-1' }, { nome: 'Orgânico', n: org, cor: '--ser-2' }], ent.length, 'mães') +
       '<div class="dn-leg"><p><i style="background:var(--ser-1)"></i><span>Indicação de parceiro</span><b class="tnum">' + ind + '</b><small class="tnum">' + dnPct(ind, ent.length) + '</small></p><p><i style="background:var(--ser-2)"></i><span>Orgânico</span><b class="tnum">' + org + '</b><small class="tnum">' + dnPct(org, ent.length) + '</small></p></div>' +
       '<p class="dn-rodape">' + dnPct(ind, ent.length) + ' vieram de parceiros</p>' : '<div class="dn-vazio">Nenhuma mãe entrou no período</div>') + '</div>';
+    html += dnAtencaoHtml;
+    if (isAdmin()) html += dnSecao('Resultado do período', 'Honorários dos benefícios ganhos no período, o que já foi recebido (acerto feito), o que falta receber e o resultado: recebido menos guias e repasses pagos no período.', dnResultado(rows, no, noAnt, ant));
     html += dnGastosHtml;
     html += dnSecao('Evolução e origem', '', '<div class="dn-evo"><div class="card dash-graf-card">' + cab + dashGrafico(dashSerie, Math.floor(box.clientWidth * 0.64 - 40)) + '</div>' + rosca + '</div>');
-    if (dashTudo && isAdmin()){
-      var gan = rows.filter(function(r){ return ganhou(r) && (j.ini ? no(dataGanho(r)) : true); }), acert = rows.filter(function(r){ return ganhou(r) && r.repasse && r.repasse.data && (j.ini ? no(r.repasse.data) : true); });
-      html += dnSecao('Financeiro', 'Benefícios ganhos no período (INSS e Judicial), honorários e o que já foi acertado.', '<div class="dn-grade">' +
-        dnCard('i-check', 'Ganhos', gan.length, 'benefícios ganhos', '', '', 'f') +
-        dnCard('i-scale', 'Benefícios', moedaTxt(gan.reduce(function(a, r){ return a + valorBenef(r); }, 0)), 'soma dos benefícios ganhos', '', '', 'f') +
-        dnCard('i-cash', 'Honorários', moedaTxt(gan.reduce(function(a, r){ return a + honorarios(r); }, 0)), 'dos benefícios ganhos', '', '', 'f') +
-        dnCard('i-cash', 'Recebido', moedaTxt(acert.reduce(function(a, r){ return a + honorarios(r); }, 0)), plural(acert.length, 'acerto feito', 'acertos feitos'), '', '', 'f') + '</div>');
-    }
     html += dnSecao('Mapa das mães', 'Mães que entraram no período, por estado e cidade. Clique no estado ou na cidade para ver quem são.', dnMapa(ent));
     var porParc = {}, porResp = {};
     ent.forEach(function(r){ if (!r.responsavelId) return; porParc[r.responsavelId] = (porParc[r.responsavelId] || 0) + 1; });
     rows.filter(function(r){ return fechado(r) || naFila(r); }).forEach(function(r){ var n = r.posResp || 'Sem responsável'; porResp[n] = (porResp[n] || 0) + 1; });
-    var rkP = Object.keys(porParc).map(function(id){ var p = prospById(id); return [p ? (p.tipo === 'clinica' && p.clinica ? p.clinica : p.nome) : 'Parceiro removido', porParc[id]]; }).sort(function(a, b){ return b[1] - a[1] || a[0].localeCompare(b[0], 'pt'); }).slice(0, 8);
+    // parceiros: mães que entraram no período, quantas das mães dele já ganharam e o repasse pago no período
+    var gPagos = (dnGastos.ultimo && dnGastos.ultimo.pagos) || [];
+    var rkP = Object.keys(porParc).map(function(id){ var p = prospById(id), conc = rows.filter(function(r){ return r.responsavelId === id && ganhou(r); }).length, rp = gPagos.filter(function(x){ return x.papel === 'parc' && x.pessoa.id === id; }).reduce(function(a, x){ return a + (Number(x.pago.valor) || x.valor); }, 0);
+      return [p ? (p.tipo === 'clinica' && p.clinica ? p.clinica : p.nome) : 'Parceiro removido', porParc[id], conc, isAdmin() ? moedaTxt(rp) : '—']; }).sort(function(a, b){ return b[1] - a[1] || b[2] - a[2] || a[0].localeCompare(b[0], 'pt'); }).slice(0, 8);
     var rkR = Object.keys(porResp).map(function(n){ return [n, porResp[n]]; }).sort(function(a, b){ return b[1] - a[1] || a[0].localeCompare(b[0], 'pt'); }).slice(0, 8);
-    if (dashTudo) html += dnSecao('Rankings', '', '<div class="dash-duo">' + dashRanking('Mães por parceiro', ['Parceiro', 'Mães'], rkP, 'Nenhuma mãe de parceiro no período.') + dashRanking('Em andamento por responsável', ['Responsável', 'Clientes'], rkR, 'Ninguém em andamento.') + '</div>');
+    if (dashTudo) html += dnSecao('Parceiros e responsáveis', 'Mães que cada parceiro indicou no período, quantas mães dele já ganharam o benefício e o repasse pago no período; e quantas clientes cada responsável tem em andamento.', '<div class="dash-duo">' + dashRanking('Parceiros', ['Parceiro', 'Mães', 'Concedidas', 'Repasse'], rkP, 'Nenhuma mãe de parceiro no período.') + dashRanking('Em andamento por responsável', ['Responsável', 'Clientes'], rkR, 'Ninguém em andamento.') + '</div>');
     box.innerHTML = html;
     if (perAberto) pintarCalendario();
   }
@@ -5805,6 +5853,7 @@ html[data-fx="novo"] .dn-ind-x b{font-weight:600;color:var(--ink)}
     if (perAberto) pintarCalendario();
   }
   $('dash-box').addEventListener('click', function(e){
+    var sn = e.target.closest('[data-dn-sino]'); if (sn){ abrirAvisos(); return; }
     var dt = e.target.closest('[data-dash-tudo]'); if (dt){ dashTudo = !dashTudo; guardar('nascer-dash-tudo', dashTudo); renderDash(); return; }
     var mf = e.target.closest('[data-mapa-fechar]'); if (mf){ mapaEscolha = ''; renderDash(); return; }
     var mp = e.target.closest('[data-mapa]'); if (mp){ mapaEscolha = mapaEscolha === mp.dataset.mapa ? '' : mp.dataset.mapa; renderDash(); return; }
