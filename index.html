@@ -2199,6 +2199,12 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
 .pm-itens li.pm-item .nome-abrir:hover{color:hsl(var(--c-pri));text-decoration:underline}
 .pm-itens li.pm-item small{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;color:var(--ink-3)}
 .pm-itens li.pm-item b{text-align:right;font-weight:600}
+
+/* fluxo novo: campo escondido pelo código fica escondido (o .field{display:flex} passava por cima) */
+html[data-fx="novo"] .field[hidden]{display:none!important}
+/* cadastro inicial no fluxo novo: só gestante, sem atendente (closer) e sem proposta */
+html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.novo .f-body > #f-atend-box,html[data-fx="novo"] #form.novo .f-body > #f-prop-box{display:none!important}
+.fc-doc-dica{margin-left:auto;font-size:11px;color:var(--ink-3);text-align:right}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -3404,7 +3410,7 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
     var campo = Array.isArray(r.campoDocs) ? r.campoDocs : null, antigo = Array.isArray(r.faltaDocs) ? r.faltaDocs : null;
     // urbano: precisa do NIT (é dele que sai a GPS); rural (segurada especial): precisa da prova da atividade rural e não do NIT
     return DOCS_APP.filter(function(d){ return d[0] === 'procuracao' ? doFluxoNovo(r) : d[0] === 'rural' ? (rural(r) || !!(campo && campo.indexOf('rural') >= 0)) : d[0] === 'nit' ? !rural(r) : true; }).map(function(d){
-      if (d[0] === 'senha') return { k: 'senha', n: d[1], ok: !!r.senhaGovOk || !!(campo && campo.indexOf('senha') >= 0) };
+      if (d[0] === 'senha') return { k: 'senha', n: d[1], ok: !!r.senhaGovOk || (!doFluxoNovo(r) && !!(campo && campo.indexOf('senha') >= 0)) };
       if (d[0] === 'nit') return { k: 'nit', n: d[1], ok: nitOk(r.nit) };
       var ok = campo ? campo.indexOf(d[0]) >= 0 : (r.docsCompletos === true || (r.origem === 'campo' && antigo && antigo.indexOf(d[0]) < 0));   // cadastro antigo do app: vale o que não estava na lista de faltantes
       return { k: d[0], n: d[1], ok: !!ok };
@@ -3668,7 +3674,7 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
       '<div class="fc-lin">' + svgI('i-users') + '<span>CPF</span>' + (cpf.length >= 11 ? '<b class="tnum">' + esc(r.cpf) + '</b>' + fcCopiar(cpf, 'Copiar o CPF') : '<em>Não cadastrado</em>') + '</div>' +
       (rural(r) && !r.nit ? '<div class="fc-lin">' + svgI('i-users') + '<span>Salário-maternidade</span><b>Rural · segurada especial (sem GPS)</b></div>' : '<div class="fc-lin">' + svgI('i-users') + '<span>NIT</span>' + (nitOk(r.nit) ? '<b class="tnum">' + esc(nitFmt(r.nit)) + '</b>' + fcCopiar(digits(r.nit), 'Copiar o NIT') : '<em>' + (r.nit ? 'NIT inválido: ' + esc(r.nit) : 'Não cadastrado') + '</em>') + '</div>') + fcSenhaHtml() +
       '<div class="fc-lin">' + svgI('i-zap') + '<span>WhatsApp</span>' + (tel ? (zp ? '<a class="tnum" href="' + esc(zp) + '" target="_blank" rel="noopener" title="Abrir a conversa no WhatsApp">' + esc(fmtTel(tel)) + '</a>' : '<b class="tnum">' + esc(fmtTel(tel)) + '</b>') + fcCopiar(digits(tel), 'Copiar o WhatsApp') : '<em>Não cadastrado</em>') + '</div>' +
-      '<div class="fc-links"><a href="https://meu.inss.gov.br/" target="_blank" rel="noopener">' + svgI('i-inss') + 'Meu INSS</a>' + (rural(r) ? '' : '<a href="https://sal.rfb.gov.br/calculo-contribuicao/contribuintes-2" target="_blank" rel="noopener">' + svgI('i-cash') + 'Gerar guia</a>') + '</div></div>';
+      '<div class="fc-links"><a href="https://meu.inss.gov.br/" target="_blank" rel="noopener">' + svgI('i-inss') + 'Meu INSS</a>' + (rural(r) || doFluxoNovo(r) ? '' : '<a href="https://sal.rfb.gov.br/calculo-contribuicao/contribuintes-2" target="_blank" rel="noopener">' + svgI('i-cash') + 'Gerar guia</a>') + '</div></div>';
   }
   // quem responde pela cliente em cada fase
   function fcResp(r, t){ return t === 'd' ? [r.atendente, r.atendenteEmail] : t === 'h' ? [r.filaPor, ''] : [r.posResp, r.posRespEmail]; }
@@ -3704,16 +3710,16 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
       '<p class="fc-sec">Fase do processo</p>' + (pode ? '<label class="fc-c"><span class="fc-rot">Responsável</span>' + respSel + '</label><label class="fc-c"><span class="fc-rot">Salário-maternidade*</span><select id="fc-tipo">' + tipoOpts(r.tipoSegurada) + '</select></label>' : '') +
       '<label class="fc-c"><span class="fc-rot">Fase*</span><input disabled value="' + esc(TITULOS[t] ? TITULOS[t][0] : '') + '"></label><label class="fc-c"><span class="fc-rot">Etapa*</span>' + etapaSel + '</label>' +
       (t === 'h' ? '<p class="fc-nota">Para avançar, use o botão do card.</p>' : '') +
-      '<p class="fc-sec">Fechamento</p><div>' + fcLeitura('Situação', t === 'd' ? (LEAD[leadDe(r)] || '—') : t === 'q' ? (desqualificada(r) ? 'Desqualificado' : 'Perda') : 'Contrato fechado') + fcLeitura('Closer', r.contratoPor || r.atendente || '—') + fcLeitura('Proposta', r.propostaAceita ? 'Aceita pela cliente' + (r.propostaObs ? ' · ' + r.propostaObs : '') : '') +
+      '<p class="fc-sec">Fechamento</p><div>' + fcLeitura('Situação', doFluxoNovo(r) ? 'Contrato e procuração assinados no app' : t === 'd' ? (LEAD[leadDe(r)] || '—') : t === 'q' ? (desqualificada(r) ? 'Desqualificado' : 'Perda') : 'Contrato fechado') + (doFluxoNovo(r) ? '' : fcLeitura('Closer', r.contratoPor || r.atendente || '—')) + (doFluxoNovo(r) ? '' : fcLeitura('Proposta', r.propostaAceita ? 'Aceita pela cliente' + (r.propostaObs ? ' · ' + r.propostaObs : '') : '')) +
         fcLeitura('Origem do contrato', parNome || '—') + fcLeitura('Cidade', cidadeCli(r)) + fcLeitura('Criança', r.crianca) +
         fcLeitura('Exigência', r.inssStatus === 'exigencia' ? (r.exigenciaObs || 'Sem descrição') + (r.exigenciaPrazo ? ' · prazo ' + fmtDate(r.exigenciaPrazo) : '') : '') + fcLeitura('Motivo', r.desqualMotivo || r.motivoIndeferimento || r.motivoArquivo) +
-        fcLeitura('Resultado', r.resultado && RES[r.resultado] ? RES[r.resultado][0] : '') + fcLeitura('Pagamento', r.pagamento && PAG[r.pagamento] ? PAG[r.pagamento][0] : '') + fcLeitura('Penalidades', penalidadesTxt(r)) + '</div>' +
+        fcLeitura('Resultado', r.resultado && RES[r.resultado] ? RES[r.resultado][0] : '') + fcLeitura('Pagamento', r.pagamento && PAG[r.pagamento] ? PAG[r.pagamento][0] : '') + (doFluxoNovo(r) ? '' : fcLeitura('Penalidades', penalidadesTxt(r))) + '</div>' +
       (fechado(r) && !doFluxoNovo(r) ? '<button type="button" class="fc-volta" data-act="voltar-cad">↩ Voltar ao Cadastro</button>' : '') +
       '<div class="fc-salvar"><button type="button" class="btn primary" data-fc-salvar>Atualizar dados</button></div></div>';
   }
   function fcArquivos(r){
     var docs = docsApp(r), ok = docs.filter(function(x){ return x.ok; }).length, zp = zapUrl(foneDe(r)), id = esc(r.id);
-    return '<div class="fc-p p-arq"><p class="fc-sec0">Documentos juntados no app · ' + ok + '/' + docs.length + '</p>' + docs.map(function(x){ return '<div class="fc-doc ' + (x.ok ? 'ok' : 'no') + '"><i>' + svgI(x.ok ? 'i-ok' : 'i-x') + '</i><span>' + esc(x.n) + '</span>' + (x.ok ? '' : '<button type="button" class="btn" data-act="recebido" data-id="' + id + '" data-doc="' + x.k + '" title="Chegou por outro meio: marcar como recebido">Recebi</button>') + '</div>'; }).join('') +
+    return '<div class="fc-p p-arq"><p class="fc-sec0">Documentos juntados no app · ' + ok + '/' + docs.length + '</p>' + docs.map(function(x){ return '<div class="fc-doc ' + (x.ok ? 'ok' : 'no') + '"><i>' + svgI(x.ok ? 'i-ok' : 'i-x') + '</i><span>' + esc(x.n) + '</span>' + (x.ok ? '' : doFluxoNovo(r) && x.k === 'senha' ? '<small class="fc-doc-dica">cadastre na aba Dados, abaixo do CPF</small>' : doFluxoNovo(r) && x.k === 'nit' ? '<small class="fc-doc-dica">digite no campo NIT da guia, na aba Dados</small>' : '<button type="button" class="btn" data-act="recebido" data-id="' + id + '" data-doc="' + x.k + '" title="Chegou por outro meio: marcar como recebido">Recebi</button>') + '</div>'; }).join('') +
       (zp ? '<a class="btn fc-cobrar" target="_blank" rel="noopener" href="' + esc(zp + '?text=' + encodeURIComponent(msgCobranca(r))) + '" title="Abre o WhatsApp com a mensagem pronta; você confere e envia">' + svgI('i-zap') + 'Cobrar a mãe pelo WhatsApp</a>' : '') + '</div>';
   }
   function fcHistorico(r){ return '<div class="fc-p p-hist">' + (htmlLinhaTempo(r) || '<p class="fc-nota">Nada registrado ainda.</p>') + '</div>'; }
@@ -4269,7 +4275,7 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
       (k === 'concedido' && isAdmin() ? '<span class="kb-rep">' + repasseCell(r) + '</span>' : '');
     var meta = [(r.der ? 'DER ' + fmtDate(r.der) : 'DER não informada') + (k === 'analise' && d != null ? ' · <span class="' + (analiseAtrasada(r) ? 'verm' : '') + '">' + d + ' d</span>' : ''),
       r.protocoloInss ? '<button type="button" class="copia" data-copiar="' + esc(r.protocoloInss) + '" title="Copiar o protocolo">' + esc(r.protocoloInss) + svgI('i-copy') + '</button>' : 'Sem número de protocolo'];
-    return { etapa: INSS[k][0], etapaSel: inssSelect(r), meta: meta, status: st, acao: acao, resp: r.filaPor || r.posResp || r.contratoPor, dias: diasNaEtapa(r), dataVal: r.der ? fmtDate(r.der) : '—',
+    return { etapa: INSS[k][0], etapaSel: inssSelect(r), meta: meta, status: st, acao: acao, resp: r.filaPor || r.posResp || (doFluxoNovo(r) ? '' : r.contratoPor), dias: diasNaEtapa(r), dataVal: r.der ? fmtDate(r.der) : '—',
       mover: kbMover('<select data-inss="' + id + '" aria-label="Situação no INSS de ' + esc(r.nome) + '">' + Object.keys(INSS).map(function(x){ return '<option value="' + x + '"' + (x === k ? ' selected' : '') + '>' + INSS[x][0] + '</option>'; }).join('') + '</select>') };
   }
   function inssCard(r){ var i = inssInfo(r); return kbCard(r, { arrasta: true, resp: i.resp, dias: i.dias, meta: i.meta, status: i.status, acoes: i.acao, mover: i.mover }); }
@@ -4295,7 +4301,7 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
       pintarQuadro(box, 'inss', INSS_COLS.filter(function(c){ return c[0] !== 'redigir' || conta.redigir; }).map(function(c){ return { col: c, cartoes: lista.filter(function(r){ return statusInss(r) === c[0]; }).map(inssCard), vazio: 'Solte uma cliente aqui' }; }));
       return;
     }
-    tabelaFase(box, lista, inssInfo, 'Requerimento', todos.length ? 'Nenhum requerimento neste filtro.' : 'Nenhum requerimento no INSS ainda. Eles chegam aqui quando o protocolo é registrado na Fila de protocolo.');
+    tabelaFase(box, lista, inssInfo, 'Requerimento', todos.length ? 'Nenhum requerimento neste filtro.' : 'Nenhum requerimento no INSS ainda. Eles chegam aqui quando o protocolo é registrado ' + (fluxoVista === 'novo' ? 'na tela Requerimento.' : 'na Fila de protocolo.'));
   }
   // "Registrar requerimento": abre o cadastro com a DER de hoje e a situação Em análise; falta o protocolo do Meu INSS
   function abrirRequerimento(r){
@@ -4454,7 +4460,7 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
   function gpsPaga(r){ return r.guiaStatus === 'paga'; }
   function gpsAPagar(r){ var g = gatilhoGps(r), hj = iso(new Date()); return !!g && !gpsPaga(r) && g <= hj && String(r.dpp).slice(0, 10) > hj; }
   // a tarefa da GPS nasce quando o prazo chega, mesmo com o cartão em Senha ou Documentação, ou quando ele está em Emitir/Pagar GPS
-  function gpsTarefa(r){ return noContratos(r) && !nascido(r) && !rural(r) && !gpsPaga(r) && (gpsAPagar(r) || posEtapaDe(r) === 'gps'); }
+  function gpsTarefa(r){ return noContratos(r) && !nascido(r) && !rural(r) && !gpsPaga(r) && (gpsAPagar(r) || posEtapaDe(r) === 'gps') && (!doFluxoNovo(r) || !!r.tipoSegurada); }
   // o que o responsável precisa fazer agora: aparece no cartão, na janela e no sino até ser feito
   // gestante que fechou antes do prazo da GPS e não pagou: continua avisando depois do parto
   function gpsVencida(r){
@@ -4529,7 +4535,7 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
     if (nascido(r)){
       if (POS_SO_GESTANTE[e]) e = r.certidaoRecebida ? 'ok' : 'cert';
       var nasc = String(r.criancaNasc || '').slice(0, 10);
-      if (antes('cert') && (!mudou || (nasc && mudou < nasc))) return 'cert';
+      if (antes('cert') && (!mudou || (nasc && mudou < nasc))) return doFluxoNovo(r) && r.certidaoRecebida ? 'ok' : 'cert';
       return e;
     }
     var parto = String(r.dpp || '').slice(0, 10), g = gatilhoGps(r);
@@ -4538,7 +4544,7 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
     // senha gov.br no cofre: segue para a Documentação Pessoal; documentação completa: segue sozinha para a GPS (urbano) ou para o nascimento (rural)
     if (e === 'senha' && r.senhaGovOk) e = 'docs';
     if (e === 'docs' && !faltamTxt(r)) e = rural(r) ? 'nasc' : 'prazo_gps';
-    if (parto && parto <= hj && antes('cert') && (!mudou || mudou < parto)) return 'cert';
+    if (parto && parto <= hj && antes('cert') && (!mudou || mudou < parto)) return doFluxoNovo(r) && r.certidaoRecebida ? 'ok' : 'cert';
     // GPS paga: vai para Aguardando Nascimento de qualquer coluna anterior (só para a frente)
     if (gpsPaga(r) && antes('nasc')) return 'nasc';
     // prazo da GPS chegou: pula uma vez só; quem arrastou de volta depois do pulo fica onde deixou
@@ -4560,7 +4566,7 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
     if (r.pvAnalise === 'devolvido') st.push(kbSt('Devolvida pela Controladoria' + (r.analiseMotivo ? ': ' + r.analiseMotivo : '')));
     if (tarefaPos(r)) st.push(kbSt(tarefaPos(r).replace(/^Tarefa: /, ''), 'lar'));
     if (atr) st.push(kbSt(atr.charAt(0).toUpperCase() + atr.slice(1)));
-    if ((et === 'docs' || et === 'ok') && faltamTxt(r)) st.push(kbSt('Falta: ' + faltamTxt(r), 'lar'));
+    if ((et === 'docs' || et === 'ok' || (doFluxoNovo(r) && et !== 'senha')) && faltamTxt(r)) st.push(kbSt('Falta: ' + faltamTxt(r), 'lar'));
     var meta = [linhaPartoBv(r), linhaGps(r), linhaOrigem(r), linhaDocs(r)];
     var opts = posColsDe(r).map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === et ? ' selected' : '') + '>' + esc(posNome(r, c)) + '</option>'; }).join('') + (doFluxoNovo(r) ? '' : '<option value="__cad">↩ Voltar ao Cadastro</option>');
     var acao = gpsTarefa(r) ? '<button type="button" class="kb-btn" data-guia-paga="' + id + '">' + svgI('i-cash') + 'Marcar GPS paga</button>'
@@ -4569,7 +4575,7 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
     if (doFluxoNovo(r) && faseDe(r) === 'k'){
       var zpN = zapUrl(foneDe(r));
       acao = !r.tipoSegurada ? tipoSeg(r)
-        : et === 'senha' ? '<button type="button" class="kb-btn" data-act="abrir" data-id="' + id + '" title="Abre a ficha: a senha gov.br fica logo abaixo do CPF">' + svgI('i-chave') + 'Cadastrar senha</button>'
+        : !r.senhaGovOk ? '<button type="button" class="kb-btn" data-act="abrir" data-id="' + id + '" title="Abre a ficha: a senha gov.br fica logo abaixo do CPF">' + svgI('i-chave') + 'Cadastrar senha</button>'
         : zpN ? '<a class="kb-btn" target="_blank" rel="noopener" href="' + esc(zpN + '?text=' + encodeURIComponent(msgCobranca(r))) + '" title="Abre o WhatsApp com a mensagem pronta; você confere e envia">' + svgI('i-zap') + 'Cobrar no WhatsApp</a>'
         : '<button type="button" class="kb-btn" data-act="edit" data-id="' + id + '" title="Sem telefone: abra o cadastro e informe o WhatsApp da mãe">' + svgI('i-pencil') + 'Pôr o telefone</button>';
     }
@@ -4589,7 +4595,7 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
   var CTR_SITS_NOVO = [['', 'Status: todas'], ['semsenha', 'Sem senha gov.br'], ['docs', 'Documentos faltando'], ['rprova', 'Prova rural faltando'], ['semtipo', 'Sem rural/urbano'], ['urb', 'Urbanas'], ['rur', 'Rurais'], ['atr', 'Atrasadas']];
   function ctrSitsAtivos(){ return fluxoVista === 'novo' ? CTR_SITS_NOVO : CTR_SITS; }
   var CTR_SITS = [['', 'Status: todas'], ['urb', 'Urbanas (com GPS)'], ['rur', 'Rurais (prova rural)'], ['semtipo', 'Sem rural/urbano'], ['completa', 'Pastas completas'], ['gest', 'Gestantes'], ['nasc', 'Bebê já nasceu'], ['atr', 'Atrasadas'], ['gps', 'GPS a pagar'], ['docs', 'Documentos faltando'], ['dev', 'Devolvidas pela Controladoria']];
-  function passaCtr(r, f){ return !f || (f === 'semsenha' ? posEtapaDe(r) === 'senha' : f === 'rprova' ? rural(r) && faltaDocs(r).indexOf('rural') >= 0 : f === 'urb' ? tipoChave(r) === 'urbana' : f === 'rur' ? rural(r) : f === 'semtipo' ? !r.tipoSegurada : f === 'completa' ? !faltamTxt(r) : f === 'gest' ? !nascido(r) : f === 'nasc' ? nascido(r) : f === 'atr' ? atrasada(r) : f === 'gps' ? gpsTarefa(r) : f === 'docs' ? !!faltamTxt(r) : f === 'dev' ? r.pvAnalise === 'devolvido' : true); }
+  function passaCtr(r, f){ return !f || (f === 'semsenha' ? (doFluxoNovo(r) ? !r.senhaGovOk : posEtapaDe(r) === 'senha') : f === 'rprova' ? rural(r) && faltaDocs(r).indexOf('rural') >= 0 : f === 'urb' ? tipoChave(r) === 'urbana' : f === 'rur' ? rural(r) : f === 'semtipo' ? !r.tipoSegurada : f === 'completa' ? !faltamTxt(r) : f === 'gest' ? !nascido(r) : f === 'nasc' ? nascido(r) : f === 'atr' ? atrasada(r) : f === 'gps' ? gpsTarefa(r) : f === 'docs' ? !!faltamTxt(r) : f === 'dev' ? r.pvAnalise === 'devolvido' : true); }
   function renderContratos(){
     var box = $('ctr-list'); if (!box) return;
     (function(){
@@ -4638,10 +4644,12 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
   function emDias(d){ var n = daysUntil(d); return n == null ? '' : n > 0 ? 'em ' + n + ' d' : n === 0 ? 'hoje' : 'há ' + (-n) + ' d'; }
   function gpsInfoN(r){
     var et = posEtapaDe(r), v = prazoGps(r), g = gpsGerar(r), st = [];
+    var pendG = docsApp(r).filter(function(x){ return !x.ok && x.k !== 'nit'; }).map(function(x){ return x.n; });
     if (!nitOk(r.nit)) st.push(kbSt('Falta o NIT da mãe: sem ele a guia não sai', 'lar'));
     else if (et === 'gps') st.push(v && v < iso(new Date()) ? kbSt('Prazo da GPS passou em ' + fmtDate(v) + ': pagar já') : kbSt('Guia pronta: pagar até ' + fmtDate(v), 'lar'));
     else st.push(kbSt('Guia pronta · paga no prazo (Asaas, quando ligado)', 'ok'));
-    return { etapa: et === 'gps' ? 'Pagar agora' : 'Aguardando o prazo', etapaSel: selPos(r), status: st, resp: r.posResp, dias: diasNoPos(r), parado: false,
+    if (pendG.length) st.push(kbSt('Pendência no Pós-venda: ' + pendG.join(', '), 'lar'));
+    return { etapa: gpsTarefa(r) ? 'Pagar agora' : 'Aguardando o prazo', etapaSel: selPos(r), status: st, resp: r.posResp, dias: diasNoPos(r), parado: false,
       dataVal: v ? fmtDate(v) + ' · ' + emDias(v) : 'sem data do parto',
       acao: gpsTarefa(r) ? '<button type="button" class="kb-btn" data-guia-paga="' + esc(r.id) + '">' + svgI('i-cash') + 'Marcar GPS paga</button>' : (g ? '<button type="button" class="kb-btn" data-gpn-copia="' + esc(g.digitos) + '">' + svgI('i-copy') + 'Copiar código</button>' : '') };
   }
@@ -4656,6 +4664,7 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
     if (et === 'cert') st.push(kbSt('A IA pede à mãe a foto da certidão', 'info'));
     else if (falta) st.push(kbSt('Falta: ' + falta, 'lar'));
     else st.push(kbSt('Pasta completa: pronta para o requerimento', 'ok'));
+    if (!rural(r) && !gpsPaga(r)) st.push(kbSt('GPS não consta como paga: confira antes do protocolo'));
     var prot = '<button type="button" class="kb-btn" data-rqn-prot="' + id + '" title="Requerimento feito no Meu INSS: registrar o número do protocolo (vai ser automático)">' + svgI('i-file') + 'Registrar protocolo</button>';
     return { etapa: et === 'cert' ? 'Aguardando certidão' : 'Pronta para requerer', etapaSel: fila ? '' : selPos(r), status: st, resp: r.posResp, dias: fila ? (diasDesdeIso(r.filaMudouEm || r.encaminhadoEm) || 0) : diasNoPos(r), parado: false,
       dataVal: r.criancaNasc ? 'Nasceu ' + fmtDate(String(r.criancaNasc).slice(0, 10)) : r.dpp ? fmtDate(String(r.dpp).slice(0, 10)) : '—',
@@ -4691,7 +4700,7 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
   [['gpn-q', function(v){ gpnQ = v; renderGpsNovo(); }], ['nan-q', function(v){ nanQ = v; renderNascNovo(); }], ['rqn-q', function(v){ rqnQ = v; renderReqNovo(); }]].forEach(function(x){ var el = $(x[0]); if (el) el.addEventListener('input', function(){ x[1](this.value.trim()); }); });
   ['gpn-list', 'nan-list', 'rqn-list'].forEach(function(lid){ var el = $(lid); if (!el) return; el.addEventListener('click', async function(e){
     var c = e.target.closest('[data-pv-cert]'); if (c){ receberCertidao(c.dataset.pvCert); return; }
-    var p = e.target.closest('[data-rqn-prot]'); if (p){ var r = acharRow(p.dataset.rqnProt); if (r) abrirRequerimento(r); return; }
+    var p = e.target.closest('[data-rqn-prot]'); if (p){ var r = acharRow(p.dataset.rqnProt); if (r && (rural(r) || gpsPaga(r) || window.confirm('A GPS de ' + r.nome + ' não consta como paga. Registrar o protocolo assim mesmo?'))) abrirRequerimento(r); return; }
     var cp = e.target.closest('[data-gpn-copia]'); if (cp){ try { await copiarTexto(cp.dataset.gpnCopia); toast('Código de barras da GPS copiado'); } catch(err){ toast('Não foi possível copiar.'); } return; }
   }); ligarLista(lid.replace('-list', ''), function(){ return null; }, render); });
   /* ---------- Fila de protocolo: um botão por etapa ---------- */
@@ -4816,7 +4825,7 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
       if (daysUntil(p.criancaNasc) > 0){ toast('A data de nascimento está no futuro.'); return; }
     }
     var antes = { certidaoRecebida: !!r.certidaoRecebida, certidaoEm: r.certidaoEm || '', posEtapa: r.posEtapa || '', posMudouEm: r.posMudouEm || '', criancaNasc: r.criancaNasc || '', fatoGerador: r.fatoGerador || '' };
-    try { await patchRow(id, p); toast('Certidão recebida: ' + r.nome + ' foi para Documentação OK', 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); }); } catch(err){ toast(errMsg(err)); }
+    try { await patchRow(id, p); toast('Certidão recebida: ' + r.nome + (doFluxoNovo(r) ? ' está pronta para o requerimento' : ' foi para Documentação OK'), 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); }); } catch(err){ toast(errMsg(err)); }
   }
   $('ctr-list').addEventListener('click', function(e){
     var c = e.target.closest('[data-pv-cert]'); if (c){ receberCertidao(c.dataset.pvCert); return; }
@@ -4847,7 +4856,7 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
     var mudanca = Object.assign({ posEtapa: etapa, posMudouEm: new Date().toISOString(), atualizadoEm: new Date().toISOString() }, respMantido(r));
     try {
       await patchRow(id, mudanca);
-      var nome = (POS_COLS.filter(function(c){ return c[0] === etapa; })[0] || [0, etapa])[1];
+      var nome = posNome(r, POS_COLS.filter(function(c){ return c[0] === etapa; })[0] || [0, etapa]);
       toast(r.nome + ': ' + nome, 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
     } catch(err){ toast(errMsg(err)); render(); }
   }
@@ -5327,7 +5336,7 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
       var tl = String(r.contato || '').replace(/\D/g, '').slice(-9); if (tl.length === 9){ (tels[tl] = tels[tl] || []).push(r); }
       if (noCadastro(r) && prioridadeNasc(r) != null) add('Parto perto e sem contrato', r, 'parto em ' + prioridadeNasc(r) + ' dias');
       if (r.inssStatus === 'exigencia' && r.exigenciaPrazo){ var n = daysUntil(r.exigenciaPrazo); if (n != null && n <= 5) add('Exigência do INSS vencendo', r, n < 0 ? 'prazo venceu há ' + (-n) + ' dias' : 'faltam ' + n + ' dias'); }
-      var respPos = primeiroNome(r.posResp || r.contratoPor), comResp = respPos ? ' · responsável: ' + respPos : '';
+      var respPos = primeiroNome(r.posResp || (doFluxoNovo(r) ? '' : r.contratoPor)), comResp = respPos ? ' · responsável: ' + respPos : '';
       if (gpsTarefa(r)) add(!nitOk(r.nit) ? 'Pegar o NIT para a GPS' : 'Pagar a GPS', r, (prazoGps(r) ? 'vence ' + fmtDate(prazoGps(r)) + ' · parto ' + fmtDate(r.dpp) : 'sem data do parto') + comResp);
       if (noContratos(r) && r.fatoGerador === 'gestante' && !r.criancaNasc && !r.dpp) add('Informar a data do parto', r, 'gestante sem data prevista');
       if (noContratos(r) && !r.tipoSegurada) add('Informar se é rural ou urbano', r, 'urbano paga a GPS; rural precisa da prova rural' + comResp);
@@ -5369,7 +5378,7 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
     q(r.ultimoContatoEm, 'Contato' + (r.contatoCloser ? ' de ' + r.contatoCloser : '') + (r.tentativas ? ' · ' + r.tentativas + ' tentativa(s) sem atender' : ''));
     q(r.desqualEm, 'Desqualificada' + (r.desqualMotivo ? ': ' + r.desqualMotivo : ''));
     q(r.contratoEm, 'Contrato fechado' + (r.contratoPor ? ' por ' + r.contratoPor : '') + (r.propostaAceita ? ' · proposta aceita' : ''));
-    q(r.posMudouEm, 'Pós-venda: ' + ((POS_COLS.filter(function(c){ return c[0] === posEtapaDe(r); })[0] || [0, 'em andamento'])[1]) + (r.posResp ? ' (' + r.posResp + ')' : ''));
+    q(r.posMudouEm, 'Pós-venda: ' + posNome(r, POS_COLS.filter(function(c){ return c[0] === posEtapaDe(r); })[0] || [0, 'em andamento']) + (r.posResp ? ' (' + r.posResp + ')' : ''));
     q(r.guiaPagaEm, 'Guia paga');
     q(r.criancaNasc, 'Bebê nasceu');
     q(r.certidaoEm, 'Certidão de nascimento recebida');
@@ -5773,7 +5782,7 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
     var valG = function(r){ return Number(r.gpsValor) > 0 ? Number(r.gpsValor) : gpsValor(); };
     var pagas = rows.filter(function(r){ return no(r.guiaPagaEm); }), G = pagas.reduce(function(a, r){ return a + valG(r); }, 0);
     var pagasA = rows.filter(function(r){ return noAnt(r.guiaPagaEm); }).reduce(function(a, r){ return a + valG(r); }, 0);
-    var agora = rows.filter(gpsTarefa), prox = rows.filter(function(r){ return noContratos(r) && !rural(r) && !nascido(r) && !gpsPaga(r) && !gpsTarefa(r) && prazoGps(r); });
+    var agora = rows.filter(gpsTarefa), prox = rows.filter(function(r){ return noContratos(r) && !!r.tipoSegurada && !rural(r) && !nascido(r) && !gpsPaga(r) && !gpsTarefa(r) && prazoGps(r); });
     var com = comLinhas(), pagos = com.filter(function(x){ return x.pago && no(x.pago.pagoEm); }), R = pagos.reduce(function(a, x){ return a + (Number(x.pago.valor) || x.valor); }, 0);
     var RA = com.filter(function(x){ return x.pago && noAnt(x.pago.pagoEm); }).reduce(function(a, x){ return a + (Number(x.pago.valor) || x.valor); }, 0);
     var pend = com.filter(function(x){ return !x.pago; }), P = pend.reduce(function(a, x){ return a + x.valor; }, 0);
@@ -6309,7 +6318,7 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
   $('pop-add').addEventListener('click', function(e){
     var b = e.target.closest('[data-add]'); if (!b) return; fecharPops();
     if (b.dataset.add === 'cad') openForm(null);
-    else if (b.dataset.add === 'parc'){ showTab('g'); openProsp(null); }
+    else if (b.dataset.add === 'parc'){ showTab('g'); if (fluxoVista === 'novo') abrirParcNovo(null); else openProsp(null); }
     else if (b.dataset.add === 'func'){ showTab('e'); $('btn-eq-novo').click(); }
   });
   $('pop-user').addEventListener('click', function(){ fecharPops(); });
@@ -6391,7 +6400,12 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
   }
   function faseDe(r){ if (r.arquivado) return arquivadoPago(r) ? 'r' : 'q'; if (String(r.processo || '').trim()) return 'c'; if (requerido(r)) return 'i'; if (naFila(r)) return doFluxoNovo(r) ? 'rq' : 'h'; if (noContratos(r)) return doFluxoNovo(r) ? faseNovoPos(r) : 'k'; if (desqualificada(r) || perdidoAuto(r)) return 'q'; return 'd'; }
   // fluxo novo: senha/documentos ficam no Pós-venda; GPS, nascimento e certidão/requerimento ganham tela própria
-  function faseNovoPos(r){ var e = posEtapaDe(r); return e === 'prazo_gps' || e === 'gps' ? 'gp' : e === 'nasc' ? 'an' : e === 'cert' || e === 'ok' ? 'rq' : 'k'; }
+  function faseNovoPos(r){
+    if (!r.tipoSegurada) return 'k';            // o escritório decide rural ou urbano antes de qualquer guia
+    if (gpsTarefa(r)) return 'gp';              // prazo da GPS chegou: vai para a GPS mesmo com pendência (a pendência aparece na linha)
+    if (faltamTxt(r)) return 'k';               // senha gov.br, documento, NIT ou prova rural faltando: Pós-venda resolve
+    var e = posEtapaDe(r); return e === 'prazo_gps' || e === 'gps' ? 'gp' : e === 'nasc' ? 'an' : e === 'cert' || e === 'ok' ? 'rq' : 'k';
+  }
   function faseTexto(r){
     var t = faseDe(r), n = TITULOS[t] ? TITULOS[t][0] : '';
     if (t === 'gp' || t === 'an' || t === 'rq') return n + ' · ' + (naFila(r) ? 'Pronta para requerer' : posNome(r, POS_COLS.filter(function(c){ return c[0] === posEtapaDe(r); })[0] || [0, '']));
@@ -7958,6 +7972,7 @@ html[data-fx="novo"] .parcn-pausa{vertical-align:middle}
     $('f-ativ').value = r ? r.atividade || '' : '';
     $('f-fato').value = r && FATOS[r.fatoGerador] ? r.fatoGerador : (r ? 'parto' : 'gestante'); syncSeg();
     $('f-seg-box').hidden = !r;   // cadastro novo é sempre de gestante; editar continua permitindo registrar o nascimento
+    if (fluxoVista === 'novo'){ $('f-atend-box').hidden = true; $('f-prop-box').hidden = true; }   // fluxo novo: sem closer e sem proposta
     $('f-crianca').value = r ? r.crianca || '' : '';
     $('f-cnasc').value = r ? r.criancaNasc || '' : '';
     $('f-dpp').value = r ? r.dpp || '' : '';
