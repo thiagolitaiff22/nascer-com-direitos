@@ -6,12 +6,12 @@
 <meta name="robots" content="noindex">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Gestor">
-<meta name="theme-color" content="#faf7f2">
+<meta name="theme-color" content="#f6f3f9">
 <link rel="apple-touch-icon" href="img/icone-180.png">
 <title>Gestor · Nascer com Direitos</title>
 <style>
-:root{--bg:#faf7f2;--card:#fff;--ink:#2b2418;--ink2:#6b5d47;--ink3:#9a8a70;--line:#ebe2cf;--gold:#a07a45;--gold2:#8a6a3d;--soft:#f6efe0;--ok:#2e8b57;--warn:#c0861b;--bad:#c0392b;--sh:0 2px 10px rgba(80,60,20,.07);--gx:max(18px,env(safe-area-inset-left))}
-@media (prefers-color-scheme:dark){:root{--bg:#14110d;--card:#1d1812;--ink:#f3ead8;--ink2:#b9a98c;--ink3:#8d7f66;--line:#322a1f;--soft:#271f15;--sh:none}}
+:root{--bg:#f6f3f9;--card:#fff;--ink:#22172c;--ink2:#5b4072;--ink3:#8868a2;--line:#dfd1e9;--gold:#7633b2;--gold2:#662e99;--soft:#ece2f4;--ok:#2e8b57;--warn:#c0861b;--bad:#c0392b;--sh:0 2px 10px rgba(52,30,70,.07);--gx:max(18px,env(safe-area-inset-left))}
+@media (prefers-color-scheme:dark){:root{--bg:#110d14;--card:#18111d;--ink:#e7daf1;--ink2:#a683c2;--ink3:#7c5e95;--line:#291e33;--soft:#1e1428;--sh:none}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 -apple-system,"Segoe UI",system-ui,Roboto,sans-serif}
 button,input,select{font:inherit;color:inherit}
@@ -25,7 +25,7 @@ button,input,select{font:inherit;color:inherit}
 .campo span{display:block;font-weight:600;font-size:13px;margin-bottom:5px}
 .campo input,.campo select{width:100%;height:48px;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:0 14px}
 .btn{height:46px;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:0 16px;font-weight:600;cursor:pointer}
-.btn.p{background:linear-gradient(135deg,#b08a52,#8a6a3d);border:0;color:#fff}
+.btn.p{background:linear-gradient(135deg,#853fc3,#662e99);border:0;color:#fff}
 .btn.full{width:100%;margin-top:18px;height:50px}
 .btn:disabled{opacity:.55}
 .msg{min-height:20px;margin-top:12px;text-align:center;font-size:13.5px;color:var(--bad)}
@@ -70,7 +70,7 @@ main{max-width:760px;margin:0 auto;padding:14px var(--gx) calc(96px + env(safe-a
 .tag{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--soft);color:var(--gold2)}
 .tag.ok{background:#e4f4ea;color:#1f6b3d}.tag.warn{background:#fdf0d5;color:#8a5a00}.tag.bad{background:#fbe3e1;color:#a02e24}
 .vazio{text-align:center;color:var(--ink2);padding:30px 10px}
-.fab{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:calc(84px + env(safe-area-inset-bottom));z-index:7;height:52px;border:0;border-radius:26px;padding:0 20px;background:linear-gradient(135deg,#b08a52,#8a6a3d);color:#fff;font-weight:700;box-shadow:0 8px 20px rgba(80,60,20,.3);cursor:pointer}
+.fab{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:calc(84px + env(safe-area-inset-bottom));z-index:7;height:52px;border:0;border-radius:26px;padding:0 20px;background:linear-gradient(135deg,#853fc3,#662e99);color:#fff;font-weight:700;box-shadow:0 8px 20px rgba(52,30,70,.3);cursor:pointer}
 /* folha */
 .fundo{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center}
 .folha{width:100%;max-width:560px;max-height:92dvh;overflow:auto;background:var(--bg);border-radius:24px 24px 0 0;padding:16px var(--gx) calc(20px + env(safe-area-inset-bottom))}
@@ -88,7 +88,7 @@ main{max-width:760px;margin:0 auto;padding:14px var(--gx) calc(96px + env(safe-a
 .cli b{display:block}
 .cli .acoes{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
 .cli .acoes .btn{height:36px;font-size:13px;padding:0 12px;display:inline-flex;align-items:center;text-decoration:none}
-#toast{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:30;background:#2b2418;color:#fff;padding:10px 16px;border-radius:12px;font-size:13.5px;max-width:86vw}
+#toast{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:30;background:#22172c;color:#fff;padding:10px 16px;border-radius:12px;font-size:13.5px;max-width:86vw}
 
 main{max-width:1180px}
 .kpis.g4{grid-template-columns:repeat(2,1fr)}
@@ -114,7 +114,7 @@ main{max-width:1180px}
 .grafico .gl{stroke:var(--line);stroke-width:1}
 .grafico .tx{font-size:11px;fill:var(--ink3)}
 .grafico .tv{font-size:10.5px;font-weight:700;fill:var(--ink2)}
-.c-ind{fill:#a07a45;background:#a07a45}.c-con{fill:#2e8b57;background:#2e8b57}
+.c-ind{fill:#7633b2;background:#7633b2}.c-con{fill:#2e8b57;background:#2e8b57}
 .leg{display:flex;gap:16px;font-size:12px;color:var(--ink2);margin-top:6px}
 .leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px}
 .rosca{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
@@ -394,7 +394,7 @@ function tentarParceiro(cpf, senha){
   }
   function rosca(fatias){
     var tot = fatias.reduce(function(s, f){ return s + f.v; }, 0), R = 52, C = 2 * Math.PI * R, off = 0;
-    var cores = ['#a07a45', '#2e8b57', '#4a7fc1', '#c0861b', '#9a8a70', '#c0392b'];
+    var cores = ['#7633b2', '#2e8b57', '#4a7fc1', '#c0861b', '#8868a2', '#c0392b'];
     var arcos = tot ? fatias.map(function(f, i){
       var len = C * f.v / tot, s = '<circle r="' + R + '" cx="70" cy="70" fill="none" stroke="' + cores[i % cores.length] + '" stroke-width="22" stroke-dasharray="' + len + ' ' + (C - len) + '" stroke-dashoffset="' + (-off) + '" transform="rotate(-90 70 70)"/>';
       off += len; return s;
