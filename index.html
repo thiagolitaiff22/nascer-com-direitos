@@ -1853,14 +1853,19 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
 .app.collapsed .nav .tab .nav-n{display:none}
 .nome-l{display:flex;align-items:center;gap:6px;min-width:0}
 .nome-l .nome-abrir{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sm-tipo{flex:none;display:inline-block;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:600;line-height:16px;letter-spacing:.02em;border:1px solid}
-.sm-tipo.urb{color:hsl(var(--c-gold));border-color:hsl(var(--c-gold)/.45);background:hsl(var(--c-gold)/.1)}
-.sm-tipo.rur{color:hsl(var(--c-green));border-color:hsl(var(--c-green)/.45);background:hsl(var(--c-green)/.1)}
-.sm-tipo.sem{color:hsl(var(--c-red));border-color:hsl(var(--c-red)/.45);background:hsl(var(--c-red)/.08)}
-.kb-tab select.sm-sel{width:100%;max-width:104px}
-.kb-tab select.sm-sel.rur{color:hsl(var(--c-green));font-weight:600}
-.kb-tab select.sm-sel.urb{color:hsl(var(--c-gold));font-weight:600}
-.kb-tab select.sm-sel.sem{color:hsl(var(--c-red))}
+.sm-tipo{flex:none;display:inline-flex;align-items:center;gap:4px;padding:0 6px;border-radius:4px;font-size:10.5px;font-weight:500;line-height:17px;color:var(--ink-3);background:hsl(var(--c-sec))}
+.sm-tipo::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.sm-tipo.urb::before{background:hsl(var(--c-gold))}
+.sm-tipo.rur::before{background:hsl(var(--c-green))}
+.sm-tipo.sem{color:hsl(var(--c-red));background:hsl(var(--c-red)/.08)}
+.sm-seg{display:inline-flex;height:24px;border:1px solid var(--line-2);border-radius:5px;overflow:hidden;background:var(--bg)}
+.sm-seg.sem{border-color:hsl(var(--c-red)/.55)}
+.sm-seg button{display:inline-flex;align-items:center;gap:4px;height:100%;padding:0 7px;border:0;background:none;font:inherit;font-size:11px;font-weight:500;color:var(--ink-3);cursor:pointer}
+.sm-seg button+button{border-left:1px solid var(--line-2)}
+.sm-seg button:hover{color:var(--ink)}
+.sm-seg button[aria-pressed="true"]{color:var(--ink);font-weight:600}
+.sm-seg button.urb[aria-pressed="true"]{background:hsl(var(--c-gold)/.2)}
+.sm-seg button.rur[aria-pressed="true"]{background:hsl(var(--c-green)/.18)}
 .fc-tipo-seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 12px}
 .fc-tipo-seg button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px;border-radius:10px;border:1px solid var(--line-2,#d9cfbd);background:var(--soft,#faf6ee);color:inherit;font:inherit;text-align:left;cursor:pointer}
 .fc-tipo-seg button b{font-size:14px}
@@ -1871,15 +1876,16 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
 .card.list{overflow-x:auto;overflow-y:hidden}
 #cad-list{container-type:inline-size}
 @container (max-width: 1240px){
-  #cad-list .kb-tab{min-width:962px}
+  #cad-list .kb-tab{min-width:982px}
   #cad-list col:nth-child(2){width:126px!important}
   #cad-list col:nth-child(3){width:116px!important}
   #cad-list col:nth-child(4){width:90px!important}
-  #cad-list col:nth-child(5){width:88px!important}
+  #cad-list col:nth-child(5){width:108px!important}
   #cad-list col:nth-child(6){width:140px!important}
   #cad-list col:nth-child(7){width:74px!important}
   #cad-list col:nth-child(8){width:148px!important}
   #cad-list .kb-tab th{white-space:normal;line-height:1.2}
+  #cad-list .sm-seg button{padding:0 6px}
   #cad-list .cad-acoes{display:grid;grid-template-columns:auto 24px;gap:4px 6px;justify-content:end;align-items:center}
   #cad-list .cad-acoes .btn.tent{grid-column:1;grid-row:1}
   #cad-list .cad-acoes .btn.fechar{grid-column:1;grid-row:2}
@@ -3862,7 +3868,7 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
       '<td><div class="kb-tel">' + contatoCloser(r) + '</div></td>' +
       '<td>' + (cidadeCli(r) ? '<div class="kb-lugar cad-l1">' + ufFlag(r) + '<span title="' + esc(cidadeCli(r)) + '">' + esc(cidadeCli(r)) + '</span></div>' : '<div class="cad-l1">—</div>') + '<small title="' + esc(parNome) + '">' + esc(parNome) + '</small></td>' +
       '<td>' + parto + '</td>' +
-      '<td><select class="inss-sel sm-sel' + (r.tipoSegurada ? ' ' + (rural(r) ? 'rur' : 'urb') : ' sem') + '" data-tiposeg="' + id + '" aria-label="Salário-maternidade rural ou urbano: ' + esc(r.nome) + '">' + tipoOpts(r.tipoSegurada, true) + '</select></td>' +
+      '<td>' + tipoSeg(r) + '</td>' +
       '<td><div class="cad-sit-box">' + leadSelect(r) + (contadorContato(r) ? '' : r.atendente ? '<small>' + esc(primeiroNome(r.atendente)) + '</small>' : '') + '</div></td>' +
       '<td><div class="cad-l1">' + (nd == null ? '—' : nd <= 0 ? 'hoje' : nd === 1 ? 'ontem' : 'há ' + nd + ' dias') + '</div>' + (atr ? '<small class="verm" title="' + esc(atr) + '">' + esc(atr) + '</small>' : '') + '</td>' +
       '<td><div class="cad-acoes"><button type="button" class="btn tent" data-act="tentativa" data-id="' + id + '" title="Ligou e não atendeu: conta uma tentativa. Com ' + LEAD_TENTATIVAS + ' vira Sem resposta">Não atendeu' + (r.tentativas > 0 ? ' · ' + r.tentativas + '/' + LEAD_TENTATIVAS : '') + '</button>' +
@@ -4077,6 +4083,13 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
     var t = tipoSmTxt(r);
     if (t) return '<span class="sm-tipo ' + (rural(r) ? 'rur' : 'urb') + '" title="' + (rural(r) ? 'Salário-maternidade rural: segurada especial, prova rural, sem GPS' : 'Salário-maternidade urbano: facultativa, paga a GPS') + '">' + t + '</span>';
     return noContratos(r) ? '<span class="sm-tipo sem" title="Falta informar se o salário-maternidade é rural ou urbano">Rural ou urbano?</span>' : '';
+  }
+  // dois botões, Urbano | Rural: um toque troca (lista do Cadastro)
+  function tipoSeg(r){
+    var id = esc(r.id), u = !!r.tipoSegurada && !rural(r);
+    return '<div class="sm-seg' + (r.tipoSegurada ? '' : ' sem') + '" role="group" aria-label="Salário-maternidade de ' + esc(r.nome) + '"' + (r.tipoSegurada ? '' : ' title="Escolha: urbano ou rural"') + '>' +
+      '<button type="button" class="urb" data-tipo-set="urbana" data-id="' + id + '" aria-pressed="' + u + '" title="Urbano: paga a GPS">Urbano</button>' +
+      '<button type="button" class="rur" data-tipo-set="especial" data-id="' + id + '" aria-pressed="' + rural(r) + '" title="Rural: segurada especial, prova rural">Rural</button></div>';
   }
   function tipoOpts(v, curto){
     var l = [['', curto ? '—' : 'Rural ou urbano? (escolher)'], ['urbana', curto ? 'Urbano' : 'Urbano · paga a GPS'], ['especial', curto ? 'Rural' : 'Rural · segurada especial']];
@@ -4484,10 +4497,12 @@ dialog::backdrop{background:rgba(10,8,5,.5)}
   $('ctr-q').addEventListener('input', function(){ ctrQ2 = this.value.trim(); renderContratos(); });
   document.addEventListener('click', function(e){ if (e.target.closest && e.target.closest('select[data-lead],select[data-ctr],select[data-guia],select[data-tiposeg]')) e.stopPropagation(); }, true);
   // o closer marca na lista do Cadastro se o salário-maternidade é rural ou urbano
-  document.addEventListener('change', function(e){
-    var s = e.target.closest && e.target.closest('select[data-tiposeg]'); if (!s) return;
-    var r = acharRow(s.dataset.tiposeg); if (!r) return;
-    var antes = { tipoSegurada: r.tipoSegurada || '' }, v = s.value;
+  document.addEventListener('click', function(e){
+    var s = e.target.closest && e.target.closest('[data-tipo-set]'); if (!s) return;
+    var r = acharRow(s.dataset.id); if (!r) return;
+    var v = s.dataset.tipoSet; if (tipoChave(r) === v) return;
+    var antes = { tipoSegurada: r.tipoSegurada || '' };
+    Array.prototype.forEach.call(s.parentNode.querySelectorAll('[data-tipo-set]'), function(x){ x.setAttribute('aria-pressed', String(x === s)); }); s.parentNode.classList.remove('sem');
     patchRow(r.id, { tipoSegurada: v, atualizadoEm: new Date().toISOString() }).then(function(){
       toast((v === 'especial' ? 'Rural (segurada especial, prova rural): ' : v ? 'Urbano (paga a GPS): ' : 'Sem rural/urbano: ') + r.nome, 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
     }, function(err){ toast(errMsg(err)); });
