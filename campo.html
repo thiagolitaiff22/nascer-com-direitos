@@ -886,9 +886,17 @@ html.inicio-fixo,html.inicio-fixo body{overflow:hidden;overscroll-behavior:none}
 .vista.inicio .pm-btn{height:42px}
 .vista.inicio [data-maes-rede]{height:38px;margin-top:8px!important}
 /* topo no jeito do Monju (05/11): sem barra nem logo; título da página à esquerda e botões redondos à direita; rola junto com a tela */
-#app .topo{position:relative!important;top:auto!important;background:transparent!important;border:0!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;margin:0!important;gap:8px!important;align-items:center!important;padding:calc(8px + env(safe-area-inset-top)) var(--gxr,16px) 6px var(--gx,16px)!important}
+#app .topo{position:relative!important;top:auto!important;background:transparent!important;border:0!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;margin:0!important;gap:8px!important;align-items:center!important;padding:calc(14px + env(safe-area-inset-top)) var(--gxr,16px) 10px var(--gx,16px)!important;border-bottom:1px solid var(--line)!important}
 html[data-tema="dark"] #app .topo{background:transparent!important;box-shadow:none!important}
-#app .topo .logo{display:none!important}
+#app .topo .logo{display:block!important;flex:none;width:34px!important;height:34px!important;background:none!important;border:0!important;box-shadow:none!important}
+#app .topo .logo img{width:100%!important;height:100%!important;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(102,46,153,.22))}
+#app .topo .quem b.marca{font-size:18px!important;line-height:1.1!important}
+#app > .tit-tela{flex:none;width:100%;max-width:560px;margin:0 auto;padding:12px var(--gxr,16px) 4px var(--gx,16px)}
+#app > .tit-tela b{display:block;font-family:'Fraunces',Georgia,serif;font-size:23px;font-weight:600;line-height:1.15;letter-spacing:-.015em;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#app > .tit-tela span{display:block;margin-top:2px;font-size:12.5px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#app > .tit-tela span b{display:inline;font:inherit;font-weight:700;color:var(--ink)}
+html[data-tema="dark"] #app > .tit-tela b{color:#f1e9f7}
+html[data-tema="dark"] #app > .tit-tela span{color:#bd9ad8}
 #app .topo .quem{flex:1;min-width:0;cursor:default}
 #app .topo .quem b{font-family:'Fraunces',Georgia,serif!important;font-size:21px!important;font-weight:600!important;line-height:1.1!important;letter-spacing:-.015em}
 #app .topo .quem #topo-sub{margin-top:1px;font-size:12px!important;font-weight:500!important;color:var(--ink2)!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -897,7 +905,7 @@ html[data-tema="dark"] #app .topo{background:transparent!important;box-shadow:no
 html[data-tema="dark"] #app .topo .av{background:rgba(158,89,216,.22);color:#e4d2f3}
 .pm-ola.no-topo{display:none!important}
 .vista{padding-top:10px}
-@media (max-width:359px){ #app .topo .quem b{font-size:19px!important} }
+@media (max-width:359px){ #app .topo .quem b.marca{font-size:16px!important} #app > .tit-tela b{font-size:20px} }
 /* aplicativo de verdade: o topo e a barra de baixo ficam parados; só o conteúdo da aba rola, sem barra de rolagem aparecendo */
 html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden;overscroll-behavior:none}
 #app:has(> #vista){display:flex;flex-direction:column;height:100vh;height:100dvh}
@@ -952,7 +960,7 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 69;
+  var APP_VERSAO = 70;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1198,10 +1206,11 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
     $('app').dataset.perfil = perfilCasca;
     $('app').innerHTML =
       '<div class="topo"><div class="logo"><img src="img/logo-nascer-t.png" alt="Nascer com Direitos"></div>' +
-        '<div class="quem"><b id="topo-nome"></b><span id="topo-sub">Parceira</span></div><div class="sinc" id="sinc"><i></i><span></span></div>' +
+        '<div class="quem"><b class="marca">Nascer com Direitos</b></div><div class="sinc" id="sinc"><i></i><span></span></div>' +
         '<button type="button" class="tema" id="modo" hidden style="width:auto;padding:0 11px;font-size:12px;font-weight:700"></button>' +
         '<button type="button" class="tema" id="tema" aria-label="Trocar entre modo claro e escuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle class="sol" cx="12" cy="12" r="4"/><path class="sol" d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/><path class="lua" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>' +
         '<button type="button" class="av" id="topo-av" aria-label="Sua conta"></button></div>' +
+      '<div class="tit-tela"><b id="topo-nome"></b><span id="topo-sub"></span></div>' +
       '<main class="vista" id="vista"></main>' +
       '<nav class="abas' + (semGanho() ? ' sg' : '') + '" id="abas">' +
         navBotoes() +
