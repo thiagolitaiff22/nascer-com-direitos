@@ -1129,6 +1129,9 @@ html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,r
 .wz-prog .barrinha{flex:1;height:6px;border-radius:99px;background:var(--line);overflow:hidden}
 .wz-prog .barrinha i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#8a43d3,#c084fc);transition:width .35s ease}
 .wz-prog small{flex:none;font-size:12px;font-weight:700;color:var(--ink2)}
+.wz-acoes{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:24px}
+.wz-descartar{border:0;background:none;padding:2px 0;font:inherit;font-size:13.5px;font-weight:600;color:#c0392b}
+html[data-tema="dark"] .wz-descartar{color:#ff8a80}
 .wz-voltar{align-self:flex-start;border:0;background:none;padding:2px 0;font:inherit;font-size:14px;font-weight:600;color:#66279d}
 .wz-passo{display:flex;flex-direction:column;gap:12px;animation:sobeLeve .35s cubic-bezier(.2,.8,.2,1) both}
 .wz-t{margin:8px 0 0;font-family:'Fraunces',Georgia,serif;font-size:26px;font-weight:600;line-height:1.15;letter-spacing:-.01em;color:var(--ink)}
@@ -1187,7 +1190,7 @@ html[data-tema="dark"] .wz-voltar,html[data-tema="dark"] .wz-lin u{color:#c49be6
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 80;
+  var APP_VERSAO = 81;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1857,6 +1860,16 @@ html[data-tema="dark"] .wz-voltar,html[data-tema="dark"] .wz-lin u{color:#c49be6
   }
   // cadastro em etapas: uma pergunta por tela, com barra de progresso; o resumo, as fotos e o Enviar ficam na última
   var passoNovo = null;
+  var CAMPOS_CADASTRO = ['campo_fone', 'campo_cpf', 'campo_cidade', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp', 'campo_nasceu', 'campo_cep', 'campo_rua', 'campo_num', 'campo_compl', 'campo_bairro', 'campo_uf_cep'];
+  function temRascunhoCadastro(){ return !!(Object.keys(fotos).length || senhaGovRascunho || CAMPOS_CADASTRO.some(function(k){ return String(lsGet(k) || '').trim(); })); }
+  function descartarCadastro(){
+    if (!temRascunhoCadastro()) return;
+    if (!confirm('Descartar este cadastro? Os dados digitados e as fotos serão apagados deste celular.')) return;
+    fotos = {}; local = null; guardarRascunho();   // sem fotos, o rascunho guardado é apagado
+    CAMPOS_CADASTRO.forEach(function(k){ lsSet(k, ''); });
+    senhaGovRascunho = ''; passoNovo = null;
+    telaInicial(); if ($('vista')) $('vista').scrollTop = 0;
+  }
   function montarPassos(){
     if (completando) return;
     var v = $('vista'); if (!v || !$('l-nome')) return;
@@ -1883,7 +1896,7 @@ html[data-tema="dark"] .wz-voltar,html[data-tema="dark"] .wz-lin u{color:#c49be6
     var pas = P[passoNovo], tot = P.length;
     var w = document.createElement('div'); w.className = 'wz';
     w.innerHTML = '<div class="wz-prog"><span class="barrinha"><i style="width:' + Math.round(100 * (passoNovo + 1) / tot) + '%"></i></span><small>' + (passoNovo + 1) + ' de ' + tot + '</small></div>' +
-      (passoNovo ? '<button type="button" class="wz-voltar" id="wz-voltar">‹ Voltar</button>' : '') +
+      ((passoNovo || temRascunhoCadastro()) ? '<div class="wz-acoes">' + (passoNovo ? '<button type="button" class="wz-voltar" id="wz-voltar">‹ Voltar</button>' : '<span></span>') + (temRascunhoCadastro() ? '<button type="button" class="wz-descartar" id="wz-descartar">Descartar cadastro</button>' : '') + '</div>' : '') +
       '<div class="wz-passo"><h2 class="wz-t">' + esc(pas.t) + '</h2>' + (pas.s ? '<p class="wz-s">' + esc(pas.s) + '</p>' : '') + '<div class="wz-slot" id="wz-slot"></div><p class="wz-erro" id="wz-erro" hidden></p>' +
       (pas.pular ? '<button type="button" class="wz-pular" id="wz-pular">Pular esta pergunta</button>' : '') + '</div>';
     v.insertBefore(w, v.firstChild); v.appendChild(guarda);
@@ -1915,6 +1928,7 @@ html[data-tema="dark"] .wz-voltar,html[data-tema="dark"] .wz-lin u{color:#c49be6
       };
     }
     if ($('wz-voltar')) $('wz-voltar').onclick = function(){ passoNovo--; telaInicial(); };
+    if ($('wz-descartar')) $('wz-descartar').onclick = descartarCadastro;
     if ($('wz-pular')) $('wz-pular').onclick = function(){ senhaGovRascunho = ''; passoNovo++; telaInicial(); };
     Array.prototype.forEach.call(w.querySelectorAll('[data-ir-passo]'), function(b){ b.onclick = function(){ passoNovo = +b.dataset.irPasso; telaInicial(); }; });
     // Enter (ou "Ir" no teclado) passa para a próxima pergunta
