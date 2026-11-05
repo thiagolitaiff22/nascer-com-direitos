@@ -2217,6 +2217,10 @@ html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.
 .dn-sec.recolhida .dn-rec .i{transform:rotate(-90deg)}
 .dn-sec.recolhida > :not(.dn-tit){display:none!important}
 .dn-rec-nota{font-size:11px;font-weight:500;color:var(--ink-3)}
+
+/* senha gov.br no cadastro (só fluxo novo) */
+#f-senha-box[hidden]{display:none!important}
+html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:flex!important;order:3}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2787,6 +2791,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.
       <div class="field full"><label>Pasta da cliente</label><div class="folder-box" id="f-pasta"></div></div>
       <div class="field"><label for="f-cpf">CPF</label><input id="f-cpf" inputmode="numeric" placeholder="000.000.000-00" class="tnum"><span class="hint" id="h-cpf"></span></div>
       <div class="field"><label for="f-contato">Contato (telefone / WhatsApp)</label><input id="f-contato" inputmode="tel" placeholder="(97) 00000-0000" class="tnum"></div>
+      <div class="field" id="f-senha-box" hidden><label for="f-senha">Senha gov.br</label><input id="f-senha" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" data-lpignore="true" placeholder="Senha do gov.br da mãe"><span class="hint" id="f-senha-hint">Fica guardada no cofre; aparece só na ficha da mãe.</span></div>
       <div class="field"><label for="f-uf">Estado</label><div class="cid-wrap"><span id="f-uf-flag" class="cid-uf-flag"></span><select id="f-uf"></select></div></div>
       <div class="field"><label for="f-cidade">Cidade</label><div class="cid-wrap"><span id="f-cid-flag" class="cid-uf-flag"></span><input id="f-cidade" readonly autocomplete="off" placeholder="Escolher a cidade" style="cursor:pointer"></div></div>
       <div class="field"><label for="f-tipo">Salário-maternidade</label><select id="f-tipo"><option value="">Rural ou urbano? (escolher)</option><option value="urbana">Urbano · paga a GPS (facultativa)</option><option value="especial">Rural · segurada especial (prova rural)</option><option value="individual" hidden>Urbano · contribuinte individual (antigo)</option><option value="desempregada" hidden>Urbano · desempregada (antigo)</option></select><span class="hint">Urbano segue pela guia GPS; rural segue pela prova da atividade rural.</span></div>
@@ -8028,6 +8033,9 @@ html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.
     $('f-fato').value = r && FATOS[r.fatoGerador] ? r.fatoGerador : (r ? 'parto' : 'gestante'); syncSeg();
     $('f-seg-box').hidden = !r;   // cadastro novo é sempre de gestante; editar continua permitindo registrar o nascimento
     if (fluxoVista === 'novo'){ $('f-atend-box').hidden = true; $('f-prop-box').hidden = true; }   // fluxo novo: sem closer e sem proposta
+    $('f-senha-box').hidden = fluxoVista !== 'novo'; $('f-senha').value = '';
+    $('f-senha').placeholder = r && r.senhaGovOk ? 'Já cadastrada no cofre (digite só para trocar)' : 'Senha do gov.br da mãe';
+    $('f-senha-hint').textContent = r && r.senhaGovOk ? 'Para ver a senha atual, abra a ficha da mãe.' : 'Fica guardada no cofre; aparece só na ficha da mãe.';
     $('f-crianca').value = r ? r.crianca || '' : '';
     $('f-cnasc').value = r ? r.criancaNasc || '' : '';
     $('f-dpp').value = r ? r.dpp || '' : '';
@@ -8191,8 +8199,16 @@ html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.
     try {
       var isNew = !state.editing;
       var noCadastro = $('form').parentElement === $('cad-box');
+      var senhaGov = fluxoVista === 'novo' ? $('f-senha').value.trim() : '';
       var newId = await saveRow(state.editing, data); if (dlg.open) dlg.close();
       toast(isNew ? 'Cliente cadastrada: ' + nome : 'Alterações salvas');
+      if (senhaGov && newId){
+        try {
+          if (state.db){ var rsg = await SB.rpc('senha_gov_gravar', { p_cliente: newId, p_senha: senhaGov }); if (rsg.error) throw rsg.error; }
+          await patchRow(newId, { senhaGovOk: true, atualizadoEm: new Date().toISOString() });
+          toast((isNew ? 'Cliente cadastrada: ' : 'Alterações salvas: ') + nome + ' · senha gov.br no cofre');
+        } catch(e3){ toast('Cliente salva, mas a senha gov.br não foi gravada (' + errMsg(e3) + '). Cadastre pela ficha da mãe.'); }
+      }
       // pasta automática no Drive para o cliente novo (sem travar o cadastro)
       if (isNew && newId && !data.pastaUrl){
         ensureFolder(newId, nome).then(function(u){ if (u) toast('Pasta criada no Drive: ' + nome); }).catch(function(e2){ toast('Cliente salvo, mas a pasta não foi criada: ' + driveErr(e2)); });
