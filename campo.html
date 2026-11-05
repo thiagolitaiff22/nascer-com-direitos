@@ -1157,7 +1157,7 @@ html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,r
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 76;
+  var APP_VERSAO = 77;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -3338,7 +3338,6 @@ html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,r
         '<button type="submit" class="lg-entrar" id="entrar">Entrar</button>' +
         '<div class="lg-links"><a href="equipe-cadastro.html">Primeiro acesso</a><i></i><a href="#" id="esqueci">Esqueci a senha</a></div>' +
         (podeInstalar() ? '<button type="button" class="lg-inst" id="inst-login"><svg viewBox="0 0 24 24"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/></svg>Instalar o aplicativo no celular</button>' : '') +
-        '<p class="lg-nota">Precisa de internet só para entrar. Depois o aplicativo funciona sem sinal.</p>' +
       '</form></div>';
     $('usuario').addEventListener('input', function(){ this.value = maskCpf(this.value); });   // só números
     $('esqueci').onclick = function(e){ e.preventDefault(); alert('Esqueceu a senha? Procure o escritório: o gestor redefine e ela volta a ser 123456. No próximo acesso você cria outra.'); };
