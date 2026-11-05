@@ -1119,11 +1119,12 @@ html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,r
 .cep-st{flex:none;font-size:12px;font-weight:600;color:var(--ink2)}.cep-st.ok{color:#1f8a54;font-size:15px}.cep-st.erro{color:#c0392b}
 .end-auto{display:grid;gap:10px}.end-auto[hidden]{display:none}
 .end-dois{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:10px}
-.end-bairro{margin:-2px 4px 0;font-size:13px;color:var(--ink2)}
+.end-cid{grid-template-columns:minmax(0,1fr) 84px}
+.end-cid input#uf2{text-transform:uppercase;text-align:center}
 .sgov-ver{flex:none;border:0;background:none;padding:6px 2px;font:inherit;font-size:13px;font-weight:600;color:#66279d}
 
 /* cadastro em etapas (05/11): uma pergunta por tela, barra de progresso, resumo com "editar" antes de enviar */
-.wz{display:flex;flex-direction:column;gap:12px;padding-top:2px}
+.wz{display:flex;flex-direction:column;gap:12px;padding-top:2px;padding-bottom:96px}
 .wz-prog{display:flex;align-items:center;gap:10px}
 .wz-prog .barrinha{flex:1;height:6px;border-radius:99px;background:var(--line);overflow:hidden}
 .wz-prog .barrinha i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#8a43d3,#c084fc);transition:width .35s ease}
@@ -1186,7 +1187,7 @@ html[data-tema="dark"] .wz-voltar,html[data-tema="dark"] .wz-lin u{color:#c49be6
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 79;
+  var APP_VERSAO = 80;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1864,8 +1865,8 @@ html[data-tema="dark"] .wz-voltar,html[data-tema="dark"] .wz-lin u{color:#c49be6
       { t: 'Qual é o nome da mãe?', s: 'Nome completo, como está no documento.', el: ['l-nome'], foco: 'nome', ok: function(){ return txt('campo_nome').length >= 3; }, erro: 'Digite o nome completo da mãe.' },
       { t: 'Qual é o CPF dela?', s: 'Só os números.', el: ['l-cpf'], foco: 'cpf', ok: function(){ return cpfOk(($('cpf') || {}).value); }, erro: 'Confira o CPF: são 11 números.' },
       { t: 'Qual é o WhatsApp dela?', s: 'Com DDD. É por ele que o escritório vai falar com ela.', el: ['l-fone'], foco: 'fone', ok: function(){ return foneOk(($('fone') || {}).value); }, erro: 'Digite o celular com DDD.' },
-      { t: 'Onde ela mora?', s: 'Digite o CEP: a rua e a cidade aparecem sozinhas. Depois é só o número.', el: ['l-cep', 'end-auto', 'l-cidade'], foco: 'cep',
-        ok: function(){ return cepOk(txt('campo_cep')) && txt('campo_rua') && txt('campo_num') && txt('campo_cidade'); }, erro: 'Falta o CEP, a rua, o número ou a cidade.' },
+      { t: 'Onde ela mora?', s: 'Digite o CEP: a rua e a cidade aparecem sozinhas. Depois é só o número.', el: ['l-cep', 'end-auto'], foco: 'cep',
+        ok: function(){ return cepOk(txt('campo_cep')) && txt('campo_rua') && txt('campo_num') && txt('campo_cidade') && txt('campo_uf_cep').length === 2; }, erro: 'Falta o CEP, a rua, o número, a cidade ou a UF.' },
       gest ? { t: 'Quando o bebê deve nascer?', s: 'Atendemos só gestantes: o bebê ainda não pode ter nascido.', el: ['l-dpp'], foco: 'dpp', ok: function(){ return !!txt('campo_dpp'); }, erro: 'Digite a data prevista do parto.' }
            : { t: 'Quando o bebê nasceu?', s: '', el: ['l-cnasc'], foco: 'cnasc', ok: function(){ return !!txt('campo_crianca_nasc'); }, erro: 'Digite a data de nascimento do bebê.' },
       { t: 'Qual é a senha do gov.br dela?', s: 'Se ela não souber agora, toque em Pular: o escritório pede depois.', el: ['l-sgov'], foco: 'sgov', ok: function(){ return true; }, pular: true },
@@ -1909,7 +1910,7 @@ html[data-tema="dark"] .wz-voltar,html[data-tema="dark"] .wz-lin u{color:#c49be6
       seg.innerHTML = 'Continuar<svg viewBox="0 0 24 24" style="margin-left:6px"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
       barra.appendChild(seg);
       seg.onclick = function(){
-        if (!pas.ok()){ var er = $('wz-erro'); er.textContent = pas.erro || 'Responda para continuar.'; er.hidden = false; pas.el.forEach(function(id){ var l = $(id); if (l && l.classList.contains('fone')) l.classList.add('falta'); }); var fo = $(pas.foco); if (fo) fo.focus(); return; }
+        if (!pas.ok()){ var er = $('wz-erro'); er.textContent = pas.erro || 'Responda para continuar.'; er.hidden = false; Array.prototype.forEach.call($('wz-slot').querySelectorAll('.fone'), function(l){ var i = l.querySelector('input'); if (i && !i.value.trim() && ['compl', 'bairro', 'sgov'].indexOf(i.id) < 0) l.classList.add('falta'); else l.classList.remove('falta'); }); var fo = $(pas.foco); if (fo) fo.focus(); return; }
         passoNovo++; telaInicial();
       };
     }
@@ -1940,7 +1941,9 @@ html[data-tema="dark"] .wz-voltar,html[data-tema="dark"] .wz-lin u{color:#c49be6
           '<label class="fone' + (lsGet('campo_rua').trim() ? '' : ' falta') + '" id="l-rua"><input id="rua" autocomplete="off" autocapitalize="words" placeholder="Rua" value="' + esc(lsGet('campo_rua')) + '"></label>' +
           '<div class="end-dois"><label class="fone' + (lsGet('campo_num').trim() ? '' : ' falta') + '" id="l-num"><input id="num" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="Número" value="' + esc(lsGet('campo_num')) + '"></label>' +
           '<label class="fone" id="l-compl"><input id="compl" autocomplete="off" maxlength="60" placeholder="Complemento" value="' + esc(lsGet('campo_compl')) + '"></label></div>' +
-          '<p class="end-bairro" id="end-bairro">' + esc([lsGet('campo_bairro'), [lsGet('campo_cidade'), lsGet('campo_uf_cep')].filter(Boolean).join('/')].filter(Boolean).join(' · ')) + '</p>' +
+          '<label class="fone" id="l-bairro"><input id="bairro" autocomplete="off" autocapitalize="words" placeholder="Bairro" value="' + esc(lsGet('campo_bairro')) + '"></label>' +
+          '<div class="end-dois end-cid"><label class="fone' + (lsGet('campo_cidade').trim() ? '' : ' falta') + '" id="l-cid2"><input id="cid2" autocomplete="off" autocapitalize="words" placeholder="Cidade" value="' + esc(lsGet('campo_cidade')) + '"></label>' +
+          '<label class="fone' + (lsGet('campo_uf_cep').trim() ? '' : ' falta') + '" id="l-uf2"><input id="uf2" autocomplete="off" autocapitalize="characters" maxlength="2" placeholder="UF" value="' + esc(lsGet('campo_uf_cep')) + '"></label></div>' +
         '</div>' +
       '</div>' +
       '<div class="rot">Gestação</div><p class="so-gest">Atendemos só gestantes: o bebê ainda não pode ter nascido.</p><div class="dados">' +
@@ -1989,7 +1992,7 @@ html[data-tema="dark"] .wz-voltar,html[data-tema="dark"] .wz-lin u{color:#c49be6
     if ($('cpf')) $('cpf').addEventListener('input', function(){ this.value = maskCpf(this.value); lsSet('campo_cpf', this.value); var l = $('l-cpf'); if (l) l.classList.toggle('falta', !cpfOk(this.value)); });
     if ($('cep')){
       var ultimoCep = '';
-      var mostraEnd = function(){ var b = $('end-bairro'); if (b) b.textContent = [lsGet('campo_bairro'), [lsGet('campo_cidade'), lsGet('campo_uf_cep')].filter(Boolean).join('/')].filter(Boolean).join(' · '); };
+      var mostraEnd = function(){ if ($('bairro')) $('bairro').value = lsGet('campo_bairro'); if ($('cid2')){ $('cid2').value = lsGet('campo_cidade'); $('l-cid2').classList.toggle('falta', !lsGet('campo_cidade')); } if ($('uf2')){ $('uf2').value = lsGet('campo_uf_cep'); $('l-uf2').classList.toggle('falta', !lsGet('campo_uf_cep')); } };
       var buscarCep = function(){
         var d = $('cep').value.replace(/\D/g, ''), st = $('cep-st'); if (d.length !== 8 || d === ultimoCep) return; ultimoCep = d;
         st.textContent = 'buscando…'; st.className = 'cep-st';
@@ -2007,6 +2010,10 @@ html[data-tema="dark"] .wz-voltar,html[data-tema="dark"] .wz-lin u{color:#c49be6
       $('rua').addEventListener('input', function(){ lsSet('campo_rua', this.value); $('l-rua').classList.toggle('falta', !this.value.trim()); });
       $('num').addEventListener('input', function(){ lsSet('campo_num', this.value); $('l-num').classList.toggle('falta', !this.value.trim()); });
       $('compl').addEventListener('input', function(){ lsSet('campo_compl', this.value); });
+      $('bairro').addEventListener('input', function(){ lsSet('campo_bairro', this.value); });
+      $('cid2').addEventListener('input', function(){ lsSet('campo_cidade', this.value); if ($('cidade')) $('cidade').value = this.value; $('l-cid2').classList.toggle('falta', !this.value.trim()); });
+      $('cid2').addEventListener('blur', function(){ this.value = bonito(this.value); lsSet('campo_cidade', this.value); if ($('cidade')) $('cidade').value = this.value; });
+      $('uf2').addEventListener('input', function(){ this.value = this.value.replace(/[^a-z]/gi, '').toUpperCase().slice(0, 2); lsSet('campo_uf_cep', this.value); $('l-uf2').classList.toggle('falta', this.value.length !== 2); });
     }
     if ($('sgov')){
       $('sgov').addEventListener('input', function(){ senhaGovRascunho = this.value; });
