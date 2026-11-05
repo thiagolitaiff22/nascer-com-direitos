@@ -4585,8 +4585,15 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
   function posNome(r, c){ return (doFluxoNovo(r) && POS_NOME_NOVO[c[0]]) || c[1]; }
   function posColsDe(r){ return POS_COLS.filter(function(c){ return !(nascido(r) && POS_SO_GESTANTE[c[0]]) && !(rural(r) && POS_SO_URBANA[c[0]]); }); }
   function posLane(r){ return nascido(r) ? 'nasc' : 'gest'; }
-  // a coluna vem do que foi gravado, mais o que as datas mandam (só anda para frente)
+  // durante um render a etapa de cada mãe é calculada uma vez só (com milhares de mães, ela é pedida várias vezes por tela)
+  var memoPos = null;
   function posEtapaDe(r){
+    if (!memoPos) return posEtapaCalc(r);
+    var m = memoPos.get(r); if (m === undefined){ m = posEtapaCalc(r); memoPos.set(r, m); }
+    return m;
+  }
+  // a coluna vem do que foi gravado, mais o que as datas mandam (só anda para frente)
+  function posEtapaCalc(r){
     var e = POS_LEGADO[r.posEtapa] || r.posEtapa;
     if (e === 'regularizada') e = r.certidaoRecebida ? 'ok' : 'nasc';
     if (POS_ORDEM.indexOf(e) < 0) e = 'senha';
@@ -6551,7 +6558,14 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
   });
   $('bg-res').addEventListener('mousedown', function(e){ e.preventDefault(); var b = e.target.closest('[data-bg]'); if (!b) return; var r = acharNaBase(b.dataset.bg); $('bg-res').hidden = true; $('bg-q').blur(); if (r) abrirNoFluxo(r); });
   function abrirNoFluxo(r){ var f = doFluxoNovo(r) ? 'novo' : 'antigo'; if (f !== fluxoVista) trocarFluxo(f); abrirCard(r.id, noCadastro(r)); }
-  function render(){ renderParcNovo(); renderGpsNovo(); renderNascNovo(); renderReqNovo(); pintarAvisosBtn(); renderRelatorio(); pintarCard(); renderEstadosCfg(); renderRegioes(); renderContratos(); renderFila(); renderDesq(); renderCad(); renderInss(); renderList(); renderRet(); renderProsp(); renderEquipe(); renderFin(); renderDash(); renderFunil(); pintarPagina(); medirQuadros(); }
+  // com milhares de mães, desenhar as 14 telas a cada mudança trava o BI: só a tela aberta é desenhada (as outras, quando forem abertas em showTab)
+  var RENDER_TELA = { b: [renderDash], d: [renderCad], k: [renderContratos], h: [renderFila], q: [renderDesq], i: [renderInss], c: [renderList], r: [renderRet], g: [renderParcNovo, renderProsp], e: [renderEquipe], f: [renderFin], gp: [renderGpsNovo], an: [renderNascNovo], rq: [renderReqNovo] };
+  function renderTela(t){ (RENDER_TELA[t] || []).forEach(function(f){ f(); }); }
+  function render(){
+    memoPos = typeof WeakMap === 'function' ? new WeakMap() : null;
+    try { renderTela(telaAberta); pintarAvisosBtn(); renderRelatorio(); pintarCard(); renderEstadosCfg(); renderRegioes(); renderFunil(); pintarPagina(); medirQuadros(); }
+    finally { memoPos = null; }
+  }
   var clQ = '';
   // stage of each process, derived from what is already recorded (no extra typing)
   var ETAPAS = [
@@ -8532,7 +8546,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
     $('pop-filtro').hidden = true;
     Object.keys(VIEWS).forEach(function(k){ $(VIEWS[k][0]).setAttribute('aria-selected', VIEWS[k][0] === VIEWS[which][0] ? 'true' : 'false'); $(VIEWS[k][1]).hidden = k !== which; });
     try { sessionStorage.setItem('qe-view', which); } catch(e){}
-    if (which === 'b') renderDash();
+    try { renderTela(which); } catch(e){ console.error(e); }   // na abertura do BI os dados ainda não chegaram
     renderFunil(); pintarPagina(); medirQuadros();
   }
   Object.keys(VIEWS).forEach(function(k){ $(VIEWS[k][0]).addEventListener('click', function(){ showTab(k); }); });
