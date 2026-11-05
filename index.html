@@ -2221,6 +2221,14 @@ html[data-fx="novo"] #form.novo .f-body > #f-seg-box,html[data-fx="novo"] #form.
 /* senha gov.br no cadastro (só fluxo novo) */
 #f-senha-box[hidden]{display:none!important}
 html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:flex!important;order:3}
+
+/* fluxo novo: pergunta da atividade (pescadora, agricultora ou indígena) */
+#f-ativn-box[hidden]{display:none!important}
+html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:flex!important;order:3}
+.ativ-sel{height:26px;max-width:100%;padding:0 6px;border:1px solid hsl(var(--c-pri)/.6);border-radius:3.6px;background:var(--bg);color:hsl(var(--c-pri));font:inherit;font-size:11.25px;font-weight:600;cursor:pointer}
+.ativ-sel:hover{background:hsl(var(--c-pri)/.06)}
+.ativ-sel:focus-visible{outline:2px solid hsl(var(--c-pri));outline-offset:2px}
+.ativ-sel option{color:var(--ink);background:var(--bg);font-weight:400}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -2792,6 +2800,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:fle
       <div class="field"><label for="f-cpf">CPF</label><input id="f-cpf" inputmode="numeric" placeholder="000.000.000-00" class="tnum"><span class="hint" id="h-cpf"></span></div>
       <div class="field"><label for="f-contato">Contato (telefone / WhatsApp)</label><input id="f-contato" inputmode="tel" placeholder="(97) 00000-0000" class="tnum"></div>
       <div class="field" id="f-senha-box" hidden><label for="f-senha">Senha gov.br</label><input id="f-senha" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" data-lpignore="true" placeholder="Senha do gov.br da mãe"><span class="hint" id="f-senha-hint">Fica guardada no cofre; aparece só na ficha da mãe.</span></div>
+      <div class="field" id="f-ativn-box" hidden><label for="f-ativn">É pescadora, agricultora ou indígena?</label><select id="f-ativn"></select><span class="hint">As três não pagam GPS e precisam da prova da atividade. Nenhuma das três: paga a GPS.</span></div>
       <div class="field"><label for="f-uf">Estado</label><div class="cid-wrap"><span id="f-uf-flag" class="cid-uf-flag"></span><select id="f-uf"></select></div></div>
       <div class="field"><label for="f-cidade">Cidade</label><div class="cid-wrap"><span id="f-cid-flag" class="cid-uf-flag"></span><input id="f-cidade" readonly autocomplete="off" placeholder="Escolher a cidade" style="cursor:pointer"></div></div>
       <div class="field"><label for="f-tipo">Salário-maternidade</label><select id="f-tipo"><option value="">Rural ou urbano? (escolher)</option><option value="urbana">Urbano · paga a GPS (facultativa)</option><option value="especial">Rural · segurada especial (prova rural)</option><option value="individual" hidden>Urbano · contribuinte individual (antigo)</option><option value="desempregada" hidden>Urbano · desempregada (antigo)</option></select><span class="hint">Urbano segue pela guia GPS; rural segue pela prova da atividade rural.</span></div>
@@ -3689,7 +3698,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:fle
     return '<div class="fc-caixa"><div class="fc-cx-top"><div class="fc-cx-nome"><button type="button" class="fc-nome" data-act="edit" title="Abrir o cadastro">' + esc(r.nome || 'Cliente') + '</button><p class="fc-num tnum">' + esc(num) + '</p></div>' +
         (r.pastaUrl ? '<a class="fc-pasta" href="' + esc(urlSegura(r.pastaUrl)) + '" target="_blank" rel="noopener">' + svgI('i-folder') + 'Pasta no Drive</a>' : '<span class="fc-sem-pasta">Pasta ainda não criada no Drive</span>') + '</div>' +
       '<div class="fc-lin">' + svgI('i-users') + '<span>CPF</span>' + (cpf.length >= 11 ? '<b class="tnum">' + esc(r.cpf) + '</b>' + fcCopiar(cpf, 'Copiar o CPF') : '<em>Não cadastrado</em>') + '</div>' +
-      (rural(r) && !r.nit ? '<div class="fc-lin">' + svgI('i-users') + '<span>Salário-maternidade</span><b>Rural · segurada especial (sem GPS)</b></div>' : '<div class="fc-lin">' + svgI('i-users') + '<span>NIT</span>' + (nitOk(r.nit) ? '<b class="tnum">' + esc(nitFmt(r.nit)) + '</b>' + fcCopiar(digits(r.nit), 'Copiar o NIT') : '<em>' + (r.nit ? 'NIT inválido: ' + esc(r.nit) : 'Não cadastrado') + '</em>') + '</div>') + fcSenhaHtml() +
+      (rural(r) && !r.nit ? '<div class="fc-lin">' + svgI('i-users') + '<span>' + (doFluxoNovo(r) ? 'Atividade' : 'Salário-maternidade') + '</span><b>' + (doFluxoNovo(r) ? esc(ativNovoTxt(r)) + ' · sem GPS' : 'Rural · segurada especial (sem GPS)') + '</b></div>' : '<div class="fc-lin">' + svgI('i-users') + '<span>NIT</span>' + (nitOk(r.nit) ? '<b class="tnum">' + esc(nitFmt(r.nit)) + '</b>' + fcCopiar(digits(r.nit), 'Copiar o NIT') : '<em>' + (r.nit ? 'NIT inválido: ' + esc(r.nit) : 'Não cadastrado') + '</em>') + '</div>') + fcSenhaHtml() +
       '<div class="fc-lin">' + svgI('i-zap') + '<span>WhatsApp</span>' + (tel ? (zp ? '<a class="tnum" href="' + esc(zp) + '" target="_blank" rel="noopener" title="Abrir a conversa no WhatsApp">' + esc(fmtTel(tel)) + '</a>' : '<b class="tnum">' + esc(fmtTel(tel)) + '</b>') + fcCopiar(digits(tel), 'Copiar o WhatsApp') : '<em>Não cadastrado</em>') + '</div>' +
       '<div class="fc-links"><a href="https://meu.inss.gov.br/" target="_blank" rel="noopener">' + svgI('i-inss') + 'Meu INSS</a>' + (rural(r) || doFluxoNovo(r) ? '' : '<a href="https://sal.rfb.gov.br/calculo-contribuicao/contribuintes-2" target="_blank" rel="noopener">' + svgI('i-cash') + 'Gerar guia</a>') + '</div></div>';
   }
@@ -3697,7 +3706,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:fle
   function fcResp(r, t){ return t === 'd' ? [r.atendente, r.atendenteEmail] : t === 'h' ? [r.filaPor, ''] : [r.posResp, r.posRespEmail]; }
   function fcGuia(r){
     if (!noContratos(r) || nascido(r)) return '';
-    if (rural(r)){ var pr = docsApp(r).filter(function(x){ return x.k === 'rural'; })[0]; return '<p class="fc-sec">Salário-maternidade rural</p><p class="fc-nota">Segurada especial: não paga GPS. O que garante o benefício é a prova da atividade rural' + (pr && pr.ok ? ' (já recebida).' : ' (ainda não chegou: cobrar da mãe).') + '</p>'; }
+    if (rural(r)){ var pr = docsApp(r).filter(function(x){ return x.k === 'rural'; })[0]; return doFluxoNovo(r) ? '<p class="fc-sec">' + esc(ativNovoTxt(r)) + ' · segurada especial</p><p class="fc-nota">Não paga GPS. O que garante o benefício é a prova da atividade' + (pr && pr.ok ? ' (já recebida).' : ' (ainda não chegou: cobrar da mãe).') + '</p>' : '<p class="fc-sec">Salário-maternidade rural</p><p class="fc-nota">Segurada especial: não paga GPS. O que garante o benefício é a prova da atividade rural' + (pr && pr.ok ? ' (já recebida).' : ' (ainda não chegou: cobrar da mãe).') + '</p>'; }
     var pago = gpsPaga(r), emitida = !!gpsGerar(r);
     return '<p class="fc-sec">Guia GPS (segurada facultativa)</p><div class="fc-guia">' +
       fcLeitura('Código de pagamento', GPS_CODIGO + ' · plano simplificado (11%)') + fcLeitura('Valor', moedaTxt(gpsValor())) + fcLeitura('Prazo', prazoGps(r) ? fmtDate(prazoGps(r)) : 'informe a data do parto') + fcLeitura('Situação', pago ? 'Paga' + (r.guiaPagaEm ? ' em ' + fmtDate(r.guiaPagaEm) : '') : emitida ? 'Guia pronta, aguardando pagamento' : 'Falta o NIT para gerar a guia') + '</div>' +
@@ -3725,7 +3734,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:fle
       (requerido(r) ? '<label class="fc-c"><span class="fc-rot">Número do protocolo/requerimento</span><input id="fc-prot" value="' + esc(r.protocoloInss || '') + '"></label><label class="fc-c"><span class="fc-rot">Data do requerimento</span><input id="fc-der" type="date" value="' + esc(r.der || '') + '"></label><label class="fc-c"><span class="fc-rot">NB</span><input id="fc-nb" value="' + esc(r.nb || '') + '"></label>' : '') +
       (String(r.processo || '').trim() ? '<label class="fc-c"><span class="fc-rot">Número do processo (CNJ)</span><input id="fc-proc" value="' + esc(r.processo) + '"></label>' : '') +
       '<p class="fc-sec">Linha do tempo</p><div>' + fcLeitura('Data do cadastro', dc ? fmtDate(dc) : '—') + fcLeitura('Data do fechamento', r.contratoEm ? fmtDate(String(r.contratoEm).slice(0, 10)) : '—') + '</div>' +
-      '<p class="fc-sec">Fase do processo</p>' + (pode ? '<label class="fc-c"><span class="fc-rot">Responsável</span>' + respSel + '</label><label class="fc-c"><span class="fc-rot">Salário-maternidade*</span><select id="fc-tipo">' + tipoOpts(r.tipoSegurada) + '</select></label>' : '') +
+      '<p class="fc-sec">Fase do processo</p>' + (pode ? '<label class="fc-c"><span class="fc-rot">Responsável</span>' + respSel + '</label>' + (doFluxoNovo(r) ? '<label class="fc-c"><span class="fc-rot">Pescadora, agricultora ou indígena?*</span><select id="fc-ativn">' + ativOpts(r) + '</select></label>' : '<label class="fc-c"><span class="fc-rot">Salário-maternidade*</span><select id="fc-tipo">' + tipoOpts(r.tipoSegurada) + '</select></label>') : '') +
       '<label class="fc-c"><span class="fc-rot">Fase*</span><input disabled value="' + esc(TITULOS[t] ? TITULOS[t][0] : '') + '"></label><label class="fc-c"><span class="fc-rot">Etapa*</span>' + etapaSel + '</label>' +
       (t === 'h' ? '<p class="fc-nota">Para avançar, use o botão do card.</p>' : '') +
       '<p class="fc-sec">Fechamento</p><div>' + fcLeitura('Situação', doFluxoNovo(r) ? 'Contrato e procuração assinados no app' : t === 'd' ? (LEAD[leadDe(r)] || '—') : t === 'q' ? (desqualificada(r) ? 'Desqualificado' : 'Perda') : 'Contrato fechado') + (doFluxoNovo(r) ? '' : fcLeitura('Closer', r.contratoPor || r.atendente || '—')) + (doFluxoNovo(r) ? '' : fcLeitura('Proposta', r.propostaAceita ? 'Aceita pela cliente' + (r.propostaObs ? ' · ' + r.propostaObs : '') : '')) +
@@ -3774,6 +3783,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:fle
       if (lin !== digits(r.gpsLinha || '')){ p.gpsLinha = lin; p.gpsEmitidaEm = lin ? ag : ''; p.gpsValor = lin ? gg.valor : ''; p.gpsVencimento = lin ? gg.vencimento : ''; }
     }
     if (q('#fc-tipo') && q('#fc-tipo').value !== (r.tipoSegurada || '')) p.tipoSegurada = q('#fc-tipo').value;
+    if (q('#fc-ativn') && q('#fc-ativn').value !== ativNovo(r)) Object.assign(p, ativPatch(q('#fc-ativn').value, r));
     if (q('#fc-proc')){ var proc = q('#fc-proc').value.trim(); if (!proc){ toast('Informe o número do processo.'); return; } p.processo = proc; }
     if (q('#fc-resp')){
       var sel = q('#fc-resp'), email = sel.value, nome = email ? (sel.selectedOptions[0] || {}).textContent || '' : '';
@@ -4453,9 +4463,39 @@ html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:fle
   function tipoChave(r){ return rural(r) ? 'especial' : r.tipoSegurada ? 'urbana' : ''; }
   function tipoSmTxt(r){ return rural(r) ? 'Rural' : r.tipoSegurada ? 'Urbano' : ''; }
   function tipoPill(r){
+    if (doFluxoNovo(r)){   // fluxo novo: a pergunta aparece na coluna Etapa do Pós-venda; aqui só a resposta
+      if (!r.tipoSegurada) return '';
+      return rural(r) ? '<span class="sm-tipo rur" title="' + esc(ativNovoTxt(r)) + ': segurada especial, sem GPS, prova da atividade">' + esc(ativNovoTxt(r)) + '</span>'
+        : '<span class="sm-tipo urb" title="Não é pescadora, agricultora nem indígena: paga a GPS">Com GPS</span>';
+    }
     var t = tipoSmTxt(r);
     if (t) return '<span class="sm-tipo ' + (rural(r) ? 'rur' : 'urb') + '" title="' + (rural(r) ? 'Salário-maternidade rural: segurada especial, prova rural, sem GPS' : 'Salário-maternidade urbano: facultativa, paga a GPS') + '">' + t + '</span>';
     return noContratos(r) ? '<span class="sm-tipo sem" title="Falta informar se o salário-maternidade é rural ou urbano">Rural ou urbano?</span>' : '';
+  }
+  // fluxo novo: a pergunta é a atividade da mãe; pescadora, agricultora ou indígena = segurada especial (sem GPS); nenhuma das três = paga a GPS
+  var ATIV_NOVO = [['pescadora', 'Pescadora'], ['agricultora', 'Agricultora'], ['indigena', 'Indígena'], ['nenhuma', 'Nenhuma das três']];
+  function ativNovo(r){
+    if (!r || !r.tipoSegurada) return '';
+    if (!rural(r)) return 'nenhuma';
+    var a = semAcento(r.atividade);
+    return /pesc/.test(a) ? 'pescadora' : /indig/.test(a) ? 'indigena' : /agric|lavrad/.test(a) ? 'agricultora' : 'rural';
+  }
+  function ativNovoTxt(r){ var k = ativNovo(r); return k === 'rural' ? 'Rural' : (ATIV_NOVO.filter(function(x){ return x[0] === k; })[0] || [0, ''])[1]; }
+  function ativPatch(v, r){
+    if (v === 'nenhuma') return { tipoSegurada: 'urbana', atividade: '' };
+    if (v === 'rural') return { tipoSegurada: 'especial', atividade: (r && r.atividade) || '' };
+    var a = ATIV_NOVO.filter(function(x){ return x[0] === v; })[0];
+    return a ? { tipoSegurada: 'especial', atividade: a[1] } : { tipoSegurada: '', atividade: '' };
+  }
+  function ativOpts(r){
+    var k = ativNovo(r);
+    return '<option value="">Ainda não perguntei</option>' + ATIV_NOVO.map(function(x){ return '<option value="' + x[0] + '"' + (x[0] === k ? ' selected' : '') + '>' + (x[0] === 'nenhuma' ? 'Nenhuma das três (paga a GPS)' : x[1]) + '</option>'; }).join('') +
+      (k === 'rural' ? '<option value="rural" selected>Rural (atividade não informada)</option>' : '');
+  }
+  // resposta no Pós-venda do fluxo novo: Pescadora, Agricultora, Indígena ou Nenhuma das três
+  function ativSeg(r){
+    return '<select class="ativ-sel" data-ativ-sel="' + esc(r.id) + '" aria-label="É pescadora, agricultora ou indígena? ' + esc(r.nome) + '" title="Pergunte à mãe: é pescadora, agricultora ou indígena?"><option value="">Escolher a resposta</option>' +
+      ATIV_NOVO.map(function(x){ return '<option value="' + x[0] + '">' + (x[0] === 'nenhuma' ? 'Nenhuma das três (paga a GPS)' : x[1]) + '</option>'; }).join('') + '</select>';
   }
   // dois botões, Urbano | Rural: um toque troca (lista do Cadastro)
   function tipoSeg(r){
@@ -4492,7 +4532,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:fle
     if (gpsTarefa(r) && doFluxoNovo(r)){ if (!nitOk(r.nit)) return 'Tarefa: pegar o NIT da mãe (a GPS sai sozinha)' + (prazoGps(r) ? ' até ' + fmtDate(prazoGps(r)) : ''); if (prazoGps(r) && prazoGps(r) < iso(new Date())) return 'Tarefa: conferir o pagamento automático da GPS (prazo ' + fmtDate(prazoGps(r)) + ')'; }
     else if (gpsTarefa(r)) return (!nitOk(r.nit) ? 'Tarefa: pegar o NIT da mãe (a GPS sai sozinha)' : 'Tarefa: pagar a GPS (guia pronta)') + (prazoGps(r) ? ' até ' + fmtDate(prazoGps(r)) : '');
     if (gpsVencida(r) && String(r.dpp).slice(0, 10) <= iso(new Date())) return 'GPS não foi paga (venceu ' + fmtDate(gpsVencida(r)) + '): confira antes de encaminhar';
-    if (!r.tipoSegurada) return 'Tarefa: informar se é rural ou urbano';
+    if (!r.tipoSegurada) return doFluxoNovo(r) ? 'Tarefa: perguntar se é pescadora, agricultora ou indígena' : 'Tarefa: informar se é rural ou urbano';
     if (posEtapaDe(r) === 'cert' && !doFluxoNovo(r)) return 'Tarefa: falar com a mãe e pedir a certidão';
     if (!nascido(r) && !r.dpp) return 'Tarefa: informar a data do parto';
     return '';
@@ -4583,17 +4623,17 @@ html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:fle
   function iniciais(n){ var p = String(n || '?').trim().split(/\s+/); return ((p[0] || '?').charAt(0) + (p.length > 1 ? p[p.length - 1].charAt(0) : '')).toUpperCase(); }
   // pendência principal da mãe no Pós-venda do fluxo novo
   function pendNovoTxt(r){
-    if (!r.tipoSegurada) return 'Rural ou urbano?';
+    if (!r.tipoSegurada) return 'Pescadora, agricultora ou indígena?';
     if (!r.senhaGovOk) return 'Senha gov.br';
     var f = faltaDocs(r);
     if (f.indexOf('nit') >= 0 && f.length === 1) return 'NIT';
-    if (f.indexOf('rural') >= 0 && f.length === 1) return 'Prova rural';
+    if (f.indexOf('rural') >= 0 && f.length === 1) return 'Prova da atividade';
     return f.length ? 'Documentos' : 'Em dia';
   }
   function posInfo(r){
     var et = posEtapaDe(r), atr = atrasoTxt(r), d = diasNoPos(r), st = [], id = esc(r.id);
     if (r.pvAnalise === 'devolvido') st.push(kbSt('Devolvida pela Controladoria' + (r.analiseMotivo ? ': ' + r.analiseMotivo : '')));
-    if (tarefaPos(r)) st.push(kbSt(tarefaPos(r).replace(/^Tarefa: /, ''), 'lar'));
+    if (tarefaPos(r) && !(doFluxoNovo(r) && !r.tipoSegurada)) st.push(kbSt(tarefaPos(r).replace(/^Tarefa: /, ''), 'lar'));
     if (atr) st.push(kbSt(atr.charAt(0).toUpperCase() + atr.slice(1)));
     if ((et === 'docs' || et === 'ok' || (doFluxoNovo(r) && et !== 'senha')) && faltamTxt(r)) st.push(kbSt('Falta: ' + faltamTxt(r), 'lar'));
     var meta = [linhaPartoBv(r), linhaGps(r), linhaOrigem(r), linhaDocs(r)];
@@ -4603,7 +4643,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:fle
       : et === 'ok' || r.pvAnalise === 'devolvido' ? (doFluxoNovo(r) ? '<button type="button" class="kb-btn" data-pv-enc="' + id + '" title="Pasta pronta: vai direto para a Fila de protocolo">' + svgI('i-file') + 'Encaminhar para protocolo</button>' : '<button type="button" class="kb-btn" data-pv-enc="' + id + '" title="Manda para a Controladoria: se estiver OK, vai para o protocolo; se não, volta para regularizar">' + svgI('i-file') + 'Encaminhar para análise</button>') : '';
     if (doFluxoNovo(r) && faseDe(r) === 'k'){
       var zpN = zapUrl(foneDe(r));
-      acao = !r.tipoSegurada ? tipoSeg(r)
+      acao = !r.tipoSegurada ? ativSeg(r)
         : !r.senhaGovOk ? '<button type="button" class="kb-btn" data-act="abrir" data-id="' + id + '" title="Abre a ficha: a senha gov.br fica logo abaixo do CPF">' + svgI('i-chave') + 'Cadastrar senha</button>'
         : zpN ? '<a class="kb-btn" target="_blank" rel="noopener" href="' + esc(zpN + '?text=' + encodeURIComponent(msgCobranca(r))) + '" title="Abre o WhatsApp com a mensagem pronta; você confere e envia">' + svgI('i-zap') + 'Cobrar no WhatsApp</a>'
         : '<button type="button" class="kb-btn" data-act="edit" data-id="' + id + '" title="Sem telefone: abra o cadastro e informe o WhatsApp da mãe">' + svgI('i-pencil') + 'Pôr o telefone</button>';
@@ -4620,9 +4660,9 @@ html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:fle
     if (!r.dpp) return '<p><button type="button" class="kb-inline" data-act="edit" data-id="' + esc(r.id) + '">Informar data do parto</button></p>';
     return '<div class="kb-par"><span>Parto ' + fmtDate(String(r.dpp).slice(0, 10)) + '</span>' + relogio(r.dpp, 'azul') + '</div>';
   }
-  // fluxo novo: o Pós-venda só mostra quem tem pendência (senha, documento, prova rural, rural ou urbano)
+  // fluxo novo: o Pós-venda só mostra quem tem pendência (pescadora/agricultora/indígena, senha, documento, prova da atividade)
   function posDaTela(r){ return noContratos(r) && (fluxoVista !== 'novo' || faseDe(r) === 'k'); }
-  var CTR_SITS_NOVO = [['', 'Status: todas'], ['semsenha', 'Sem senha gov.br'], ['docs', 'Documentos faltando'], ['rprova', 'Prova rural faltando'], ['semtipo', 'Sem rural/urbano'], ['urb', 'Urbanas'], ['rur', 'Rurais'], ['atr', 'Atrasadas']];
+  var CTR_SITS_NOVO = [['', 'Status: todas'], ['semsenha', 'Sem senha gov.br'], ['docs', 'Documentos faltando'], ['rprova', 'Prova da atividade faltando'], ['semtipo', 'Falta perguntar a atividade'], ['rur', 'Pescadora, agricultora ou indígena'], ['urb', 'Nenhuma das três (GPS)'], ['atr', 'Atrasadas']];
   function ctrSitsAtivos(){ return fluxoVista === 'novo' ? CTR_SITS_NOVO : CTR_SITS; }
   var CTR_SITS = [['', 'Status: todas'], ['urb', 'Urbanas (com GPS)'], ['rur', 'Rurais (prova rural)'], ['semtipo', 'Sem rural/urbano'], ['completa', 'Pastas completas'], ['gest', 'Gestantes'], ['nasc', 'Bebê já nasceu'], ['atr', 'Atrasadas'], ['gps', 'GPS a pagar'], ['docs', 'Documentos faltando'], ['dev', 'Devolvidas pela Controladoria']];
   function passaCtr(r, f){ return !f || (f === 'semsenha' ? (doFluxoNovo(r) ? !r.senhaGovOk : posEtapaDe(r) === 'senha') : f === 'rprova' ? rural(r) && faltaDocs(r).indexOf('rural') >= 0 : f === 'urb' ? tipoChave(r) === 'urbana' : f === 'rur' ? rural(r) : f === 'semtipo' ? !r.tipoSegurada : f === 'completa' ? !faltamTxt(r) : f === 'gest' ? !nascido(r) : f === 'nasc' ? nascido(r) : f === 'atr' ? atrasada(r) : f === 'gps' ? gpsTarefa(r) : f === 'docs' ? !!faltamTxt(r) : f === 'dev' ? r.pvAnalise === 'devolvido' : true); }
@@ -4635,8 +4675,8 @@ html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:fle
         $('ctr-stats').innerHTML = cardLista('data-ctr-kpi', 'i-users', 'Com pendência', pos.length, 'o resto do fluxo anda sozinho', '', 'x') +
           cardLista('data-ctr-kpi', 'i-chave', 'Sem senha gov.br', pos.filter(function(r){ return passaCtr(r, 'semsenha'); }).length, 'recuperar a senha', 'semsenha', ctrSit) +
           cardLista('data-ctr-kpi', 'i-file', 'Documentos faltando', pos.filter(function(r){ return passaCtr(r, 'docs'); }).length, 'a mãe não mandou', 'docs', ctrSit) +
-          cardLista('data-ctr-kpi', 'i-alert', 'Prova rural faltando', pos.filter(function(r){ return passaCtr(r, 'rprova'); }).length, 'só as rurais', 'rprova', ctrSit) +
-          cardLista('data-ctr-kpi', 'i-users', 'Sem rural/urbano', nTipo, 'o escritório decide', 'semtipo', ctrSit);
+          cardLista('data-ctr-kpi', 'i-alert', 'Prova da atividade faltando', pos.filter(function(r){ return passaCtr(r, 'rprova'); }).length, 'pescadora, agricultora ou indígena', 'rprova', ctrSit) +
+          cardLista('data-ctr-kpi', 'i-users', 'Falta perguntar a atividade', nTipo, 'pescadora, agricultora ou indígena?', 'semtipo', ctrSit);
         return;
       }
       var compl = pos.filter(function(r){ return !faltamTxt(r); }).length, atrDoc = pos.filter(function(r){ return /documenta/.test(atrasoTxt(r)); }).length;
@@ -4654,7 +4694,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:fle
     var nA = n('atr'), nG = n('gps'), nD = n('docs'), nV = n('dev');
     if (fluxoVista === 'novo'){ var nS = n('semsenha'), nR = n('rprova'), nT = n('semtipo'); nG = 0; nV = 0;
       $('ctr-chips').innerHTML = (nS ? fbChip('ver', 'i-chave', plural(nS, 'sem senha gov.br', 'sem senha gov.br'), 'ctr:semsenha', 'ctr:' + ctrSit) : '') + (nD ? fbChip('ver', 'i-file', plural(nD, 'sem documento', 'sem documento'), 'ctr:docs', 'ctr:' + ctrSit) : '') +
-        (nR ? fbChip('ver', 'i-alert', plural(nR, 'sem prova rural', 'sem prova rural'), 'ctr:rprova', 'ctr:' + ctrSit) : '') + (nT ? fbChip('ver', 'i-users', plural(nT, 'sem rural/urbano', 'sem rural/urbano'), 'ctr:semtipo', 'ctr:' + ctrSit) : '') + (nS || nD || nR || nT ? '' : FB_NADA);
+        (nR ? fbChip('ver', 'i-alert', plural(nR, 'sem prova da atividade', 'sem prova da atividade'), 'ctr:rprova', 'ctr:' + ctrSit) : '') + (nT ? fbChip('ver', 'i-users', plural(nT, 'falta perguntar a atividade', 'falta perguntar a atividade'), 'ctr:semtipo', 'ctr:' + ctrSit) : '') + (nS || nD || nR || nT ? '' : FB_NADA);
     } else
     $('ctr-chips').innerHTML = (nA ? fbChip('lar', 'i-clock', plural(nA, 'atrasada', 'atrasadas'), 'ctr:atr', 'ctr:' + ctrSit) : '') + (nG ? fbChip('ver', 'i-cash', plural(nG, 'GPS a pagar', 'GPS a pagar'), 'ctr:gps', 'ctr:' + ctrSit) : '') +
       (nD ? fbChip('ver', 'i-file', plural(nD, 'sem documento', 'sem documento'), 'ctr:docs', 'ctr:' + ctrSit) : '') + (nV ? fbChip('ver', 'i-undo', plural(nV, 'devolvida', 'devolvidas'), 'ctr:dev', 'ctr:' + ctrSit) : '') + (nA || nG || nD || nV ? '' : FB_NADA);
@@ -4716,7 +4756,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:fle
     var box = $('nan-list'); if (!box) return;
     var todos = state.rows.filter(function(r){ return faseDe(r) === 'an'; });
     var sem = todos.filter(function(r){ var d = daysUntil(r.dpp); return d != null && d <= 7; }).length, mes = todos.filter(function(r){ var d = daysUntil(r.dpp); return d != null && d <= 30; }).length;
-    statsNovo('nan-stats', [['i-baby', 'Aguardando nascimento', todos.length, 'GPS paga ou prova rural completa'], ['i-alert', 'Parto em até 7 dias', sem, 'a IA já está falando com a mãe'], ['i-cal', 'Parto em até 30 dias', mes, 'no próximo mês'], ['i-users', 'Rurais', todos.filter(rural).length, 'sem GPS, com prova rural']]);
+    statsNovo('nan-stats', [['i-baby', 'Aguardando nascimento', todos.length, 'GPS paga ou prova da atividade completa'], ['i-alert', 'Parto em até 7 dias', sem, 'a IA já está falando com a mãe'], ['i-cal', 'Parto em até 30 dias', mes, 'no próximo mês'], ['i-users', 'Rurais', todos.filter(rural).length, 'sem GPS, com prova rural']]);
     var l = ordenar(listaNovo('an', nanQ), function(a, b){ return String(a.dpp || '9999').localeCompare(String(b.dpp || '9999')); });
     kbInfo('nan', 'an', l.length, 'gestante', 'gestantes');
     tabelaFase(box, l, nascInfoN, 'Parto previsto', 'Nenhuma gestante aguardando o nascimento.');
@@ -4992,6 +5032,17 @@ html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:fle
   filtroCards($('ctr-stats'), 'data-ctr-kpi', function(v){ if (v === 'h' || v === 'h-prot'){ filaSit = v === 'h-prot' ? 'prot' : ''; showTab('h'); return; } ctrSit = ctrSit === v ? '' : v; }, renderContratos);
   $('ctr-q').addEventListener('input', function(){ ctrQ2 = this.value.trim(); renderContratos(); });
   document.addEventListener('click', function(e){ if (e.target.closest && e.target.closest('select[data-lead],select[data-ctr],select[data-guia],select[data-tiposeg]')) e.stopPropagation(); }, true);
+  // fluxo novo: o escritório pergunta se a mãe é pescadora, agricultora ou indígena
+  document.addEventListener('change', function(e){
+    var s = e.target.closest && e.target.closest('[data-ativ-sel]'); if (!s) return;
+    var r = acharRow(s.dataset.ativSel); if (!r) return;
+    var v = s.value; if (!v || ativNovo(r) === v) return;
+    var antes = { tipoSegurada: r.tipoSegurada || '', atividade: r.atividade || '' };
+    s.disabled = true;
+    patchRow(r.id, Object.assign(ativPatch(v, r), { atualizadoEm: new Date().toISOString() })).then(function(){
+      toast((v === 'nenhuma' ? 'Nenhuma das três (paga a GPS): ' : ativPatch(v).atividade + ' (sem GPS, prova da atividade): ') + r.nome, 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
+    }, function(err){ s.disabled = false; s.value = ''; toast(errMsg(err)); });
+  });
   // o closer marca na lista do Cadastro se o salário-maternidade é rural ou urbano
   document.addEventListener('click', function(e){
     var s = e.target.closest && e.target.closest('[data-tipo-set]'); if (!s) return;
@@ -5389,7 +5440,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:fle
       var respPos = primeiroNome(r.posResp || (doFluxoNovo(r) ? '' : r.contratoPor)), comResp = respPos ? ' · responsável: ' + respPos : '';
       if (gpsTarefa(r)) add(!nitOk(r.nit) ? 'Pegar o NIT para a GPS' : 'Pagar a GPS', r, (prazoGps(r) ? 'vence ' + fmtDate(prazoGps(r)) + ' · parto ' + fmtDate(r.dpp) : 'sem data do parto') + comResp);
       if (noContratos(r) && r.fatoGerador === 'gestante' && !r.criancaNasc && !r.dpp) add('Informar a data do parto', r, 'gestante sem data prevista');
-      if (noContratos(r) && !r.tipoSegurada) add('Informar se é rural ou urbano', r, 'urbano paga a GPS; rural precisa da prova rural' + comResp);
+      if (noContratos(r) && !r.tipoSegurada){ if (doFluxoNovo(r)) add('Perguntar se é pescadora, agricultora ou indígena', r, 'as três não pagam GPS e precisam da prova da atividade; nenhuma das três paga a GPS' + comResp); else add('Informar se é rural ou urbano', r, 'urbano paga a GPS; rural precisa da prova rural' + comResp); }
       if (doFluxoNovo(r) && noContratos(r) && posEtapaDe(r) === 'ok') add('Fazer o requerimento no INSS', r, 'pasta pronta' + (r.criancaNasc ? ' · nasceu em ' + fmtDate(r.criancaNasc) : '') + comResp);
       if (noContratos(r) && posEtapaDe(r) === 'cert') add('Falar com a mãe: pedir a certidão', r, (r.criancaNasc ? 'nasceu em ' + fmtDate(r.criancaNasc) : 'parto previsto ' + fmtDate(r.dpp)) + comResp);
       if (naFila(r) && filaEtapaDe(r) === 'conferir') add('Conferir a documentação', r, 'encaminhada ' + fmtDate(diaLocal(r.encaminhadoEm)) + ' · prazo ' + prazoTarefa(r.filaMudouEm || r.encaminhadoEm, 2));
@@ -5413,7 +5464,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:fle
   function abrirAvisos(){
     var l = avisosLista(), grupos = {};
     l.forEach(function(x){ (grupos[x.tipo] = grupos[x.tipo] || []).push(x); });
-    var ordem = ['Parto perto e sem contrato', 'Problema registrado', 'Pegar o NIT para a GPS', 'Pagar a GPS', 'Informar se é rural ou urbano', 'Informar a data do parto', 'Falar com a mãe: pedir a certidão', 'Cobrar documentos da mãe', 'Devolvida pela Controladoria', 'Conferir a documentação', 'Fazer o requerimento no INSS', 'Protocolar no INSS', 'Pôr o número do protocolo', 'Registrar o pagamento do benefício', 'Fazer o acerto de honorários', 'Exigência do INSS vencendo', 'Parada além do prazo', 'Cadastro repetido', 'Data para conferir'];
+    var ordem = ['Parto perto e sem contrato', 'Problema registrado', 'Pegar o NIT para a GPS', 'Pagar a GPS', 'Perguntar se é pescadora, agricultora ou indígena', 'Informar se é rural ou urbano', 'Informar a data do parto', 'Falar com a mãe: pedir a certidão', 'Cobrar documentos da mãe', 'Devolvida pela Controladoria', 'Conferir a documentação', 'Fazer o requerimento no INSS', 'Protocolar no INSS', 'Pôr o número do protocolo', 'Registrar o pagamento do benefício', 'Fazer o acerto de honorários', 'Exigência do INSS vencendo', 'Parada além do prazo', 'Cadastro repetido', 'Data para conferir'];
     var f = document.createElement('div'); f.className = 'cid-sheet av-sheet';
     f.innerHTML = '<div><div class="av-cab"><b>Avisos</b><span>' + (l.length ? l.length + (l.length === 1 ? ' ponto para olhar' : ' pontos para olhar') : 'Nada pendente agora') + '</span></div><div class="lista av-lista">' +
       ordem.filter(function(k){ return grupos[k]; }).map(function(k){ return '<div class="av-g"><b>' + esc(k) + ' <span class="tnum">' + grupos[k].length + '</span></b>' + grupos[k].map(function(x){ return '<button type="button" data-av="' + esc(x.id) + '"><span>' + esc(x.nome) + '</span><small>' + esc(x.txt) + '</small></button>'; }).join('') + '</div>'; }).join('') +
@@ -6085,7 +6136,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:fle
         dnCard('i-x', 'Indeferidos', indef, indef ? 'vão para o Judicial' : 'nenhum no período', indef ? 'alerta' : '') +
         dnCard('i-scale', 'Taxa de concessão', dnPct(conc, conc + indef), conc + ' de ' + (conc + indef) + ' decididos') +
         dnCard('i-clock', 'Do parto ao requerimento', tMedio == null ? '—' : tMedio + ' d', tMedio == null ? 'sem requerimentos no período' : 'média de ' + plural(tempos.length, 'requerimento', 'requerimentos')) +
-        dnCard('i-users', 'Urbanas · Rurais', urbEnt + ' · ' + rurEnt, 'das que entraram no período') + '</div>' : ''));
+        dnCard('i-users', 'Com GPS · Sem GPS', urbEnt + ' · ' + rurEnt, 'sem GPS: pescadora, agricultora ou indígena') + '</div>' : ''));
     // fases numa linha fina, em vez de um balão por fase
     var dnGastosHtml = isAdmin() ? dnSecao('Gastos do período', 'Guias GPS pagas no período (11% do salário mínimo cada) e repasses a parceiros e prospectadores com baixa no período (Financeiro › Comissões). Ainda a pagar: guias que venceram agora e comissões sem baixa.', dnGastos(rows, no, noAnt)) : '';
     // evolução + origem
@@ -6129,9 +6180,9 @@ html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:fle
     var novoF = fluxoVista === 'novo';
     if (novoF) html += dashSecao('Entrada', 'no período', '<div class="stats">' +
       dashCard('k', 'i-users', 'Mães que entraram', cads.length, 'qualificadas e com contrato') +
-      dashCard('gp', 'i-cash', 'Urbanas', cads.filter(function(r){ return tipoChave(r) === 'urbana'; }).length, 'pagam a GPS') +
-      dashCard('an', 'i-baby', 'Rurais', cads.filter(rural).length, 'prova rural, sem GPS') +
-      dashCard('k', 'i-alert', 'Com pendência agora', res.k[0], 'senha, documento, prova rural ou tipo') + '</div>');
+      dashCard('gp', 'i-cash', 'Pagam a GPS', cads.filter(function(r){ return tipoChave(r) === 'urbana'; }).length, 'nenhuma das três atividades') +
+      dashCard('an', 'i-baby', 'Sem GPS', cads.filter(rural).length, 'pescadora, agricultora ou indígena') +
+      dashCard('k', 'i-alert', 'Com pendência agora', res.k[0], 'atividade, senha, documento ou prova') + '</div>');
     else html += dashSecao('Comercial', 'no período', '<div class="stats">' +
       dashCard('d', 'i-phone', 'Mães cadastradas', cads.length, 'cadastradas no período') +
       dashCard('k', 'i-check', 'Contratos fechados', ctrs.length, 'fechados no período') +
@@ -7993,6 +8044,8 @@ html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:fle
   $('f-cidade').addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); escolherCidadeForm(); } });
   function syncSeg(){ var v = $('f-fato').value === 'gestante' ? 'gestante' : 'parto'; Array.prototype.forEach.call($('f-seg').querySelectorAll('button'), function(b){ b.setAttribute('aria-pressed', String(b.dataset.v === v)); }); }
   $('f-seg').addEventListener('click', function(e){ var b = e.target.closest('button[data-v]'); if (!b) return; $('f-fato').value = b.dataset.v; $('f-fato').dispatchEvent(new Event('change')); syncSeg(); });
+  // fluxo novo: a resposta da pergunta da atividade preenche os campos de tipo e atividade que o salvar já grava
+  $('f-ativn').addEventListener('change', function(){ var p = ativPatch(this.value, state.editBase); $('f-tipo').value = p.tipoSegurada; $('f-ativ').value = p.atividade; });
   function openForm(r, embutido, compacto, comPasta){
     var lugar = embutido ? $('cad-box') : dlg;
     if ($('form').parentElement !== lugar) lugar.appendChild($('form'));
@@ -8034,6 +8087,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:fle
     $('f-seg-box').hidden = !r;   // cadastro novo é sempre de gestante; editar continua permitindo registrar o nascimento
     if (fluxoVista === 'novo'){ $('f-atend-box').hidden = true; $('f-prop-box').hidden = true; }   // fluxo novo: sem closer e sem proposta
     $('f-senha-box').hidden = fluxoVista !== 'novo'; $('f-senha').value = '';
+    $('f-ativn-box').hidden = fluxoVista !== 'novo'; $('f-tipo').closest('.field').hidden = fluxoVista === 'novo'; $('f-ativn').innerHTML = ativOpts(r);
     $('f-senha').placeholder = r && r.senhaGovOk ? 'Já cadastrada no cofre (digite só para trocar)' : 'Senha do gov.br da mãe';
     $('f-senha-hint').textContent = r && r.senhaGovOk ? 'Para ver a senha atual, abra a ficha da mãe.' : 'Fica guardada no cofre; aparece só na ficha da mãe.';
     $('f-crianca').value = r ? r.crianca || '' : '';
@@ -8466,7 +8520,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-senha-box:not([hidden]){display:fle
     g: ['Parceiros', 'Estados de atuação, responsável de cada um e os parceiros que cadastram as clientes'],
     e: ['Configurações', 'Equipe, integrações e parceiros'],
     gp: ['GPS (urbana)', 'Guia da segurada facultativa: gerada pelo NIT e paga automaticamente pelo Asaas, 5 dias antes do prazo'],
-    an: ['Aguardando parto', 'GPS paga ou prova rural completa: esperando o parto; a IA fala com a mãe uma semana antes'],
+    an: ['Aguardando parto', 'GPS paga ou prova da atividade completa: esperando o parto; a IA fala com a mãe uma semana antes'],
     rq: ['Requerimento', 'A IA pede a certidão à mãe e o sistema faz o requerimento no Meu INSS']
   };
   function showTab(which){
