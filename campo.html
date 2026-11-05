@@ -885,6 +885,29 @@ html.inicio-fixo,html.inicio-fixo body{overflow:hidden;overscroll-behavior:none}
 .vista.inicio .pm-acoes .pm-btn:only-child{grid-column:1 / -1}
 .vista.inicio .pm-btn{height:42px}
 .vista.inicio [data-maes-rede]{height:38px;margin-top:8px!important}
+/* topo no jeito do Monju (05/11): sem barra nem logo; título da página à esquerda e botões redondos à direita; rola junto com a tela */
+#app .topo{position:relative!important;top:auto!important;background:transparent!important;border:0!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;margin:0!important;gap:8px!important;align-items:center!important;padding:calc(8px + env(safe-area-inset-top)) var(--gxr,16px) 6px var(--gx,16px)!important}
+html[data-tema="dark"] #app .topo{background:transparent!important;box-shadow:none!important}
+#app .topo .logo{display:none!important}
+#app .topo .quem{flex:1;min-width:0;cursor:default}
+#app .topo .quem b{font-family:'Fraunces',Georgia,serif!important;font-size:21px!important;font-weight:600!important;line-height:1.1!important;letter-spacing:-.015em}
+#app .topo .quem #topo-sub{margin-top:1px;font-size:12px!important;font-weight:500!important;color:var(--ink2)!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#app .topo .quem #topo-sub b{display:inline!important;font:inherit!important;font-weight:700!important;color:var(--ink)!important}
+#app .topo .av{flex:none;width:34px;height:34px;border:0;border-radius:50%;padding:0;background:linear-gradient(145deg,#e2cff1,#cca6ea);color:#561f86;font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:13px;display:grid;place-items:center}
+html[data-tema="dark"] #app .topo .av{background:rgba(158,89,216,.22);color:#e4d2f3}
+.pm-ola.no-topo{display:none!important}
+.vista{padding-top:10px}
+@media (max-width:359px){ #app .topo .quem b{font-size:19px!important} }
+/* aplicativo de verdade: o topo e a barra de baixo ficam parados; só o conteúdo da aba rola, sem barra de rolagem aparecendo */
+html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden;overscroll-behavior:none}
+#app:has(> #vista){display:flex;flex-direction:column;height:100vh;height:100dvh}
+#app > .topo{flex:none}
+#app > #vista{flex:1 1 auto;min-height:0;width:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:none}
+#app > #vista::-webkit-scrollbar{display:none}
+#app > #vista.inicio{overflow:hidden}
+/* busca e filtros das listas ficam parados no alto; a lista passa por baixo deles */
+#vista > .pm-busca,#vista > .busca{position:sticky;top:0;z-index:4;box-shadow:0 -24px 0 20px var(--bg)!important}
+#vista > .pm-filtro,#vista > .chips{position:sticky;top:46px;z-index:3;background:var(--bg);box-shadow:0 -24px 0 var(--bg);margin-top:0!important;padding-top:10px!important;padding-bottom:8px!important}
 @media (max-height:760px){ .vista.inicio .pm-num{font-size:40px} .vista.inicio .pm-hero p{margin-bottom:6px} .vista.inicio .pm-rot{margin-top:10px} }
 </style>
 <link rel="preload" as="image" href="img/marca-suave.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
@@ -929,7 +952,7 @@ html.inicio-fixo,html.inicio-fixo body{overflow:hidden;overscroll-behavior:none}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 68;
+  var APP_VERSAO = 69;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1177,13 +1200,15 @@ html.inicio-fixo,html.inicio-fixo body{overflow:hidden;overscroll-behavior:none}
       '<div class="topo"><div class="logo"><img src="img/logo-nascer-t.png" alt="Nascer com Direitos"></div>' +
         '<div class="quem"><b id="topo-nome"></b><span id="topo-sub">Parceira</span></div><div class="sinc" id="sinc"><i></i><span></span></div>' +
         '<button type="button" class="tema" id="modo" hidden style="width:auto;padding:0 11px;font-size:12px;font-weight:700"></button>' +
-        '<button type="button" class="tema" id="tema" aria-label="Trocar entre modo claro e escuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle class="sol" cx="12" cy="12" r="4"/><path class="sol" d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/><path class="lua" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button></div>' +
+        '<button type="button" class="tema" id="tema" aria-label="Trocar entre modo claro e escuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle class="sol" cx="12" cy="12" r="4"/><path class="sol" d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/><path class="lua" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>' +
+        '<button type="button" class="av" id="topo-av" aria-label="Sua conta"></button></div>' +
       '<main class="vista" id="vista"></main>' +
       '<nav class="abas' + (semGanho() ? ' sg' : '') + '" id="abas">' +
         navBotoes() +
       '</nav>';
     $('abas').addEventListener('click', function(e){ var b = e.target.closest('[data-aba]'); if (!b) return; if (ehProspectador() && b.dataset.aba === 'novo') return escolherNovo(); irPara(b.dataset.aba); });
-    var tq = document.querySelector('#app .topo .quem'); if (tq){ tq.style.cursor = 'pointer'; tq.onclick = function(){ irPara('conta'); }; }
+    $('topo-av').onclick = function(){ irPara('conta'); };
+    if (window.MutationObserver) new MutationObserver(tituloTopo).observe($('vista'), { childList: true });
     var tl = document.querySelector('#app .topo .logo'); if (tl) tl.onclick = function(){ irPara('painel'); };
     try { var temaSalvo = localStorage.getItem('nascer_tema'); if (temaSalvo === 'dark' || temaSalvo === 'light') document.documentElement.setAttribute('data-tema', temaSalvo); } catch(e){}
     $('tema').addEventListener('click', function(){
@@ -1192,7 +1217,7 @@ html.inicio-fixo,html.inicio-fixo body{overflow:hidden;overscroll-behavior:none}
       try { localStorage.setItem('nascer_tema', novo); } catch(e){}
     });
   }
-  function irPara(a){ aba = a; lsSet('campo_aba', a); window.scrollTo(0, 0); telaInicial(); if (a !== 'novo' && a !== 'novop') carregarPainel(); }
+  function irPara(a){ aba = a; lsSet('campo_aba', a); window.scrollTo(0, 0); if ($('vista')) $('vista').scrollTop = 0; telaInicial(); if (a !== 'novo' && a !== 'novop') carregarPainel(); }
   function sincronia(){
     var el = $('sinc'); if (!el) return;
     filaTodos().catch(function(){ return []; }).then(function(l){
@@ -1759,7 +1784,23 @@ html.inicio-fixo,html.inicio-fixo body{overflow:hidden;overscroll-behavior:none}
   }
   function depoisDoInicio(){ caberInicio(); setTimeout(function(){ conviteAvisos(); caberInicio(); reativarAvisos(); }, 600); }
   // Início sem rolagem: tira do fim da lista as linhas que não cabem na tela (as outras ficam na aba Mães ou Parceiros)
+  // topo no jeito do Monju: o título de cada tela (o bloco .pm-ola) sobe para a linha dos botões; tela sem título usa o nome da aba
+  var TIT_ABA = { painel: 'Início', clientes: 'Mães', maes: 'Mães', novo: 'Novo cadastro', novop: 'Novo parceiro', recebimentos: 'Meus ganhos', conta: 'Sua conta' };
+  function tituloTopo(){
+    var v = $('vista'), n = $('topo-nome'), sb = $('topo-sub'), av = $('topo-av'); if (!v || !n || !sb) return;
+    var clin = quem && quem.tipo === 'clinica' && quem.clinica, nome = clin ? bonito(quem.clinica) : bonito((quem && quem.nome) || '') || 'Parceiro';
+    if (av) av.textContent = iniciais(nome);
+    var o = null; Array.prototype.forEach.call(v.children, function(c){ if (!o && c.classList.contains('pm-ola')) o = c; });
+    if (o){
+      var h = o.querySelector('h2'), sp = o.querySelector('span');
+      n.textContent = h ? h.textContent : ''; sb.innerHTML = sp ? sp.innerHTML : ''; o.classList.add('no-topo');
+    } else {
+      n.textContent = aba === 'novo' && completando ? 'Completar documentos' : (TIT_ABA[aba] || 'Nascer com Direitos');
+      sb.innerHTML = '<span class="t-nome">' + esc(nome) + '</span><span class="t-papel"> · ' + (ehProspectador() ? 'Prospectador' : clin ? 'Clínica parceira' : 'Parceira') + '</span>';
+    }
+  }
   function caberInicio(){
+    tituloTopo();
     var raiz = document.documentElement; raiz.classList.remove('inicio-fixo');
     var v = $('vista'), nav = $('abas'); if (!v || !v.classList.contains('inicio') || !nav || getComputedStyle(nav).position !== 'fixed') return;
     window.scrollTo(0, 0);
@@ -2665,7 +2706,7 @@ html.inicio-fixo,html.inicio-fixo body{overflow:hidden;overscroll-behavior:none}
        fotos = {}; local = null; guardarRascunho();   // apaga o rascunho dessas fotos
        if (comp){ completando = null; lsSet('campo_completando', ''); if (painel) painel.clientes.forEach(function(c){ if (c.id === comp.id) c.faltaDocs = comp.faltaDocs.filter(function(k){ return envio.docs.indexOf(k) < 0; }); }); }
        else { ['campo_fone', 'campo_cpf', 'campo_cidade', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp', 'campo_nasceu'].forEach(function(k){ lsSet(k, ''); }); }
-       t.remove(); aba = comp ? 'painel' : 'novo'; telaInicial(); window.scrollTo(0, 0);
+       t.remove(); aba = comp ? 'painel' : 'novo'; telaInicial(); window.scrollTo(0, 0); if ($('vista')) $('vista').scrollTop = 0;
        var ok = tela('<svg viewBox="0 0 24 24" style="stroke:var(--ok)"><use href="#i-ok"/></svg><b>' + (comp ? 'Documentos guardados' : 'Cadastro guardado') + '</b><p>' + esc(envio.cliente || '') + '<br>' + (comp ? 'Vão para a pasta da cliente sozinhos quando tiver internet.' : 'Está sendo enviado agora: acompanhe na barra embaixo. Pode cadastrar a próxima cliente.') + '</p><button id="t-ok">' + (comp ? 'Entendi' : 'Cadastrar a próxima') + '</button>');
        ok.querySelector('#t-ok').onclick = function(){ ok.remove(); };
        proximo();
