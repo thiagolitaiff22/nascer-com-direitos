@@ -1211,7 +1211,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 83;
+  var APP_VERSAO = 84;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1885,9 +1885,10 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   var Q_TRAB = [
     ['dona_casa', 'Dona de casa', '', 'guia_facultativa'], ['estudante', 'Estudante', '', 'guia_facultativa'],
     ['desempregada', 'Desempregada', '', ''], ['autonoma', 'Autônoma', '', 'guia_individual'],
-    ['mei', 'MEI', '', 'mei'], ['domestica', 'Doméstica com carteira', '', 'direto_inss'],
+    ['mei', 'MEI', '', 'mei'], ['domestica', 'Doméstica', '', ''],
     ['pescadora', 'Pescadora', '', 'rural'], ['agricultora', 'Agricultora', '', 'rural'], ['indigena', 'Indígena', '', 'rural'],
     ['clt', 'CLT', '', 'nao'], ['servidora', 'Servidora pública', '', 'nao']];
+  var Q_DOM = [['dom_sim', 'Sim, tem carteira', '', 'direto_inss'], ['dom_nao', 'Não tem carteira', '', 'guia_individual']];   // doméstica: com carteira pede direto ao INSS; sem carteira paga como autônoma (1163)
   var Q_SAIDA = [['menos12', 'Menos de 12 meses', '', 'direto_inss'], ['mais12', 'Mais de 12 meses', '', 'guia_facultativa'], ['nunca', 'Nunca teve carteira', '', 'guia_facultativa']];
   var Q_BENEF = [['nenhum', 'Nenhum', '', 'ok'], ['bolsa', 'Bolsa Família', '', 'ok'], ['pensao', 'Pensão', '', 'ok'], ['bpc', 'BPC/LOAS', '', 'analisar'], ['auxilio', 'Auxílio-doença', '', 'nao'], ['outro', 'Outro', '', 'analisar']];
   // respostas acolhedoras para quem não se enquadra ({n} = primeiro nome da mãe)
@@ -1905,9 +1906,10 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     if (ot[3] === 'nao') return { nao: t };
     var caminho = ot[3];
     if (t === 'desempregada'){ var os = qOpcao(Q_SAIDA, sd); if (!os) return { falta: 'saida' }; caminho = os[3]; }
+    if (t === 'domestica'){ var od = qOpcao(Q_DOM, sd); if (!od) return { falta: 'saida' }; caminho = od[3]; }
     var ob = qOpcao(Q_BENEF, bf); if (!ob) return { falta: 'beneficio', caminho: caminho };
     if (ob[3] === 'nao') return { nao: bf };
-    return { ok: true, caminho: caminho, analisar: ob[3] === 'analisar', trabalho: t, saida: t === 'desempregada' ? sd : '', beneficio: bf };
+    return { ok: true, caminho: caminho, analisar: ob[3] === 'analisar', trabalho: t, saida: t === 'desempregada' || t === 'domestica' ? sd : '', beneficio: bf };
   }
   var CAMPOS_CADASTRO = ['campo_fone', 'campo_cpf', 'campo_cidade', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp', 'campo_nasceu', 'campo_cep', 'campo_rua', 'campo_num', 'campo_compl', 'campo_bairro', 'campo_uf_cep', 'campo_q_trab', 'campo_q_saida', 'campo_q_benef'];
   function temRascunhoCadastro(){ return !!(Object.keys(fotos).length || senhaGovRascunho || CAMPOS_CADASTRO.some(function(k){ return String(lsGet(k) || '').trim(); })); }
@@ -1927,7 +1929,8 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     var P = [
       { k: 'nome', t: 'Qual é o nome da mãe?', s: 'Nome completo, como está no documento.', el: ['l-nome'], foco: 'nome', ok: function(){ return txt('campo_nome').length >= 3; }, erro: 'Digite o nome completo da mãe.' },
       { k: 'trab', t: 'O que a ' + nm + ' faz hoje?', s: '', opcoes: Q_TRAB, chave: 'campo_q_trab', el: [], ok: function(){ var q = qualif(); return !q.nao && q.falta !== 'trabalho'; }, erro: 'Escolha uma opção.' },
-      lsGet('campo_q_trab') === 'desempregada' ? { k: 'saida', t: 'Saiu do último emprego com carteira há quanto tempo?', s: '', opcoes: Q_SAIDA, chave: 'campo_q_saida', el: [], ok: function(){ return !!lsGet('campo_q_saida'); }, erro: 'Escolha uma opção.' } : null,
+      lsGet('campo_q_trab') === 'domestica' ? { k: 'saida', t: 'A ' + nm + ' tem carteira assinada?', s: '', opcoes: Q_DOM, chave: 'campo_q_saida', el: [], ok: function(){ return !!qOpcao(Q_DOM, lsGet('campo_q_saida')); }, erro: 'Escolha uma opção.' } :
+      lsGet('campo_q_trab') === 'desempregada' ? { k: 'saida', t: 'Saiu do último emprego com carteira há quanto tempo?', s: '', opcoes: Q_SAIDA, chave: 'campo_q_saida', el: [], ok: function(){ return !!qOpcao(Q_SAIDA, lsGet('campo_q_saida')); }, erro: 'Escolha uma opção.' } : null,
       { k: 'benef', t: 'A ' + nm + ' recebe algum benefício?', s: '', opcoes: Q_BENEF, chave: 'campo_q_benef', el: [], ok: function(){ var q = qualif(); return !q.nao && !!lsGet('campo_q_benef'); }, erro: 'Escolha uma opção.' },
       { k: 'cpf', t: 'Qual é o CPF dela?', s: 'Só os números.', el: ['l-cpf'], foco: 'cpf', ok: function(){ return cpfOk(($('cpf') || {}).value); }, erro: 'Confira o CPF: são 11 números.' },
       { k: 'fone', t: 'Qual é o WhatsApp dela?', s: 'Com DDD. É por ele que o escritório vai falar com ela.', el: ['l-fone'], foco: 'fone', ok: function(){ return foneOk(($('fone') || {}).value); }, erro: 'Digite o celular com DDD.' },
@@ -1958,7 +1961,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     if (pas.final){
       var dpp = txt('campo_dpp'), linhas = [
         ['Nome', txt('campo_nome'), idx('nome')],
-        ['Situação', ((qOpcao(Q_TRAB, txt('campo_q_trab')) || [0, ''])[1] + (txt('campo_q_trab') === 'desempregada' ? ' · ' + ((qOpcao(Q_SAIDA, txt('campo_q_saida')) || [0, ''])[1]).toLowerCase() : '')), idx('trab')],
+        ['Situação', ((qOpcao(Q_TRAB, txt('campo_q_trab')) || [0, ''])[1] + (function(){ var l = txt('campo_q_trab') === 'desempregada' ? Q_SAIDA : txt('campo_q_trab') === 'domestica' ? Q_DOM : null, o = l && qOpcao(l, txt('campo_q_saida')); return o ? ' · ' + o[1].toLowerCase() : ''; })()), idx('trab')],
         ['Benefício', (qOpcao(Q_BENEF, txt('campo_q_benef')) || [0, ''])[1], idx('benef')],
         ['Caminho', (CAMINHO_TXT[qualif().caminho] || '') + (qualif().analisar ? ' · o escritório confere o benefício' : ''), idx('trab')],
         ['CPF', txt('campo_cpf'), idx('cpf')], ['WhatsApp', txt('campo_fone'), idx('fone')],
@@ -1983,7 +1986,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
         slot.innerHTML = '<div class="wz-opcoes' + (pas.opcoes.length > 4 ? ' duas' : '') + '">' + pas.opcoes.map(function(o){ return '<button type="button" class="wz-op" data-op="' + o[0] + '" aria-pressed="' + (o[0] === marcado) + '"><i></i><span><b>' + esc(o[1]) + '</b>' + (o[2] ? '<small>' + esc(o[2]) + '</small>' : '') + '</span></button>'; }).join('') + '</div>';
         Array.prototype.forEach.call(slot.querySelectorAll('[data-op]'), function(b){ b.onclick = function(){
           lsSet(pas.chave, b.dataset.op);
-          if (pas.chave === 'campo_q_trab' && b.dataset.op !== 'desempregada') lsSet('campo_q_saida', '');
+          if (pas.chave === 'campo_q_trab' && b.dataset.op !== marcado) lsSet('campo_q_saida', '');
           Array.prototype.forEach.call(slot.querySelectorAll('[data-op]'), function(x){ x.setAttribute('aria-pressed', String(x === b)); });
           var o2 = qOpcao(pas.opcoes, b.dataset.op);
           setTimeout(function(){ if (!(o2 && o2[3] === 'nao')) passoNovo++; telaInicial(); }, 220);   // não se enquadra: fica e mostra o porquê
