@@ -894,6 +894,70 @@ html.inicio-fixo,html.inicio-fixo body{overflow:hidden;overscroll-behavior:none}
 html[data-tema="dark"] .seg-ini{background:rgba(158,89,216,.14)}
 html[data-tema="dark"] .seg-ini button{color:#c9a3ea}
 html[data-tema="dark"] .seg-ini button[aria-pressed="true"]{background:#2a1f33;color:#f1e9f7}
+/* sininho do topo (05/11): número vermelho com o total de avisos; a janela lista cada aviso com o seu botão */
+#app .topo .sino{position:relative}
+#app .topo .sino svg{width:18px;height:18px}
+.sino-n{position:absolute;top:-3px;right:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#dc2626;color:#fff;font-size:10.5px;font-weight:800;line-height:18px;text-align:center;box-shadow:0 0 0 2px var(--bg)}
+.sino-n[hidden]{display:none}
+.sino-lista{display:flex;flex-direction:column;gap:8px;margin:14px 0 4px}
+.sino-it{display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;background:var(--soft);border:1px solid var(--line)}
+.sino-ic{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:800;color:#fff;background:#8a43d3}
+.sino-ic.fila{background:#dc2626}.sino-ic svg{width:18px;height:18px}
+.sino-tx{flex:1;min-width:0}.sino-tx b{display:block;font-size:14px;line-height:1.25;color:var(--ink)}.sino-tx small{display:block;margin-top:2px;font-size:12px;line-height:1.35;color:var(--ink2)}
+.sino-it button{flex:none;border:0;border-radius:11px;background:#66279d;color:#fff;font:inherit;font-size:13px;font-weight:600;padding:9px 12px}
+.sino-vazio{display:flex;flex-direction:column;align-items:center;gap:4px;margin:18px 0 8px;color:var(--ink2);font-size:13px;text-align:center}
+.sino-vazio svg{width:30px;height:30px;color:#8a43d3;margin-bottom:4px}.sino-vazio b{font-size:15px;color:var(--ink)}
+.sino-nao{display:block;margin:10px auto 0;border:0;background:none;color:var(--ink2);font:inherit;font-size:13px;text-decoration:underline}
+/* o ponto de internet vira um pontinho no canto das iniciais (sobra espaço para o nome inteiro) */
+#app .topo .sinc{position:absolute!important;z-index:2;right:calc(var(--gxr,16px) - 2px);top:calc(14px + env(safe-area-inset-top) + 23px);width:13px;height:13px;margin:0!important;padding:0!important;border:0!important;border-radius:50%;background:var(--bg)!important;display:grid!important;place-items:center}
+#app .topo .sinc i{width:8px;height:8px}
+#app .topo .sinc span{display:none!important}
+#app .topo .quem b.marca{font-size:clamp(14px,4.4vw,18px)!important}
+@media (max-width:359px){ #app .topo{gap:5px!important} #app .topo .tema,#app .topo .av{width:31px!important;height:31px!important} }
+/* nada de "puxar" a página no iPhone: na tela de entrar e no app, o corpo da página fica parado (só a lista da aba rola) */
+html.lg-fixo,html.lg-fixo body{height:100%;overflow:hidden;overscroll-behavior:none}
+html.lg-fixo body{position:fixed;inset:0;width:100%}
+html.lg-fixo .lg{height:100%;min-height:0;overflow:hidden}
+html:has(#app > #vista) body{position:fixed;inset:0;width:100%}
+/* avatar com foto (topo e Conta) */
+#app .topo .av{overflow:hidden;padding:0}
+#app .topo .av img,.ct-foto img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
+/* Conta (05/11): foto, nome que aparece, aparência, senha e o aplicativo */
+.ct-perfil{display:flex;align-items:center;gap:16px;margin:4px 0 6px;padding:16px;border-radius:22px;background:var(--card);border:1px solid var(--line);box-shadow:0 4px 14px rgba(41,24,56,.06)}
+.ct-foto{position:relative;flex:none;width:76px;height:76px;border-radius:50%;border:0;padding:0;background:linear-gradient(145deg,#e2cff1,#cca6ea);color:#561f86;font-family:'Fraunces',Georgia,serif;font-size:26px;font-weight:600;display:grid;place-items:center}
+.ct-cam{position:absolute;right:-2px;bottom:-2px;width:28px;height:28px;border-radius:50%;background:#66279d;display:grid;place-items:center;box-shadow:0 0 0 3px var(--card)}
+.ct-cam svg{width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2;stroke-linejoin:round}
+.ct-nome{min-width:0;flex:1}.ct-nome b{display:block;font-family:'Fraunces',Georgia,serif;font-size:20px;font-weight:600;line-height:1.15;color:var(--ink);overflow-wrap:anywhere}
+.ct-nome small{display:block;margin-top:2px;font-size:12.5px;color:var(--ink2)}
+.ct-tirar{margin-top:6px;border:0;background:none;padding:0;font:inherit;font-size:13px;font-weight:600;color:#66279d}
+.ct-bloco{margin-top:12px;padding:14px 16px 16px;border-radius:20px;background:var(--card);border:1px solid var(--line)}
+.ct-rot{margin:0 0 8px 2px;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.ct-linha{display:flex;align-items:center;gap:8px;height:48px;padding:0 6px 0 14px;margin-bottom:8px;border-radius:14px;background:var(--soft);border:1.5px solid transparent}
+.ct-linha:focus-within{border-color:#8a43d3;background:var(--card)}
+.ct-linha input{flex:1;min-width:0;height:100%;border:0;background:none;outline:0;font:inherit;font-size:16px;color:var(--ink)}
+.ct-linha button{flex:none;height:36px;padding:0 14px;border:0;border-radius:10px;background:#66279d;color:#fff;font:inherit;font-size:13.5px;font-weight:600}
+.ct-dica{display:block;margin:-2px 2px 0;font-size:12px;color:var(--ink2)}
+.ct-btn{width:100%;height:46px;border:0;border-radius:14px;background:linear-gradient(135deg,#8a43d3,#5e2296);color:#fff;font:inherit;font-size:15px;font-weight:700}
+.ct-tema{margin:0}
+html[data-tema="dark"] .ct-tirar{color:#c49be6}
+html[data-tema="dark"] .ct-foto{background:rgba(158,89,216,.22);color:#e4d2f3}
+@media (max-height:520px){ .lg-marca,.lg-inst{display:none} .lg-topo{min-height:96px} }
+/* esqueleto de carregamento (05/11): quadradinhos com brilho no lugar de "Entrando…" */
+.esq{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;background:var(--bg);animation:esqEntra .22s ease both}
+.esq.sai{animation:esqSai .4s ease forwards}
+@keyframes esqEntra{from{opacity:0}to{opacity:1}}
+@keyframes esqSai{from{opacity:1}to{opacity:0}}
+.esq i{display:block;border-radius:9px;background:linear-gradient(100deg,rgba(118,51,178,.09) 30%,rgba(118,51,178,.20) 50%,rgba(118,51,178,.09) 70%);background-size:250% 100%;animation:esqBrilho 1.15s ease-in-out infinite}
+@keyframes esqBrilho{from{background-position:100% 0}to{background-position:-60% 0}}
+.esq-topo{display:flex;align-items:center;gap:8px;padding:calc(14px + env(safe-area-inset-top)) 16px 10px;border-bottom:1px solid var(--line)}
+.esq-corpo{flex:1;width:100%;max-width:560px;margin:0 auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.esq-lin{display:flex;align-items:center;gap:12px;padding:12px;border-radius:18px;border:1px solid var(--line);background:var(--card)}
+.esq-nav{width:100%;max-width:560px;margin:0 auto;padding:0 12px calc(10px + env(safe-area-inset-bottom))}
+html[data-tema="dark"] .esq i{background-image:linear-gradient(100deg,rgba(158,89,216,.10) 30%,rgba(158,89,216,.22) 50%,rgba(158,89,216,.10) 70%)}
+#vista.entra > *{animation:vistaEntra .5s ease both}
+#vista.entra > *:nth-child(2){animation-delay:.05s}#vista.entra > *:nth-child(3){animation-delay:.1s}#vista.entra > *:nth-child(4){animation-delay:.15s}#vista.entra > *:nth-child(5){animation-delay:.2s}#vista.entra > *:nth-child(n+6){animation-delay:.25s}
+@keyframes vistaEntra{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){ .esq,.esq i,#vista.entra > *{animation:none!important} }
 /* tela de entrar (05/11): ocupa a tela sem rolar; faixa roxa com a marca e cartão branco por cima */
 .lg{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--bg)}
 .lg-topo{position:relative;flex:1 0 auto;min-height:clamp(180px,36dvh,330px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(20px + env(safe-area-inset-top)) 24px 56px;color:#fff;text-align:center;overflow:hidden;background:radial-gradient(120% 90% at 85% 0%,rgba(255,255,255,.18),transparent 55%),linear-gradient(155deg,#8a43d3 0%,#6a2aa3 55%,#4d1a7c 100%)}
@@ -1001,7 +1065,7 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 72;
+  var APP_VERSAO = 73;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1249,7 +1313,7 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
       '<div class="topo"><div class="logo"><img src="img/logo-nascer-t.png" alt="Nascer com Direitos"></div>' +
         '<div class="quem"><b class="marca">Nascer com Direitos</b></div><div class="sinc" id="sinc"><i></i><span></span></div>' +
         '<button type="button" class="tema" id="modo" hidden style="width:auto;padding:0 11px;font-size:12px;font-weight:700"></button>' +
-        '<button type="button" class="tema" id="tema" aria-label="Trocar entre modo claro e escuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle class="sol" cx="12" cy="12" r="4"/><path class="sol" d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/><path class="lua" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>' +
+        '<button type="button" class="tema sino" id="topo-sino" aria-label="Avisos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="sino-n" id="sino-n" hidden></span></button>' +
         '<button type="button" class="av" id="topo-av" aria-label="Sua conta"></button></div>' +
       '<div class="tit-tela"><b id="topo-nome"></b><span id="topo-sub"></span></div>' +
       '<main class="vista" id="vista"></main>' +
@@ -1258,14 +1322,11 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
       '</nav>';
     $('abas').addEventListener('click', function(e){ var b = e.target.closest('[data-aba]'); if (!b) return; if (ehProspectador() && b.dataset.aba === 'novo') return escolherNovo(); irPara(b.dataset.aba); });
     $('topo-av').onclick = function(){ irPara('conta'); };
+    $('topo-sino').onclick = abrirSino;
     if (window.MutationObserver) new MutationObserver(tituloTopo).observe($('vista'), { childList: true });
     var tl = document.querySelector('#app .topo .logo'); if (tl) tl.onclick = function(){ irPara('painel'); };
     try { var temaSalvo = localStorage.getItem('nascer_tema'); if (temaSalvo === 'dark' || temaSalvo === 'light') document.documentElement.setAttribute('data-tema', temaSalvo); } catch(e){}
-    $('tema').addEventListener('click', function(){
-      var novo = document.documentElement.getAttribute('data-tema') === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-tema', novo);
-      try { localStorage.setItem('nascer_tema', novo); } catch(e){}
-    });
+    carregarPerfil();
   }
   function irPara(a){ aba = a; lsSet('campo_aba', a); window.scrollTo(0, 0); if ($('vista')) $('vista').scrollTop = 0; telaInicial(); if (a !== 'novo' && a !== 'novop') carregarPainel(); }
   function sincronia(){
@@ -1275,6 +1336,7 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
       el.className = 'sinc' + (off || n ? ' off' : '');
       el.querySelector('span').textContent = n ? n + ' na fila' : off ? 'Sem internet' : 'Em dia';
       var b = $('bolha'); if (b){ b.hidden = !n; b.textContent = n; }
+      pintarSino();
     });
   }
   window.addEventListener('online', sincronia); window.addEventListener('offline', sincronia);
@@ -1321,11 +1383,10 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
     var cl = clientesPainel().slice().sort(function(a, b){ return String(b.cadastro || '').localeCompare(String(a.cadastro || '')); });
     $('vista').classList.add('inicio');
     $('vista').innerHTML =
-      '<div class="pm-ola"><h2>' + saudacao() + (primeiro ? ', ' + esc(bonito(primeiro)) : '') + '</h2><span>' + hojeTxt() + '</span></div>' +
+      '<div class="pm-ola"><h2>' + saudacao() + (nomeSaudacao() ? ', ' + esc(nomeSaudacao()) : '') + '</h2><span>' + hojeTxt() + '</span></div>' +
       '<div class="pm-hero"><small>Parceiros que você trouxe</small><div class="pm-num">' + l.length + '</div><p>' + (l.length === 1 ? 'parceiro na sua rede' : 'parceiros na sua rede') + '</p>' +
         '<div class="pm-trio"><span><b>' + t.ind + '</b>indicações</span><span><b>' + t.con + '</b>contratos</span><span><b>' + t.cnc + '</b>concedidos</span></div></div>' +
-      '<div id="aviso-fila"></div>' +
-      (r.pend ? '<button type="button" class="pm-alerta" data-ir="maes"><span class="n">' + r.pend + '</span><span><b>' + (r.pend === 1 ? 'mãe sua com documento faltando' : 'mães suas com documento faltando') + '</b><small>Toque para ver quais e completar</small></span></button>' : '') +
+      (false ? '<button type="button" class="pm-alerta" data-ir="maes"><span class="n">' + r.pend + '</span><span><b>' + (r.pend === 1 ? 'mãe sua com documento faltando' : 'mães suas com documento faltando') + '</b><small>Toque para ver quais e completar</small></span></button>' : '') +
       // filtro Parceiros | Mães e, embaixo, a lista escolhida (cadastrar fica no botão Novo)
       '<div class="seg-ini" role="group" aria-label="Mostrar"><button type="button" data-ini="parc" aria-pressed="' + (filtroIni !== 'maes') + '">Parceiros<b>' + l.length + '</b></button><button type="button" data-ini="maes" aria-pressed="' + (filtroIni === 'maes') + '">Mães<b>' + cl.length + '</b></button></div>' +
       (filtroIni !== 'maes'
@@ -1637,7 +1698,8 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
     };
   }
   function telaInicial(){
-    document.documentElement.classList.remove('inicio-fixo');   // só o Início fica sem rolar (caberInicio liga de novo)
+    document.documentElement.classList.remove('inicio-fixo', 'lg-fixo');   // só o Início fica sem rolar (caberInicio liga de novo)
+    tirarEsqueleto();
     montarCasca();
     $('vista').style.zoom = '';
     var clin = quem && quem.tipo === 'clinica' && quem.clinica;
@@ -1839,6 +1901,109 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
   }
   function depoisDoInicio(){ caberInicio(); setTimeout(function(){ conviteAvisos(); caberInicio(); reativarAvisos(); }, 600); }
   // Início sem rolagem: tira do fim da lista as linhas que não cabem na tela (as outras ficam na aba Mães ou Parceiros)
+  // esqueleto de carregamento: o desenho do app em quadradinhos com brilho, enquanto entra; some devagar quando o Início fica pronto
+  var esqDesde = 0;
+  function mostrarEsqueleto(){
+    if (document.getElementById('esq')) return;
+    var r = function(st){ return '<i style="' + st + '"></i>'; }, linhas = '';
+    for (var k = 0; k < 4; k++) linhas += '<div class="esq-lin">' + r('width:40px;height:40px;border-radius:50%;flex:none') + '<div style="flex:1;display:grid;gap:7px">' + r('width:' + (70 - k * 8) + '%;height:13px') + r('width:38%;height:11px') + '</div></div>';
+    var d = document.createElement('div'); d.id = 'esq'; d.className = 'esq'; d.setAttribute('aria-hidden', 'true');
+    d.innerHTML = '<div class="esq-topo">' + r('width:34px;height:34px;border-radius:50%') + r('width:150px;height:16px') + '<span style="flex:1"></span>' + r('width:34px;height:34px;border-radius:50%') + r('width:34px;height:34px;border-radius:50%') + '</div>' +
+      '<div class="esq-corpo">' + r('width:58%;height:24px') + r('width:36%;height:12px') + r('height:178px;border-radius:24px;margin-top:6px') + r('height:46px;border-radius:14px') + linhas + '</div>' +
+      '<div class="esq-nav">' + r('height:62px;border-radius:26px') + '</div>';
+    document.body.appendChild(d); esqDesde = Date.now();
+  }
+  function tirarEsqueleto(agora){
+    var d = document.getElementById('esq'); if (!d || d.dataset.saindo) return;
+    if (agora){ d.remove(); return; }
+    d.dataset.saindo = '1';
+    setTimeout(function(){
+      d.classList.add('sai'); var v = $('vista'); if (v){ v.classList.add('entra'); setTimeout(function(){ v.classList.remove('entra'); }, 900); }
+      setTimeout(function(){ d.remove(); }, 420);
+    }, Math.max(0, 650 - (Date.now() - esqDesde)));   // fica pelo menos um instante, para não piscar
+  }
+  // perfil da conta: o nome que a pessoa quer ver e a foto (guardados no celular; com o SQL 53, também no sistema)
+  function perfilLocal(){ return { apelido: lsGet('campo_apelido'), foto: lsGet('campo_foto') }; }
+  function nomeOficial(){ var clin = quem && quem.tipo === 'clinica' && quem.clinica; return clin ? bonito(quem.clinica) : bonito((quem && quem.nome) || '') || 'Parceiro'; }
+  function primeiroNome(n){ var x = String(n || '').trim().split(/\s+/)[0] || ''; return x ? x.charAt(0).toUpperCase() + x.slice(1).toLowerCase() : ''; }
+  function nomeExibicao(){ return perfilLocal().apelido.trim() || nomeOficial(); }
+  function nomeSaudacao(){ return perfilLocal().apelido.trim() || primeiroNome(nomeOficial()); }
+  function fotoOk(u){ return /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(u || ''); }
+  function avatarHtml(nome){ var u = perfilLocal().foto; return fotoOk(u) ? '<img src="' + u + '" alt="">' : '<span>' + esc(iniciais(nome)) + '</span>'; }
+  function salvarPerfil(muda){
+    if ('apelido' in muda) lsSet('campo_apelido', muda.apelido);
+    if ('foto' in muda) lsSet('campo_foto', muda.foto);
+    tituloTopo();
+    if (!token || !CFG_OK) return Promise.resolve(false);
+    return chamar('campo_perfil_salvar', { p_token: token, p_apelido: 'apelido' in muda ? muda.apelido : null, p_foto: 'foto' in muda ? muda.foto : null })
+      .then(function(d){ return !!(d && d.ok); }).catch(function(){ return false; });
+  }
+  function carregarPerfil(){
+    if (!token || !CFG_OK || navigator.onLine === false) return;
+    chamar('campo_perfil', { p_token: token }).then(function(d){
+      if (!d || typeof d !== 'object' || !('apelido' in d)) return;   // SQL 53 ainda não rodou: fica o que está no celular
+      var loc = perfilLocal(), sobe = {};
+      if (d.apelido) lsSet('campo_apelido', d.apelido); else if (loc.apelido) sobe.apelido = loc.apelido;
+      if (d.foto) lsSet('campo_foto', d.foto); else if (loc.foto) sobe.foto = loc.foto;
+      if (Object.keys(sobe).length) salvarPerfil(sobe);
+      tituloTopo(); if (aba === 'painel' && $('vista') && $('vista').classList.contains('inicio')) telaInicial();
+    }).catch(function(){});
+  }
+  function fotoQuadrada(arq){
+    return new Promise(function(ok, falha){
+      var url = URL.createObjectURL(arq), img = new Image();
+      img.onload = function(){
+        var t = 192, c = document.createElement('canvas'), l = Math.min(img.naturalWidth, img.naturalHeight); c.width = c.height = t;
+        c.getContext('2d').drawImage(img, (img.naturalWidth - l) / 2, (img.naturalHeight - l) / 2, l, l, 0, 0, t, t);
+        URL.revokeObjectURL(url); ok(c.toDataURL('image/jpeg', 0.82));
+      };
+      img.onerror = function(){ URL.revokeObjectURL(url); falha(new Error('foto')); };
+      img.src = url;
+    });
+  }
+  // sininho do topo: documento faltando, cadastros esperando internet e o convite para ligar os avisos do celular
+  function avisosApp(){
+    var r = resumoParceiro(clientesPainel()), l = [];
+    var push = pushSuporte() && !avisosAtivos() && lsGet('campo_push_nao') !== '1' && !(typeof Notification !== 'undefined' && Notification.permission === 'denied');
+    return filaTodos().catch(function(){ return []; }).then(function(fl){
+      var n = fl.filter(function(x){ return x.token === token; }).length;
+      if (n) l.push({ k: 'fila', n: n, t: n === 1 ? 'cadastro esperando internet' : 'cadastros esperando internet', s: 'Guardados neste celular. Sobem sozinhos quando tiver sinal.', b: 'Enviar agora' });
+      if (r.pend) l.push({ k: 'docs', n: r.pend, t: r.pend === 1 ? (ehProspectador() ? 'mãe sua com documento faltando' : 'mãe com documento faltando') : (ehProspectador() ? 'mães suas com documento faltando' : 'mães com documento faltando'), s: 'Veja quais e complete os documentos.', b: 'Ver' });
+      if (push) l.push({ k: 'push', n: 0, t: 'Receba os avisos no celular', s: 'Pagamentos, mães confirmadas e novidades, mesmo com o aplicativo fechado.', b: 'Ativar' });
+      return l;
+    });
+  }
+  function pintarSino(){
+    var el = $('sino-n'), bt = $('topo-sino'); if (!el || !bt) return;
+    avisosApp().then(function(l){
+      var tot = l.reduce(function(a, x){ return a + (x.n || 1); }, 0);
+      el.hidden = !tot; el.textContent = tot > 9 ? '9+' : String(tot);
+      bt.setAttribute('aria-label', tot ? tot + (tot === 1 ? ' aviso' : ' avisos') : 'Avisos');
+    });
+  }
+  function abrirSino(){
+    avisosApp().then(function(l){
+      var sino = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>';
+      var f = document.createElement('div'); f.className = 'folha';
+      f.innerHTML = '<div><div class="puxa"></div><h3>Avisos</h3>' +
+        (l.length ? '<div class="sino-lista">' + l.map(function(x){ return '<div class="sino-it"><span class="sino-ic ' + x.k + '">' + (x.n ? (x.n > 99 ? '99+' : x.n) : sino) + '</span><span class="sino-tx"><b>' + esc(x.t) + '</b><small>' + esc(x.s) + '</small></span><button type="button" data-sino="' + x.k + '">' + esc(x.b) + '</button></div>'; }).join('') + '</div>'
+                  : '<div class="sino-vazio">' + sino + '<b>Tudo em dia</b>Nenhum aviso agora.</div>') +
+        (l.some(function(x){ return x.k === 'push'; }) ? '<button type="button" class="sino-nao" data-sino="push-nao">Não quero avisos no celular</button>' : '') +
+        '<button type="button" class="sair" style="margin-top:8px" data-fecha>Fechar</button></div>';
+      document.body.appendChild(f);
+      f.addEventListener('click', function(e){
+        var b = e.target.closest('[data-sino]');
+        if (b){
+          var k = b.dataset.sino;
+          if (k === 'docs'){ f.remove(); filtroCli = 'faltam'; buscaCli = ''; return irPara(ehProspectador() ? 'maes' : 'clientes'); }
+          if (k === 'fila'){ f.remove(); ultimoErro = function(er){ ultimoErro = null; alert('Não foi possível enviar ' + (er.cliente || 'o cadastro') + ': ' + er.erro + '.\n\nO aplicativo continua tentando sozinho.'); }; return proximo(true); }
+          if (k === 'push'){ b.disabled = true; b.textContent = '…'; return ativarAvisos().then(function(r){ if (r.ok){ f.remove(); pintarSino(); } else { b.disabled = false; b.textContent = 'Ativar'; alert(r.msg); } }); }
+          if (k === 'push-nao'){ lsSet('campo_push_nao', '1'); f.remove(); return pintarSino(); }
+        }
+        if (e.target === f || e.target.closest('[data-fecha]')) f.remove();
+      });
+    });
+  }
   // Início: "Bom dia / Boa tarde / Boa noite, nome" e só a data embaixo (sem frase de explicação)
   function saudacao(){ var h = new Date().getHours(); return h >= 5 && h < 12 ? 'Bom dia' : h >= 12 && h < 18 ? 'Boa tarde' : 'Boa noite'; }
   function hojeTxt(){ var t = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }); return esc(t.charAt(0).toUpperCase() + t.slice(1)); }
@@ -1846,8 +2011,8 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
   var TIT_ABA = { painel: 'Início', clientes: 'Mães', maes: 'Mães', novo: 'Novo cadastro', novop: 'Novo parceiro', recebimentos: 'Meus ganhos', conta: 'Sua conta' };
   function tituloTopo(){
     var v = $('vista'), n = $('topo-nome'), sb = $('topo-sub'), av = $('topo-av'); if (!v || !n || !sb) return;
-    var clin = quem && quem.tipo === 'clinica' && quem.clinica, nome = clin ? bonito(quem.clinica) : bonito((quem && quem.nome) || '') || 'Parceiro';
-    if (av) av.textContent = iniciais(nome);
+    var clin = quem && quem.tipo === 'clinica' && quem.clinica, nome = nomeExibicao();
+    if (av) av.innerHTML = avatarHtml(nome);
     var o = null; Array.prototype.forEach.call(v.children, function(c){ if (!o && c.classList.contains('pm-ola')) o = c; });
     if (o){
       var h = o.querySelector('h2'), sp = o.querySelector('span');
@@ -1888,11 +2053,10 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
     var frase = r.ok ? (r.ok === 1 ? 'mãe amparada por você' : 'mães amparadas por você') : 'mães amparadas por você';
     $('vista').classList.add('inicio');
     $('vista').innerHTML =
-      '<div class="pm-ola"><h2>' + saudacao() + ', ' + esc(primeiro ? primeiro.charAt(0) + primeiro.slice(1).toLowerCase() : 'parceira') + '</h2><span>' + hojeTxt() + '</span></div>' +
+      '<div class="pm-ola"><h2>' + saudacao() + ', ' + esc(nomeSaudacao() || 'parceira') + '</h2><span>' + hojeTxt() + '</span></div>' +
       '<div class="pm-hero"><small>Deram certo</small><div class="pm-num">' + r.ok + '</div><p>' + frase + '</p>' +
         '<div class="pm-trio"><span><b>' + r.total + '</b>enviadas</span><span><b>' + r.and + '</b>em andamento</span><span><b>' + r.pend + '</b>com pendência</span></div></div>' +
-      '<div id="aviso-fila"></div>' +
-      (r.pend ? '<button type="button" class="pm-alerta" data-ir="faltam"><span class="n">' + r.pend + '</span><span><b>' + (r.pend === 1 ? 'mãe com documento faltando' : 'mães com documento faltando') + '</b><small>Toque para ver quais e completar</small></span></button>' : '') +
+      (false ? '<button type="button" class="pm-alerta" data-ir="faltam"><span class="n">' + r.pend + '</span><span><b>' + (r.pend === 1 ? 'mãe com documento faltando' : 'mães com documento faltando') + '</b><small>Toque para ver quais e completar</small></span></button>' : '') +
       (cl.length ? '<div class="pm-rot">Últimas enviadas</div><div class="pm-lista" data-mais-ir="todos" data-mais-txt="Ver todas as ' + cl.length + ' mães">' + cl.slice(0, 5).map(linhaMae).join('') + '</div>' + (cl.length > 5 ? '<button type="button" class="pm-mais" data-ir="todos">Ver todas as ' + cl.length + ' mães</button>' : '')
         : '<div class="vazio" style="margin-top:14px">' + (navigator.onLine === false && !painel ? 'Sem internet: o painel aparece quando o celular tiver sinal.' : 'As mães que você cadastrar aparecem aqui. Toque em <b>Novo cadastro</b> para começar.') + '</div>') +
       '';
@@ -1981,16 +2145,7 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
     if (typeof Notification !== 'undefined' && Notification.permission === 'granted') ativarAvisos();
   }
   // convite para ativar, uma vez, no Início
-  function conviteAvisos(){
-    if (!pushSuporte() || avisosAtivos() || lsGet('campo_push_nao') === '1') return;
-    if (typeof Notification !== 'undefined' && Notification.permission === 'denied') return;
-    var v = $('vista'); if (!v || document.getElementById('convite-push') || (aba !== 'painel')) return;
-    var d = document.createElement('div'); d.id = 'convite-push'; d.className = 'pm-push';
-    d.innerHTML = '<div><b>Receba os avisos no celular</b><span>Pagamentos, mães confirmadas e novidades, mesmo com o aplicativo fechado.</span></div><button type="button" id="push-sim">Ativar</button><button type="button" id="push-nao" aria-label="Agora não">×</button>';
-    var alvo = v.querySelector('.pm-hero'); if (alvo) alvo.insertAdjacentElement('afterend', d); else v.insertBefore(d, v.firstChild);
-    d.querySelector('#push-nao').onclick = function(){ lsSet('campo_push_nao', '1'); d.remove(); if (aba === 'painel') telaInicial(); };
-    d.querySelector('#push-sim').onclick = function(){ var b = this; b.disabled = true; b.textContent = '…'; ativarAvisos().then(function(r){ if (r.ok){ d.remove(); } else { b.disabled = false; b.textContent = 'Ativar'; alert(r.msg); } }); };
-  }
+  function conviteAvisos(){ pintarSino(); }   // o convite para ligar os avisos fica no sininho do topo
   /* ---------- instalar o aplicativo pelo navegador (sem baixar arquivo, sem alerta de "arquivo perigoso") ---------- */
   var instalarEv = null;
   window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); instalarEv = e; });
@@ -2009,9 +2164,22 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
   }
   /* ---------- conta ---------- */
   function vistaConta(){
-    var nome = bonito((quem && quem.nome) || '') || 'Sua conta';
+    var p = perfilLocal(), oficial = nomeOficial(), papel = ehProspectador() ? 'Prospectador' : (quem && quem.tipo === 'clinica' && quem.clinica ? 'Clínica parceira' : 'Parceira');
+    var escuro = document.documentElement.getAttribute('data-tema') === 'dark';
     $('vista').innerHTML =
-      '<div class="pm-ola"><h2>Sua conta</h2><span>' + esc(nome) + ' · ' + (ehProspectador() ? 'Prospectador' : 'Parceiro') + '</span></div>' +
+      '<div class="pm-ola"><h2>Sua conta</h2><span>' + esc(oficial) + ' · ' + papel + '</span></div>' +
+      '<div class="ct-perfil"><button type="button" class="ct-foto" id="ct-foto" aria-label="Trocar a foto de perfil">' + avatarHtml(nomeExibicao()) + '<span class="ct-cam"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span></button>' +
+        '<div class="ct-nome"><b id="ct-nome-b">' + esc(nomeExibicao()) + '</b><small>' + esc(oficial) + ' · ' + papel + '</small>' + (p.foto ? '<button type="button" class="ct-tirar" id="ct-tirar">Tirar a foto</button>' : '<button type="button" class="ct-tirar" id="ct-por">Pôr uma foto</button>') + '</div></div>' +
+      '<input type="file" id="ct-arq" accept="image/*" hidden>' +
+      '<div class="ct-bloco"><div class="ct-rot">Como você quer ser chamado</div>' +
+        '<div class="ct-linha"><input id="ct-apelido" maxlength="40" autocomplete="off" placeholder="' + esc(primeiroNome(oficial)) + '" value="' + esc(p.apelido) + '"><button type="button" id="ct-apelido-ok">Salvar</button></div>' +
+        '<small class="ct-dica">Aparece no Início e no seu perfil. O nome oficial no escritório não muda.</small></div>' +
+      '<div class="ct-bloco"><div class="ct-rot">Aparência</div><div class="seg-ini ct-tema"><button type="button" data-tema-set="light" aria-pressed="' + !escuro + '">Claro</button><button type="button" data-tema-set="dark" aria-pressed="' + escuro + '">Escuro</button></div></div>' +
+      '<div class="ct-bloco"><div class="ct-rot">Trocar a senha</div>' +
+        '<div class="ct-linha"><input id="ct-s1" type="password" inputmode="numeric" autocomplete="new-password" placeholder="Nova senha (só números, mínimo 6)"></div>' +
+        '<div class="ct-linha"><input id="ct-s2" type="password" inputmode="numeric" autocomplete="new-password" placeholder="Repita a nova senha"></div>' +
+        '<button type="button" class="ct-btn" id="ct-senha-ok">Salvar a nova senha</button></div>' +
+      '<div class="ct-rot" style="margin-top:18px">Aplicativo</div>' +
       '<div class="pm-conta">' + (podeInstalar() ? '<button type="button" id="inst-btn"><b>Instalar o aplicativo</b><small>Sem baixar arquivo e sem alertas. Atualiza sozinho.</small></button>' : '') + (pushSuporte() ? '<button type="button" id="avisos-btn"><b>Avisos no celular</b><small id="avisos-sub">' + (avisosAtivos() ? 'Ativados · toque para desativar' : 'Desativados · toque para ativar') + '</small></button>' : '') + '<button type="button" id="verif-atu"><b>Verificar atualização</b><small>Veja se há uma versão nova do aplicativo</small></button>' +
       '<button type="button" class="sair" id="sair"><svg><use href="#i-sair"/></svg>Sair desta conta</button></div>' +
       '<div class="versao">Nascer com Direitos · versão ' + APP_VERSAO + '</div>';
@@ -2019,11 +2187,41 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
     if ($('inst-btn')) $('inst-btn').onclick = instalarApp;
     if ($('avisos-btn')) $('avisos-btn').onclick = function(){
       var sub = $('avisos-sub');
-      if (avisosAtivos()){ desativarAvisos().then(function(){ sub.textContent = 'Desativados · toque para ativar'; }); return; }
+      if (avisosAtivos()){ desativarAvisos().then(function(){ sub.textContent = 'Desativados · toque para ativar'; pintarSino(); }); return; }
       sub.textContent = 'Ativando…';
-      ativarAvisos().then(function(r){ if (r.ok) sub.textContent = 'Ativados · toque para desativar'; else { sub.textContent = 'Desativados · toque para ativar'; alert(r.msg); } });
+      ativarAvisos().then(function(r){ if (r.ok) sub.textContent = 'Ativados · toque para desativar'; else { sub.textContent = 'Desativados · toque para ativar'; alert(r.msg); } pintarSino(); });
     };
     $('verif-atu').onclick = function(){ var b = this; b.querySelector('small').textContent = 'Verificando…'; ultimaChecagem = 0; verificarAtualizacao(); setTimeout(function(){ if (document.body.contains(b)) b.querySelector('small').textContent = document.querySelector('.atu') ? 'Há uma versão nova: use o aviso no topo' : 'Seu aplicativo está atualizado'; }, 1800); };
+    // foto: escolhe da galeria ou tira na hora; o app recorta quadrada e diminui (192 x 192)
+    var escolher = function(){ $('ct-arq').value = ''; $('ct-arq').click(); };
+    $('ct-foto').onclick = escolher; if ($('ct-por')) $('ct-por').onclick = escolher;
+    if ($('ct-tirar')) $('ct-tirar').onclick = function(){ if (!confirm('Tirar a sua foto de perfil?')) return; salvarPerfil({ foto: '' }).then(function(){ vistaConta(); }); };
+    $('ct-arq').onchange = function(){
+      var a = this.files && this.files[0]; if (!a) return;
+      fotoQuadrada(a).then(function(url){ return salvarPerfil({ foto: url }); }).then(function(){ vistaConta(); }, function(){ alert('Não foi possível usar essa foto. Tente outra.'); });
+    };
+    $('ct-apelido-ok').onclick = function(){
+      var b = this, v = $('ct-apelido').value.replace(/\s+/g, ' ').trim().slice(0, 40);
+      b.disabled = true; b.textContent = 'Salvando…';
+      salvarPerfil({ apelido: v }).then(function(foi){ b.disabled = false; b.textContent = foi ? 'Salvo' : 'Salvo no celular'; $('ct-nome-b').textContent = nomeExibicao(); setTimeout(function(){ if (document.body.contains(b)) b.textContent = 'Salvar'; }, 1800); });
+    };
+    $('ct-apelido').onkeydown = function(e){ if (e.key === 'Enter') $('ct-apelido-ok').click(); };
+    Array.prototype.forEach.call(document.querySelectorAll('[data-tema-set]'), function(b){ b.onclick = function(){
+      var t = b.dataset.temaSet; document.documentElement.setAttribute('data-tema', t); try { localStorage.setItem('nascer_tema', t); } catch(e){}
+      Array.prototype.forEach.call(document.querySelectorAll('[data-tema-set]'), function(x){ x.setAttribute('aria-pressed', String(x === b)); });
+    }; });
+    $('ct-senha-ok').onclick = function(){
+      var a = $('ct-s1').value, c = $('ct-s2').value, bt = this;
+      var pe = senhaNumerica(a); if (pe) return alert(pe);
+      if (a !== c) return alert('As duas senhas não são iguais.');
+      if (navigator.onLine === false) return alert('Sem internet agora. Para trocar a senha precisa de sinal.');
+      bt.disabled = true; bt.textContent = 'Salvando…';
+      fetch(CFG.url + '/rest/v1/rpc/campo_trocar_senha', { method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_token: token, p_senha: a }) })
+        .then(function(r){ return r.json(); })
+        .then(function(d){ if (d && d.ok){ $('ct-s1').value = ''; $('ct-s2').value = ''; alert('Senha trocada. Use a nova senha na próxima vez que entrar.'); } else alert((d && (d.erro || d.message)) || 'Não foi possível trocar agora.'); })
+        .catch(function(){ alert('Sem internet agora. Tente de novo.'); })
+        .then(function(){ if (document.body.contains(bt)){ bt.disabled = false; bt.textContent = 'Salvar a nova senha'; } });
+    };
   }
   var GRUPOS_P = [['todos', 'Todas'], ['faltam', 'Pendências'], ['andamento', 'Andamento'], ['ganharam', 'Deram certo']];
   function noGrupoP(c, g){ var ok = marcos(c).lib, fl = !ok && faltas(c).length > 0; return g === 'todos' || (g === 'faltam' && fl) || (g === 'ganharam' && ok) || (g === 'andamento' && !fl && !ok); }
@@ -2973,6 +3171,7 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
     return '';
   }
   function telaNovaSenha(tk){
+    tirarEsqueleto(true); document.documentElement.classList.remove('lg-fixo');
     $('app').innerHTML = '<div class="login"><div class="entrar"><img class="login-logo" src="img/logo-nascer-t.png" alt="Nascer com Direitos">' +
       '<b class="login-t">Crie a sua senha</b><p class="login-s">Este é o seu primeiro acesso.<br>Se quiser, crie agora uma senha só sua: só números, no mínimo 6. Ou deixe para depois.</p>' +
       '<label class="login-rot" for="ns1">Nova senha</label><label class="fone" style="margin:0 0 14px"><input id="ns1" type="password" inputmode="numeric" placeholder="nova senha" autocomplete="new-password"></label>' +
@@ -3025,7 +3224,8 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
       .catch(function(){ return false; });
   }
   function pedirLink(msg){
-    document.documentElement.classList.remove('inicio-fixo');
+    tirarEsqueleto(true);
+    document.documentElement.classList.remove('inicio-fixo'); document.documentElement.classList.add('lg-fixo');
     $('app').innerHTML = '<div class="lg">' +
       '<div class="lg-topo"><img class="lg-marca" src="img/marca-branca.png" alt=""><div class="lg-nome">Nascer com Direitos</div><div class="lg-tag">Salário-maternidade</div></div>' +
       '<div class="lg-cartao"><h1 class="lg-t">Entrar</h1><p class="lg-s">' + esc(msg || 'Use o seu CPF e a sua senha.') + '</p>' +
@@ -3046,7 +3246,7 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
       var uCru = u; if (/^[\d.\-\s]+$/.test(u) && u.replace(/\D/g, '').length === 11) u = u.replace(/\D/g, '');   // CPF: só os números
       if (!u || !p) return alert('Digite o usuário e a senha.');
       if (navigator.onLine === false) return alert('Sem internet agora. Para entrar a primeira vez precisa de sinal.');
-      b.disabled = true; b.textContent = 'Entrando…';
+      b.disabled = true; mostrarEsqueleto();
       fetch(CFG.url + '/rest/v1/rpc/campo_entrar', { method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_usuario: u, p_senha: p }) })
         .then(function(r){ return r.json(); })
         .then(function(d){
@@ -3057,10 +3257,10 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
           }
           // não é parceiro: pode ser um gestor do escritório (usuário e senha do sistema) → vai para o painel do gestor
           return tentarGestor(uCru, p).then(function(foi){
-            if (!foi) alert((d && (d.erro || d.message)) || 'Não foi possível entrar.');
+            if (!foi){ tirarEsqueleto(true); alert((d && (d.erro || d.message)) || 'Não foi possível entrar.'); }
           });
         })
-        .catch(function(){ alert('Sem internet agora. Para entrar a primeira vez precisa de sinal.'); })
+        .catch(function(){ tirarEsqueleto(true); alert('Sem internet agora. Para entrar a primeira vez precisa de sinal.'); })
         .then(function(){ if (document.body.contains(b)){ b.disabled = false; b.textContent = 'Entrar'; } });
     };
     var uu = lsGet('campo_usuario'); if (uu && /^[0-9]{11}$/.test(uu)) $('usuario').value = maskCpf(uu);   // só CPF; nomes antigos não voltam
@@ -3076,6 +3276,7 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
     if (!CFG_OK) return semConfiguracao();
     if (!token) return pedirLink();
     lsSet('campo_token', token);
+    if (!$('vista')) mostrarEsqueleto();
     var mAba = /[#&]aba=([a-z]+)/.exec(location.hash || ''); if (mAba){ aba = mAba[1]; lsSet('campo_aba', aba); }
     if (location.hash) history.replaceState(null, '', location.pathname);
     try { quem = JSON.parse(lsGet('campo_quem') || 'null'); } catch(e){}
