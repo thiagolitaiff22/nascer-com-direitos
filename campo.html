@@ -1083,6 +1083,37 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
   html:has(#app > #vista) body{transform:translateZ(0);right:auto;width:env(viewport-segment-width 0 0)}
   html:has(#app > #vista)::after{content:"";position:fixed;top:0;bottom:0;left:env(viewport-segment-left 1 0);right:0;background:url(img/marca-branca.png) no-repeat center/140px auto,linear-gradient(155deg,#8a43d3,#4d1a7c)}
 }
+
+
+/* tela de entrar (05/11, como o usuário descreveu): a tela toda roxa com a marca e, no centro, um balão branco com o login */
+.lg.balao{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(16px,3.6dvh,32px);padding:calc(16px + env(safe-area-inset-top)) 20px calc(16px + env(safe-area-inset-bottom));overflow:hidden;background:radial-gradient(110% 70% at 85% 0%,rgba(255,255,255,.17),transparent 55%),linear-gradient(160deg,#8a43d3 0%,#6a2aa3 52%,#4d1a7c 100%)}
+.lg.balao::before{content:"";position:absolute;right:-16vmax;bottom:-12vmax;width:64vmax;height:64vmax;background:url(img/marca-suave.png) no-repeat center/contain;opacity:.15;pointer-events:none}
+.lg.balao::after{content:"";position:absolute;left:-22vmax;top:-22vmax;width:56vmax;height:56vmax;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none}
+.lg.balao .lg-topo{position:relative;z-index:1;flex:none;height:auto;min-height:0;padding:0;background:none;overflow:visible;animation:lgFundo .6s ease both}
+.lg.balao .lg-topo::before,.lg.balao .lg-topo::after{display:none}
+.lg.balao .lg-marca{width:clamp(54px,10dvh,86px)}
+.lg.balao .lg-nome{margin-top:10px;font-size:clamp(23px,3.8dvh,30px)}
+.lg.balao .lg-cartao{--card:#fff;--ink:#22172c;--ink2:#5c4571;--soft:#ede4f5;--line:#ddd1e7;--line2:#c6a6e2;position:relative;z-index:1;flex:none;width:min(420px,100%);max-width:none;max-height:none;margin:0;align-self:center;overflow:visible;border-radius:28px;padding:24px 22px 20px;background:#fff;box-shadow:0 26px 60px rgba(25,0,50,.38);animation:balaoSobe .8s cubic-bezier(.16,1,.3,1) .18s both}
+@keyframes balaoSobe{from{opacity:0;transform:translateY(42px) scale(.96)}to{opacity:1;transform:none}}
+html[data-tema="dark"] .lg.balao .lg-links a,html[data-tema="dark"] .lg.balao .lg-campo button{color:#66279d}
+html[data-tema="dark"] .lg.balao .lg-campo svg{stroke:#7633b2}
+html[data-tema="dark"] .lg.balao .lg-cartao{box-shadow:0 26px 60px rgba(0,0,0,.5)}
+html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,rgba(255,255,255,.12),transparent 55%),linear-gradient(160deg,#6a2aa3 0%,#4d1a7c 55%,#2e0e4c 100%)}
+@media (max-height:640px){ .lg.balao{gap:12px} .lg.balao .lg-cartao{padding:18px 18px 14px} .lg.balao .lg-tag{display:none} }
+@media (max-height:540px){ .lg.balao .lg-marca{display:none} .lg.balao .lg-nome{margin-top:0;font-size:21px} .lg.balao .lg-inst{display:none} }
+/* celular deitado: a marca à esquerda e o balão à direita */
+@media (max-height:520px) and (orientation:landscape){
+  .lg.balao{flex-direction:row;gap:5vw}
+  .lg.balao .lg-marca{display:block;width:60px}
+  .lg.balao .lg-cartao{width:min(400px,55vw);max-height:calc(100% - 4px);overflow:auto;padding:14px 18px}
+}
+/* Surface Duo com duas telas: a marca numa tela e o balão no meio da outra */
+@media (horizontal-viewport-segments:2){
+  .lg.balao{display:grid;grid-template-columns:env(viewport-segment-width 0 0) calc(env(viewport-segment-left 1 0) - env(viewport-segment-right 0 0)) env(viewport-segment-width 1 0);align-items:center;justify-items:center;padding:0}
+  .lg.balao .lg-topo{grid-column:1}
+  .lg.balao .lg-cartao{grid-column:3;width:min(420px,calc(100% - 40px))}
+}
+
 </style>
 <link rel="preload" as="image" href="img/marca-suave.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
 </head>
@@ -1126,7 +1157,7 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 75;
+  var APP_VERSAO = 76;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -3297,33 +3328,35 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
   }
   function pedirLink(msg){
     tirarEsqueleto(true); corTopo('#8340cb');
+    lsSet('campo_usuario', '');   // o app não guarda o CPF: quem lembra o login é o celular (Senhas do iPhone, Google)
     document.documentElement.classList.remove('inicio-fixo'); document.documentElement.classList.add('lg-fixo');
-    $('app').innerHTML = '<div class="lg">' +
+    $('app').innerHTML = '<div class="lg balao">' +
       '<div class="lg-topo"><img class="lg-marca" src="img/marca-branca.png" alt=""><div class="lg-nome">Nascer com Direitos</div><div class="lg-tag">Salário-maternidade</div></div>' +
-      '<div class="lg-cartao"><h1 class="lg-t">Entrar</h1><p class="lg-s">' + esc(msg || 'Use o seu CPF e a sua senha.') + '</p>' +
-        '<label class="lg-campo"><span>CPF</span><div><svg viewBox="0 0 24 24"><use href="#i-pessoa"/></svg><input id="usuario" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" autocomplete="off" name="cpf-nc" autocapitalize="none" autocorrect="off" spellcheck="false"></div></label>' +
-        '<label class="lg-campo"><span>Senha</span><div><svg viewBox="0 0 24 24"><use href="#i-cadeado"/></svg><input id="senha" type="password" placeholder="sua senha" autocomplete="current-password"><button type="button" id="ver-senha">mostrar</button></div></label>' +
-        '<button class="lg-entrar" id="entrar">Entrar</button>' +
+      '<form class="lg-cartao" id="lg-form" autocomplete="on" novalidate><h1 class="lg-t">Entrar</h1><p class="lg-s">' + esc(msg || 'Use o seu CPF e a sua senha.') + '</p>' +
+        '<label class="lg-campo"><span>CPF</span><div><svg viewBox="0 0 24 24"><use href="#i-pessoa"/></svg><input id="usuario" name="username" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false"></div></label>' +
+        '<label class="lg-campo"><span>Senha</span><div><svg viewBox="0 0 24 24"><use href="#i-cadeado"/></svg><input id="senha" name="password" type="password" placeholder="sua senha" autocomplete="current-password"><button type="button" id="ver-senha">mostrar</button></div></label>' +
+        '<button type="submit" class="lg-entrar" id="entrar">Entrar</button>' +
         '<div class="lg-links"><a href="equipe-cadastro.html">Primeiro acesso</a><i></i><a href="#" id="esqueci">Esqueci a senha</a></div>' +
         (podeInstalar() ? '<button type="button" class="lg-inst" id="inst-login"><svg viewBox="0 0 24 24"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/></svg>Instalar o aplicativo no celular</button>' : '') +
         '<p class="lg-nota">Precisa de internet só para entrar. Depois o aplicativo funciona sem sinal.</p>' +
-      '</div></div>';
+      '</form></div>';
     $('usuario').addEventListener('input', function(){ this.value = maskCpf(this.value); });   // só números
     $('esqueci').onclick = function(e){ e.preventDefault(); alert('Esqueceu a senha? Procure o escritório: o gestor redefine e ela volta a ser 123456. No próximo acesso você cria outra.'); };
     if ($('inst-login')) $('inst-login').onclick = function(e){ e.preventDefault(); instalarApp(); };
     $('ver-senha').onclick = function(){ var e = $('senha'); e.type = e.type === 'password' ? 'text' : 'password'; this.textContent = e.type === 'password' ? 'mostrar' : 'esconder'; };
-    $('senha').addEventListener('keydown', function(e){ if (e.key === 'Enter') $('entrar').click(); });
-    $('entrar').onclick = function(){
-      var u = $('usuario').value.trim(), p = $('senha').value, b = this;
+    $('lg-form').addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var u = $('usuario').value.trim(), p = $('senha').value, b = $('entrar');
       var uCru = u; if (/^[\d.\-\s]+$/.test(u) && u.replace(/\D/g, '').length === 11) u = u.replace(/\D/g, '');   // CPF: só os números
-      if (!u || !p) return alert('Digite o usuário e a senha.');
+      if (!u || !p) return alert('Digite o CPF e a senha.');
       if (navigator.onLine === false) return alert('Sem internet agora. Para entrar a primeira vez precisa de sinal.');
       b.disabled = true; mostrarEsqueleto();
       fetch(CFG.url + '/rest/v1/rpc/campo_entrar', { method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_usuario: u, p_senha: p }) })
         .then(function(r){ return r.json(); })
         .then(function(d){
           if (d && d.token){
-            lsSet('campo_usuario', u); token = d.token;
+            token = d.token;
+            try { if (window.PasswordCredential && navigator.credentials) navigator.credentials.store(new PasswordCredential({ id: uCru, password: p })).catch(function(){}); } catch(x){}   // Android/Chrome: "Salvar senha?"
             if (d.trocar && SENHA_TROCA_OBRIGATORIA) return telaNovaSenha(d.token);   // desligado: vale a senha padrão 123456
             return iniciar();
           }
@@ -3333,9 +3366,8 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
           });
         })
         .catch(function(){ tirarEsqueleto(true); alert('Sem internet agora. Para entrar a primeira vez precisa de sinal.'); })
-        .then(function(){ if (document.body.contains(b)){ b.disabled = false; b.textContent = 'Entrar'; } });
-    };
-    var uu = lsGet('campo_usuario'); if (uu && /^[0-9]{11}$/.test(uu)) $('usuario').value = maskCpf(uu);   // só CPF; nomes antigos não voltam
+        .then(function(){ if (document.body.contains(b)) b.disabled = false; });
+    });
   }
   // aplicativo ainda sem o endereço do Supabase (CFG lá em cima): avisa em vez de tentar entrar
   function semConfiguracao(){
