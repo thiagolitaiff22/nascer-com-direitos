@@ -857,6 +857,35 @@ html{touch-action:manipulation;overscroll-behavior:none;-webkit-touch-callout:no
 body{-webkit-user-select:none;user-select:none}
 input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:text;font-size:max(16px,1em)}
 button,a,label,[role=button]{touch-action:manipulation}
+
+/* Início sem rolagem: tudo cabe na tela; a lista mostra só as linhas que couberem (as outras ficam na aba Mães ou Parceiros) */
+html.inicio-fixo,html.inicio-fixo body{overflow:hidden;overscroll-behavior:none}
+.vista.inicio{padding-top:8px}
+.vista.inicio .pm-ola{margin:0 0 10px}
+.vista.inicio .pm-ola h2{font-size:24px;margin-top:0}
+.vista.inicio .pm-ola span{margin-top:2px}
+.vista.inicio .pm-hero{padding:15px 18px 13px;border-radius:24px}
+.vista.inicio .pm-num{font-size:52px;margin:2px 0 0}
+.vista.inicio .pm-hero p{margin-bottom:9px}
+.vista.inicio .pm-trio{padding-top:9px}
+.vista.inicio .pm-trio b{font-size:19px}
+.vista.inicio .pm-push{margin-top:10px;padding:9px 10px 9px 12px}
+.vista.inicio .pm-push span{display:none}
+.vista.inicio .pm-alerta{margin-top:10px;padding:10px 12px}
+.vista.inicio .pm-alerta .n{width:30px;height:30px}
+.vista.inicio .pm-rot{margin:14px 2px 8px;font-size:17px}
+.vista.inicio .pm-lista{gap:7px}
+.vista.inicio .pm-m{padding:8px 12px 8px 9px}
+.vista.inicio .pm-av{width:34px;height:34px;font-size:13px}
+.vista.inicio .pm-pts,.vista.inicio .pm-ganho{display:none}
+.vista.inicio .pm-l2{margin-top:3px}
+.vista.inicio .pm-mais{margin-top:4px;padding:6px}
+.vista.inicio .gn-res{margin:0;padding:8px 0}
+.vista.inicio .pm-acoes{grid-template-columns:1fr 1fr;margin:10px 0 0}
+.vista.inicio .pm-acoes .pm-btn:only-child{grid-column:1 / -1}
+.vista.inicio .pm-btn{height:42px}
+.vista.inicio [data-maes-rede]{height:38px;margin-top:8px!important}
+@media (max-height:760px){ .vista.inicio .pm-num{font-size:40px} .vista.inicio .pm-hero p{margin-bottom:6px} .vista.inicio .pm-rot{margin-top:10px} }
 </style>
 <link rel="preload" as="image" href="img/marca-suave.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
 </head>
@@ -900,7 +929,7 @@ button,a,label,[role=button]{touch-action:manipulation}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 67;
+  var APP_VERSAO = 68;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1208,22 +1237,24 @@ button,a,label,[role=button]{touch-action:manipulation}
       var n = l.filter(function(x){ return x.token === token; }).length, el = $('aviso-fila'); if (!el || !n) return;
       el.innerHTML = '<div class="aviso-fila"><div><b>' + n + (n === 1 ? ' cadastro esperando' : ' cadastros esperando') + ' internet</b><span>Guardados neste celular. Sobem sozinhos.</span></div><button type="button" id="mandar-ja">Enviar agora</button></div>';
       $('mandar-ja').onclick = function(){ ultimoErro = function(e){ ultimoErro = null; alert('Não foi possível enviar ' + (e.cliente || 'o cadastro') + ': ' + e.erro + '.\n\nO aplicativo continua tentando sozinho.'); }; proximo(true); };
+      caberInicio();
     });
   }
   function vistaProspPainel(){
     var l = listaProsp(), t = somaProsp(l), r = resumoParceiro(clientesPainel()), primeiro = String((quem && quem.nome) || '').trim().split(/\s+/)[0];
+    $('vista').classList.add('inicio');
     $('vista').innerHTML =
       '<div class="pm-ola"><h2>Olá' + (primeiro ? ', ' + esc(bonito(primeiro)) : '') + '</h2><span>Sua rede de parceiros e as mães que você mesmo cadastrou</span></div>' +
       '<div class="pm-hero"><small>Parceiros que você trouxe</small><div class="pm-num">' + l.length + '</div><p>' + (l.length === 1 ? 'parceiro na sua rede' : 'parceiros na sua rede') + '</p>' +
         '<div class="pm-trio"><span><b>' + t.ind + '</b>indicações</span><span><b>' + t.con + '</b>contratos</span><span><b>' + t.cnc + '</b>concedidos</span></div></div>' +
       '<div id="aviso-fila"></div>' +
       (r.pend ? '<button type="button" class="pm-alerta" data-ir="maes"><span class="n">' + r.pend + '</span><span><b>' + (r.pend === 1 ? 'mãe sua com documento faltando' : 'mães suas com documento faltando') + '</b><small>Toque para ver quais e completar</small></span></button>' : '') +
-      '<div class="pm-rot">Suas captações</div>' +
+      '<div class="pm-rot pm-rot-cap">Suas captações</div>' +
       '<div class="gn-res"><span><b>' + r.total + '</b>mães enviadas</span><span><b>' + r.and + '</b>em andamento</span><span><b>' + r.ok + '</b>deram certo</span></div>' +
       '<div class="pm-acoes"><button type="button" class="pm-btn" data-ir="novo">+&nbsp; Cadastrar uma mãe</button>' + (r.total ? '<button type="button" class="pm-btn pm-ghost" data-ir="maes">Ver minhas mães</button>' : '') + '</div>' +
       (maesDaRede().length ? '<button type="button" class="pm-btn pm-ghost" data-maes-rede style="margin-top:10px;width:100%">Ver as mães dos meus parceiros · ' + maesDaRede().length + '</button>' : '') +
       '<div class="pm-rot">Seus parceiros' + (l.length ? ' · ' + l.length : '') + '</div>' +
-      (l.length ? '<div class="pm-lista">' + l.slice(0, 6).map(linhaParc).join('') + '</div>' + (l.length > 6 ? '<button type="button" class="pm-mais" data-ir="clientes">Ver todos os ' + l.length + ' parceiros</button>' : '')
+      (l.length ? '<div class="pm-lista" data-mais-ir="clientes" data-mais-txt="Ver todos os ' + l.length + ' parceiros">' + l.slice(0, 6).map(linhaParc).join('') + '</div>' + (l.length > 6 ? '<button type="button" class="pm-mais" data-ir="clientes">Ver todos os ' + l.length + ' parceiros</button>' : '')
                 : '<div class="pm-vazio"><b>Sua rede começa aqui</b>Toque no <b style="display:inline;font-size:inherit">+</b> para cadastrar o primeiro parceiro.</div>');
     $('vista').onclick = function(e){
       if (e.target.closest('[data-maes-rede]')) return telaMaesRede();
@@ -1526,7 +1557,9 @@ button,a,label,[role=button]{touch-action:manipulation}
     };
   }
   function telaInicial(){
+    document.documentElement.classList.remove('inicio-fixo');   // só o Início fica sem rolar (caberInicio liga de novo)
     montarCasca();
+    $('vista').style.zoom = '';
     var clin = quem && quem.tipo === 'clinica' && quem.clinica;
     var quemTxt = clin ? bonito(quem.clinica) : bonito((quem && quem.nome) || '') || 'Parceiro';
     var papelTxt = ehProspectador() ? 'Prospectador' : clin ? 'Clínica parceira' : (quem && quem.perfil === 'prospectador' ? 'Parceiro' : 'Parceira');
@@ -1724,20 +1757,44 @@ button,a,label,[role=button]{touch-action:manipulation}
     var s = situacaoSimples(c);
     return '<button type="button" class="pm-m" data-cli="' + esc(c.id) + '"><span class="pm-av">' + esc(iniciais(c.nome)) + '</span><span class="pm-n"><b>' + esc(bonito(c.nome) || 'Sem nome') + '</b><span class="pm-l2"><span class="pm-s ' + s[0] + '">' + esc(s[1]) + '</span><small>' + (c.cadastro ? esc(quando(c.cadastro)) : '') + '</small></span>' + (semGanho() ? '' : '<span class="pm-pts"><span class="' + (marcos(c).conf ? 'on' : '') + '"><i></i>Confirmada</span><span class="' + (marcos(c).lib ? 'on' : '') + '"><i></i>Benefício liberado</span></span>') + '</span><span class="pm-seta">›</span></button>';
   }
-  function depoisDoInicio(){ setTimeout(function(){ conviteAvisos(); reativarAvisos(); }, 600); }
+  function depoisDoInicio(){ caberInicio(); setTimeout(function(){ conviteAvisos(); caberInicio(); reativarAvisos(); }, 600); }
+  // Início sem rolagem: tira do fim da lista as linhas que não cabem na tela (as outras ficam na aba Mães ou Parceiros)
+  function caberInicio(){
+    var raiz = document.documentElement; raiz.classList.remove('inicio-fixo');
+    var v = $('vista'), nav = $('abas'); if (!v || !v.classList.contains('inicio') || !nav || getComputedStyle(nav).position !== 'fixed') return;
+    window.scrollTo(0, 0);
+    // o conteúdo tem de terminar acima da barra de baixo (ela fica por cima da tela)
+    var limite = function(){ return nav.getBoundingClientRect().top - 8; };
+    var fim = function(){ var b = 0; Array.prototype.forEach.call(v.children, function(c){ b = Math.max(b, c.getBoundingClientRect().bottom); }); return b; };
+    var cabe = function(){ return fim() <= limite(); }, l = v.querySelector('.pm-lista');
+    var mais = function(){ if (l && l.dataset.maisIr && !v.querySelector('.pm-mais')) l.insertAdjacentHTML('afterend', '<button type="button" class="pm-mais" data-ir="' + esc(l.dataset.maisIr) + '">' + esc(l.dataset.maisTxt || 'Ver todas') + '</button>'); };
+    // 1) menos linhas na lista (fica pelo menos uma) e o botão "Ver todas"
+    while (l && !cabe() && l.children.length > 1){ l.lastElementChild.remove(); mais(); }
+    // 2) celular pequeno: sai o que é enfeite ou repetido (cadastrar e ver as mães também estão na barra de baixo)
+    ['.pm-ola span', '.pm-rot-cap', '.pm-acoes'].forEach(function(sel){ if (cabe()) return; var e = v.querySelector(sel); if (e) e.remove(); });
+    // 3) ainda não coube: a lista sai e fica só o "Ver todas"
+    if (l && !cabe()){ mais(); var t = l.previousElementSibling; if (t && t.classList.contains('pm-rot')) t.remove(); l.remove(); }
+    // 4) celular muito pequeno: o Início diminui um pouco para caber inteiro (nunca rola)
+    for (var k = 0; k < 4 && !cabe(); k++){ var topo = v.getBoundingClientRect().top, z = (parseFloat(v.style.zoom) || 1) * (limite() - topo) / (fim() - topo); v.style.zoom = String(Math.max(0.55, z - 0.01)); }
+    raiz.classList.add('inicio-fixo');
+  }
+  var inicioT = 0;
+  if (location.hostname === 'localhost') window.__app = { caberInicio: caberInicio };   // só para testes no computador
+  window.addEventListener('resize', function(){ clearTimeout(inicioT); inicioT = setTimeout(function(){ var v = $('vista'); if (aba === 'painel' && v && v.classList.contains('inicio') && !document.querySelector('.folha, .tela')) telaInicial(); }, 250); });
   function vistaPainelParceira(){
     var cl = clientesPainel().slice().sort(function(a, b){ return String(b.cadastro || '').localeCompare(String(a.cadastro || '')); });
     var r = resumoParceiro(cl);
     var primeiro = String((quem && quem.nome) || '').trim().split(/\s+/)[0];
     var h = new Date(), atual = painel && painel.atualizado ? new Date(painel.atualizado) : null;
     var frase = r.ok ? (r.ok === 1 ? 'mãe amparada por você' : 'mães amparadas por você') : 'mães amparadas por você';
+    $('vista').classList.add('inicio');
     $('vista').innerHTML =
       '<div class="pm-ola"><h2>Olá, ' + esc(primeiro ? primeiro.charAt(0) + primeiro.slice(1).toLowerCase() : 'parceira') + '</h2><span>' + h.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' }) + (atual ? ' · atualizado às ' + atual.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '') + '</span></div>' +
       '<div class="pm-hero"><small>Deram certo</small><div class="pm-num">' + r.ok + '</div><p>' + frase + '</p>' +
         '<div class="pm-trio"><span><b>' + r.total + '</b>enviadas</span><span><b>' + r.and + '</b>em andamento</span><span><b>' + r.pend + '</b>com pendência</span></div></div>' +
       '<div id="aviso-fila"></div>' +
       (r.pend ? '<button type="button" class="pm-alerta" data-ir="faltam"><span class="n">' + r.pend + '</span><span><b>' + (r.pend === 1 ? 'mãe com documento faltando' : 'mães com documento faltando') + '</b><small>Toque para ver quais e completar</small></span></button>' : '') +
-      (cl.length ? '<div class="pm-rot">Últimas enviadas</div><div class="pm-lista">' + cl.slice(0, 5).map(linhaMae).join('') + '</div>' + (cl.length > 5 ? '<button type="button" class="pm-mais" data-ir="todos">Ver todas as ' + cl.length + ' mães</button>' : '')
+      (cl.length ? '<div class="pm-rot">Últimas enviadas</div><div class="pm-lista" data-mais-ir="todos" data-mais-txt="Ver todas as ' + cl.length + ' mães">' + cl.slice(0, 5).map(linhaMae).join('') + '</div>' + (cl.length > 5 ? '<button type="button" class="pm-mais" data-ir="todos">Ver todas as ' + cl.length + ' mães</button>' : '')
         : '<div class="vazio" style="margin-top:14px">' + (navigator.onLine === false && !painel ? 'Sem internet: o painel aparece quando o celular tiver sinal.' : 'As mães que você cadastrar aparecem aqui. Toque em <b>Novo cadastro</b> para começar.') + '</div>') +
       '';
     $('vista').onclick = function(e){
@@ -1749,6 +1806,7 @@ button,a,label,[role=button]{touch-action:manipulation}
       var n = l.filter(function(x){ return x.token === token; }).length, el = $('aviso-fila'); if (!el || !n) return;
       el.innerHTML = '<div class="aviso-fila"><div><b>' + n + (n === 1 ? ' cadastro esperando' : ' cadastros esperando') + ' internet</b><span>Guardados neste celular. Sobem sozinhos.</span></div><button type="button" id="mandar-ja">Enviar agora</button></div>';
       $('mandar-ja').onclick = function(){ ultimoErro = function(e){ ultimoErro = null; alert('Não foi possível enviar ' + (e.cliente || 'o cadastro') + ': ' + e.erro + '.\n\nO aplicativo continua tentando sozinho.'); }; proximo(true); };
+      caberInicio();
     });
   }
   /* ---------- recebimentos: só o que já foi pago (data, mãe, momento, valor) ---------- */
@@ -1831,7 +1889,7 @@ button,a,label,[role=button]{touch-action:manipulation}
     var d = document.createElement('div'); d.id = 'convite-push'; d.className = 'pm-push';
     d.innerHTML = '<div><b>Receba os avisos no celular</b><span>Pagamentos, mães confirmadas e novidades, mesmo com o aplicativo fechado.</span></div><button type="button" id="push-sim">Ativar</button><button type="button" id="push-nao" aria-label="Agora não">×</button>';
     var alvo = v.querySelector('.pm-hero'); if (alvo) alvo.insertAdjacentElement('afterend', d); else v.insertBefore(d, v.firstChild);
-    d.querySelector('#push-nao').onclick = function(){ lsSet('campo_push_nao', '1'); d.remove(); };
+    d.querySelector('#push-nao').onclick = function(){ lsSet('campo_push_nao', '1'); d.remove(); if (aba === 'painel') telaInicial(); };
     d.querySelector('#push-sim').onclick = function(){ var b = this; b.disabled = true; b.textContent = '…'; ativarAvisos().then(function(r){ if (r.ok){ d.remove(); } else { b.disabled = false; b.textContent = 'Ativar'; alert(r.msg); } }); };
   }
   /* ---------- instalar o aplicativo pelo navegador (sem baixar arquivo, sem alerta de "arquivo perigoso") ---------- */
