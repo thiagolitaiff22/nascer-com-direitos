@@ -941,7 +941,7 @@ html:has(#app > #vista) body{position:fixed;inset:0;width:100%}
 .ct-tema{margin:0}
 html[data-tema="dark"] .ct-tirar{color:#c49be6}
 html[data-tema="dark"] .ct-foto{background:rgba(158,89,216,.22);color:#e4d2f3}
-@media (max-height:520px){ .lg-marca,.lg-inst{display:none} .lg-topo{min-height:96px} }
+@media (max-height:520px){ .lg-marca,.lg-inst{display:none} .lg-topo{height:100px} }
 /* esqueleto de carregamento (05/11): quadradinhos com brilho no lugar de "Entrando…" */
 .esq{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;background:var(--bg);animation:esqEntra .22s ease both}
 .esq.sai{animation:esqSai .4s ease forwards}
@@ -983,13 +983,13 @@ html.lg-fixo .lg{position:fixed;inset:0;height:auto}
 @media (prefers-reduced-motion:reduce){ .esq,.esq i,#vista.entra > *,#vista.entra .pm-lista > *,#vista.troca > *,#app > .topo.entra,#app > .tit-tela.entra,#abas.entra,.lg-topo,.lg-marca,.lg-nome,.lg-tag,.lg-cartao,.lg-cartao > *{animation:none!important} }
 /* tela de entrar (05/11): ocupa a tela sem rolar; faixa roxa com a marca e cartão branco por cima */
 .lg{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--bg)}
-.lg-topo{position:relative;flex:1 0 auto;min-height:clamp(180px,36dvh,330px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(20px + env(safe-area-inset-top)) 24px 56px;color:#fff;text-align:center;overflow:hidden;background:radial-gradient(120% 90% at 85% 0%,rgba(255,255,255,.18),transparent 55%),linear-gradient(155deg,#8a43d3 0%,#6a2aa3 55%,#4d1a7c 100%)}
+.lg-topo{position:relative;flex:0 0 auto;min-height:0;height:clamp(200px,32dvh,320px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(20px + env(safe-area-inset-top)) 24px 56px;color:#fff;text-align:center;overflow:hidden;background:radial-gradient(120% 90% at 85% 0%,rgba(255,255,255,.18),transparent 55%),linear-gradient(155deg,#8a43d3 0%,#6a2aa3 55%,#4d1a7c 100%)}
 .lg-topo::before{content:"";position:absolute;right:-70px;bottom:-50px;width:270px;height:270px;background:url(img/marca-suave.png) no-repeat center/contain;opacity:.16;pointer-events:none}
 .lg-topo::after{content:"";position:absolute;left:-90px;top:-90px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,.07);pointer-events:none}
 .lg-marca{position:relative;width:clamp(58px,12dvh,92px);height:auto;filter:drop-shadow(0 8px 20px rgba(0,0,0,.20))}
 .lg-nome{position:relative;margin-top:12px;font-family:'Fraunces',Georgia,serif;font-size:clamp(24px,4.2dvh,31px);font-weight:600;letter-spacing:-.012em;line-height:1.1}
 .lg-tag{position:relative;margin-top:6px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.82}
-.lg-cartao{position:relative;z-index:1;width:100%;max-width:520px;align-self:center;margin-top:-34px;flex:0 0 auto;background:var(--card);border-radius:30px 30px 0 0;padding:26px 24px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -12px 32px rgba(41,24,56,.12)}
+.lg-cartao{position:relative;z-index:1;width:100%;max-width:520px;align-self:center;margin-top:-34px;flex:1 0 auto;background:var(--card);border-radius:30px 30px 0 0;padding:26px 24px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -12px 32px rgba(41,24,56,.12)}
 .lg-t{margin:0;font-family:'Fraunces',Georgia,serif;font-size:27px;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
 .lg-s{margin:4px 0 18px;font-size:14px;color:var(--ink2)}
 .lg-campo{display:block;margin:0 0 12px}
@@ -1011,8 +1011,8 @@ html[data-tema="dark"] .lg-topo{background:radial-gradient(120% 90% at 85% 0%,rg
 html[data-tema="dark"] .lg-cartao{box-shadow:0 -12px 32px rgba(0,0,0,.45)}
 html[data-tema="dark"] .lg-links a,html[data-tema="dark"] .lg-campo button{color:#c49be6}
 html[data-tema="dark"] .lg-campo svg{stroke:#c49be6}
-@media (max-height:740px){ .lg-topo{min-height:clamp(150px,30dvh,260px);padding-bottom:50px} .lg-cartao{padding-top:22px} .lg-t{font-size:24px} .lg-s{margin-bottom:12px} .lg-campo{margin-bottom:10px} .lg-campo>div{height:48px} .lg-entrar{height:50px} .lg-links{margin-top:12px} .lg-inst{margin-top:10px} .lg-nota{display:none} }
-@media (max-height:600px){ .lg-topo{min-height:128px;padding-top:calc(12px + env(safe-area-inset-top));padding-bottom:46px} .lg-marca{width:46px} .lg-nome{margin-top:6px;font-size:22px} .lg-tag{display:none} .lg-s{display:none} .lg-t{margin-bottom:12px} }
+@media (max-height:740px){ .lg-topo{height:clamp(160px,29dvh,230px);padding-bottom:50px} .lg-cartao{padding-top:22px} .lg-t{font-size:24px} .lg-s{margin-bottom:12px} .lg-campo{margin-bottom:10px} .lg-campo>div{height:48px} .lg-entrar{height:50px} .lg-links{margin-top:12px} .lg-inst{margin-top:10px} .lg-nota{display:none} }
+@media (max-height:600px){ .lg-topo{height:132px;padding-top:calc(12px + env(safe-area-inset-top));padding-bottom:46px} .lg-marca{width:46px} .lg-nome{margin-top:6px;font-size:22px} .lg-tag{display:none} .lg-s{display:none} .lg-t{margin-bottom:12px} }
 /* topo no jeito do Monju (05/11): sem barra nem logo; título da página à esquerda e botões redondos à direita; rola junto com a tela */
 #app .topo{position:relative!important;top:auto!important;background:transparent!important;border:0!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;margin:0!important;gap:8px!important;align-items:center!important;padding:calc(14px + env(safe-area-inset-top)) var(--gxr,16px) 10px var(--gx,16px)!important;border-bottom:1px solid var(--line)!important}
 html[data-tema="dark"] #app .topo{background:transparent!important;box-shadow:none!important}
@@ -1056,13 +1056,13 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
 }
 /* tela de entrar em tablet de pé: o cartão flutua, com cantos redondos e espaço embaixo */
 @media (min-width:700px) and (orientation:portrait){
-  .lg-cartao{border-radius:30px;margin:-40px auto calc(40px + env(safe-area-inset-bottom));box-shadow:0 24px 60px rgba(41,24,56,.18)}
-  .lg-topo{min-height:44dvh}
+  .lg-cartao{flex:0 0 auto;border-radius:30px;margin:-64px auto calc(40px + env(safe-area-inset-bottom));box-shadow:0 24px 60px rgba(41,24,56,.18)}
+  .lg-topo{height:38dvh;flex:0 0 auto;min-height:0}
 }
 /* tela de entrar deitada e larga (tablet deitado, dobrável aberto): duas metades, a marca à esquerda e o cartão à direita */
 @media (min-width:820px) and (orientation:landscape){
   .lg{flex-direction:row}
-  .lg-topo{flex:1 1 50%;min-height:0;padding:40px}
+  .lg-topo{flex:1 1 50%;height:auto;min-height:0;padding:40px}
   .lg-cartao{flex:0 0 auto;width:min(480px,46vw);align-self:center;margin:0 max(32px,4vw);border-radius:30px;box-shadow:0 24px 60px rgba(41,24,56,.16);max-height:calc(100% - 40px);overflow:auto}
   .lg-marca{width:clamp(80px,16vh,128px)}.lg-nome{font-size:clamp(28px,4.4vw,40px)}
   @keyframes lgCartao{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:none}}
@@ -1070,7 +1070,7 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
 /* celular deitado (tela baixa e larga): entrar em duas metades também */
 @media (max-height:520px) and (orientation:landscape){
   .lg{flex-direction:row}
-  .lg-topo{flex:1 1 42%;min-height:0;padding:16px}
+  .lg-topo{flex:1 1 42%;height:auto;min-height:0;padding:16px}
   .lg-cartao{flex:1 1 58%;width:auto;max-height:none;box-shadow:none;margin:0;border-radius:0;padding:14px 22px calc(10px + env(safe-area-inset-bottom));overflow:auto;align-self:stretch;display:flex;flex-direction:column;justify-content:center}
   .lg-marca{display:block;width:56px}.lg-tag,.lg-s,.lg-inst,.lg-nota{display:none}
   .lg-t{font-size:22px;margin-bottom:8px}.lg-campo{margin-bottom:8px}.lg-campo>div{height:44px}.lg-entrar{height:46px}
@@ -1078,7 +1078,7 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
 /* Surface Duo e outros com duas telas lado a lado: nada fica em cima da dobradiça */
 @media (horizontal-viewport-segments:2){
   .lg{flex-direction:row}
-  .lg-topo{flex:0 0 env(viewport-segment-width 0 0);min-height:0}
+  .lg-topo{flex:0 0 env(viewport-segment-width 0 0);height:auto;min-height:0}
   .lg-cartao{flex:0 0 env(viewport-segment-width 1 0);width:auto;max-height:none;box-shadow:none;margin:0 0 0 calc(env(viewport-segment-left 1 0) - env(viewport-segment-right 0 0));border-radius:0;align-self:stretch;display:flex;flex-direction:column;justify-content:center;padding:28px max(24px,4vw)}
   html:has(#app > #vista) body{transform:translateZ(0);right:auto;width:env(viewport-segment-width 0 0)}
   html:has(#app > #vista)::after{content:"";position:fixed;top:0;bottom:0;left:env(viewport-segment-left 1 0);right:0;background:url(img/marca-branca.png) no-repeat center/140px auto,linear-gradient(155deg,#8a43d3,#4d1a7c)}
@@ -1126,7 +1126,7 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 74;
+  var APP_VERSAO = 75;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
