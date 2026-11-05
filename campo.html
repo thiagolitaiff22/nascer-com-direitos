@@ -1114,6 +1114,14 @@ html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,r
   .lg.balao .lg-cartao{grid-column:3;width:min(420px,calc(100% - 40px))}
 }
 
+/* cadastro da mãe (05/11): CEP que preenche rua, bairro e cidade; número e complemento lado a lado; senha gov.br */
+#app > .tit-tela span span{display:inline;margin:0}
+.cep-st{flex:none;font-size:12px;font-weight:600;color:var(--ink2)}.cep-st.ok{color:#1f8a54;font-size:15px}.cep-st.erro{color:#c0392b}
+.end-auto{display:grid;gap:10px}.end-auto[hidden]{display:none}
+.end-dois{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:10px}
+.end-bairro{margin:-2px 4px 0;font-size:13px;color:var(--ink2)}
+.sgov-ver{flex:none;border:0;background:none;padding:6px 2px;font:inherit;font-size:13px;font-weight:600;color:#66279d}
+
 </style>
 <link rel="preload" as="image" href="img/marca-suave.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
 </head>
@@ -1157,7 +1165,7 @@ html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,r
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 77;
+  var APP_VERSAO = 78;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1197,6 +1205,9 @@ html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,r
   // telefone no padrão (DDD) 00000-0000
   function maskFone(v){ var d = String(v || '').replace(/\D/g, '').slice(0, 11); if (!d) return ''; if (d.length <= 2) return '(' + d; if (d.length <= 6) return '(' + d.slice(0, 2) + ') ' + d.slice(2); if (d.length <= 10) return '(' + d.slice(0, 2) + ') ' + d.slice(2, 6) + '-' + d.slice(6); return '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7); }
   function ufDoApp(){ return String((quem && quem.regiaoId) || '').slice(0, 2).toUpperCase(); }
+  function maskCep(v){ var d = String(v || '').replace(/\D/g, '').slice(0, 8); return d.length > 5 ? d.slice(0, 5) + '-' + d.slice(5) : d; }
+  function cepOk(v){ return String(v || '').replace(/\D/g, '').length === 8; }
+  var senhaGovRascunho = '';   // a senha gov.br não fica guardada no rascunho do celular: só vai junto do cadastro
   function maskCpf(v){ var d = String(v || '').replace(/\D/g, '').slice(0, 11); if (d.length <= 3) return d; if (d.length <= 6) return d.slice(0, 3) + '.' + d.slice(3); if (d.length <= 9) return d.slice(0, 3) + '.' + d.slice(3, 6) + '.' + d.slice(6); return d.slice(0, 3) + '.' + d.slice(3, 6) + '.' + d.slice(6, 9) + '-' + d.slice(9); }
   function cpfOk(v){
     var d = String(v || '').replace(/\D/g, ''); if (d.length !== 11 || /^(\d)\1+$/.test(d)) return false;
@@ -1424,6 +1435,7 @@ html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,r
   function animarTroca(){ var v = $('vista'); if (!v || v.classList.contains('entra')) return; v.classList.remove('troca'); void v.offsetWidth; v.classList.add('troca'); clearTimeout(trocaT); trocaT = setTimeout(function(){ v.classList.remove('troca'); }, 700); }
   function irPara(a){ aba = a; lsSet('campo_aba', a); window.scrollTo(0, 0); if ($('vista')) $('vista').scrollTop = 0; telaInicial(); requestAnimationFrame(animarTroca); if (a !== 'novo' && a !== 'novop') carregarPainel(); }
   function sincronia(){
+    if (navigator.onLine !== false && lsGet('campo_completar') && lsGet('campo_completar') !== '{}') completarDados();
     var el = $('sinc'); if (!el) return;
     filaTodos().catch(function(){ return []; }).then(function(l){
       var n = l.filter(function(x){ return x.token === token; }).length, off = navigator.onLine === false;
@@ -1835,11 +1847,21 @@ html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,r
         '<label class="fone cid-campo' + (lsGet('campo_cidade') ? '' : ' falta') + '" id="l-cidade"><svg viewBox="0 0 24 24"><use href="#i-casa"/></svg><img class="cid-flag" id="cidade-flag" alt="" hidden><input id="cidade" autocomplete="off" autocapitalize="words" placeholder="Cidade da cliente" value="' + esc(lsGet('campo_cidade')) + '"' + (ufDoApp() ? ' readonly' : '') + '>' + (ufDoApp() ? '<svg class="cid-seta" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '') + '</label>' +
         '<label class="fone' + (cpfOk(lsGet('campo_cpf')) ? '' : ' falta') + '" id="l-cpf"><svg viewBox="0 0 24 24"><use href="#i-id"/></svg><input id="cpf" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="CPF da cliente" value="' + esc(maskCpf(lsGet('campo_cpf'))) + '"></label>' +
       '</div>' +
+      '<div class="rot">Endereço da cliente</div><div class="dados">' +
+        '<label class="fone' + (cepOk(lsGet('campo_cep')) ? '' : ' falta') + '" id="l-cep"><svg viewBox="0 0 24 24"><use href="#i-casa"/></svg><input id="cep" inputmode="numeric" autocomplete="off" maxlength="9" placeholder="CEP (a rua e a cidade aparecem sozinhas)" value="' + esc(maskCep(lsGet('campo_cep'))) + '"><span class="cep-st" id="cep-st"></span></label>' +
+        '<div class="end-auto" id="end-auto"' + (lsGet('campo_rua') || lsGet('campo_bairro') ? '' : ' hidden') + '>' +
+          '<label class="fone' + (lsGet('campo_rua').trim() ? '' : ' falta') + '" id="l-rua"><input id="rua" autocomplete="off" autocapitalize="words" placeholder="Rua" value="' + esc(lsGet('campo_rua')) + '"></label>' +
+          '<div class="end-dois"><label class="fone' + (lsGet('campo_num').trim() ? '' : ' falta') + '" id="l-num"><input id="num" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="Número" value="' + esc(lsGet('campo_num')) + '"></label>' +
+          '<label class="fone" id="l-compl"><input id="compl" autocomplete="off" maxlength="60" placeholder="Complemento" value="' + esc(lsGet('campo_compl')) + '"></label></div>' +
+          '<p class="end-bairro" id="end-bairro">' + esc([lsGet('campo_bairro'), [lsGet('campo_cidade'), lsGet('campo_uf_cep')].filter(Boolean).join('/')].filter(Boolean).join(' · ')) + '</p>' +
+        '</div>' +
+      '</div>' +
       '<div class="rot">Gestação</div><p class="so-gest">Atendemos só gestantes: o bebê ainda não pode ter nascido.</p><div class="dados">' +
         (gest ?
         '<label class="fone' + (lsGet('campo_dpp') ? '' : ' falta') + '" id="l-dpp"><svg viewBox="0 0 24 24"><use href="#i-cal"/></svg><span class="rc">Data prevista do parto</span><input id="dpp" type="text" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="dd/mm/aaaa" value="' + esc(isoParaBr(lsGet('campo_dpp'))) + '"></label>' :
         '<label class="fone' + (lsGet('campo_crianca_nasc') ? '' : ' falta') + '" id="l-cnasc"><svg viewBox="0 0 24 24"><use href="#i-cal"/></svg><span class="rc">Data de nascimento do bebê</span><input id="cnasc" type="text" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="dd/mm/aaaa" value="' + esc(isoParaBr(lsGet('campo_crianca_nasc'))) + '"></label>') +
       '</div>') +
+      (completando ? '' : '<div class="rot">Senha do gov.br</div><div class="dados"><label class="fone" id="l-sgov"><svg viewBox="0 0 24 24"><use href="#i-cadeado"/></svg><input id="sgov" type="password" autocomplete="off" placeholder="Senha gov.br da mãe (se ela souber)" value="' + esc(senhaGovRascunho) + '"><button type="button" class="sgov-ver" id="sgov-ver">mostrar</button></label></div>') +
       '<div class="rot">' + (completando ? 'Documentos que faltam' : 'Documentos') + '</div><div class="grid">' + visiveis.map(function(d){
         var par = PARES[d.k] || null, f = par ? parFotos(par) : fotos[d.k];
         if (par && f.length) return '<button class="doc feito" data-k="' + d.k + '"><div class="thumbs">' + f.map(miniatura).join('') + '</div>' +
@@ -1878,6 +1900,30 @@ html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,r
       pintaB();
     }
     if ($('cpf')) $('cpf').addEventListener('input', function(){ this.value = maskCpf(this.value); lsSet('campo_cpf', this.value); var l = $('l-cpf'); if (l) l.classList.toggle('falta', !cpfOk(this.value)); });
+    if ($('cep')){
+      var ultimoCep = '';
+      var mostraEnd = function(){ var b = $('end-bairro'); if (b) b.textContent = [lsGet('campo_bairro'), [lsGet('campo_cidade'), lsGet('campo_uf_cep')].filter(Boolean).join('/')].filter(Boolean).join(' · '); };
+      var buscarCep = function(){
+        var d = $('cep').value.replace(/\D/g, ''), st = $('cep-st'); if (d.length !== 8 || d === ultimoCep) return; ultimoCep = d;
+        st.textContent = 'buscando…'; st.className = 'cep-st';
+        fetch('https://viacep.com.br/ws/' + d + '/json/').then(function(r){ return r.json(); }).then(function(x){
+          if (!x || x.erro){ st.textContent = 'CEP não encontrado'; st.className = 'cep-st erro'; $('end-auto').hidden = false; return; }
+          lsSet('campo_rua', x.logradouro || ''); lsSet('campo_bairro', x.bairro || ''); lsSet('campo_cidade', x.localidade || ''); lsSet('campo_uf_cep', x.uf || '');
+          $('rua').value = x.logradouro || ''; $('l-rua').classList.toggle('falta', !x.logradouro);
+          if ($('cidade')){ $('cidade').value = x.localidade || ''; var lc = $('l-cidade'); if (lc) lc.classList.toggle('falta', !x.localidade); }
+          $('end-auto').hidden = false; mostraEnd(); st.textContent = '✓'; st.className = 'cep-st ok';
+          setTimeout(function(){ var n = $(x.logradouro ? 'num' : 'rua'); if (n) n.focus(); }, 60);   // a parceira só põe o número
+        }).catch(function(){ ultimoCep = ''; st.textContent = 'sem internet: digite a rua'; st.className = 'cep-st erro'; $('end-auto').hidden = false; });
+      };
+      $('cep').addEventListener('input', function(){ this.value = maskCep(this.value); lsSet('campo_cep', this.value); $('l-cep').classList.toggle('falta', !cepOk(this.value)); if (cepOk(this.value)) buscarCep(); });
+      $('rua').addEventListener('input', function(){ lsSet('campo_rua', this.value); $('l-rua').classList.toggle('falta', !this.value.trim()); });
+      $('num').addEventListener('input', function(){ lsSet('campo_num', this.value); $('l-num').classList.toggle('falta', !this.value.trim()); });
+      $('compl').addEventListener('input', function(){ lsSet('campo_compl', this.value); });
+    }
+    if ($('sgov')){
+      $('sgov').addEventListener('input', function(){ senhaGovRascunho = this.value; });
+      $('sgov-ver').onclick = function(){ var e = $('sgov'); e.type = e.type === 'password' ? 'text' : 'password'; this.textContent = e.type === 'password' ? 'mostrar' : 'esconder'; };
+    }
     $('nome').addEventListener('input', function(){ lsSet('campo_nome', this.value); $('l-nome').classList.toggle('falta', !this.value.trim()); });
     $('nome').addEventListener('blur', function(){ this.value = bonito(this.value); lsSet('campo_nome', this.value); });
     Array.prototype.forEach.call(document.querySelectorAll('#seg-nasc [data-n]'), function(b){ b.onclick = function(){ lsSet('campo_nasceu', b.dataset.n); vistaNovo(); }; });
@@ -2986,10 +3032,11 @@ html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,r
     pede(foneOk(($('fone') || {}).value), 'telefone com DDD', 'fone');
     pede(String(lsGet('campo_cidade') || '').trim(), 'cidade', 'cidade');
     pede(cpfOk(($('cpf') || {}).value), 'CPF (11 números)', 'cpf');
+    if ($('cep')){ pede(cepOk(($('cep') || {}).value), 'CEP', 'cep'); pede(String(lsGet('campo_rua') || '').trim(), 'rua', 'rua'); pede(String(lsGet('campo_num') || '').trim(), 'número da casa', 'num'); }
     if (gestante()) pede(lsGet('campo_dpp'), 'data prevista do parto', 'dpp');
     else pede(lsGet('campo_crianca_nasc'), 'data de nascimento da criança', 'cnasc');
     if (faltaDados.length){
-      ['l-nome', 'l-fone', 'l-cidade', 'l-cpf', 'l-dpp', 'l-cnasc'].forEach(function(i){ var l = $(i); if (l && l.querySelector('input') && !l.querySelector('input').value.trim()) l.classList.add('falta'); });
+      ['l-nome', 'l-fone', 'l-cidade', 'l-cpf', 'l-cep', 'l-rua', 'l-num', 'l-dpp', 'l-cnasc'].forEach(function(i){ var l = $(i); if (l && l.querySelector('input') && !l.querySelector('input').value.trim()) l.classList.add('falta'); });
       var msg = 'Para enviar o cadastro, falta preencher: ' + faltaDados.join(', ') + '.';
       falar(msg); alert(msg); if ($(primeiro)) $(primeiro).focus(); return;
     }
@@ -3054,7 +3101,9 @@ html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,r
       cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height); fotoMini = cv.toDataURL('image/jpeg', 0.72);
     }).catch(function(){}); });
     p     .then(function(){
-       var envio = { id: id, token: token, criado: new Date().toISOString(), completar: comp ? comp.id : '', foto: fotoMini, contato: maskFone(($('fone') || {}).value || ''), cpf: comp ? '' : maskCpf(($('cpf') || {}).value || ''), cidade: comp ? '' : lsGet('campo_cidade'), cidadeUf: ufDoApp(), cliente: comp ? comp.nome : bonito(($('nome') || {}).value || ''), local: local, faltam: falta.map(function(d){ return d.k; }),
+       var envio = { id: id, token: token, criado: new Date().toISOString(), completar: comp ? comp.id : '', foto: fotoMini, contato: maskFone(($('fone') || {}).value || ''), cpf: comp ? '' : maskCpf(($('cpf') || {}).value || ''), cidade: comp ? '' : lsGet('campo_cidade'), cidadeUf: (!comp && lsGet('campo_uf_cep')) || ufDoApp(),
+         endereco: comp ? null : { cep: lsGet('campo_cep'), rua: lsGet('campo_rua'), numero: lsGet('campo_num'), complemento: lsGet('campo_compl'), bairro: lsGet('campo_bairro'), cidade: lsGet('campo_cidade'), uf: lsGet('campo_uf_cep') },
+         senhaGov: comp ? '' : senhaGovRascunho, cliente: comp ? comp.nome : bonito(($('nome') || {}).value || ''), local: local, faltam: falta.map(function(d){ return d.k; }),
          tipoSegurada: tipoAtual(), crianca: '', criancaNasc: comp || gestante() ? '' : lsGet('campo_crianca_nasc'),
          fatoGerador: comp || gestante() ? 'gestante' : 'parto', dpp: !comp && gestante() ? lsGet('campo_dpp') : '',
          docs: DOCS.filter(function(d){ return fotos[d.k]; }).map(function(d){ return d.k; }), arquivos: [] };
@@ -3064,7 +3113,7 @@ html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,r
      .then(function(envio){
        fotos = {}; local = null; guardarRascunho();   // apaga o rascunho dessas fotos
        if (comp){ completando = null; lsSet('campo_completando', ''); if (painel) painel.clientes.forEach(function(c){ if (c.id === comp.id) c.faltaDocs = comp.faltaDocs.filter(function(k){ return envio.docs.indexOf(k) < 0; }); }); }
-       else { ['campo_fone', 'campo_cpf', 'campo_cidade', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp', 'campo_nasceu'].forEach(function(k){ lsSet(k, ''); }); }
+       else { ['campo_fone', 'campo_cpf', 'campo_cidade', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp', 'campo_nasceu', 'campo_cep', 'campo_rua', 'campo_num', 'campo_compl', 'campo_bairro', 'campo_uf_cep'].forEach(function(k){ lsSet(k, ''); }); senhaGovRascunho = ''; }
        t.remove(); aba = comp ? 'painel' : 'novo'; telaInicial(); window.scrollTo(0, 0); if ($('vista')) $('vista').scrollTop = 0;
        var ok = tela('<svg viewBox="0 0 24 24" style="stroke:var(--ok)"><use href="#i-ok"/></svg><b>' + (comp ? 'Documentos guardados' : 'Cadastro guardado') + '</b><p>' + esc(envio.cliente || '') + '<br>' + (comp ? 'Vão para a pasta da cliente sozinhos quando tiver internet.' : 'Está sendo enviado agora: acompanhe na barra embaixo. Pode cadastrar a próxima cliente.') + '</p><button id="t-ok">' + (comp ? 'Entendi' : 'Cadastrar a próxima') + '</button>');
        ok.querySelector('#t-ok').onclick = function(){ ok.remove(); };
@@ -3157,6 +3206,7 @@ html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,r
         return noSistema('campo-' + envio.id).then(function(ok){ if (!ok) throw new Error('o sistema não confirmou o cadastro'); return d; });
       })
       .then(function(d){
+        if (!envio.completar && (envio.endereco || envio.senhaGov)) completarDados('campo-' + envio.id, envio);
         return filaTira(envio.id).then(function(){ return histMuda(envio.id, { enviado: new Date().toISOString(), confirmado: true, erro: null }); }).then(function(){
           enviando = false; mostrarFila(); sincronia(); carregarPainel();
           barraEnvio({ ok: true, nome: envio.cliente, passo: 'no sistema' });
@@ -3175,6 +3225,18 @@ html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,r
       });
   }
   var ultimoErro = null;
+  // endereço e senha gov.br da mãe (SQL 54): manda logo depois do cadastro; se não der, guarda e tenta de novo na próxima sincronia
+  function completarDados(cliente, envio){
+    var pend = {}; try { pend = JSON.parse(lsGet('campo_completar') || '{}') || {}; } catch(e){}
+    if (envio) pend[cliente] = { token: envio.token, endereco: envio.endereco || null, senhaGov: envio.senhaGov || '' };
+    lsSet('campo_completar', JSON.stringify(pend));
+    Object.keys(pend).forEach(function(cid){
+      var x = pend[cid];
+      chamar('campo_completar_dados', { p_token: x.token, p_cliente: cid, p_endereco: x.endereco, p_senha_gov: x.senhaGov || null }).then(function(r){
+        if (r && (r.ok || r.erro)){ var p2 = {}; try { p2 = JSON.parse(lsGet('campo_completar') || '{}') || {}; } catch(e){} delete p2[cid]; lsSet('campo_completar', JSON.stringify(p2)); }
+      }).catch(function(){});
+    });
+  }
   // manda o que estiver guardado; sem o endereço do envio ainda, busca primeiro (ex.: abriu o app sem internet)
   function proximo(forcar){
     if (enviando) return Promise.resolve();
