@@ -884,7 +884,16 @@ html.inicio-fixo,html.inicio-fixo body{overflow:hidden;overscroll-behavior:none}
 .vista.inicio .pm-acoes{grid-template-columns:1fr 1fr;margin:10px 0 0}
 .vista.inicio .pm-acoes .pm-btn:only-child{grid-column:1 / -1}
 .vista.inicio .pm-btn{height:42px}
-.vista.inicio [data-maes-rede]{height:38px;margin-top:8px!important}
+.vista.inicio [data-maes-rede]{margin-top:0!important}
+/* Início do prospectador: filtro Parceiros | Mães com a lista embaixo */
+.seg-ini{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;margin:12px 0 10px;border-radius:14px;background:rgba(118,51,178,.10)}
+.seg-ini button{height:38px;border:0;border-radius:11px;background:none;font:inherit;font-size:14px;font-weight:600;color:#66279d;display:flex;align-items:center;justify-content:center;gap:7px}
+.seg-ini button b{font-size:12px;font-weight:700;min-width:22px;height:20px;padding:0 6px;border-radius:999px;background:rgba(118,51,178,.14);display:grid;place-items:center}
+.seg-ini button[aria-pressed="true"]{background:#fff;color:#401764;box-shadow:0 2px 8px rgba(41,24,56,.10)}
+.seg-ini button[aria-pressed="true"] b{background:#66279d;color:#fff}
+html[data-tema="dark"] .seg-ini{background:rgba(158,89,216,.14)}
+html[data-tema="dark"] .seg-ini button{color:#c9a3ea}
+html[data-tema="dark"] .seg-ini button[aria-pressed="true"]{background:#2a1f33;color:#f1e9f7}
 /* topo no jeito do Monju (05/11): sem barra nem logo; título da página à esquerda e botões redondos à direita; rola junto com a tela */
 #app .topo{position:relative!important;top:auto!important;background:transparent!important;border:0!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;margin:0!important;gap:8px!important;align-items:center!important;padding:calc(14px + env(safe-area-inset-top)) var(--gxr,16px) 10px var(--gx,16px)!important;border-bottom:1px solid var(--line)!important}
 html[data-tema="dark"] #app .topo{background:transparent!important;box-shadow:none!important}
@@ -960,7 +969,7 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 70;
+  var APP_VERSAO = 71;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1274,23 +1283,28 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
       caberInicio();
     });
   }
+  var filtroIni = lsGet('campo_ini_filtro') === 'maes' ? 'maes' : 'parc';
   function vistaProspPainel(){
     var l = listaProsp(), t = somaProsp(l), r = resumoParceiro(clientesPainel()), primeiro = String((quem && quem.nome) || '').trim().split(/\s+/)[0];
+    var cl = clientesPainel().slice().sort(function(a, b){ return String(b.cadastro || '').localeCompare(String(a.cadastro || '')); });
     $('vista').classList.add('inicio');
     $('vista').innerHTML =
-      '<div class="pm-ola"><h2>Olá' + (primeiro ? ', ' + esc(bonito(primeiro)) : '') + '</h2><span>Sua rede de parceiros e as mães que você mesmo cadastrou</span></div>' +
+      '<div class="pm-ola"><h2>' + saudacao() + (primeiro ? ', ' + esc(bonito(primeiro)) : '') + '</h2><span>' + hojeTxt() + '</span></div>' +
       '<div class="pm-hero"><small>Parceiros que você trouxe</small><div class="pm-num">' + l.length + '</div><p>' + (l.length === 1 ? 'parceiro na sua rede' : 'parceiros na sua rede') + '</p>' +
         '<div class="pm-trio"><span><b>' + t.ind + '</b>indicações</span><span><b>' + t.con + '</b>contratos</span><span><b>' + t.cnc + '</b>concedidos</span></div></div>' +
       '<div id="aviso-fila"></div>' +
       (r.pend ? '<button type="button" class="pm-alerta" data-ir="maes"><span class="n">' + r.pend + '</span><span><b>' + (r.pend === 1 ? 'mãe sua com documento faltando' : 'mães suas com documento faltando') + '</b><small>Toque para ver quais e completar</small></span></button>' : '') +
-      '<div class="pm-rot pm-rot-cap">Suas captações</div>' +
-      '<div class="gn-res"><span><b>' + r.total + '</b>mães enviadas</span><span><b>' + r.and + '</b>em andamento</span><span><b>' + r.ok + '</b>deram certo</span></div>' +
-      '<div class="pm-acoes"><button type="button" class="pm-btn" data-ir="novo">+&nbsp; Cadastrar uma mãe</button>' + (r.total ? '<button type="button" class="pm-btn pm-ghost" data-ir="maes">Ver minhas mães</button>' : '') + '</div>' +
-      (maesDaRede().length ? '<button type="button" class="pm-btn pm-ghost" data-maes-rede style="margin-top:10px;width:100%">Ver as mães dos meus parceiros · ' + maesDaRede().length + '</button>' : '') +
-      '<div class="pm-rot">Seus parceiros' + (l.length ? ' · ' + l.length : '') + '</div>' +
-      (l.length ? '<div class="pm-lista" data-mais-ir="clientes" data-mais-txt="Ver todos os ' + l.length + ' parceiros">' + l.slice(0, 6).map(linhaParc).join('') + '</div>' + (l.length > 6 ? '<button type="button" class="pm-mais" data-ir="clientes">Ver todos os ' + l.length + ' parceiros</button>' : '')
-                : '<div class="pm-vazio"><b>Sua rede começa aqui</b>Toque no <b style="display:inline;font-size:inherit">+</b> para cadastrar o primeiro parceiro.</div>');
+      // filtro Parceiros | Mães e, embaixo, a lista escolhida (cadastrar fica no botão Novo)
+      '<div class="seg-ini" role="group" aria-label="Mostrar"><button type="button" data-ini="parc" aria-pressed="' + (filtroIni !== 'maes') + '">Parceiros<b>' + l.length + '</b></button><button type="button" data-ini="maes" aria-pressed="' + (filtroIni === 'maes') + '">Mães<b>' + cl.length + '</b></button></div>' +
+      (filtroIni !== 'maes'
+        ? (l.length ? '<div class="pm-lista" data-mais-ir="clientes" data-mais-txt="Ver todos os ' + l.length + ' parceiros">' + l.slice(0, 6).map(linhaParc).join('') + '</div>' + (l.length > 6 ? '<button type="button" class="pm-mais" data-ir="clientes">Ver todos os ' + l.length + ' parceiros</button>' : '')
+                    : '<div class="pm-vazio"><b>Sua rede começa aqui</b>Toque no <b style="display:inline;font-size:inherit">+</b> para cadastrar o primeiro parceiro.</div>')
+        : (cl.length ? '<div class="pm-lista" data-mais-ir="maes" data-mais-txt="Ver todas as ' + cl.length + ' mães">' + cl.slice(0, 6).map(linhaMae).join('') + '</div>' + (cl.length > 6 ? '<button type="button" class="pm-mais" data-ir="maes">Ver todas as ' + cl.length + ' mães</button>' : '')
+                     : '<div class="pm-vazio"><b>Nenhuma mãe ainda</b>Toque no <b style="display:inline;font-size:inherit">+</b> para cadastrar uma mãe.</div>') +
+          (maesDaRede().length ? '<button type="button" class="pm-mais" data-maes-rede>Mães dos seus parceiros · ' + maesDaRede().length + '</button>' : ''));
     $('vista').onclick = function(e){
+      var fi = e.target.closest('[data-ini]'); if (fi){ filtroIni = fi.dataset.ini; lsSet('campo_ini_filtro', filtroIni); return telaInicial(); }
+      var cm = e.target.closest('[data-cli]'); if (cm) return fichaCli(cm.dataset.cli);
       if (e.target.closest('[data-maes-rede]')) return telaMaesRede();
       var ir = e.target.closest('[data-ir]'); if (ir) return irPara(ir.dataset.ir);
       var p = e.target.closest('[data-parc]'); if (p) return fichaParceiro(p.dataset.parc);
@@ -1793,6 +1807,9 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
   }
   function depoisDoInicio(){ caberInicio(); setTimeout(function(){ conviteAvisos(); caberInicio(); reativarAvisos(); }, 600); }
   // Início sem rolagem: tira do fim da lista as linhas que não cabem na tela (as outras ficam na aba Mães ou Parceiros)
+  // Início: "Bom dia / Boa tarde / Boa noite, nome" e só a data embaixo (sem frase de explicação)
+  function saudacao(){ var h = new Date().getHours(); return h >= 5 && h < 12 ? 'Bom dia' : h >= 12 && h < 18 ? 'Boa tarde' : 'Boa noite'; }
+  function hojeTxt(){ var t = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }); return esc(t.charAt(0).toUpperCase() + t.slice(1)); }
   // topo no jeito do Monju: o título de cada tela (o bloco .pm-ola) sobe para a linha dos botões; tela sem título usa o nome da aba
   var TIT_ABA = { painel: 'Início', clientes: 'Mães', maes: 'Mães', novo: 'Novo cadastro', novop: 'Novo parceiro', recebimentos: 'Meus ganhos', conta: 'Sua conta' };
   function tituloTopo(){
@@ -1814,10 +1831,10 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
     var v = $('vista'), nav = $('abas'); if (!v || !v.classList.contains('inicio') || !nav || getComputedStyle(nav).position !== 'fixed') return;
     window.scrollTo(0, 0);
     // o conteúdo tem de terminar acima da barra de baixo (ela fica por cima da tela)
-    var limite = function(){ return nav.getBoundingClientRect().top - 8; };
+    var limite = function(){ var t = nav.getBoundingClientRect().top, bola = nav.querySelector('[data-aba="novo"] svg'); if (bola) t = Math.min(t, bola.getBoundingClientRect().top); return t - 8; };   // a bola do + sobe acima da barra
     var fim = function(){ var b = 0; Array.prototype.forEach.call(v.children, function(c){ b = Math.max(b, c.getBoundingClientRect().bottom); }); return b; };
     var cabe = function(){ return fim() <= limite(); }, l = v.querySelector('.pm-lista');
-    var mais = function(){ if (l && l.dataset.maisIr && !v.querySelector('.pm-mais')) l.insertAdjacentHTML('afterend', '<button type="button" class="pm-mais" data-ir="' + esc(l.dataset.maisIr) + '">' + esc(l.dataset.maisTxt || 'Ver todas') + '</button>'); };
+    var mais = function(){ if (l && l.dataset.maisIr && !v.querySelector('.pm-mais[data-ir]')) l.insertAdjacentHTML('afterend', '<button type="button" class="pm-mais" data-ir="' + esc(l.dataset.maisIr) + '">' + esc(l.dataset.maisTxt || 'Ver todas') + '</button>'); };
     // 1) menos linhas na lista (fica pelo menos uma) e o botão "Ver todas"
     while (l && !cabe() && l.children.length > 1){ l.lastElementChild.remove(); mais(); }
     // 2) celular pequeno: sai o que é enfeite ou repetido (cadastrar e ver as mães também estão na barra de baixo)
@@ -1839,7 +1856,7 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
     var frase = r.ok ? (r.ok === 1 ? 'mãe amparada por você' : 'mães amparadas por você') : 'mães amparadas por você';
     $('vista').classList.add('inicio');
     $('vista').innerHTML =
-      '<div class="pm-ola"><h2>Olá, ' + esc(primeiro ? primeiro.charAt(0) + primeiro.slice(1).toLowerCase() : 'parceira') + '</h2><span>' + h.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' }) + (atual ? ' · atualizado às ' + atual.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '') + '</span></div>' +
+      '<div class="pm-ola"><h2>' + saudacao() + ', ' + esc(primeiro ? primeiro.charAt(0) + primeiro.slice(1).toLowerCase() : 'parceira') + '</h2><span>' + hojeTxt() + '</span></div>' +
       '<div class="pm-hero"><small>Deram certo</small><div class="pm-num">' + r.ok + '</div><p>' + frase + '</p>' +
         '<div class="pm-trio"><span><b>' + r.total + '</b>enviadas</span><span><b>' + r.and + '</b>em andamento</span><span><b>' + r.pend + '</b>com pendência</span></div></div>' +
       '<div id="aviso-fila"></div>' +
