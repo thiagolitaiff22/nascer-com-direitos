@@ -3709,7 +3709,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
     if (rural(r)){ var pr = docsApp(r).filter(function(x){ return x.k === 'rural'; })[0]; return doFluxoNovo(r) ? '<p class="fc-sec">' + esc(ativNovoTxt(r)) + ' · segurada especial</p><p class="fc-nota">Não paga GPS. O que garante o benefício é a prova da atividade' + (pr && pr.ok ? ' (já recebida).' : ' (ainda não chegou: cobrar da mãe).') + '</p>' : '<p class="fc-sec">Salário-maternidade rural</p><p class="fc-nota">Segurada especial: não paga GPS. O que garante o benefício é a prova da atividade rural' + (pr && pr.ok ? ' (já recebida).' : ' (ainda não chegou: cobrar da mãe).') + '</p>'; }
     var pago = gpsPaga(r), emitida = !!gpsGerar(r);
     return '<p class="fc-sec">Guia GPS (segurada facultativa)</p><div class="fc-guia">' +
-      fcLeitura('Código de pagamento', GPS_CODIGO + ' · plano simplificado (11%)') + fcLeitura('Valor', moedaTxt(gpsValor())) + fcLeitura('Prazo', prazoGps(r) ? fmtDate(prazoGps(r)) : 'informe a data do parto') + fcLeitura('Situação', pago ? 'Paga' + (r.guiaPagaEm ? ' em ' + fmtDate(r.guiaPagaEm) : '') : emitida ? 'Guia pronta, aguardando pagamento' : 'Falta o NIT para gerar a guia') + '</div>' +
+      fcLeitura('Código de pagamento', gpsCodigoDe(r) + (gpsCodigoDe(r) === '1163' ? ' · contribuinte individual, plano simplificado (11%)' : ' · facultativa, plano simplificado (11%)')) + fcLeitura('Valor', moedaTxt(gpsValor())) + fcLeitura('Prazo', prazoGps(r) ? fmtDate(prazoGps(r)) : 'informe a data do parto') + fcLeitura('Situação', pago ? 'Paga' + (r.guiaPagaEm ? ' em ' + fmtDate(r.guiaPagaEm) : '') : emitida ? 'Guia pronta, aguardando pagamento' : 'Falta o NIT para gerar a guia') + '</div>' +
       '<label class="fc-c"><span class="fc-rot">NIT / PIS da mãe</span><input id="fc-nit" class="tnum" inputmode="numeric" placeholder="000.00000.00-0" value="' + esc(r.nit ? nitFmt(r.nit) : '') + '"></label>' +
       '<label class="fc-c"><span class="fc-rot">Competência da guia</span><input id="fc-gps-comp" type="month" value="' + esc(gpsCompetencia(r)) + '"></label>' +
       (function(){ var g = gpsGerar(r); return g ? '<div class="fc-gps-cod"><span class="fc-rot">Código de barras da GPS (gerado pelo sistema)</span><b class="tnum">' + esc(g.linha) + '</b><div class="fc-guia-acoes"><button type="button" class="btn" data-fc-copia="' + esc(g.digitos) + '">' + svgI('i-copy') + 'Copiar código de barras</button></div><p class="fc-nota">Competência ' + esc(compTxt(g.competencia)) + ' · vence ' + fmtDate(g.vencimento) + ' · ' + esc(moedaTxt(g.valor)) + '. Pague até o vencimento: depois dele o valor muda (juros).</p></div>' : '<p class="fc-nota">Informe o NIT da mãe e clique em Atualizar dados: o código de barras da GPS sai na hora.</p>'; })();
@@ -4511,19 +4511,21 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
   }
   // GPS: vence 2 meses antes do parto (30/04 vira 28/02); o cartão pula para Emitir/Pagar 5 dias antes de vencer
   function prazoGps(r){
-    if (nascido(r) || !r.dpp || rural(r)) return '';   // rural (segurada especial) não paga GPS
+    if (nascido(r) || !r.dpp || rural(r) || semGps(r)) return '';   // rural (segurada especial) não paga GPS; pedido direto ao INSS e MEI também não
     var p = String(r.dpp).slice(0, 10).split('-').map(Number), ult = new Date(p[0], p[1] - 2, 0).getDate();
     return iso(new Date(p[0], p[1] - 3, Math.min(p[2], ult), 12));
   }
   function gatilhoGps(r){ var v = prazoGps(r); if (!v) return ''; var d = new Date(v + 'T12:00:00'); d.setDate(d.getDate() - 5); return iso(d); }
   function gpsPaga(r){ return r.guiaStatus === 'paga'; }
+  // qualificação do app (SQL 55): pedido direto ao INSS ou MEI (paga o próprio DAS) não passam pela GPS do escritório
+  function semGps(r){ var q = r && r.qualificacao; return !!(q && (q.caminho === 'direto_inss' || q.caminho === 'mei')); }
   function gpsAPagar(r){ var g = gatilhoGps(r), hj = iso(new Date()); return !!g && !gpsPaga(r) && g <= hj && String(r.dpp).slice(0, 10) > hj; }
   // a tarefa da GPS nasce quando o prazo chega, mesmo com o cartão em Senha ou Documentação, ou quando ele está em Emitir/Pagar GPS
-  function gpsTarefa(r){ return noContratos(r) && !nascido(r) && !rural(r) && !gpsPaga(r) && (gpsAPagar(r) || posEtapaDe(r) === 'gps') && (!doFluxoNovo(r) || !!r.tipoSegurada); }
+  function gpsTarefa(r){ return noContratos(r) && !nascido(r) && !rural(r) && !semGps(r) && !gpsPaga(r) && (gpsAPagar(r) || posEtapaDe(r) === 'gps') && (!doFluxoNovo(r) || !!r.tipoSegurada); }
   // o que o responsável precisa fazer agora: aparece no cartão, na janela e no sino até ser feito
   // gestante que fechou antes do prazo da GPS e não pagou: continua avisando depois do parto
   function gpsVencida(r){
-    if (gpsPaga(r) || !r.dpp || !r.contratoEm || rural(r)) return '';
+    if (gpsPaga(r) || !r.dpp || !r.contratoEm || rural(r) || semGps(r)) return '';
     var p = String(r.dpp).slice(0, 10).split('-').map(Number), ult = new Date(p[0], p[1] - 2, 0).getDate(), v = iso(new Date(p[0], p[1] - 3, Math.min(p[2], ult), 12));
     return v < iso(new Date()) && String(r.contratoEm).slice(0, 10) <= v ? v : '';
   }
@@ -4583,7 +4585,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
   var POS_SO_GESTANTE = { prazo_gps: 1, gps: 1, nasc: 1 }, POS_SO_URBANA = { prazo_gps: 1, gps: 1 };
   var POS_NOME_NOVO = { senha: 'Senha gov.br', docs: 'Documentos', prazo_gps: 'GPS · aguardando o prazo', gps: 'GPS · pagamento automático', nasc: 'Aguardando parto', cert: 'Aguardando certidão', ok: 'Requerimento automático' };
   function posNome(r, c){ return (doFluxoNovo(r) && POS_NOME_NOVO[c[0]]) || c[1]; }
-  function posColsDe(r){ return POS_COLS.filter(function(c){ return !(nascido(r) && POS_SO_GESTANTE[c[0]]) && !(rural(r) && POS_SO_URBANA[c[0]]); }); }
+  function posColsDe(r){ return POS_COLS.filter(function(c){ return !(nascido(r) && POS_SO_GESTANTE[c[0]]) && !((rural(r) || semGps(r)) && POS_SO_URBANA[c[0]]); }); }
   function posLane(r){ return nascido(r) ? 'nasc' : 'gest'; }
   // durante um render a etapa de cada mãe é calculada uma vez só (com milhares de mães, ela é pedida várias vezes por tela)
   var memoPos = null;
@@ -4607,10 +4609,10 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
     }
     var parto = String(r.dpp || '').slice(0, 10), g = gatilhoGps(r);
     // rural não passa pela GPS: volta para a documentação (ou já espera o nascimento, se a pasta estiver completa)
-    if (rural(r) && POS_SO_URBANA[e]) e = faltamTxt(r) ? 'docs' : 'nasc';
+    if ((rural(r) || semGps(r)) && POS_SO_URBANA[e]) e = faltamTxt(r) ? 'docs' : 'nasc';
     // senha gov.br no cofre: segue para a Documentação Pessoal; documentação completa: segue sozinha para a GPS (urbano) ou para o nascimento (rural)
     if (e === 'senha' && r.senhaGovOk) e = 'docs';
-    if (e === 'docs' && !faltamTxt(r)) e = rural(r) ? 'nasc' : 'prazo_gps';
+    if (e === 'docs' && !faltamTxt(r)) e = (rural(r) || semGps(r)) ? 'nasc' : 'prazo_gps';
     if (parto && parto <= hj && antes('cert') && (!mudou || mudou < parto)) return doFluxoNovo(r) && r.certidaoRecebida ? 'ok' : 'cert';
     // GPS paga: vai para Aguardando Nascimento de qualquer coluna anterior (só para a frente)
     if (gpsPaga(r) && antes('nasc')) return 'nasc';
@@ -6856,10 +6858,12 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
   // código de barras da GPS (arrecadação): 8 5 8 + DV + valor(11) + 0270 (INSS) + código(4) + NIT(14) + competência AAAAMM + 3.
   // Conferido número por número com 8 guias emitidas pelo SAL. O SAL só calcula: a guia não tem número de emissão.
   function gpsDv(s){ var soma = 0, p = 2; for (var i = s.length - 1; i >= 0; i--){ soma += +s[i] * p; p = p === 9 ? 2 : p + 1; } var r = soma % 11; return r === 0 || r === 1 ? 0 : 11 - r; }
+  // quem trabalha por conta própria (qualificação do app) recolhe como contribuinte individual: código 1163, os mesmos 11%
+  function gpsCodigoDe(r){ return r && r.qualificacao && r.qualificacao.caminho === 'guia_individual' ? '1163' : GPS_CODIGO; }
   function gpsGerar(r){
     if (!nitOk(r.nit)) return null;
     var comp = gpsCompetencia(r), valor = gpsValor();
-    var sem = '858' + String(Math.round(valor * 100)).padStart(11, '0') + '0270' + GPS_CODIGO + digits(r.nit).padStart(14, '0') + comp.replace('-', '') + '3';
+    var sem = '858' + String(Math.round(valor * 100)).padStart(11, '0') + '0270' + gpsCodigoDe(r) + digits(r.nit).padStart(14, '0') + comp.replace('-', '') + '3';
     var cod = sem.slice(0, 3) + gpsDv(sem) + sem.slice(3);
     var blocos = [0, 1, 2, 3].map(function(b){ var bl = cod.slice(b * 11, b * 11 + 11); return bl + '-' + gpsDv(bl); });
     var p = comp.split('-').map(Number), v = new Date(p[0], p[1], 15), ds = v.getDay(); if (ds === 6) v.setDate(17); else if (ds === 0) v.setDate(16);
