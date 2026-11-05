@@ -3435,7 +3435,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
   function docsApp(r){
     var campo = Array.isArray(r.campoDocs) ? r.campoDocs : null, antigo = Array.isArray(r.faltaDocs) ? r.faltaDocs : null;
     // urbano: precisa do NIT (é dele que sai a GPS); rural (segurada especial): precisa da prova da atividade rural e não do NIT
-    return DOCS_APP.filter(function(d){ return d[0] === 'procuracao' ? doFluxoNovo(r) : d[0] === 'rural' ? (rural(r) || !!(campo && campo.indexOf('rural') >= 0)) : d[0] === 'nit' ? !rural(r) : true; }).map(function(d){
+    return DOCS_APP.filter(function(d){ return d[0] === 'procuracao' ? false :   /* 05/11: contrato e procuração saem do app (vão ser assinados pelo ZapSign) e deixam de ser cobrados */ d[0] === 'rural' ? (rural(r) || !!(campo && campo.indexOf('rural') >= 0)) : d[0] === 'nit' ? !rural(r) : true; }).map(function(d){
       if (d[0] === 'senha') return { k: 'senha', n: d[1], ok: !!r.senhaGovOk || (!doFluxoNovo(r) && !!(campo && campo.indexOf('senha') >= 0)) };
       if (d[0] === 'nit') return { k: 'nit', n: d[1], ok: nitOk(r.nit) };
       var ok = campo ? campo.indexOf(d[0]) >= 0 : (r.docsCompletos === true || (r.origem === 'campo' && antigo && antigo.indexOf(d[0]) < 0));   // cadastro antigo do app: vale o que não estava na lista de faltantes

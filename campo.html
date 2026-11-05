@@ -1122,6 +1122,27 @@ html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,r
 .end-bairro{margin:-2px 4px 0;font-size:13px;color:var(--ink2)}
 .sgov-ver{flex:none;border:0;background:none;padding:6px 2px;font:inherit;font-size:13px;font-weight:600;color:#66279d}
 
+/* cadastro em etapas (05/11): uma pergunta por tela, barra de progresso, resumo com "editar" antes de enviar */
+.wz{display:flex;flex-direction:column;gap:12px;padding-top:2px}
+.wz-prog{display:flex;align-items:center;gap:10px}
+.wz-prog .barrinha{flex:1;height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.wz-prog .barrinha i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#8a43d3,#c084fc);transition:width .35s ease}
+.wz-prog small{flex:none;font-size:12px;font-weight:700;color:var(--ink2)}
+.wz-voltar{align-self:flex-start;border:0;background:none;padding:2px 0;font:inherit;font-size:14px;font-weight:600;color:#66279d}
+.wz-passo{display:flex;flex-direction:column;gap:12px;animation:sobeLeve .35s cubic-bezier(.2,.8,.2,1) both}
+.wz-t{margin:8px 0 0;font-family:'Fraunces',Georgia,serif;font-size:26px;font-weight:600;line-height:1.15;letter-spacing:-.01em;color:var(--ink)}
+.wz-s{margin:-6px 0 2px;font-size:14px;line-height:1.4;color:var(--ink2)}
+.wz-slot{display:grid;gap:10px}
+.wz-erro{margin:0 4px;font-size:13.5px;font-weight:600;color:#c0392b}.wz-erro[hidden]{display:none}
+.wz-pular{align-self:center;margin-top:4px;border:0;background:none;padding:6px;font:inherit;font-size:14px;font-weight:600;color:var(--ink2);text-decoration:underline}
+.wz-res{display:grid;gap:0;margin-bottom:8px;border:1px solid var(--line);border-radius:18px;background:var(--card);overflow:hidden}
+.wz-lin{display:grid;grid-template-columns:96px minmax(0,1fr) auto;align-items:center;gap:10px;padding:11px 14px;border:0;border-bottom:1px solid var(--line);background:none;font:inherit;text-align:left;color:var(--ink)}
+.wz-lin:last-child{border-bottom:0}
+.wz-lin span{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink2)}
+.wz-lin b{font-size:14px;font-weight:600;overflow-wrap:anywhere}
+.wz-lin u{font-size:12.5px;font-weight:600;color:#66279d}
+html[data-tema="dark"] .wz-voltar,html[data-tema="dark"] .wz-lin u{color:#c49be6}
+
 </style>
 <link rel="preload" as="image" href="img/marca-suave.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
 </head>
@@ -1165,7 +1186,7 @@ html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,r
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 78;
+  var APP_VERSAO = 79;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1180,9 +1201,9 @@ html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,r
     { k: 'titulo_verso', arq: 'Título de eleitor - verso', t: 'Título de eleitor', s: 'verso', lado: 'Verso', oculto: true, ic: 'i-idv', fala: 'Agora o verso do título de eleitor, se tiver.' },
     { k: 'residencia', arq: 'Comprovante de residência', t: 'Comprovante de residência', s: 'da mãe', ic: 'i-casa', req: true, fala: 'Tire a foto do comprovante de residência.' },
     { k: 'rural', arq: 'Provas de atividade rural', t: 'Provas de atividade rural (se tiver)', s: 'opcional: só se a mãe tiver', ic: 'i-doc', req: false, multi: true, fala: 'Tire a foto das provas de atividade rural. Toque de novo para cada documento a mais.' },
-    { k: 'video', arq: 'Vídeo de concordância', t: 'Vídeo de concordância', s: 'a cliente aceitando os termos do contrato', ic: 'i-video', opcional: true, video: true, fala: 'Grave um vídeo curto com a cliente concordando com os termos do contrato.' },
-    { k: 'procuracao', arq: 'Contrato e procuração', t: 'Contrato e procuração', s: 'fotografe os dois, um em seguida do outro', ic: 'i-pena', opcional: true, multi: true, fala: 'Tire a foto do contrato e, em seguida, da procuração. Toque de novo para cada folha.' },
-    { k: 'outro', arq: 'Outro documento', t: 'Outros documentos', s: 'tire quantas fotos precisar', ic: 'i-doc', opcional: true, multi: true, fala: 'Tire a foto do documento. Toque de novo para cada folha ou documento a mais.' }
+    { k: 'video', arq: 'Vídeo de concordância', t: 'Vídeo de concordância', s: 'a cliente aceitando os termos do contrato', ic: 'i-video', opcional: true, oculto: true, video: true, fala: 'Grave um vídeo curto com a cliente concordando com os termos do contrato.' },
+    { k: 'procuracao', arq: 'Contrato e procuração', t: 'Contrato e procuração', s: 'fotografe os dois, um em seguida do outro', ic: 'i-pena', opcional: true, oculto: true, multi: true, fala: 'Tire a foto do contrato e, em seguida, da procuração. Toque de novo para cada folha.' },
+    { k: 'outro', arq: 'Outro documento', t: 'Outros documentos', s: 'tire quantas fotos precisar', ic: 'i-doc', opcional: true, oculto: true, multi: true, fala: 'Tire a foto do documento. Toque de novo para cada folha ou documento a mais.' }
   ];
   // formato do enquadramento: cartão (RG/CPF, deitado), folha (A4, em pé) ou rosto (oval)
   // documentos com frente e verso: um cartão só na tela, duas fotos
@@ -1833,6 +1854,72 @@ html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,r
     if (aba === 'clientes') return vistaClientes();
     vistaNovo();
   }
+  // cadastro em etapas: uma pergunta por tela, com barra de progresso; o resumo, as fotos e o Enviar ficam na última
+  var passoNovo = null;
+  function montarPassos(){
+    if (completando) return;
+    var v = $('vista'); if (!v || !$('l-nome')) return;
+    var gest = gestante(), txt = function(k){ return String(lsGet(k) || '').trim(); };
+    var P = [
+      { t: 'Qual é o nome da mãe?', s: 'Nome completo, como está no documento.', el: ['l-nome'], foco: 'nome', ok: function(){ return txt('campo_nome').length >= 3; }, erro: 'Digite o nome completo da mãe.' },
+      { t: 'Qual é o CPF dela?', s: 'Só os números.', el: ['l-cpf'], foco: 'cpf', ok: function(){ return cpfOk(($('cpf') || {}).value); }, erro: 'Confira o CPF: são 11 números.' },
+      { t: 'Qual é o WhatsApp dela?', s: 'Com DDD. É por ele que o escritório vai falar com ela.', el: ['l-fone'], foco: 'fone', ok: function(){ return foneOk(($('fone') || {}).value); }, erro: 'Digite o celular com DDD.' },
+      { t: 'Onde ela mora?', s: 'Digite o CEP: a rua e a cidade aparecem sozinhas. Depois é só o número.', el: ['l-cep', 'end-auto', 'l-cidade'], foco: 'cep',
+        ok: function(){ return cepOk(txt('campo_cep')) && txt('campo_rua') && txt('campo_num') && txt('campo_cidade'); }, erro: 'Falta o CEP, a rua, o número ou a cidade.' },
+      gest ? { t: 'Quando o bebê deve nascer?', s: 'Atendemos só gestantes: o bebê ainda não pode ter nascido.', el: ['l-dpp'], foco: 'dpp', ok: function(){ return !!txt('campo_dpp'); }, erro: 'Digite a data prevista do parto.' }
+           : { t: 'Quando o bebê nasceu?', s: '', el: ['l-cnasc'], foco: 'cnasc', ok: function(){ return !!txt('campo_crianca_nasc'); }, erro: 'Digite a data de nascimento do bebê.' },
+      { t: 'Qual é a senha do gov.br dela?', s: 'Se ela não souber agora, toque em Pular: o escritório pede depois.', el: ['l-sgov'], foco: 'sgov', ok: function(){ return true; }, pular: true },
+      { t: 'Fotos dos documentos', s: 'Toque em cada um para tirar a foto. Confira os dados e envie.', el: [], grid: true, ok: function(){ return true; }, final: true }
+    ];
+    if (passoNovo == null){ passoNovo = 0; for (var k = 0; k < P.length - 1 && P[k].ok() && !P[k].pular; k++) passoNovo = k + 1; }   // rascunho: volta para a primeira pergunta sem resposta
+    passoNovo = Math.max(0, Math.min(P.length - 1, passoNovo));
+    // guarda escondidos os campos de todas as etapas (continuam ligados, o envio lê deles)
+    var guarda = document.createElement('div'); guarda.hidden = true; guarda.className = 'wz-guarda';
+    P.forEach(function(p){ p.el.forEach(function(id){ var e = $(id); if (e) guarda.appendChild(e); }); });
+    Array.prototype.forEach.call(v.querySelectorAll('.rot, .so-gest, .dados'), function(x){ if (!x.closest('.wz-guarda') && !x.querySelector('.doc') && !(x.nextElementSibling && x.nextElementSibling.querySelector && x.nextElementSibling.classList.contains('grid'))) x.remove(); });
+    var docsEls = Array.prototype.filter.call(v.children, function(c){ return !c.classList.contains('barra'); });
+    docsEls.forEach(function(c){ guarda.appendChild(c); });
+    var pas = P[passoNovo], tot = P.length;
+    var w = document.createElement('div'); w.className = 'wz';
+    w.innerHTML = '<div class="wz-prog"><span class="barrinha"><i style="width:' + Math.round(100 * (passoNovo + 1) / tot) + '%"></i></span><small>' + (passoNovo + 1) + ' de ' + tot + '</small></div>' +
+      (passoNovo ? '<button type="button" class="wz-voltar" id="wz-voltar">‹ Voltar</button>' : '') +
+      '<div class="wz-passo"><h2 class="wz-t">' + esc(pas.t) + '</h2>' + (pas.s ? '<p class="wz-s">' + esc(pas.s) + '</p>' : '') + '<div class="wz-slot" id="wz-slot"></div><p class="wz-erro" id="wz-erro" hidden></p>' +
+      (pas.pular ? '<button type="button" class="wz-pular" id="wz-pular">Pular esta pergunta</button>' : '') + '</div>';
+    v.insertBefore(w, v.firstChild); v.appendChild(guarda);
+    var slot = w.querySelector('#wz-slot');
+    if (pas.final){
+      var dpp = txt('campo_dpp'), linhas = [
+        ['Nome', txt('campo_nome'), 0], ['CPF', txt('campo_cpf'), 1], ['WhatsApp', txt('campo_fone'), 2],
+        ['Endereço', [txt('campo_rua'), txt('campo_num'), txt('campo_compl'), txt('campo_bairro'), [txt('campo_cidade'), txt('campo_uf_cep')].filter(Boolean).join('/')].filter(Boolean).join(', '), 3],
+        [gest ? 'Parto previsto' : 'Nascimento', gest ? isoParaBr(dpp) : isoParaBr(txt('campo_crianca_nasc')), 4],
+        ['Senha gov.br', senhaGovRascunho ? '••••••' : 'não informada', 5]];
+      var res = document.createElement('div'); res.className = 'wz-res';
+      res.innerHTML = linhas.map(function(l){ return '<button type="button" class="wz-lin" data-ir-passo="' + l[2] + '"><span>' + l[0] + '</span><b>' + esc(l[1] || '—') + '</b><u>editar</u></button>'; }).join('');
+      slot.appendChild(res);
+      docsEls.forEach(function(c){ slot.appendChild(c); });
+    } else {
+      pas.el.forEach(function(id){ var e = $(id); if (e){ slot.appendChild(e); if (e.classList.contains('falta') && e.querySelector('input') && !e.querySelector('input').value) e.classList.remove('falta'); } });
+      if (pas.el.indexOf('l-cidade') >= 0 && $('l-cidade')) $('l-cidade').style.display = txt('campo_uf_cep') && txt('campo_cidade') ? 'none' : '';   // o CEP já trouxe a cidade
+    }
+    // barra de baixo: Continuar nas perguntas; Enviar cadastro só na última
+    var barra = v.querySelector('.barra'), env = $('enviar');
+    if (barra && !pas.final){
+      if (env) env.style.display = 'none';
+      var seg = document.createElement('button'); seg.type = 'button'; seg.className = 'enviar'; seg.id = 'wz-seguir';
+      seg.innerHTML = 'Continuar<svg viewBox="0 0 24 24" style="margin-left:6px"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      barra.appendChild(seg);
+      seg.onclick = function(){
+        if (!pas.ok()){ var er = $('wz-erro'); er.textContent = pas.erro || 'Responda para continuar.'; er.hidden = false; pas.el.forEach(function(id){ var l = $(id); if (l && l.classList.contains('fone')) l.classList.add('falta'); }); var fo = $(pas.foco); if (fo) fo.focus(); return; }
+        passoNovo++; telaInicial();
+      };
+    }
+    if ($('wz-voltar')) $('wz-voltar').onclick = function(){ passoNovo--; telaInicial(); };
+    if ($('wz-pular')) $('wz-pular').onclick = function(){ senhaGovRascunho = ''; passoNovo++; telaInicial(); };
+    Array.prototype.forEach.call(w.querySelectorAll('[data-ir-passo]'), function(b){ b.onclick = function(){ passoNovo = +b.dataset.irPasso; telaInicial(); }; });
+    // Enter (ou "Ir" no teclado) passa para a próxima pergunta
+    Array.prototype.forEach.call(slot.querySelectorAll('input'), function(i){ i.addEventListener('keydown', function(e){ if (e.key === 'Enter' && $('wz-seguir')){ e.preventDefault(); $('wz-seguir').click(); } }); });
+    var fo = $(pas.foco); if (fo && !pas.final) setTimeout(function(){ try { fo.focus({ preventScroll: true }); } catch(e){ fo.focus(); } }, 350);
+  }
   function vistaNovo(){
     guardarRascunho();
     var n = Object.keys(fotos).length;
@@ -1912,6 +1999,7 @@ html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,r
           $('rua').value = x.logradouro || ''; $('l-rua').classList.toggle('falta', !x.logradouro);
           if ($('cidade')){ $('cidade').value = x.localidade || ''; var lc = $('l-cidade'); if (lc) lc.classList.toggle('falta', !x.localidade); }
           $('end-auto').hidden = false; mostraEnd(); st.textContent = '✓'; st.className = 'cep-st ok';
+          var lc2 = $('l-cidade'); if (lc2 && x.localidade && document.getElementById('wz-slot')) lc2.style.display = 'none';
           setTimeout(function(){ var n = $(x.logradouro ? 'num' : 'rua'); if (n) n.focus(); }, 60);   // a parceira só põe o número
         }).catch(function(){ ultimoCep = ''; st.textContent = 'sem internet: digite a rua'; st.className = 'cep-st erro'; $('end-auto').hidden = false; });
       };
@@ -1955,6 +2043,7 @@ html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,r
       });
     });
     $('enviar').addEventListener('click', enviar);
+    montarPassos();
     mostrarFila();
   }
 
@@ -3113,7 +3202,7 @@ html[data-tema="dark"] .lg.balao{background:radial-gradient(110% 70% at 85% 0%,r
      .then(function(envio){
        fotos = {}; local = null; guardarRascunho();   // apaga o rascunho dessas fotos
        if (comp){ completando = null; lsSet('campo_completando', ''); if (painel) painel.clientes.forEach(function(c){ if (c.id === comp.id) c.faltaDocs = comp.faltaDocs.filter(function(k){ return envio.docs.indexOf(k) < 0; }); }); }
-       else { ['campo_fone', 'campo_cpf', 'campo_cidade', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp', 'campo_nasceu', 'campo_cep', 'campo_rua', 'campo_num', 'campo_compl', 'campo_bairro', 'campo_uf_cep'].forEach(function(k){ lsSet(k, ''); }); senhaGovRascunho = ''; }
+       else { ['campo_fone', 'campo_cpf', 'campo_cidade', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp', 'campo_nasceu', 'campo_cep', 'campo_rua', 'campo_num', 'campo_compl', 'campo_bairro', 'campo_uf_cep'].forEach(function(k){ lsSet(k, ''); }); senhaGovRascunho = ''; passoNovo = null; }
        t.remove(); aba = comp ? 'painel' : 'novo'; telaInicial(); window.scrollTo(0, 0); if ($('vista')) $('vista').scrollTop = 0;
        var ok = tela('<svg viewBox="0 0 24 24" style="stroke:var(--ok)"><use href="#i-ok"/></svg><b>' + (comp ? 'Documentos guardados' : 'Cadastro guardado') + '</b><p>' + esc(envio.cliente || '') + '<br>' + (comp ? 'Vão para a pasta da cliente sozinhos quando tiver internet.' : 'Está sendo enviado agora: acompanhe na barra embaixo. Pode cadastrar a próxima cliente.') + '</p><button id="t-ok">' + (comp ? 'Entendi' : 'Cadastrar a próxima') + '</button>');
        ok.querySelector('#t-ok').onclick = function(){ ok.remove(); };
