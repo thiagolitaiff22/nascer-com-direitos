@@ -78,6 +78,7 @@ function doPost(e){
     if (p.acao === 'pasta') return saida(pastaDoCadastro(p));
     if (p.acao === 'lerPasta') return saida(lerPastaDoCadastro(p));
     if (p.acao === 'conferirDocs') return saida(conferirDocsDaPasta(p));
+    if (p.acao === 'emailSenha') return saida(emailSenha_(p));   // "Esqueci a senha" do BI: quem chama é o banco
     var quem = validar(p.token);
     if (!/^[A-Za-z0-9_-]{8,64}$/.test(p.envio || '')) throw new Error('Envio inválido.');
     if (p.acao === 'arquivo') return saida(arquivo(p, quem));
@@ -89,6 +90,39 @@ function doPost(e){
   } catch (err){
     return saida({ ok: false, erro: String(err && err.message || err) });
   }
+}
+
+/* "Esqueci a senha" do BI: o banco (supabase/57) gera o link de troca e pede para este script mandar o e-mail
+   pela conta do escritório. Só o banco conhece o código secreto deste script, então ninguém de fora usa esta ação. */
+function emailSenha_(p){
+  if (!p.segredo || String(p.segredo) !== segredoScript_()) throw new Error('Não autorizado.');
+  var para = String(p.para || '').trim(), link = String(p.link || '');
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(para)) throw new Error('E-mail inválido.');
+  if (!/^https:\/\/(www\.nascercomdireitos\.com\.br|nascercomdireitos\.com\.br|thiagolitaiff22\.github\.io\/nascer-com-direitos)\/[^\s"'<>]*#troca=[0-9a-f]{64}$/.test(link)
+      && !/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/[^\s"'<>]*#troca=[0-9a-f]{64}$/.test(link)) throw new Error('Link inválido.');
+  var nome = String(p.nome || '').replace(/[<>&"]/g, '').slice(0, 40);
+  var ola = nome ? 'Olá, ' + nome + '!' : 'Olá!';
+  var html =
+    '<div style="background:#f4effb;padding:28px 12px;font-family:Arial,Helvetica,sans-serif">' +
+    '<div style="max-width:480px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e6dcf5">' +
+    '<div style="background:#4c1c82;padding:22px 26px;color:#fff;font-family:Georgia,serif;font-size:21px">Nascer com Direitos</div>' +
+    '<div style="padding:26px;color:#2a1f3d;font-size:15px;line-height:1.55">' +
+    '<p style="margin:0 0 12px;font-size:17px"><b>' + ola + '</b></p>' +
+    '<p style="margin:0 0 20px">Recebemos um pedido para trocar a sua senha do sistema. Toque no botão para criar a senha nova. Você continua entrando com o seu CPF.</p>' +
+    '<p style="margin:0 0 22px"><a href="' + link + '" style="display:inline-block;background:#6a2bae;color:#fff;text-decoration:none;font-weight:bold;padding:13px 24px;border-radius:12px">Criar senha nova</a></p>' +
+    '<p style="margin:0 0 8px;color:#6b5d80;font-size:13px">O link vale por 1 hora e funciona uma vez só.</p>' +
+    '<p style="margin:0;color:#6b5d80;font-size:13px">Se não foi você que pediu, ignore este e-mail: a sua senha continua a mesma.</p>' +
+    '</div></div></div>';
+  var texto = ola + '\n\nRecebemos um pedido para trocar a sua senha do sistema Nascer com Direitos. Abra o link abaixo para criar a senha nova (vale por 1 hora e funciona uma vez só). Você continua entrando com o seu CPF.\n\n' + link +
+    '\n\nSe não foi você que pediu, ignore este e-mail: a sua senha continua a mesma.';
+  MailApp.sendEmail({ to: para, subject: 'Troca de senha · Nascer com Direitos', name: 'Nascer com Direitos', body: texto, htmlBody: html });
+  return { ok: true };
+}
+// rode esta uma vez no editor depois de colar o script: ela pede a permissão para mandar e-mail e manda um teste para você
+function autorizarEmail(){
+  var eu = Session.getEffectiveUser().getEmail();
+  MailApp.sendEmail(eu, 'Teste · Nascer com Direitos', 'O script já consegue mandar o e-mail de troca de senha do sistema.');
+  Logger.log('E-mail de teste enviado para ' + eu + '. Restam hoje: ' + MailApp.getRemainingDailyQuota());
 }
 
 function saida(o){ return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }

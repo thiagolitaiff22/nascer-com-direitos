@@ -2324,6 +2324,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
   <symbol id="i-historico" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l4 2"/></symbol>
   <symbol id="i-zap" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.4L3 21l2.1-5.7A8.4 8.4 0 1 1 21 11.5z"/></symbol>
   <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></symbol>
 </svg>
 
 <div class="auth" id="auth" hidden>
@@ -2342,8 +2343,8 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
       <button class="btn primary" type="submit" id="af-go">Entrar</button>
       <p class="auth-msg" id="auth-msg" role="status"></p>
       <div class="auth-links" id="auth-links">
-        <a class="linkbtn" href="equipe-cadastro.html">Primeiro acesso</a>
-        <button type="button" class="linkbtn" onclick="alert('Esqueceu a senha? Procure o escritório: o gestor redefine e ela volta a ser 123456. No próximo acesso você cria outra.')">Esqueci a senha</button>
+        <a class="linkbtn" href="equipe-cadastro.html" id="af-primeiro">Primeiro acesso</a>
+        <button type="button" class="linkbtn" data-mode="esqueci">Esqueci a senha</button>
         <button type="button" class="linkbtn" data-mode="entrar" hidden>Voltar para entrar</button>
         <button type="button" class="linkbtn" id="af-modo">Entrar com e-mail (administração)</button>
         <button type="button" class="linkbtn" id="af-sair" hidden>Sair</button>
@@ -2392,7 +2393,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
         <div class="pop-box"><button type="button" class="topo-add" id="btn-add" aria-haspopup="true" aria-expanded="false">Adicionar<svg class="i"><use href="#i-chev"/></svg></button>
           <div class="pop" id="pop-add" hidden><button type="button" data-add="cad"><svg class="i"><use href="#i-phone"/></svg>Novo cadastro</button><button type="button" data-add="parc"><svg class="i"><use href="#i-users"/></svg>Novo parceiro</button><button type="button" class="admin-only" data-add="func"><svg class="i"><use href="#i-gear"/></svg>Novo funcionário</button></div></div>
         <div class="pop-box"><button type="button" class="topo-user" id="btn-user" aria-haspopup="true" aria-expanded="false"><span class="av" id="me-av">E</span><span class="ola">Olá, <b id="me-ola"></b></span><svg class="i"><use href="#i-chev"/></svg></button>
-          <div class="pop" id="pop-user" hidden><p class="pop-nome" id="me"></p><small id="sync">Conectando à base…</small><button type="button" id="btn-senha"><svg class="i"><use href="#i-chave"/></svg>Alterar senha</button><button type="button" id="btn-sair"><svg class="i"><use href="#i-sair"/></svg>Sair</button></div></div>
+          <div class="pop" id="pop-user" hidden><p class="pop-nome" id="me"></p><small id="sync">Conectando à base…</small><button type="button" id="btn-senha"><svg class="i"><use href="#i-chave"/></svg>Alterar senha</button><button type="button" id="btn-recup" hidden><svg class="i"><use href="#i-mail"/></svg>E-mail de recuperação</button><button type="button" id="btn-sair"><svg class="i"><use href="#i-sair"/></svg>Sair</button></div></div>
       </div>
     </header>
     <div class="content" id="conteudo">
@@ -3153,6 +3154,18 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
   </form>
 </dialog>
 
+<dialog id="dlg-recup">
+  <form class="f" id="form-recup" novalidate>
+    <div class="f-head"><h2>E-mail de recuperação</h2></div>
+    <div class="f-body">
+      <div class="field full"><span class="hint">Você continua entrando com o CPF. Se um dia esquecer a senha, toque em <b>Esqueci a senha</b> na tela de entrada: o link para criar outra chega neste e-mail na hora.</span></div>
+      <div class="field full"><label for="rc-email">Seu e-mail</label><input id="rc-email" type="email" inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false" placeholder="seu@email.com.br"></div>
+      <div class="field full"><span class="hint" id="rc-msg" role="status"></span></div>
+    </div>
+    <div class="f-foot"><div class="right"><button class="btn" type="button" id="rc-cancel">Agora não</button><button class="btn primary" type="submit" id="rc-go">Salvar</button></div></div>
+  </form>
+</dialog>
+
 <dialog id="dlg-senha">
   <form class="f" id="form-senha" novalidate>
     <div class="f-head"><h2>Alterar minha senha</h2></div>
@@ -3171,6 +3184,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
     <div class="f-body">
       <div class="field full"><label for="fe-nome">Nome</label><input id="fe-nome" autocomplete="off"></div>
       <div class="field full"><label for="fe-cpf">CPF (é o login para entrar)</label><input id="fe-cpf" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00"><span class="hint">A pessoa entra no sistema com o CPF. A senha inicial é <b>123456</b>; no primeiro acesso ela cria a dela (só números).</span></div>
+      <div class="field full" id="fe-recup-box" hidden><label for="fe-recup">E-mail para recuperar a senha</label><input id="fe-recup" type="email" inputmode="email" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="nome@exemplo.com.br"><span class="hint">A pessoa continua entrando com o CPF. Se esquecer a senha, toca em <b>Esqueci a senha</b> e o link para criar outra chega neste e-mail.</span></div>
       <div class="field full" id="fe-email-box"><label for="fe-email">Usuário antigo (só para quem já tinha acesso por nome)</label><input id="fe-email" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="ex.: thiago ou nome.sobrenome"><span class="hint">É com este usuário e a senha abaixo que o funcionário entra no sistema. Pode usar um e-mail, se preferir.</span></div>
       <div class="field full" id="fe-senha-wrap"><label for="fe-senha" id="fe-senha-lbl">Nova senha (opcional)</label><input id="fe-senha" name="nova-senha-equipe" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocapitalize="none" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Em branco = senha padrão 123456 (a pessoa troca no 1º acesso)"><span class="hint" id="fe-senha-dica">Só números (mínimo de 6). O próprio funcionário pode trocar depois, em Alterar senha.</span></div>
       <div class="field"><label for="fe-funcao">Cargo</label><select id="fe-funcao"><option value="closer">Closer · liga e fecha contratos</option><option value="operacional">Agente Operacional · documentos e requerimentos</option><option value="judicial">Agente Judicial · ações e processos</option><option value="posvenda">Pós-venda · acompanha a cliente depois do contrato</option><option value="admin">Gestor · acesso total</option></select></div>
@@ -9342,8 +9356,8 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
   var AUTH_TXT = {
     entrar:   { intro: 'Entre com o seu CPF e a senha.', go: 'Entrar' },
     primeiro: { intro: 'Primeiro acesso: use o e-mail que o escritório cadastrou para você e crie sua senha (mínimo de 8 caracteres).', go: 'Criar senha' },
-    esqueci:  { intro: 'Informe seu e-mail. Enviaremos um link para você criar uma nova senha. Quem entra com usuário pede a troca a um administrador.', go: 'Enviar link' },
-    nova:     { intro: 'Crie sua nova senha (mínimo de 8 caracteres).', go: 'Salvar nova senha' },
+    esqueci:  { intro: 'Digite o seu e-mail de recuperação. Mandamos na hora um link para você criar uma senha nova. Depois é só entrar com o CPF.', go: 'Mandar o link' },
+    nova:     { intro: 'Crie a sua senha nova (mínimo de 6 caracteres). Depois é só entrar com o CPF e essa senha.', go: 'Salvar e entrar' },
     bloqueado:{ intro: '', go: '' }
   };
   function authMsg(t, kind){ $('auth-msg').textContent = t || ''; $('auth-msg').className = 'auth-msg' + (kind ? ' ' + kind : ''); }
@@ -9358,10 +9372,23 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
     $('af-senha').setAttribute('autocomplete', mode === 'entrar' ? 'current-password' : 'new-password');
     $('af-go').hidden = mode === 'bloqueado'; $('af-go').textContent = t.go; $('af-go').disabled = false;
     Array.prototype.forEach.call(document.querySelectorAll('#auth-links [data-mode]'), function(b){
-      b.hidden = mode === 'bloqueado' || mode === 'nova' || b.dataset.mode === mode || (b.dataset.mode === 'entrar' && mode === 'entrar');
+      b.hidden = mode === 'bloqueado' || (mode === 'nova' && !(trocaToken && b.dataset.mode === 'entrar')) || b.dataset.mode === mode || (b.dataset.mode === 'entrar' && mode === 'entrar');
     });
     $('af-sair').hidden = mode !== 'bloqueado';
+    $('af-modo').hidden = mode !== 'entrar'; if ($('af-primeiro')) $('af-primeiro').hidden = mode !== 'entrar';
+    campoLogin();
     authMsg('');
+  }
+  // o campo de cima é o CPF; em "Esqueci a senha" (e no modo da administração) vira e-mail
+  var campoEraEmail = null;
+  function campoLogin(){
+    var ehEmail = authMode === 'esqueci' || afModoEmail, el = $('af-email');
+    if (campoEraEmail !== null && campoEraEmail !== ehEmail) el.value = '';
+    campoEraEmail = ehEmail;
+    el.inputMode = ehEmail ? 'email' : 'numeric'; el.maxLength = ehEmail ? 120 : 14;
+    el.placeholder = ehEmail ? 'seu@email.com.br' : '000.000.000-00';
+    document.querySelector('label[for="af-email"]').textContent = ehEmail ? 'E-mail' : 'CPF';
+    $('af-modo').textContent = afModoEmail ? 'Entrar com CPF' : 'Entrar com e-mail (administração)';
   }
   $('auth-form').addEventListener('click', function(e){
     var b = e.target.closest('[data-pw]'); if (!b) return;
@@ -9372,7 +9399,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
       x.setAttribute('aria-label', mostrar ? 'Esconder senha' : 'Mostrar senha'); x.title = x.getAttribute('aria-label');
     });
   });
-  $('auth-links').addEventListener('click', function(e){ var b = e.target.closest('[data-mode]'); if (b) showAuth(b.dataset.mode); });
+  $('auth-links').addEventListener('click', function(e){ var b = e.target.closest('[data-mode]'); if (!b) return; if (b.dataset.mode === 'entrar') trocaToken = ''; showAuth(b.dataset.mode); });
   function sair(){ SB.auth.signOut().finally(function(){ location.replace(location.pathname); }); }
   $('af-sair').addEventListener('click', sair);
   $('btn-sair').addEventListener('click', sair);
@@ -9409,6 +9436,19 @@ function tentarParceiro(cpf, senha){
   }
   $('auth-form').addEventListener('submit', async function(e){
     e.preventDefault();
+    // "Esqueci a senha": o banco gera o link e o script do Google manda para o e-mail de recuperação
+    if (authMode === 'esqueci'){
+      var em = String($('af-email').value || '').trim().toLowerCase();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){ authMsg('Digite o seu e-mail.', 'err'); $('af-email').focus(); return; }
+      $('af-go').disabled = true; authMsg('Mandando…');
+      try {
+        var rq = await SB.rpc('equipe_esqueci_senha', { p_email: em, p_volta: location.origin + location.pathname });
+        if (rq.error) throw rq.error;
+        if (rq.data && rq.data.erro) authMsg(rq.data.erro, 'err');
+        else authMsg('Pronto! Se este e-mail estiver cadastrado, o link para criar a senha nova chega em instantes. Confira também a caixa de spam.', 'ok');
+      } catch(err){ authMsg(/function|schema cache|could not find/i.test((err && err.message) || '') ? 'A troca de senha por e-mail ainda não está ligada. Avise o escritório.' : authErro(err), 'err'); }
+      $('af-go').disabled = false; return;
+    }
     var email = usuarioParaEmail($('af-email').value), senha = $('af-senha').value, senha2 = $('af-senha2').value;
     // CPF: procura o acesso ligado a ele (quem foi cadastrado antes, pelo nome, também entra pelo CPF depois que o CPF é registrado)
     var cpfDig = String($('af-email').value || '').replace(/\D/g, '');
@@ -9416,8 +9456,10 @@ function tentarParceiro(cpf, senha){
       try { var lk = await SB.rpc('login_por_cpf', { p_cpf: cpfDig }); if (lk && lk.data) email = lk.data; } catch(x){}
     }
     if (authMode !== 'nova' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ authMsg('Informe o usuário ou o e-mail.', 'err'); $('af-email').focus(); return; }
-    if ((authMode === 'primeiro' || authMode === 'esqueci') && ehAcessoInterno(email)){ authMsg('Quem entra com usuário não usa esta opção. Peça a um administrador para definir a senha em Configurações › Equipe.', 'err'); return; }
-    if ((authMode === 'primeiro' || authMode === 'nova') && senha.length < 8){ authMsg('A senha precisa ter pelo menos 8 caracteres.', 'err'); $('af-senha').focus(); return; }
+    if (authMode === 'primeiro' && ehAcessoInterno(email)){ authMsg('Quem entra com usuário não usa esta opção. Peça a um administrador para definir a senha em Configurações › Equipe.', 'err'); return; }
+    if (authMode === 'primeiro' && senha.length < 8){ authMsg('A senha precisa ter pelo menos 8 caracteres.', 'err'); $('af-senha').focus(); return; }
+    if (authMode === 'nova' && senha.length < 6){ authMsg('A senha precisa ter pelo menos 6 caracteres.', 'err'); $('af-senha').focus(); return; }
+    if (authMode === 'nova' && trocaToken && senha === '123456'){ authMsg('Escolha uma senha diferente da padrão (123456).', 'err'); $('af-senha').focus(); return; }
     if ((authMode === 'primeiro' || authMode === 'nova') && senha !== senha2){ authMsg('As duas senhas não são iguais.', 'err'); $('af-senha2').focus(); return; }
     if (authMode === 'entrar' && !senha){ authMsg('Informe a senha.', 'err'); $('af-senha').focus(); return; }
     $('af-go').disabled = true; authMsg('Aguarde…');
@@ -9432,6 +9474,16 @@ function tentarParceiro(cpf, senha){
       } else if (authMode === 'esqueci'){
         var r3 = await SB.auth.resetPasswordForEmail(email, { redirectTo: redirect }); if (r3.error) throw r3.error;
         authMsg('Se este e-mail estiver cadastrado, o link chega em alguns minutos. Confira também o spam.', 'ok'); $('af-go').disabled = false; return;
+      } else if (authMode === 'nova' && trocaToken){
+        // veio do link do e-mail: o banco confere o link, grava a senha nova e já entra
+        var rt = await SB.rpc('equipe_trocar_senha', { p_token: trocaToken, p_senha: senha });
+        if (rt.error) throw rt.error;
+        if (!rt.data || rt.data.erro){ authMsg((rt.data && rt.data.erro) || 'Não foi possível salvar agora. Tente de novo.', 'err'); $('af-go').disabled = false; return; }
+        trocaToken = '';
+        try { var s0 = await SB.auth.getSession(); if (s0.data.session) await SB.auth.signOut(); } catch(x){}
+        var r5 = await SB.auth.signInWithPassword({ email: rt.data.email, password: senha });
+        if (r5.error){ showAuth('entrar'); authMsg('Senha nova salva. Entre com o seu CPF e a senha nova.', 'ok'); }
+        return;
       } else if (authMode === 'nova'){
         var r4 = await SB.auth.updateUser({ password: senha }); if (r4.error) throw r4.error;
         recuperando = false;
@@ -9443,6 +9495,9 @@ function tentarParceiro(cpf, senha){
 
   /* ---------- entering the app ---------- */
   var iniciado = false, recuperando = false;
+  // link do e-mail de "Esqueci a senha" (#troca=...): tira do endereço e abre a tela de senha nova
+  var trocaToken = (function(){ var m = /[#&]troca=([0-9a-f]{64})/.exec(location.hash || ''); return m ? m[1] : ''; })();
+  if (trocaToken){ try { history.replaceState(null, '', location.pathname + location.search); } catch(x){} }
   // senha padrão: a pessoa é obrigada a criar a senha dela no primeiro acesso
   var SENHA_TROCA_OBRIGATORIA = true;   // oferece criar a senha própria (só números) no primeiro acesso; dá para deixar para depois
   function senhaNumerica(s){
@@ -9510,15 +9565,22 @@ function tentarParceiro(cpf, senha){
       state.equipe = rows;
       var eu = rows.filter(function(u){ return u.email === state.me.email; })[0];
       if (!eu || !eu.ativo){ sair(); return; }
+      $('btn-recup').hidden = !temRecup();
+      pedirRecup(eu);
       if (eu.funcao !== state.me.funcao || eu.nome !== state.me.nome){ state.me.funcao = eu.funcao; state.me.nome = eu.nome; document.body.dataset.role = eu.funcao; $('me').textContent = eu.nome + ' · ' + (FUNCAO[eu.funcao] || eu.funcao); $('me-ola').textContent = primeiroNome(eu.nome); $('me-av').textContent = String(eu.nome || '?').trim().charAt(0).toUpperCase(); showTab(state.view); }
       renderEquipe();
     }, function(){}, function(x){ return x; }, 'email');
   }
   SB.auth.onAuthStateChange(function(event, session){
     if (event === 'PASSWORD_RECOVERY'){ recuperando = true; showAuth('nova'); return; }
+    if (trocaToken && event === 'INITIAL_SESSION'){ setTimeout(function(){ showAuth('nova'); setTimeout(function(){ $('af-senha').focus(); }, 30); }, 0); return; }
     if (event === 'SIGNED_OUT'){ return; }
     if (session && (event === 'INITIAL_SESSION' || event === 'SIGNED_IN')) setTimeout(function(){ if (recuperando) showAuth('nova'); else entrar(session); }, 0);
-    else if (!session && event === 'INITIAL_SESSION') showAuth('entrar');
+    else if (!session && event === 'INITIAL_SESSION'){
+      // vindo do painel do gestor ("Esqueci a senha"): já abre a tela de pedir o link
+      if (location.hash === '#esqueci'){ try { history.replaceState(null, '', location.pathname + location.search); } catch(x){} showAuth('esqueci'); setTimeout(function(){ $('af-email').focus(); }, 30); }
+      else showAuth('entrar');
+    }
   });
 
   /* ---------- integração LiderHub: chave gravada no banco, nunca lida de volta ---------- */
@@ -9737,6 +9799,7 @@ function tentarParceiro(cpf, senha){
     $('fe-nome').value = u ? u.nome : ''; $('fe-email').value = u ? emailParaExibir(u.email) : ''; $('fe-email').disabled = !!u;
     $('fe-cpf').value = u && u.cpf ? cpfMasc(u.cpf) : ''; $('fe-email-box').hidden = !u || /^\d{11}$/.test(emailParaExibir(u.email));
     $('fe-senha').value = '';
+    $('fe-recup-box').hidden = !temRecup(); $('fe-recup').value = (u && u.email_recuperacao) || '';
     $('fe-senha-wrap').hidden = !u || !ehAcessoInterno(u.email);   // funcionário novo: sem campo de senha (vale a padrão 123456); ao editar, só para redefinir
     var dtSenha = u && u.senha_em ? new Date(u.senha_em) : null;
     $('fe-senha').placeholder = u && ehAcessoInterno(u.email) && dtSenha ? '•••••• senha já cadastrada (digite só para trocar)' : 'Só números, mínimo de 6 (aparece o que você digita)';
@@ -9804,15 +9867,12 @@ function tentarParceiro(cpf, senha){
   // entrada: só números (CPF). Para a administração há o modo e-mail, que libera as letras.
   var afModoEmail = false;
   $('af-email').addEventListener('input', function(){
-    if (!afModoEmail){ this.value = cpfMasc(this.value); return; }   // só dígitos, com pontos e traço
+    if (!afModoEmail && authMode !== 'esqueci'){ this.value = cpfMasc(this.value); return; }   // só dígitos, com pontos e traço
     var p = this.selectionStart; this.value = this.value.toLowerCase(); try { this.setSelectionRange(p, p); } catch(x){}
   });
   $('af-modo').addEventListener('click', function(){
     afModoEmail = !afModoEmail; var el = $('af-email'); el.value = '';
-    el.inputMode = afModoEmail ? 'email' : 'numeric'; el.maxLength = afModoEmail ? 120 : 14;
-    el.placeholder = afModoEmail ? 'seu@email.com.br' : '000.000.000-00';
-    document.querySelector('label[for="af-email"]').textContent = afModoEmail ? 'E-mail' : 'CPF';
-    this.textContent = afModoEmail ? 'Entrar com CPF' : 'Entrar com e-mail (administração)'; el.focus();
+    campoLogin(); el.focus();
   });
   var feEl = $('fe-email'); if (feEl) feEl.addEventListener('input', function(){ var p = this.selectionStart; this.value = this.value.toLowerCase(); try { this.setSelectionRange(p, p); } catch(x){} });
 
@@ -9891,6 +9951,41 @@ function tentarParceiro(cpf, senha){
     $('fe-funcao').value = { gestor: 'admin', closer: 'closer', judicial: 'judicial', posvenda: 'posvenda' }[p.funcao] || 'operacional';
     setTimeout(function(){ $('fe-funcao').focus(); }, 60);
   });
+  // e-mail de recuperação (supabase/57): só aparece depois que o banco tem a coluna
+  function temRecup(){ return (state.equipe || []).some(function(u){ return Object.prototype.hasOwnProperty.call(u, 'email_recuperacao'); }); }
+  function emailValido(v){ return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v) && !ehAcessoInterno(v); }
+  function abrirRecup(){
+    var eu = (state.equipe || []).filter(function(u){ return state.me && u.email === state.me.email; })[0];
+    $('rc-email').value = (eu && eu.email_recuperacao) || ''; $('rc-msg').textContent = ''; $('rc-go').disabled = false;
+    if (!$('dlg-recup').open) $('dlg-recup').showModal(); setTimeout(function(){ $('rc-email').focus(); }, 30);
+  }
+  // quem ainda não tem e-mail de recuperação: pede uma vez (e de novo só depois de 7 dias, se tocar em "Agora não")
+  var recupPerguntado = false;
+  function pedirRecup(eu){
+    if (recupPerguntado || !temRecup() || !eu || eu.email_recuperacao) return;
+    recupPerguntado = true;
+    var adiado = 0; try { adiado = +localStorage.getItem('nascer-recup-adiado') || 0; } catch(x){}
+    if (Date.now() - adiado < 7 * 864e5) return;
+    setTimeout(function(){ if (!document.querySelector('dialog[open]')) abrirRecup(); }, 1500);
+  }
+  $('btn-recup').addEventListener('click', abrirRecup);
+  $('rc-cancel').addEventListener('click', function(){
+    var eu = (state.equipe || []).filter(function(u){ return state.me && u.email === state.me.email; })[0];
+    if (!eu || !eu.email_recuperacao){ try { localStorage.setItem('nascer-recup-adiado', String(Date.now())); } catch(x){} }
+    $('dlg-recup').close();
+  });
+  $('form-recup').addEventListener('submit', async function(e){
+    e.preventDefault();
+    var v = $('rc-email').value.trim().toLowerCase();
+    if (!emailValido(v)){ $('rc-msg').textContent = 'Digite um e-mail que você abre.'; $('rc-email').focus(); return; }
+    $('rc-go').disabled = true; $('rc-msg').textContent = 'Salvando…';
+    var r = await SB.rpc('equipe_meu_email_recuperacao', { p_email: v });
+    $('rc-go').disabled = false;
+    if (r.error || !r.data || r.data.erro){ $('rc-msg').textContent = (r.data && r.data.erro) || 'Não foi possível salvar agora (' + ((r.error && r.error.message) || 'tente de novo') + ').'; return; }
+    (state.equipe || []).forEach(function(u){ if (state.me && u.email === state.me.email) u.email_recuperacao = v; });
+    try { localStorage.removeItem('nascer-recup-adiado'); } catch(x){}
+    $('dlg-recup').close(); toast('E-mail de recuperação salvo. Se esquecer a senha, o link chega em ' + v + '.');
+  });
   $('btn-senha').addEventListener('click', function(){ $('sn-nova').value = ''; $('sn-rep').value = ''; $('sn-msg').textContent = ''; $('dlg-senha').showModal(); setTimeout(function(){ $('sn-nova').focus(); }, 30); });
   $('sn-cancel').addEventListener('click', function(){ $('dlg-senha').close(); });
   $('form-senha').addEventListener('submit', async function(e){
@@ -9927,6 +10022,11 @@ function tentarParceiro(cpf, senha){
     var cargoSel = $('fe-funcao').value;
     var estSel = [].slice.call($('fe-estados').querySelectorAll('input[data-est]:checked')).map(function(c){ return c.dataset.est; });
     var row = { nome: nome, funcao: cargoSel === 'admin' ? 'admin' : 'assistente', cargo: cargoSel, ativo: $('fe-ativo').value === 'sim', cpf: cpfFe || null, estados: cargoSel === 'admin' && estSel.length ? estSel : null };
+    if (temRecup()){
+      var recup = $('fe-recup').value.trim().toLowerCase();
+      if (recup && !emailValido(recup)){ $('fe-recup').focus(); toast('E-mail de recuperação inválido'); return; }
+      row.email_recuperacao = recup || null;
+    }
     $('fe-save').disabled = true;
     try {
       var r = eEditing ? await SB.from('equipe').update(row).eq('email', eEditing).select('email') : await SB.from('equipe').insert(Object.assign({ email: email }, row));
