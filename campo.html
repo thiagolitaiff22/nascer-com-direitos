@@ -1472,7 +1472,7 @@ html[data-tema="dark"] .tela p.festa-p strong{color:#c49be6}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 110;
+  var APP_VERSAO = 111;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -3292,18 +3292,42 @@ html[data-tema="dark"] .tela p.festa-p strong{color:#c49be6}
     atual = d; falar(d.fala);
     if (d.k === 'cliente') pegarLocal();
     // iPhone (sem foto em resolução cheia pela página): usa a câmera de foto do próprio aparelho; o recorte e o scanner vêm depois
-    abrirCamera(d).catch(function(){
-      // sem acesso à câmera ao vivo: usa a câmera do próprio celular
-      $('foto').setAttribute('capture', 'environment'); // sempre a câmera de trás
-      $('foto').click();
+    abrirCamera(d).catch(function(e){
+      // navegador sem câmera ao vivo: usa a câmera do próprio celular (ainda no toque, então abre)
+      if (e && e.message === 'sem câmera'){ $('foto').setAttribute('capture', 'environment'); $('foto').click(); return; }
+      cameraFalhou(d, e);
     });
   }
   var fluxo = null;
   function pararCamera(){ if (fluxo){ fluxo.getTracks().forEach(function(t){ t.stop(); }); fluxo = null; } }
+  // alta resolução primeiro; alguns celulares recusam e abrem só com a configuração simples
+  function pedirCamera(frente){
+    var md = navigator.mediaDevices, lado = { ideal: frente ? 'user' : 'environment' };
+    return md.getUserMedia({ audio: false, video: { facingMode: lado, width: { ideal: 4096 }, height: { ideal: 3072 } } }).catch(function(e){
+      if (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError' || e.name === 'PermissionDeniedError')) throw e;   // bloqueada: não adianta insistir
+      return md.getUserMedia({ audio: false, video: { facingMode: lado } }).catch(function(){ return md.getUserMedia({ audio: false, video: true }); });
+    });
+  }
+  // a câmera não abriu: diz o motivo e dá as saídas (a galeria funciona mesmo com a câmera bloqueada)
+  function cameraFalhou(d, e){
+    processando(false);
+    var nome = (e && e.name) || '', negada = /NotAllowed|Security|PermissionDenied/.test(nome), ocupada = /NotReadable|TrackStart|Abort/.test(nome);
+    var como = APP ? 'Para liberar: Configurações do celular › Apps › Nascer com Direitos › Permissões › Câmera › Permitir. Depois volte e toque em Tentar de novo.'
+      : 'Para liberar: toque no cadeado ao lado do endereço do site › Permissões › Câmera › Permitir. Depois toque em Tentar de novo.';
+    var t = tela('<svg viewBox="0 0 24 24" style="stroke:var(--warn)"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/>' + (negada ? '<path d="M3 3l18 18"/>' : '') + '</svg>' +
+      '<b>' + (negada ? 'A câmera está bloqueada' : ocupada ? 'A câmera está em uso' : 'A câmera não abriu') + '</b>' +
+      '<p>' + (negada ? 'O celular não deixou o aplicativo usar a câmera. ' + como : ocupada ? 'Feche os outros aplicativos que estão usando a câmera (WhatsApp, chamada de vídeo) e toque em Tentar de novo.' : 'Toque em Tentar de novo ou use a câmera do próprio celular.') + '</p>' +
+      '<button id="cf-denovo">Tentar de novo</button><button class="sec2" id="cf-nativa">Usar a câmera do celular</button><button class="sec2" id="cf-galeria">Escolher foto da galeria</button>' +
+      '<button class="sq-parar" id="cf-parar">' + (seqAtiva ? 'Parar as fotos' : 'Cancelar') + '</button>');
+    t.querySelector('#cf-denovo').onclick = function(){ t.remove(); fotografar(d); };
+    t.querySelector('#cf-nativa').onclick = function(){ t.remove(); atual = d; $('foto').setAttribute('capture', 'environment'); $('foto').click(); };
+    t.querySelector('#cf-galeria').onclick = function(){ t.remove(); atual = d; $('foto').removeAttribute('capture'); $('foto').click(); };
+    t.querySelector('#cf-parar').onclick = function(){ t.remove(); if (seqAtiva) seqCameraFechada(); };
+  }
   function abrirCamera(d){
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return Promise.reject(new Error('sem câmera'));
     var tipo = MOLDURA[d.k] || 'folha', frente = false; // a foto da cliente também é com a câmera de trás (quem tira é o prospectador)
-    return navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: frente ? 'user' : 'environment' }, width: { ideal: 4096 }, height: { ideal: 3072 } } }).then(function(st){
+    return pedirCamera(frente).then(function(st){
       fluxo = st;
       var c = document.createElement('div'); c.className = 'cam';
       c.innerHTML = '<video playsinline autoplay muted' + (frente ? ' class="espelho"' : '') + '></video>' +
