@@ -90,6 +90,9 @@
 .integ-top{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
 .integ-form{display:flex;flex-direction:column;gap:6px}
 .integ-form label{font-weight:600;font-size:12.5px;color:var(--ink-2)}
+.integ-form label.zs-teste{display:flex;align-items:center;gap:8px;margin-top:4px;font-weight:500;cursor:pointer}
+.integ-form label.zs-teste input{width:16px;height:16px;margin:0;accent-color:#7633b2}
+[data-painel="zapsign"] code{font-size:11.5px;padding:1px 4px;border-radius:4px;background:var(--line, #eee);white-space:nowrap}
 .integ-row{display:flex;gap:8px;flex-wrap:wrap}
 .integ-row .pw{flex:1 1 260px}
 .integ-row .pw input{width:100%}
@@ -2736,6 +2739,19 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
             <small class="integ-s" id="cl-status">Verificando…</small>
           </form>
         </div>
+        <div class="card integ" data-painel="zapsign">
+          <div><p class="integ-d">Gera o contrato e a procuração já preenchidos (nome, CPF e endereço da mãe) a partir do modelo do escritório no ZapSign. A mãe assina com o dedo no aplicativo, logo depois da data do parto; só depois vêm a senha gov.br e as fotos. O PDF assinado vai sozinho para a pasta dela. Sem internet na hora (exceção), o contrato é gerado quando o cadastro chega e o link vai para ela no WhatsApp.</p>
+          <p class="integ-d">O token fica no ZapSign, em Configurações › Integração (precisa do plano com API). O ID do modelo aparece no modelo do contrato, em Modelos. No Word do modelo, escreva os campos assim: <code>{{NOME}}</code> <code>{{CPF}}</code> <code>{{ENDERECO}}</code> <code>{{RUA}}</code> <code>{{NUMERO}}</code> <code>{{COMPLEMENTO}}</code> <code>{{BAIRRO}}</code> <code>{{CIDADE}}</code> <code>{{UF}}</code> <code>{{CEP}}</code> <code>{{TELEFONE}}</code> <code>{{DATA}}</code>.</p></div>
+          <form id="form-zs" class="integ-form" novalidate autocomplete="off">
+            <label for="zs-token">Token da API do ZapSign</label>
+            <div class="pw"><input id="zs-token" type="text" class="mask" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Cole aqui o token da API"></div>
+            <label for="zs-modelo">ID do modelo do contrato</label>
+            <div class="pw"><input id="zs-modelo" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Cole aqui o ID do modelo"></div>
+            <label class="zs-teste"><input type="checkbox" id="zs-teste"> Conta de teste do ZapSign (sandbox): os contratos não valem</label>
+            <div class="integ-btns"><button class="btn lh-save" type="submit" id="zs-salvar"><svg class="i"><use href="#i-save"/></svg>Salvar</button><button type="button" class="btn" id="zs-testar"><svg class="i"><use href="#i-sync"/></svg>Testar</button></div>
+            <small class="integ-s" id="zs-status">Verificando…</small>
+          </form>
+        </div>
         <div class="card integ" data-painel="celular">
           <div><b class="integ-t">Cadastro pelo celular</b><p class="integ-d">Script do Google que recebe as fotos dos parceiros, cria a pasta da cliente no Drive (CLIENTES › PENDENTES DE REQUERIMENTO; vai para NO INSS quando há requerimento, NA JUSTIÇA quando há processo e ARQUIVADOS quando é paga) e confere os documentos com a IA. O código e o passo a passo estão em <b>google/campo.gs</b>. O link de cada parceiro fica no cartão dele, em Parceiros.</p></div>
           <form id="form-cp" class="integ-form" novalidate autocomplete="off">
@@ -3435,14 +3451,17 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
   function docsApp(r){
     var campo = Array.isArray(r.campoDocs) ? r.campoDocs : null, antigo = Array.isArray(r.faltaDocs) ? r.faltaDocs : null;
     // urbano: precisa do NIT (é dele que sai a GPS); rural (segurada especial): precisa da prova da atividade rural e não do NIT
-    return DOCS_APP.filter(function(d){ return d[0] === 'procuracao' ? false :   /* 05/11: contrato e procuração saem do app (vão ser assinados pelo ZapSign) e deixam de ser cobrados */ d[0] === 'rural' ? (rural(r) || !!(campo && campo.indexOf('rural') >= 0)) : d[0] === 'nit' ? !rural(r) : true; }).map(function(d){
+    return DOCS_APP.filter(function(d){ return d[0] === 'procuracao' ? !!r.contrato :   /* contrato e procuração: só os gerados pelo ZapSign (SQL 56), cobrados até a mãe assinar */ d[0] === 'rural' ? (rural(r) || !!(campo && campo.indexOf('rural') >= 0)) : d[0] === 'nit' ? !rural(r) : true; }).map(function(d){
       if (d[0] === 'senha') return { k: 'senha', n: d[1], ok: !!r.senhaGovOk || (!doFluxoNovo(r) && !!(campo && campo.indexOf('senha') >= 0)) };
       if (d[0] === 'nit') return { k: 'nit', n: d[1], ok: nitOk(r.nit) };
+      if (d[0] === 'procuracao') return { k: 'procuracao', n: d[1], ok: !ctPend(r) || !!(campo && campo.indexOf('procuracao') >= 0) };
       var ok = campo ? campo.indexOf(d[0]) >= 0 : (r.docsCompletos === true || (r.origem === 'campo' && antigo && antigo.indexOf(d[0]) < 0));   // cadastro antigo do app: vale o que não estava na lista de faltantes
       return { k: d[0], n: d[1], ok: !!ok };
     });
   }
   function faltaDocs(r){ return docsApp(r).filter(function(x){ return !x.ok; }).map(function(x){ return x.k; }); }
+  // contrato do ZapSign gerado e ainda não assinado (sem internet na hora: o link foi para a mãe nas boas-vindas)
+  function ctPend(r){ return !!(r && r.contrato && r.contrato.status !== 'assinado'); }
   // documentos que a IA confere, conforme o tipo de segurada: [chave que a IA devolve, chave do faltaDocs]
   function docsExigidos(r){
     var l = [['procuracao', 'procuracao'], ['rg', 'rg_frente'], ['cpf', 'cpf'], ['residencia', 'residencia']];
@@ -4633,6 +4652,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
   // pendência principal da mãe no Pós-venda do fluxo novo
   function pendNovoTxt(r){
     if (!r.tipoSegurada) return 'Pescadora, agricultora ou indígena?';
+    if (ctPend(r)) return 'Contrato';
     if (!r.senhaGovOk) return 'Senha gov.br';
     var f = faltaDocs(r);
     if (f.indexOf('nit') >= 0 && f.length === 1) return 'NIT';
@@ -4653,6 +4673,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
     if (doFluxoNovo(r) && faseDe(r) === 'k'){
       var zpN = zapUrl(foneDe(r));
       acao = !r.tipoSegurada ? ativSeg(r)
+        : ctPend(r) && r.contrato.url && zpN ? '<a class="kb-btn" target="_blank" rel="noopener" href="' + esc(zpN + '?text=' + encodeURIComponent(msgCobranca(r))) + '" title="Abre o WhatsApp com o link do contrato; você confere e envia">' + svgI('i-zap') + 'Mandar o contrato</a>'
         : !r.senhaGovOk ? '<button type="button" class="kb-btn" data-act="abrir" data-id="' + id + '" title="Abre a ficha: a senha gov.br fica logo abaixo do CPF">' + svgI('i-chave') + 'Cadastrar senha</button>'
         : zpN ? '<a class="kb-btn" target="_blank" rel="noopener" href="' + esc(zpN + '?text=' + encodeURIComponent(msgCobranca(r))) + '" title="Abre o WhatsApp com a mensagem pronta; você confere e envia">' + svgI('i-zap') + 'Cobrar no WhatsApp</a>'
         : '<button type="button" class="kb-btn" data-act="edit" data-id="' + id + '" title="Sem telefone: abra o cadastro e informe o WhatsApp da mãe">' + svgI('i-pencil') + 'Pôr o telefone</button>';
@@ -5507,6 +5528,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
     var n = String(r.nome || '').trim().split(/\s+/)[0] || 'tudo bem';
     var falta = docsApp(r).filter(function(x){ return !x.ok; }).map(function(x){ return x.n; });
     var base = 'Olá, ' + n + '! Aqui é da equipe Nascer com Direitos. ';
+    if (ctPend(r) && r.contrato.url) return base + 'Para seguir com o seu salário-maternidade, falta assinar o contrato e a procuração. É só abrir este link e assinar com o dedo: ' + r.contrato.url;
     if (noContratos(r) && falta.length) return base + 'Para seguir com o seu salário-maternidade, ainda falta: ' + falta.join(', ') + '. Pode mandar a foto por aqui?';
     if (noContratos(r) && posEtapaDe(r) === 'senha') return base + 'Precisamos regularizar o seu acesso ao Meu INSS (gov.br) para seguir com o pedido. Podemos falar agora?';
     if (noContratos(r) && posEtapaDe(r) === 'cert') return base + 'O bebê já nasceu? Por favor, mande a foto da certidão de nascimento para darmos entrada no seu benefício.';
@@ -7187,12 +7209,14 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
     datajud: '<svg viewBox="0 0 40 40"><rect width="40" height="40" rx="9" fill="#334155"/><path d="M20 10v20M14 30h12M11 15h18M11 15l-3 7a3 3 0 0 0 6 0zM29 15l-3 7a3 3 0 0 0 6 0z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     claude: '<svg viewBox="0 0 40 40"><rect width="40" height="40" rx="9" fill="#10A37F"/><path d="M11 13.5a3.5 3.5 0 0 1 3.5-3.5h11a3.5 3.5 0 0 1 3.5 3.5v8a3.5 3.5 0 0 1-3.5 3.5H18l-5 4v-4h-.5A1.5 1.5 0 0 1 11 23.5z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><path d="M16 17.5h8M16 21h5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>',
     drive: '<svg viewBox="0 0 40 40"><path d="M15 6h10l11 19h-10z" fill="#8e30cf"/><path d="M15 6L4 25l5 9 11-19z" fill="#0F9D58"/><path d="M9 34h22l5-9H14z" fill="#4285F4"/></svg>',
+    zapsign: '<svg viewBox="0 0 40 40"><rect width="40" height="40" rx="9" fill="#5B21B6"/><path d="M14 9h9l5 5v17H14z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><path d="M23 9v5h5M17.5 25.5c1.4-2.8 2.7-2.8 3.5 0s2.1 2.8 3.5 0" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     celular: '<svg viewBox="0 0 40 40"><rect width="40" height="40" rx="9" fill="#7C3AED"/><rect x="14" y="9" width="12" height="22" rx="2.5" fill="none" stroke="#fff" stroke-width="2.4"/><path d="M18.5 26.5h3" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>'
   };
   var IG = [
     { k: 'datajud', t: 'Tribunal (DataJud)', d: 'Consulta os processos no tribunal escolhido todo dia às 7h: audiência, sentença, RPV.', ajuda: 'Chave pública do CNJ. Escolha o tribunal (TRF1 ou TJAM) no cartão.' },
     { k: 'claude', t: 'IA (ChatGPT)', d: 'Só confere quais documentos estão na pasta do cliente (botão Conferir documentos). Não preenche dados.', ajuda: 'Clique para colar a chave da API do ChatGPT.' },
     { k: 'drive', t: 'Google Drive', d: 'Cria a pasta de cada cliente em CLIENTES e move entre Pendentes, No INSS, No Judicial e Arquivados.', ajuda: 'Funciona pelo script do Google do Cadastro pelo celular.', painel: 'celular' },
+    { k: 'zapsign', t: 'Contrato (ZapSign)', d: 'Contrato e procuração preenchidos sozinhos; a mãe assina com o dedo no aplicativo, antes das fotos.', ajuda: 'Clique para colar o token da API e o ID do modelo do ZapSign.' },
     { k: 'celular', t: 'Cadastro pelo celular', d: 'O parceiro tira as fotos dos documentos e a cliente cai no Cadastro.', ajuda: 'O link de cada parceiro fica no cartão dele, em Parceiros.' }
   ];
   var igScript = null; // resposta do script do Google (Drive e Claude)
@@ -7202,6 +7226,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
     if (k === 'lembrete') return !$('av-parar').hidden;
     if (k === 'datajud') return $('dj-chave').value.indexOf('•') === 0;
     if (k === 'celular') return !!(cpUrl || $('cp-url').value.trim());
+    if (k === 'zapsign') return zsTem;
     if (k === 'drive') return !!(igScript && igScript.ok);
     if (k === 'claude') return igScript && igScript.ia ? igScript.ia === 'ChatGPT' : (!!(igScript && igScript.claude) || clTem);
     return false;
@@ -7213,7 +7238,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
     return on ? 'Ativado' : 'Desativado';
   }
   var IG_GRUPOS = [
-    ['Documentos e arquivos', 'Pastas das clientes, fotos enviadas pelos parceiros e conferência dos documentos', ['drive', 'celular', 'claude']],
+    ['Documentos e arquivos', 'Pastas das clientes, fotos enviadas pelos parceiros e conferência dos documentos', ['zapsign', 'drive', 'celular', 'claude']],
     ['Processos', 'Acompanhamento das ações no tribunal', ['datajud']]
   ];
   function pintarInteg(){
@@ -7352,6 +7377,52 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
     try { var d = await fetch(u).then(function(r){ return r.json(); }); igScript = d; pintarInteg();
       $('cl-status').textContent = d && d.claude ? 'O script do Google encontrou a chave: leitura automática ligada.' : 'O script do Google ainda não encontrou a chave. Salve a chave e teste de novo em 1 minuto.'; }
     catch(err){ $('cl-status').textContent = 'Não consegui falar com o script do Google.'; }
+  });
+  /* ZapSign: token da API, ID do modelo e conta de teste no cofre; só o script do Google lê */
+  var zsTem = false;
+  async function zsStatus(){
+    var rs = await Promise.all(['zapsign', 'zapsign_modelo', 'zapsign_teste'].map(function(n){ return SB.rpc('status_segredo', { p_nome: n }); }));
+    var t = rs[0].data && rs[0].data[0], m = rs[1].data && rs[1].data[0], te = !!(rs[2].data && rs[2].data[0]);
+    zsTem = !!(t && m);
+    if (t && !$('zs-token').dataset.editando){ $('zs-token').value = '•'.repeat(24) + t.final; $('zs-token').classList.remove('mask'); }
+    if (m && !$('zs-modelo').dataset.editando) $('zs-modelo').value = '•'.repeat(12) + m.final;
+    $('zs-teste').checked = te;
+    $('zs-status').textContent = rs[0].error ? 'Não consegui ler o cofre: ' + rs[0].error.message
+      : zsTem ? 'Token (termina em ••' + t.final + ') e modelo (termina em ••' + m.final + ') guardados' + (te ? ', na conta de teste' : '') + '. Toque em Testar para ver se o script do Google já está pronto.'
+      : !t ? 'Falta o token da API.' : 'Falta o ID do modelo.';
+    pintarInteg();
+  }
+  ['zs-token', 'zs-modelo'].forEach(function(id){
+    $(id).addEventListener('focus', function(){ if (this.value.indexOf('•') === 0) this.select(); });
+    $(id).addEventListener('input', function(){ this.dataset.editando = '1'; var v = this.value.replace(/•/g, '').replace(/\s+/g, ''); if (v !== this.value) this.value = v; if (id === 'zs-token') this.classList.add('mask'); });
+  });
+  $('form-zs').addEventListener('submit', async function(e){
+    e.preventDefault();
+    var tk = $('zs-token').value, md = $('zs-modelo').value;
+    var novoT = tk.indexOf('•') === 0 ? null : tk.trim(), novoM = md.indexOf('•') === 0 ? null : md.trim();
+    if (novoT && novoT.length < 20){ toast('Cole o token completo do ZapSign'); return; }
+    if (novoM && novoM.length < 8){ toast('Cole o ID completo do modelo'); return; }
+    var feitos = [];
+    if (novoT !== null) feitos.push(SB.rpc('salvar_segredo', { p_nome: 'zapsign', p_valor: novoT }));
+    if (novoM !== null) feitos.push(SB.rpc('salvar_segredo', { p_nome: 'zapsign_modelo', p_valor: novoM }));
+    feitos.push(SB.rpc('salvar_segredo', { p_nome: 'zapsign_teste', p_valor: $('zs-teste').checked ? '1' : '' }));
+    var rs = await Promise.all(feitos), err = rs.filter(function(r){ return r.error; })[0];
+    if (err){ toast('Não foi possível salvar: ' + err.error.message); return; }
+    delete $('zs-token').dataset.editando; delete $('zs-modelo').dataset.editando;
+    toast('ZapSign salvo'); await zsStatus();
+  });
+  $('zs-testar').addEventListener('click', async function(){
+    var u = cpUrl || $('cp-url').value.trim(); if (!u){ $('zs-status').textContent = 'Ligue primeiro o Cadastro pelo celular (endereço do script).'; return; }
+    $('zs-status').textContent = 'Testando…';
+    try {
+      var d = await fetch(u).then(function(r){ return r.json(); }); igScript = d; pintarInteg();
+      var z = d && d.zapsign;
+      $('zs-status').textContent = z === undefined ? 'O script do Google ainda é a versão antiga: cole o google/campo.gs novo no projeto do script e implante uma nova versão.'
+        : z === 'ok' ? 'Tudo pronto: o aplicativo já gera o contrato pelo ZapSign.'
+        : z === 'teste' ? 'Pronto, na conta de teste do ZapSign (os contratos não valem).'
+        : /^erro/.test(z) ? 'O script do Google respondeu: ' + z
+        : 'O script ainda não encontrou o token e o modelo. Confira se o SQL 56 foi rodado, salve e teste de novo em 5 minutos.';
+    } catch(err){ $('zs-status').textContent = 'Não consegui falar com o script do Google.'; }
   });
   async function cpStatus(){
     if (!isAdmin() || !SB) return;
@@ -9385,7 +9456,7 @@ function tentarParceiro(cpf, senha){
     iniciado = true;
     state.db = DB;
     regioesCarregar();
-    if (f.data === 'admin'){ djStatus(); cpStatus(); clStatus(); }
+    if (f.data === 'admin'){ djStatus(); cpStatus(); clStatus(); zsStatus(); }
     function carimbo(){ var n = new Date(); $('sync').textContent = 'Atualizado: ' + n.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ', ' + n.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }
     function caiu(){ $('sync').textContent = 'Conexão interrompida'; banner('A conexão com a base foi interrompida. Recarregue a página.'); }
     watchTable('clientes', function(rows){ state.todas = rows; filtrarFluxo(); banner(''); carimbo(); render(); acertarNomesDoApp(); ligarPastasQueFaltam(); levarFluxoNovo(); }, caiu);

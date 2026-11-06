@@ -45,19 +45,26 @@ function doGet(){
   var g = 'ok'; try { gatilho(); } catch (x){ g = String(x && x.message || x); }
   var c = ''; try { c = chaveClaude(); } catch (x){}
   var ac = []; try { ac = ScriptApp.getProjectTriggers().map(function(t){ return t.getHandlerFunction(); }); } catch (x){ ac = ['erro: ' + x]; }
-  return saida({ ok: true, servico: 'cadastro pelo celular', claude: !!c, ia: c ? (/^sk-ant-/.test(c) ? 'Claude' : 'ChatGPT') : '', acionadores: ac, gatilho: g });
+  var zs = ''; try { var z = zapsign_(); zs = z.token && z.modelo ? (z.teste ? 'teste' : 'ok') : 'sem chave'; } catch (x){ zs = 'erro: ' + (x && x.message || x); }
+  return saida({ ok: true, servico: 'cadastro pelo celular', claude: !!c, ia: c ? (/^sk-ant-/.test(c) ? 'Claude' : 'ChatGPT') : '', zapsign: zs, acionadores: ac, gatilho: g });
 }
 
 /* chave do Claude: a do sistema (Configurações › Integrações › Claude); a das propriedades do script vale como reserva */
-function chaveClaude(){
-  var props = PropertiesService.getScriptProperties(), cache = CacheService.getScriptCache();
-  var c = cache.get('claude'); if (c) return c;
+/* código secreto deste script no sistema (criado e registrado no primeiro uso); é com ele que o script lê as chaves do cofre */
+function segredoScript_(){
+  var props = PropertiesService.getScriptProperties();
   var seg = props.getProperty('SEGREDO_SISTEMA');
   if (!seg){ seg = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, ''); props.setProperty('SEGREDO_SISTEMA', seg); }
   if (!props.getProperty('registrado')){
     if (rpc('campo_registrar_script', { p_segredo: seg }) !== true) throw new Error('Outro script já está registrado no sistema.');
     props.setProperty('registrado', '1');
   }
+  return seg;
+}
+function chaveClaude(){
+  var props = PropertiesService.getScriptProperties(), cache = CacheService.getScriptCache();
+  var c = cache.get('claude'); if (c) return c;
+  var seg = segredoScript_();
   c = rpc('campo_chave_claude', { p_segredo: seg }) || props.getProperty('ANTHROPIC_KEY') || '';
   if (c) cache.put('claude', c, 300);
   return c;
@@ -76,6 +83,8 @@ function doPost(e){
     if (p.acao === 'arquivo') return saida(arquivo(p, quem));
     if (p.acao === 'fechar') return saida(fechar(p, quem));
     if (p.acao === 'completar') return saida(completar(p, quem));
+    if (p.acao === 'contrato') return saida(contrato(p, quem));
+    if (p.acao === 'contratoStatus') return saida(contratoStatus(p, quem));
     throw new Error('Ação desconhecida.');
   } catch (err){
     return saida({ ok: false, erro: String(err && err.message || err) });
@@ -160,16 +169,142 @@ function fechar(p, quem){
   if (digitado) dados.nome = digitado;
   if (dados.nome) pasta.setName(String(dados.nome).toUpperCase());
   dados.nome = nomeProprio(dados.nome);
+  var ct = contratoNoEnvio_(p, quem, pasta, dados, nota);
+  var docsEnv = (p.docs || []).slice(); if (ct && ct.status === 'assinado' && docsEnv.indexOf('procuracao') < 0) docsEnv.push('procuracao');
   var id = rpc('campo_cadastrar', {
     p_token: p.token, p_envio: p.envio,
     p_dados: { nome: dados.nome, cpf: dados.cpf, rg: dados.rg, nascimento: dados.nascimento, endereco: dados.endereco,
       // salário-maternidade: tipo de segurada, criança e fato gerador informados no aplicativo
       tipoSegurada: limpa(p.tipoSegurada), crianca: limpa(p.crianca), criancaNasc: dataISO(p.criancaNasc),
       fatoGerador: limpa(p.fatoGerador), dpp: dataISO(p.dpp),
-      contato: p.contato || '', cidade: limpa(p.cidade), cidadeUf: limpa(p.cidadeUf), pastaUrl: pasta.getUrl(), pastaId: pasta.getId(), docs: p.docs || [], faltam: p.faltam || [], local: p.local || null, foto: /^data:image\/jpeg;base64,/.test(p.foto || '') ? p.foto : '', leitura: nota.join('\n') }
+      contato: p.contato || '', cidade: limpa(p.cidade), cidadeUf: limpa(p.cidadeUf), pastaUrl: pasta.getUrl(), pastaId: pasta.getId(), contrato: ct, docs: docsEnv, faltam: p.faltam || [], local: p.local || null, foto: /^data:image\/jpeg;base64,/.test(p.foto || '') ? p.foto : '', leitura: nota.join('\n') }
   });
   PropertiesService.getScriptProperties().deleteProperty('pasta_' + p.envio);
   return { ok: true, id: id, nome: dados.nome || '' };
+}
+
+/* ---------- contrato e procuração pelo ZapSign ----------
+ * Gerado e assinado no aplicativo logo depois da data do parto (antes da senha gov.br e das fotos). Sem internet na hora
+ * (exceção), o parceiro segue e o contrato é gerado aqui, no envio: o link vai para a mãe junto com as boas-vindas.
+ * Token da API, ID do modelo e conta de teste: colados no sistema (Configurações › Integrações › Contrato ZapSign).
+ * Campos que o modelo (Word) pode usar: {{NOME}} {{CPF}} {{ENDERECO}} {{RUA}} {{NUMERO}} {{COMPLEMENTO}} {{BAIRRO}}
+ * {{CIDADE}} {{UF}} {{CEP}} {{TELEFONE}} {{DATA}}.
+ * O documento leva external_id "parceiro|cadastro": só quem gerou consegue conferir e anexar. */
+function zapsign_(){
+  var cache = CacheService.getScriptCache(), c = cache.get('zapsign');
+  if (c) return JSON.parse(c);
+  var d = {}; try { d = rpc('campo_zapsign_config', { p_segredo: segredoScript_() }) || {}; } catch (x){ d = {}; }   // sem o SQL 56: desligado
+  var o = { token: d.token || '', modelo: d.modelo || '', teste: !!d.teste };
+  cache.put('zapsign', JSON.stringify(o), 300);
+  return o;
+}
+function zsApi_(cfg, metodo, caminho, corpo){
+  var base = cfg.teste ? 'https://sandbox.api.zapsign.com.br' : 'https://api.zapsign.com.br';
+  var op = { method: metodo, muteHttpExceptions: true, headers: { Authorization: 'Bearer ' + cfg.token } };
+  if (corpo){ op.contentType = 'application/json'; op.payload = JSON.stringify(corpo); }
+  var r = UrlFetchApp.fetch(base + caminho, op), t = r.getContentText(), d = null; try { d = JSON.parse(t); } catch (x){}
+  if (r.getResponseCode() >= 300) throw new Error('ZapSign: ' + ((d && (d.detail || d.message || d.error)) || t.slice(0, 200) || ('erro ' + r.getResponseCode())));
+  return d || {};
+}
+var MESES_ = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+function camposContrato_(d){
+  var e = d.endereco || {}, cpf = String(d.cpf || '').replace(/\D/g, ''), cep = String(e.cep || '').replace(/\D/g, '');
+  var nome = nomeProprio(String(d.nome || '').replace(/\s+/g, ' ').trim()).slice(0, 150);
+  if (nome.split(' ').length < 2) throw new Error('Falta o nome completo da mãe.');
+  if (!cpfValido(cpf)) throw new Error('O CPF da mãe não confere. Corrija antes de gerar o contrato.');
+  var cepF = cep.length === 8 ? cep.slice(0, 5) + '-' + cep.slice(5) : '', uf = limpa(e.uf).toUpperCase().slice(0, 2), cidade = limpa(e.cidade);
+  var hoje = new Date(), tz = 'America/Manaus';
+  return {
+    NOME: nome, CPF: cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4'),
+    ENDERECO: [limpa(e.rua), limpa(e.numero), limpa(e.complemento), limpa(e.bairro), [cidade, uf].filter(String).join('/'), cepF ? 'CEP ' + cepF : ''].filter(String).join(', '),
+    RUA: limpa(e.rua), NUMERO: limpa(e.numero), COMPLEMENTO: limpa(e.complemento), BAIRRO: limpa(e.bairro), CIDADE: cidade, UF: uf, CEP: cepF,
+    TELEFONE: foneContrato_(d.fone),
+    DATA: Utilities.formatDate(hoje, tz, 'd') + ' de ' + MESES_[Number(Utilities.formatDate(hoje, tz, 'M')) - 1] + ' de ' + Utilities.formatDate(hoje, tz, 'yyyy')
+  };
+}
+function foneDigitos_(f){ return String(f || '').replace(/\D/g, '').replace(/^55(?=\d{10,11}$)/, ''); }
+function foneContrato_(f){ var n = foneDigitos_(f); return n.length >= 10 ? '(' + n.slice(0, 2) + ') ' + n.slice(2, -4) + '-' + n.slice(-4) : ''; }
+function gerarContrato_(cfg, quem, ref, d, c){
+  c = c || camposContrato_(d);
+  var fone = foneDigitos_(d.fone);
+  var corpo = {
+    template_id: cfg.modelo, signer_name: c.NOME, lang: 'pt-br',
+    send_automatic_email: false, send_automatic_whatsapp: false, disable_signer_emails: true,
+    brand_primary_color: '#7633b2', external_id: quem.prospId + '|' + ref, folder_path: '/Nascer com Direitos/',
+    data: Object.keys(c).map(function(k){ return { de: '{{' + k + '}}', para: c[k] }; })
+  };
+  if (fone.length >= 10){ corpo.signer_phone_country = '55'; corpo.signer_phone_number = fone; }
+  var r = zsApi_(cfg, 'post', '/api/v1/models/create-doc/', corpo), s = (r.signers || [])[0] || {};
+  if (!r.token || !s.sign_url) throw new Error('O ZapSign não devolveu o link de assinatura.');
+  return { doc: r.token, url: s.sign_url };
+}
+// no aplicativo: gera (ou devolve o mesmo, se os dados não mudaram) e o app abre a tela de assinatura
+function contrato(p, quem){
+  var cfg = zapsign_();
+  if (!cfg.token || !cfg.modelo) return { ok: true, semZapsign: true };
+  var c = camposContrato_(p.dados || {}), marca = JSON.stringify(c).replace(/"DATA":"[^"]*"/, '');
+  var cache = CacheService.getScriptCache(), k = 'zs_' + String(quem.prospId).slice(0, 60) + '_' + p.envio, velho = cache.get(k);
+  if (velho){ velho = JSON.parse(velho); if (velho.marca === marca) return { ok: true, doc: velho.doc, url: velho.url }; }
+  var g = gerarContrato_(cfg, quem, p.envio, p.dados || {}, c);
+  cache.put(k, JSON.stringify({ doc: g.doc, url: g.url, marca: marca }), 21600);
+  return { ok: true, doc: g.doc, url: g.url };
+}
+function zsDoc_(cfg, doc, quem){
+  if (!/^[A-Za-z0-9-]{10,80}$/.test(String(doc || ''))) throw new Error('Contrato inválido.');
+  var d = zsApi_(cfg, 'get', '/api/v1/docs/' + doc + '/');
+  if (quem && String(d.external_id || '').split('|')[0] !== String(quem.prospId)) throw new Error('Este contrato não foi gerado por você.');
+  return d;
+}
+function zsAssinado_(d){ var s = (d.signers || [])[0] || {}; return s.status === 'signed' || d.status === 'signed'; }
+function contratoStatus(p, quem){
+  var cfg = zapsign_(); if (!cfg.token) return { ok: true, semZapsign: true };
+  return { ok: true, assinado: zsAssinado_(zsDoc_(cfg, p.doc, quem)) };
+}
+function anexarContrato_(url, pasta){
+  var nome = 'CONTRATO E PROCURAÇÃO.pdf';
+  if (pasta.getFilesByName(nome).hasNext()) return;
+  pasta.createFile(UrlFetchApp.fetch(url).getBlob().setName(nome).setContentType('application/pdf'));
+}
+// no envio do cadastro: devolve o contrato que vai para a ficha da mãe ({ doc, url, status }) ou null
+function contratoNoEnvio_(p, quem, pasta, dados, nota){
+  var pc = p.contrato || null; if (!pc) return null;
+  var cfg = zapsign_();
+  if (!cfg.token){ if (pc.doc) nota.push('Contrato assinado no ZapSign: baixe o PDF lá (a chave do ZapSign não está mais no sistema).'); return null; }
+  try {
+    if (pc.doc){   // assinado no aplicativo: o PDF assinado vai para a pasta
+      var d = zsDoc_(cfg, pc.doc, quem);
+      if (!zsAssinado_(d)){ zsPendente_(pc.doc, pasta); return { doc: pc.doc, url: ((d.signers || [])[0] || {}).sign_url || '', status: 'pendente' }; }
+      for (var i = 0; i < 3 && !d.signed_file; i++){ Utilities.sleep(2500); d = zsApi_(cfg, 'get', '/api/v1/docs/' + pc.doc + '/'); }
+      if (d.signed_file) anexarContrato_(d.signed_file, pasta); else zsPendente_(pc.doc, pasta);
+      return { doc: pc.doc, status: 'assinado' };
+    }
+    if (pc.depois && cfg.modelo){   // sem internet na hora: gera agora; o link vai nas boas-vindas
+      // envio repetido (a internet caiu no meio): usa o mesmo contrato, não gera outro
+      var cc = CacheService.getScriptCache(), ck = 'zs_env_' + p.envio, g = cc.get(ck);
+      if (g) g = JSON.parse(g);
+      else { g = gerarContrato_(cfg, quem, p.envio, { nome: dados.nome, cpf: p.cpf, fone: p.contato, endereco: p.endereco || {} }); cc.put(ck, JSON.stringify(g), 21600); }
+      zsPendente_(g.doc, pasta);
+      nota.push('Contrato gerado no envio (o parceiro estava sem internet): o link vai para a mãe no WhatsApp.');
+      return { doc: g.doc, url: g.url, status: 'pendente' };
+    }
+  } catch (x){ nota.push('Contrato pelo ZapSign: ' + (x && x.message || x)); }
+  return null;
+}
+// contratos esperando assinatura ou o PDF: conferidos de hora em hora
+function zsPendente_(doc, pasta){ PropertiesService.getScriptProperties().setProperty('zs_pend_' + doc, pasta.getId()); }
+function contratosPendentes_(){
+  var props = PropertiesService.getScriptProperties(), todos = props.getProperties(), cfg = null;
+  Object.keys(todos).filter(function(k){ return k.indexOf('zs_pend_') === 0; }).forEach(function(k){
+    try {
+      cfg = cfg || zapsign_(); if (!cfg.token) return;
+      var doc = k.slice(8), d = zsApi_(cfg, 'get', '/api/v1/docs/' + doc + '/');
+      if (d.deleted || d.status === 'deleted' || d.status === 'refused'){ props.deleteProperty(k); return; }
+      if (!zsAssinado_(d) || !d.signed_file) return;
+      anexarContrato_(d.signed_file, DriveApp.getFolderById(todos[k]));
+      rpc('campo_contrato_assinado', { p_segredo: segredoScript_(), p_doc: doc });
+      props.deleteProperty(k);
+    } catch (x){}
+  });
 }
 
 /* IA lê a procuração, o RG, o CPF, a certidão de nascimento e o comprovante de residência (as imagens escaneadas) */
@@ -261,6 +396,7 @@ function gatilho(){
   props.setProperty('gatilho_ok', '4');
 }
 function moverPastas(){
+  try { contratosPendentes_(); } catch (x){}
   var raiz = DriveApp.getFolderById(PASTA_CLIENTES), destino = {};
   Object.keys(ETAPAS).forEach(function(k){ destino[k] = subpasta(raiz, ETAPAS[k]); });
   var porId = {}, onde = {};

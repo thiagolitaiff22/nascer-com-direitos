@@ -1157,6 +1157,26 @@ html[data-tema="dark"] #app .topo .quem .marca-sub{color:#c49be6!important}
 .wz-op b{display:block;font-size:15px;font-weight:600;line-height:1.25}.wz-op small{display:block;margin-top:2px;font-size:12.5px;line-height:1.3;color:var(--ink2)}
 .wz-op[aria-pressed="true"]{border-color:#8a43d3;background:rgba(138,67,211,.07)}
 .wz-op[aria-pressed="true"] i{border-color:#8a43d3;background:radial-gradient(circle,#8a43d3 42%,transparent 47%)}
+/* contrato e procuração pelo ZapSign: conferir os dados, assinar com o dedo (tela do ZapSign dentro do app), pronto */
+.ct-tela{position:fixed;inset:0;z-index:9000;display:flex;flex-direction:column;background:#fff;animation:ctSobe .28s ease-out}
+.ct-tela-topo{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(10px + env(safe-area-inset-top)) 14px 10px 18px;background:#7633b2;color:#fff}
+.ct-tela-topo b{font-size:16px;font-weight:700;line-height:1.2}
+.ct-tela-topo button{flex:none;border:0;border-radius:999px;padding:8px 14px;background:rgba(255,255,255,.18);color:#fff;font:inherit;font-size:14px;font-weight:700}
+.ct-tela iframe{flex:1;width:100%;border:0;background:#fff}
+@keyframes ctSobe{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+.ct-aviso{margin:0 0 10px;padding:10px 14px;border-radius:14px;background:rgba(192,57,43,.08);color:#a8321f;font-size:14px;font-weight:600;line-height:1.35}
+.ct-dica{margin:8px 4px 0;font-size:13.5px;line-height:1.4;color:var(--ink2)}
+.ct-fim{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:24px 18px 18px;border:1px solid var(--line);border-radius:18px;background:var(--card)}
+.ct-fim .ct-ic{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:rgba(138,67,211,.1);color:#7633b2}
+.ct-fim.ok .ct-ic{background:rgba(22,163,74,.12);color:#15803d}
+.ct-fim .ct-ic svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.ct-fim b{font-size:17px;line-height:1.3;color:var(--ink)}
+.ct-fim p{margin:0;font-size:14.5px;line-height:1.45;color:var(--ink2)}
+.ct-fim .wz-pular{margin-top:6px}
+.ct-gira{display:inline-block;width:16px;height:16px;margin-right:9px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:ctg .8s linear infinite;vertical-align:-3px}
+@keyframes ctg{to{transform:rotate(360deg)}}
+html[data-tema="dark"] .ct-aviso{color:#ff9b8a}
+html[data-tema="dark"] .ct-fim .ct-ic{color:#c49be6}
 /* opções em lista: um bloco só, uma opção por linha, separadas por um fio; a bolinha fica à direita */
 .wz-opcoes.wz-linhas{gap:0;border:1px solid var(--line);border-radius:18px;background:var(--card);overflow:hidden}
 .wz-opcoes.wz-linhas .wz-op{min-height:50px;padding:12px 16px;border:0;border-bottom:1px solid var(--line);border-radius:0;background:none}
@@ -1217,7 +1237,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 87;
+  var APP_VERSAO = 88;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1914,7 +1934,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     if (ob[3] === 'nao') return { nao: bf };
     return { ok: true, caminho: caminho, analisar: ob[3] === 'analisar', trabalho: t, saida: '', beneficio: bf };
   }
-  var CAMPOS_CADASTRO = ['campo_fone', 'campo_cpf', 'campo_cidade', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp', 'campo_nasceu', 'campo_cep', 'campo_rua', 'campo_num', 'campo_compl', 'campo_bairro', 'campo_uf_cep', 'campo_q_trab', 'campo_q_saida', 'campo_q_benef'];
+  var CAMPOS_CADASTRO = ['campo_fone', 'campo_cpf', 'campo_cidade', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp', 'campo_nasceu', 'campo_cep', 'campo_rua', 'campo_num', 'campo_compl', 'campo_bairro', 'campo_uf_cep', 'campo_q_trab', 'campo_q_saida', 'campo_q_benef', 'campo_contrato'];
   function temRascunhoCadastro(){ return !!(Object.keys(fotos).length || senhaGovRascunho || CAMPOS_CADASTRO.some(function(k){ return String(lsGet(k) || '').trim(); })); }
   function descartarCadastro(){
     if (!temRascunhoCadastro()) return;
@@ -1924,6 +1944,78 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     senhaGovRascunho = ''; passoNovo = null;
     telaInicial(); if ($('vista')) $('vista').scrollTop = 0;
   }
+  /* contrato e procuração pelo ZapSign: gerados já preenchidos e assinados com o dedo aqui no app, antes da senha gov.br e das fotos.
+     Exceção: sem internet, o parceiro segue; o contrato é gerado no envio e o link vai para a mãe no WhatsApp, junto com as boas-vindas. */
+  function ctEstado(){ try { var c = JSON.parse(lsGet('campo_contrato') || '{}'); return c && typeof c === 'object' ? c : {}; } catch(e){ return {}; } }
+  function ctGuardar(c){ lsSet('campo_contrato', JSON.stringify(c || {})); }
+  function ctMarca(){ return ['campo_nome', 'campo_cpf', 'campo_fone', 'campo_cep', 'campo_rua', 'campo_num', 'campo_compl', 'campo_bairro', 'campo_cidade', 'campo_uf_cep'].map(function(k){ return String(lsGet(k) || '').trim().toLowerCase(); }).join('|'); }
+  // gerar · assinar (gerado, falta a assinatura) · assinado · semrede (sem internet agora) · depois (vai pelo WhatsApp) · sem (ZapSign não ligado no sistema)
+  function ctFase(){
+    var c = ctEstado();
+    if (c.sem) return 'sem';
+    if (c.doc && c.marca === ctMarca()) return c.assinado ? 'assinado' : 'assinar';
+    if (c.depois) return 'depois';
+    if (c.semRede) return 'semrede';
+    return 'gerar';
+  }
+  function ctOk(){ var f = ctFase(); return f === 'assinado' || f === 'depois' || f === 'sem'; }
+  function ctResumo(){ var f = ctFase(); return f === 'assinado' ? 'assinado' : f === 'depois' ? 'vai pelo WhatsApp (sem internet)' : f === 'sem' ? 'o escritório faz depois' : 'falta assinar'; }
+  function ctEnvio(){ var f = ctFase(), c = ctEstado(); return f === 'assinado' ? { doc: c.doc } : f === 'depois' ? { depois: true } : null; }
+  function ctDados(){ return { nome: lsGet('campo_nome'), cpf: lsGet('campo_cpf'), fone: lsGet('campo_fone'), endereco: { cep: lsGet('campo_cep'), rua: lsGet('campo_rua'), numero: lsGet('campo_num'), complemento: lsGet('campo_compl'), bairro: lsGet('campo_bairro'), cidade: lsGet('campo_cidade'), uf: lsGet('campo_uf_cep') } }; }
+  function semRede(e){ return !navigator.onLine || /sem conexão|demorou demais|Failed to fetch|Load failed|NetworkError|network/i.test(String(e && e.message || e)); }
+  function ctErro(t){ var er = $('wz-erro'); if (er){ er.textContent = t; er.hidden = false; } }
+  function ctGerar(btn){
+    var c = ctEstado(), marca = ctMarca(), rotulo = btn ? btn.innerHTML : '';
+    if (!c.id){ c.id = 'ct' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); ctGuardar(c); }
+    if ($('wz-erro')) $('wz-erro').hidden = true;
+    if (!navigator.onLine){ c.semRede = true; c.depois = false; ctGuardar(c); telaInicial(); return; }
+    if (btn){ btn.disabled = true; btn.innerHTML = '<span class="ct-gira"></span>Gerando o contrato…'; }
+    (quem && quem.envioUrl ? Promise.resolve() : atualizarQuem())
+      .then(function(){ return post({ acao: 'contrato', token: token, envio: c.id, dados: ctDados() }); })
+      .then(function(d){
+        var n = ctEstado(); n.id = n.id || c.id;
+        if (d.semZapsign) n.sem = true;
+        else { n.doc = d.doc; n.url = d.url; n.marca = marca; n.assinado = false; n.depois = false; n.semRede = false; }
+        ctGuardar(n); telaInicial(); if (!n.sem) ctAbrir();
+      }, function(e){
+        var n = ctEstado();
+        if (/Ação desconhecida/i.test(String(e && e.message))){ n.sem = true; ctGuardar(n); telaInicial(); return; }   // script do Google ainda sem o contrato
+        if (semRede(e)){ n.semRede = true; n.depois = false; ctGuardar(n); telaInicial(); return; }
+        if (btn){ btn.disabled = false; btn.innerHTML = rotulo; }
+        ctErro('Não deu para gerar o contrato: ' + (e && e.message || e));
+      });
+  }
+  function ctConferir(btn){
+    var c = ctEstado(); if (!c.doc) return;
+    var rot = btn ? btn.textContent : '';
+    if (btn){ btn.disabled = true; btn.textContent = 'Conferindo…'; }
+    post({ acao: 'contratoStatus', token: token, envio: c.id, doc: c.doc }).then(function(d){
+      var n = ctEstado();
+      if (d.assinado){ n.assinado = true; n.assinadoEm = new Date().toISOString(); ctGuardar(n); telaInicial(); return; }
+      if (btn){ btn.disabled = false; btn.textContent = rot; }
+      ctErro('Ainda não aparece como assinado. Termine a assinatura na tela acima.');
+    }, function(e){ if (btn){ btn.disabled = false; btn.textContent = rot; } ctErro(semRede(e) ? 'Sem internet para conferir agora.' : 'Não deu para conferir: ' + (e && e.message || e)); });
+  }
+  // tela cheia com a assinatura do ZapSign (a mãe lê e assina com o dedo)
+  function ctFechar(){ var t = $('ct-tela'); if (t){ t.remove(); corTopo(); } document.documentElement.style.overflow = ''; }
+  function ctAbrir(){
+    var c = ctEstado(); if (!c.url) return;
+    ctFechar();
+    var t = document.createElement('div'); t.className = 'ct-tela'; t.id = 'ct-tela'; t.setAttribute('role', 'dialog'); t.setAttribute('aria-label', 'Assinatura do contrato');
+    t.innerHTML = '<div class="ct-tela-topo"><b>Contrato da ' + esc(nomeMae()) + '</b><button type="button" id="ct-fechar">Fechar</button></div><iframe src="' + esc(c.url) + '" allow="camera" title="Assinatura do contrato"></iframe>';
+    document.body.appendChild(t); document.documentElement.style.overflow = 'hidden';
+    corTopo('#7633b2');
+    $('ct-fechar').onclick = function(){ ctFechar(); telaInicial(); };
+  }
+  // a tela de assinatura do ZapSign avisa quando a mãe termina de assinar
+  window.addEventListener('message', function(e){
+    if (!/^https:\/\/([a-z0-9-]+\.)*zapsign\.(co|com\.br)$/.test(String(e.origin || ''))) return;
+    var d = typeof e.data === 'string' ? e.data : '';
+    if (d !== 'zs-doc-signed' && d !== 'zs-signed-file-ready') return;
+    var c = ctEstado(); if (!c.doc || c.assinado) return;
+    c.assinado = true; c.assinadoEm = new Date().toISOString(); ctGuardar(c);
+    setTimeout(function(){ ctFechar(); if (aba === 'novo' && !completando) telaInicial(); }, 1200);   // deixa ela ver o "assinado" do ZapSign
+  });
   function montarPassos(){
     if (completando) return;
     var v = $('vista'); if (!v || !$('l-nome')) return;
@@ -1935,10 +2027,13 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
       { k: 'benef', t: 'A ' + nm + ' recebe algum benefício?', s: '', opcoes: Q_BENEF, chave: 'campo_q_benef', el: [], ok: function(){ var q = qualif(); return !q.nao && !!lsGet('campo_q_benef'); }, erro: 'Escolha uma opção.' },
       { k: 'cpf', t: 'Qual é o CPF dela?', s: 'Só os números.', el: ['l-cpf'], foco: 'cpf', ok: function(){ return cpfOk(($('cpf') || {}).value); }, erro: 'Confira o CPF: são 11 números.' },
       { k: 'fone', t: 'Qual é o WhatsApp dela?', s: 'Com DDD. É por ele que o escritório vai falar com ela.', el: ['l-fone'], foco: 'fone', ok: function(){ return foneOk(($('fone') || {}).value); }, erro: 'Digite o celular com DDD.' },
-      { k: 'end', t: 'Onde ela mora?', s: 'Digite o CEP: a rua e a cidade aparecem sozinhas. Depois é só o número.', el: ['l-cep', 'end-auto'], foco: 'cep',
+      { k: 'end', t: 'Onde ela mora?', s: '', el: ['l-cep', 'end-auto'], foco: 'cep',
         ok: function(){ return cepOk(txt('campo_cep')) && txt('campo_rua') && txt('campo_num') && txt('campo_cidade') && txt('campo_uf_cep').length === 2; }, erro: 'Falta o CEP, a rua, o número, a cidade ou a UF.' },
       gest ? { k: 'parto', t: 'Quando o bebê deve nascer?', s: 'Atendemos só gestantes: o bebê ainda não pode ter nascido.', el: ['l-dpp'], foco: 'dpp', ok: function(){ return !!txt('campo_dpp'); }, erro: 'Digite a data prevista do parto.' }
            : { k: 'parto', t: 'Quando o bebê nasceu?', s: '', el: ['l-cnasc'], foco: 'cnasc', ok: function(){ return !!txt('campo_crianca_nasc'); }, erro: 'Digite a data de nascimento do bebê.' },
+      (function(){ var f = ctFase(); return { k: 'contrato', contrato: true, el: [], ok: ctOk, erro: 'A ' + nm + ' precisa assinar o contrato antes das fotos.',
+        t: f === 'assinar' ? 'Assinatura da ' + nm : f === 'assinado' ? 'Contrato assinado' : f === 'semrede' ? 'Sem internet agora' : f === 'depois' ? 'Contrato pelo WhatsApp' : 'Contrato da ' + nm,
+        s: f === 'gerar' ? 'Confira os dados: o contrato e a procuração saem preenchidos e ela assina com o dedo, aqui no celular.' : f === 'assinar' ? 'Entregue o celular para ela ler e assinar com o dedo.' : '' }; })(),
       { k: 'senha', t: 'Qual é a senha do gov.br dela?', s: 'Se ela não souber agora, toque em Pular: o escritório pede depois.', el: ['l-sgov'], foco: 'sgov', ok: function(){ return true; }, pular: true },
       { k: 'docs', t: 'Fotos dos documentos', s: 'Toque em cada um para tirar a foto. Confira os dados e envie.', el: [], grid: true, ok: function(){ return true; }, final: true }
     ].filter(Boolean);
@@ -1968,11 +2063,33 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
         ['CPF', txt('campo_cpf'), idx('cpf')], ['WhatsApp', txt('campo_fone'), idx('fone')],
         ['Endereço', [txt('campo_rua'), txt('campo_num'), txt('campo_compl'), txt('campo_bairro'), [txt('campo_cidade'), txt('campo_uf_cep')].filter(Boolean).join('/')].filter(Boolean).join(', '), idx('end')],
         [gest ? 'Parto previsto' : 'Nascimento', gest ? isoParaBr(dpp) : isoParaBr(txt('campo_crianca_nasc')), idx('parto')],
+        ['Contrato', ctResumo(), idx('contrato')],
         ['Senha gov.br', senhaGovRascunho ? '••••••' : 'não informada', idx('senha')]];
       var res = document.createElement('div'); res.className = 'wz-res';
       res.innerHTML = linhas.map(function(l){ return '<button type="button" class="wz-lin" data-ir-passo="' + l[2] + '"><span>' + l[0] + '</span><b>' + esc(l[1] || '—') + '</b><u>editar</u></button>'; }).join('');
       slot.appendChild(res);
       docsEls.forEach(function(c){ slot.appendChild(c); });
+    } else if (pas.contrato){
+      var fase = ctFase(), cE = ctEstado(), ico = function(d){ return '<span class="ct-ic"><svg viewBox="0 0 24 24">' + d + '</svg></span>'; };
+      if (fase === 'gerar'){
+        var lin = [['Nome', txt('campo_nome'), idx('nome')], ['CPF', txt('campo_cpf'), idx('cpf')],
+          ['Endereço', [txt('campo_rua'), txt('campo_num'), txt('campo_compl'), txt('campo_bairro'), [txt('campo_cidade'), txt('campo_uf_cep')].filter(Boolean).join('/')].filter(Boolean).join(', '), idx('end')]];
+        slot.innerHTML = (cE.doc ? '<p class="ct-aviso">Os dados mudaram depois que o contrato foi gerado. Gere de novo para ela assinar com os dados certos.</p>' : '') +
+          '<div class="wz-res">' + lin.map(function(l){ return '<button type="button" class="wz-lin" data-ir-passo="' + l[2] + '"><span>' + l[0] + '</span><b>' + esc(l[1] || '—') + '</b><u>editar</u></button>'; }).join('') + '</div>' +
+          '<p class="ct-dica">O nome tem que estar igual ao do RG.</p>';
+      } else if (fase === 'assinar'){
+        slot.innerHTML = '<div class="ct-fim">' + ico('<path d="M7 3h7l5 5v13H7zM14 3v5h5M9.5 17c1.2-2.4 2.3-2.4 3 0s1.8 2.4 3 0"/>') + '<b>Contrato pronto para a ' + esc(nm) + ' assinar</b><p>Entregue o celular para ela ler e assinar com o dedo. Quando ela terminar, a tela fecha sozinha.</p><button type="button" class="wz-pular" id="ct-conferir">Já assinou? Conferir</button></div>';
+      } else if (fase === 'assinado'){
+        slot.innerHTML = '<div class="ct-fim ok">' + ico('<path d="M5 12.5l4.5 4.5L19 7.5"/>') + '<b>Contrato e procuração assinados</b><p>Agora a senha gov.br e as fotos dos documentos.</p></div>';
+      } else if (fase === 'semrede'){
+        slot.innerHTML = '<div class="ct-fim">' + ico('<path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0M12 19h.01M3 3l18 18"/>') + '<b>O celular está sem internet</b><p>Pode seguir com o cadastro e tirar as fotos. Quando o cadastro chegar ao escritório, o contrato vai para a ' + esc(nm) + ' no WhatsApp, junto com a mensagem de boas-vindas, e ela assina pelo link.</p><button type="button" class="wz-pular" id="ct-tentar">A internet voltou? Tentar de novo</button></div>';
+      } else if (fase === 'depois'){
+        slot.innerHTML = '<div class="ct-fim">' + ico('<path d="M4 20l1.3-3.9A8 8 0 1 1 8 18.7z"/>') + '<b>O contrato vai pelo WhatsApp</b><p>Quando o cadastro chegar ao escritório, a ' + esc(nm) + ' recebe o link junto com a mensagem de boas-vindas e assina pelo celular dela.</p><button type="button" class="wz-pular" id="ct-tentar">A internet voltou? Gerar agora</button></div>';
+      } else {
+        slot.innerHTML = '<div class="ct-fim">' + ico('<path d="M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h4"/>') + '<b>O contrato pelo celular ainda não foi ligado</b><p>Siga com o cadastro: o escritório cuida do contrato.</p></div>';
+      }
+      if ($('ct-conferir')) $('ct-conferir').onclick = function(){ ctConferir(this); };
+      if ($('ct-tentar')) $('ct-tentar').onclick = function(){ var c = ctEstado(); c.semRede = false; c.depois = false; ctGuardar(c); ctGerar(this); };
     } else if (pas.opcoes){
       var marcado = lsGet(pas.chave), op = qOpcao(pas.opcoes, marcado);
       if (op && op[3] === 'nao'){
@@ -2000,6 +2117,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     // barra de baixo: Continuar nas perguntas digitadas; Enviar cadastro só na última
     var barra = v.querySelector('.barra'), env = $('enviar');
     var naoEnquadra = pas.opcoes && (qOpcao(pas.opcoes, lsGet(pas.chave)) || [])[3] === 'nao';
+    var faseCt = pas.contrato ? ctFase() : '';
     if (barra && (naoEnquadra || pas.opcoes)){ barra.style.display = 'none'; }   // perguntas de opção: o toque já avança, sem Continuar (sobra espaço nas telas pequenas)
     else if (barra && !pas.final){
       if (env) env.style.display = 'none';
@@ -2010,6 +2128,16 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
         if (!pas.ok()){ var er = $('wz-erro'); er.textContent = pas.erro || 'Responda para continuar.'; er.hidden = false; Array.prototype.forEach.call($('wz-slot').querySelectorAll('.fone'), function(l){ var i = l.querySelector('input'); if (i && !i.value.trim() && ['compl', 'bairro', 'sgov'].indexOf(i.id) < 0) l.classList.add('falta'); else l.classList.remove('falta'); }); var fo = $(pas.foco); if (fo) fo.focus(); return; }
         passoNovo++; telaInicial();
       };
+      if (faseCt === 'gerar'){
+        seg.innerHTML = '<svg viewBox="0 0 24 24" style="margin-right:8px"><path d="M7 3h7l5 5v13H7zM14 3v5h5M10 14l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Gerar contrato';
+        seg.onclick = function(){ ctGerar(seg); };
+      } else if (faseCt === 'assinar'){
+        seg.innerHTML = '<svg viewBox="0 0 24 24" style="margin-right:8px"><path d="M4 20h16M6 16l9.5-9.5a2.1 2.1 0 0 1 3 3L9 19H6z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Abrir para assinar';
+        seg.onclick = function(){ ctAbrir(); };
+      } else if (faseCt === 'semrede'){
+        seg.innerHTML = 'Seguir sem o contrato<svg viewBox="0 0 24 24" style="margin-left:6px"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        seg.onclick = function(){ var c = ctEstado(); c.depois = true; c.semRede = false; ctGuardar(c); passoNovo++; telaInicial(); };
+      }
     }
     if ($('wz-voltar')) $('wz-voltar').onclick = function(){ passoNovo--; telaInicial(); };
     if ($('wz-descartar')) $('wz-descartar').onclick = descartarCadastro;
@@ -2034,7 +2162,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
         '<label class="fone' + (cpfOk(lsGet('campo_cpf')) ? '' : ' falta') + '" id="l-cpf"><svg viewBox="0 0 24 24"><use href="#i-id"/></svg><input id="cpf" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="CPF da cliente" value="' + esc(maskCpf(lsGet('campo_cpf'))) + '"></label>' +
       '</div>' +
       '<div class="rot">Endereço da cliente</div><div class="dados">' +
-        '<label class="fone' + (cepOk(lsGet('campo_cep')) ? '' : ' falta') + '" id="l-cep"><svg viewBox="0 0 24 24"><use href="#i-casa"/></svg><input id="cep" inputmode="numeric" autocomplete="off" maxlength="9" placeholder="CEP (a rua e a cidade aparecem sozinhas)" value="' + esc(maskCep(lsGet('campo_cep'))) + '"><span class="cep-st" id="cep-st"></span></label>' +
+        '<label class="fone' + (cepOk(lsGet('campo_cep')) ? '' : ' falta') + '" id="l-cep"><svg viewBox="0 0 24 24"><use href="#i-casa"/></svg><input id="cep" inputmode="numeric" autocomplete="off" maxlength="9" placeholder="CEP" value="' + esc(maskCep(lsGet('campo_cep'))) + '"><span class="cep-st" id="cep-st"></span></label>' +
         '<div class="end-auto" id="end-auto"' + (lsGet('campo_rua') || lsGet('campo_bairro') ? '' : ' hidden') + '>' +
           '<label class="fone' + (lsGet('campo_rua').trim() ? '' : ' falta') + '" id="l-rua"><input id="rua" autocomplete="off" autocapitalize="words" placeholder="Rua" value="' + esc(lsGet('campo_rua')) + '"></label>' +
           '<div class="end-dois"><label class="fone' + (lsGet('campo_num').trim() ? '' : ' falta') + '" id="l-num"><input id="num" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="Número" value="' + esc(lsGet('campo_num')) + '"></label>' +
@@ -3227,6 +3355,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     pede(String(lsGet('campo_cidade') || '').trim(), 'cidade', 'cidade');
     pede(cpfOk(($('cpf') || {}).value), 'CPF (11 números)', 'cpf');
     if (!completando) pede(qualif().ok, 'situação de trabalho e benefício (qualificação)', 'nome');
+    if (!completando) pede(ctOk(), ctEstado().doc ? 'assinatura do contrato (os dados mudaram: gere e assine de novo)' : 'assinatura do contrato', 'nome');
     if ($('cep')){ pede(cepOk(($('cep') || {}).value), 'CEP', 'cep'); pede(String(lsGet('campo_rua') || '').trim(), 'rua', 'rua'); pede(String(lsGet('campo_num') || '').trim(), 'número da casa', 'num'); }
     if (gestante()) pede(lsGet('campo_dpp'), 'data prevista do parto', 'dpp');
     else pede(lsGet('campo_crianca_nasc'), 'data de nascimento da criança', 'cnasc');
@@ -3302,14 +3431,15 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
          qualificacao: comp ? null : (function(){ var q = qualif(); return q.ok ? { trabalho: q.trabalho, saida: q.saida, beneficio: q.beneficio, caminho: q.caminho, analisar: q.analisar } : null; })(), cliente: comp ? comp.nome : bonito(($('nome') || {}).value || ''), local: local, faltam: falta.map(function(d){ return d.k; }),
          tipoSegurada: tipoAtual(), crianca: '', criancaNasc: comp || gestante() ? '' : lsGet('campo_crianca_nasc'),
          fatoGerador: comp || gestante() ? 'gestante' : 'parto', dpp: !comp && gestante() ? lsGet('campo_dpp') : '',
-         docs: DOCS.filter(function(d){ return fotos[d.k]; }).map(function(d){ return d.k; }), arquivos: [] };
+         contrato: comp ? null : ctEnvio(),
+         docs: DOCS.filter(function(d){ return fotos[d.k]; }).map(function(d){ return d.k; }).concat(!comp && ctFase() === 'assinado' && !fotos.procuracao ? ['procuracao'] : []), arquivos: [] };
        return Promise.all(arquivos.map(function(a){ return paraBytes(a.blob).then(function(b){ return { nome: a.nome, mime: a.mime, buf: b, tam: b.byteLength, ok: false }; }, function(){ return { nome: a.nome, mime: a.mime, blob: a.blob, tam: a.blob.size, ok: false }; }); }))
          .then(function(l){ envio.arquivos = l; return filaPor(envio); }).then(function(){ return histPor({ id: envio.id, token: token, cliente: envio.cliente + (comp ? ' · documentos' : ''), clienteId: comp ? comp.id : '', criado: envio.criado, enviado: null }); }).then(function(){ return envio; });
      })
      .then(function(envio){
        fotos = {}; local = null; guardarRascunho();   // apaga o rascunho dessas fotos
        if (comp){ completando = null; lsSet('campo_completando', ''); if (painel) painel.clientes.forEach(function(c){ if (c.id === comp.id) c.faltaDocs = comp.faltaDocs.filter(function(k){ return envio.docs.indexOf(k) < 0; }); }); }
-       else { ['campo_fone', 'campo_cpf', 'campo_cidade', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp', 'campo_nasceu', 'campo_cep', 'campo_rua', 'campo_num', 'campo_compl', 'campo_bairro', 'campo_uf_cep', 'campo_q_trab', 'campo_q_saida', 'campo_q_benef'].forEach(function(k){ lsSet(k, ''); }); senhaGovRascunho = ''; passoNovo = null; }
+       else { ['campo_fone', 'campo_cpf', 'campo_cidade', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp', 'campo_nasceu', 'campo_cep', 'campo_rua', 'campo_num', 'campo_compl', 'campo_bairro', 'campo_uf_cep', 'campo_q_trab', 'campo_q_saida', 'campo_q_benef', 'campo_contrato'].forEach(function(k){ lsSet(k, ''); }); senhaGovRascunho = ''; passoNovo = null; }
        t.remove(); aba = comp ? 'painel' : 'novo'; telaInicial(); window.scrollTo(0, 0); if ($('vista')) $('vista').scrollTop = 0;
        var ok = tela('<svg viewBox="0 0 24 24" style="stroke:var(--ok)"><use href="#i-ok"/></svg><b>' + (comp ? 'Documentos guardados' : 'Cadastro guardado') + '</b><p>' + esc(envio.cliente || '') + '<br>' + (comp ? 'Vão para a pasta da cliente sozinhos quando tiver internet.' : 'Está sendo enviado agora: acompanhe na barra embaixo. Pode cadastrar a próxima cliente.') + '</p><button id="t-ok">' + (comp ? 'Entendi' : 'Cadastrar a próxima') + '</button>');
        ok.querySelector('#t-ok').onclick = function(){ ok.remove(); };
@@ -3394,7 +3524,8 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
         barraEnvio({ nome: envio.cliente, pct: 0.99, passo: 'registrando no sistema' });
         if (envio.completar) return post({ acao: 'completar', token: envio.token, envio: envio.id, completar: envio.completar, docs: envio.docs });
         return post({ acao: 'fechar', token: envio.token, envio: envio.id, cliente: envio.cliente || '', contato: envio.contato, cpf: envio.cpf || '', cidade: envio.cidade || '', cidadeUf: envio.cidadeUf || '', local: envio.local, docs: envio.docs, faltam: envio.faltam, foto: envio.foto || '',
-          tipoSegurada: envio.tipoSegurada || '', crianca: envio.crianca || '', criancaNasc: envio.criancaNasc || '', fatoGerador: envio.fatoGerador || 'parto', dpp: envio.dpp || '' }); })
+          tipoSegurada: envio.tipoSegurada || '', crianca: envio.crianca || '', criancaNasc: envio.criancaNasc || '', fatoGerador: envio.fatoGerador || 'parto', dpp: envio.dpp || '',
+          endereco: envio.endereco || null, contrato: envio.contrato || null }); })
       .then(function(d){
         // só tira da fila depois de ver o cliente no sistema
         if (envio.completar) return d;
