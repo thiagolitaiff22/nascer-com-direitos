@@ -355,7 +355,10 @@ function docDoModelo_(cfg, quem, ref, modelo, c, fone){
   var corpo = {
     template_id: modelo, signer_name: c.NOME, lang: 'pt-br',
     send_automatic_email: false, send_automatic_whatsapp: false, disable_signer_emails: true,
-    brand_primary_color: '#7633b2', external_id: quem.prospId + '|' + ref, folder_path: '/Nascer com Direitos/',
+    brand_primary_color: '#7633b2', external_id: quem.prospId + '|' + ref,
+    // a conta do ZapSign é a do escritório (logo e nome do Kalleb): nos documentos do Nascer vão a logo e o nome do Nascer
+    brand_logo: 'https://www.nascercomdireitos.com.br/img/zapsign-marca.png', brand_name: 'Nascer com Direitos',
+    folder_path: '/NASCER COM DIREITOS/',   // a pasta que já existe na conta (com maiúsculas; outro jeito de escrever cria pasta nova)
     signature_placement: '<<assinatura>>',
     data: Object.keys(c).map(function(k){ return { de: '{{' + k + '}}', para: c[k] }; })
   };
