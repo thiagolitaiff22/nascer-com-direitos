@@ -1154,6 +1154,8 @@ html[data-tema="dark"] #app .topo .quem .marca-sub{color:#c49be6!important}
 .wz-opcoes{display:grid;gap:8px}
 .wz-opcoes.duas{grid-template-columns:repeat(2,minmax(0,1fr))}
 .wz-opcoes.duas .wz-op{padding:13px 12px;gap:9px}.wz-opcoes.duas .wz-op b{font-size:14.5px}
+/* tela estreita (320 px): bolinha e espaço menores, para o texto não quebrar em três linhas */
+@media (max-width:340px){.wz-opcoes.duas .wz-op{padding:11px 9px;gap:7px}.wz-opcoes.duas .wz-op i{width:18px;height:18px}.wz-opcoes.duas .wz-op b{font-size:13.5px}}
 .wz-op{display:flex;align-items:center;gap:12px;width:100%;padding:13px 16px;border-radius:16px;border:1.5px solid var(--line);background:var(--card);font:inherit;text-align:left;color:var(--ink);transition:border-color .15s,background .15s}
 .wz-op i{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid var(--line2)}
 .wz-op b{display:block;font-size:15px;font-weight:600;line-height:1.25}.wz-op small{display:block;margin-top:2px;font-size:12.5px;line-height:1.3;color:var(--ink2)}
@@ -1211,7 +1213,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 85;
+  var APP_VERSAO = 86;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1238,7 +1240,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   var DICA = { cartao: 'Coloque o documento dentro do quadro e segure firme', folha: 'Coloque a folha inteira dentro do quadro e segure firme', livre: 'Rosto da cliente dentro do círculo' };
   // dados do cadastro em andamento (ficam no celular até o envio)
   // cadastro antigo, sem o tipo guardado: conta como segurada especial
-  function tipoAtual(){ var t = lsGet('campo_q_trab'); return ['pescadora', 'agricultora', 'indigena'].indexOf(t) >= 0 ? 'especial' : t ? 'urbana' : ''; }   // rural ou urbano quem decide é o escritório (o closer, no BI); o app não pergunta
+  function tipoAtual(){ var t = lsGet('campo_q_trab'); return t === 'rural' ? 'especial' : t ? 'urbana' : ''; }   // pescadora, agricultora ou indígena = rural (segurada especial); qual das três o escritório marca no BI
   // data digitada como dd/mm/aaaa; guardada como aaaa-mm-dd
   function isoParaBr(iso){ var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return m ? m[3] + '/' + m[2] + '/' + m[1] : ''; }
   function brParaIso(br){
@@ -1883,12 +1885,11 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   var passoNovo = null;
   // qualificação: [chave, texto, explicação, caminho]; caminho "nao" = não se enquadra; "analisar" = segue e o escritório confere
   var Q_TRAB = [
-    ['dona_casa', 'Dona de casa', '', 'guia_facultativa'], ['estudante', 'Estudante', '', 'guia_facultativa'],
-    ['desempregada', 'Desempregada', '', 'guia_facultativa'], ['autonoma', 'Autônoma', '', 'guia_individual'],
-    ['mei', 'MEI', '', 'mei'], ['domestica', 'Doméstica', '', 'guia_individual'],
-    ['pescadora', 'Pescadora', '', 'rural'], ['agricultora', 'Agricultora', '', 'rural'], ['indigena', 'Indígena', '', 'rural'],
+    ['nao_trabalha', 'Não trabalha', '', 'guia_facultativa'], ['autonoma', 'Autônoma ou doméstica', '', 'guia_individual'],
+    ['mei', 'MEI', '', 'mei'], ['rural', 'Pescadora, agricultora ou indígena', '', 'rural'],
     ['clt', 'CLT', '', 'nao'], ['servidora', 'Servidora pública', '', 'nao']];
-  var Q_SAIDA = [['menos12', 'Menos de 12 meses', '', 'direto_inss'], ['mais12', 'Mais de 12 meses', '', 'guia_facultativa'], ['nunca', 'Nunca teve carteira', '', 'guia_facultativa']];
+  // cadastro começado na versão de 11 opções: troca a resposta antiga pela nova
+  (function(){ var velho = { dona_casa: 'nao_trabalha', estudante: 'nao_trabalha', desempregada: 'nao_trabalha', domestica: 'autonoma', pescadora: 'rural', agricultora: 'rural', indigena: 'rural' }, t = lsGet('campo_q_trab'); if (velho[t]) lsSet('campo_q_trab', velho[t]); })();
   var Q_BENEF = [['nenhum', 'Nenhum', '', 'ok'], ['bolsa', 'Bolsa Família', '', 'ok'], ['pensao', 'Pensão', '', 'ok'], ['bpc', 'BPC/LOAS', '', 'analisar'], ['auxilio', 'Auxílio-doença', '', 'nao'], ['outro', 'Outro', '', 'analisar']];
   // respostas acolhedoras para quem não se enquadra ({n} = primeiro nome da mãe)
   var Q_NAO = {
@@ -1896,7 +1897,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     servidora: ['Que bom, a {n} já está protegida!', 'Como servidora pública concursada, a licença-maternidade dela é paga pelo próprio órgão onde trabalha, pelo regime próprio de previdência. Por isso ela não precisa do nosso programa: basta procurar o setor de pessoal (RH) do órgão. Desejamos uma ótima gestação para ela e para o bebê!'],
     auxilio: ['Por enquanto, ainda não dá', 'Como a {n} recebe auxílio-doença neste momento, a lei não permite receber o salário-maternidade ao mesmo tempo. Mas não é um ponto final: quando o auxílio terminar, vale muito a pena falar com a gente de novo para avaliar. Estamos torcendo pela saúde dela e do bebê!']
   };
-  var CAMINHO_TXT = { guia_facultativa: 'Facultativa (1473), confirmar no CNIS', guia_individual: 'Autônoma (1163), confirmar no CNIS', mei: 'MEI: DAS em dia, confirmar no CNIS', direto_inss: 'Pedido direto ao INSS, sem guia', rural: 'Rural: sem guia, com prova da atividade' };
+  var CAMINHO_TXT = { guia_facultativa: 'Facultativa (1473), confirmar no CNIS', guia_individual: 'Contribuinte individual (1163), confirmar no CNIS', mei: 'MEI: DAS em dia, confirmar no CNIS', direto_inss: 'Pedido direto ao INSS, sem guia', rural: 'Rural: sem guia, com prova da atividade' };
   function nomeMae(){ var n = String(lsGet('campo_nome') || '').trim().split(/\s+/)[0] || ''; return n ? bonito(n) : 'mãe'; }
   function qOpcao(lista, k){ return lista.filter(function(x){ return x[0] === k; })[0]; }
   function qualif(){
@@ -1992,10 +1993,10 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
       pas.el.forEach(function(id){ var e = $(id); if (e){ slot.appendChild(e); if (e.classList.contains('falta') && e.querySelector('input') && !e.querySelector('input').value) e.classList.remove('falta'); } });
       if (pas.el.indexOf('l-cidade') >= 0 && $('l-cidade')) $('l-cidade').style.display = txt('campo_uf_cep') && txt('campo_cidade') ? 'none' : '';   // o CEP já trouxe a cidade
     }
-    // barra de baixo: Continuar nas perguntas; Enviar cadastro só na última
+    // barra de baixo: Continuar nas perguntas digitadas; Enviar cadastro só na última
     var barra = v.querySelector('.barra'), env = $('enviar');
     var naoEnquadra = pas.opcoes && (qOpcao(pas.opcoes, lsGet(pas.chave)) || [])[3] === 'nao';
-    if (barra && naoEnquadra){ barra.style.display = 'none'; }
+    if (barra && (naoEnquadra || pas.opcoes)){ barra.style.display = 'none'; }   // perguntas de opção: o toque já avança, sem Continuar (sobra espaço nas telas pequenas)
     else if (barra && !pas.final){
       if (env) env.style.display = 'none';
       var seg = document.createElement('button'); seg.type = 'button'; seg.className = 'enviar'; seg.id = 'wz-seguir';
