@@ -91,6 +91,14 @@ input[type=file]{display:none}
 .cam video.espelho{transform:scaleX(-1)}
 .cam .moldura{position:absolute;border:3px solid #fff;border-radius:14px;box-shadow:0 0 0 9999px rgba(0,0,0,.55);pointer-events:none}
 .cam .moldura.oval{border-radius:50%}
+.cam-prev{position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:calc(20px + env(safe-area-inset-top)) 18px calc(24px + env(safe-area-inset-bottom));background:rgba(12,8,16,.95);color:#fff;text-align:center}
+.cam-prev .cp-tit{font-size:15px;font-weight:700;letter-spacing:.02em;color:#e7daf1}
+.cam-prev img{display:block;max-width:100%;max-height:56vh;border-radius:14px;box-shadow:0 18px 40px rgba(0,0,0,.5);background:#fff}
+.cam-prev p{margin:0;font-size:15px;color:#d8c6e8}
+.cam-prev .cp-bts{display:flex;flex-direction:column;gap:10px;width:100%;max-width:420px}
+.cam-prev button{height:56px;border-radius:16px;border:0;font:inherit;font-size:17px;font-weight:700}
+.cam-prev .cp-ok{background:linear-gradient(135deg,#7633b2,#5b2491);color:#fff}
+.cam-prev .cp-denovo{background:rgba(255,255,255,.12);color:#fff}
 .cam .moldura i{position:absolute;width:28px;height:28px;border:5px solid #4ade80}
 .cam .moldura i:nth-child(1){left:-5px;top:-5px;border-right:0;border-bottom:0;border-top-left-radius:14px}
 .cam .moldura i:nth-child(2){right:-5px;top:-5px;border-left:0;border-bottom:0;border-top-right-radius:14px}
@@ -1389,7 +1397,7 @@ html[data-tema="dark"] .tuto-pts i.on{background:#c49be6}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 108;
+  var APP_VERSAO = 109;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -3230,11 +3238,48 @@ html[data-tema="dark"] .tuto-pts i.on{background:#c49be6}
       c.querySelector('.fechar').onclick = function(){ sair(); seqCameraFechada(); };
       c.querySelector('.xis').onclick = function(){ sair(); seqCameraFechada(); };
       c.querySelector('.galeria').onclick = function(){ sair(); $('foto').removeAttribute('capture'); $('foto').click(); };
-      c.querySelector('.disparo').onclick = function(){
+      var btDisparo = c.querySelector('.disparo');
+      // volta a mirar (depois de "Tirar de novo" ou para o verso)
+      function retomar(){ btDisparo.disabled = false; btDisparo.style.opacity = ''; c.classList.remove('achou', 'certo'); vivo = tipo !== 'livre'; if (vivo) detectarVivo(); }
+      // a foto tirada aparece aqui mesmo, na câmera: ficou boa → o outro lado; tirar de novo → volta a mirar
+      function mostrarPrevia(dk){
+        var lista = fotos[dk.k] || [], f = lista[lista.length - 1]; if (!f){ retomar(); return; }
+        var par = parDe(dk.k), outro = par ? (dk.k === par.f ? par.v : par.f) : null, vaiOutro = !!(outro && !fotos[outro]);
+        var pv = document.createElement('div'); pv.className = 'cam-prev';
+        pv.innerHTML = '<div class="cp-tit">' + esc((par ? par.nome : dk.t) + (dk.lado ? ' · ' + dk.lado.toLowerCase() : '')) + '</div><img alt="" src="' + f.url + '">' +
+          '<p>Dá para ler tudo, sem sombra e sem borrão?</p><div class="cp-bts"><button type="button" class="cp-ok">' + (vaiOutro ? 'Ficou boa · tirar o ' + (outro === par.v ? 'verso' : 'frente') : 'Ficou boa') + '</button>' +
+          '<button type="button" class="cp-denovo">Tirar de novo</button></div>';
+        c.appendChild(pv);
+        falar('Confira se dá para ler tudo.');
+        pv.querySelector('.cp-denovo').onclick = function(){ if (dk.multi && lista.length > 1) lista.pop(); else delete fotos[dk.k]; pv.remove(); retomar(); };
+        pv.querySelector('.cp-ok').onclick = function(){
+          pv.remove(); guardarRascunho();
+          if (vaiOutro){
+            d = DOCS.filter(function(x){ return x.k === outro; })[0]; atual = d; marcarLado();
+            var dc = c.querySelector('.dica small'); if (dc) dc.textContent = outro === par.v ? 'Agora vire o documento: o verso dentro do quadro' : 'Agora a frente dentro do quadro';
+            falar(d.fala); retomar(); return;
+          }
+          sair(); telaInicial();
+          if (seqAtiva) seqDepois();
+        };
+      }
+      btDisparo.onclick = function(){
         if (!v.videoWidth || this.disabled) return;
         this.disabled = true; this.style.opacity = '.5';
         processando(true);
         var W = c.clientWidth, H = c.clientHeight, vw = v.videoWidth, vh = v.videoHeight;
+        if (parDe(d.k)){
+          // RG e CPF: o quadro já é o recorte (sem procurar bordas e sem a tela de ajustar)
+          vivo = false;
+          var kq = Math.max(W / vw, H / vh), oxq = (vw * kq - W) / 2, oyq = (vh * kq - H) / 2, rq = m.getBoundingClientRect();
+          var qx = Math.max(0, (rq.left + oxq) / kq), qy = Math.max(0, (rq.top + oyq) / kq), qw = Math.min(vw - qx, rq.width / kq), qh = Math.min(vh - qy, rq.height / kq);
+          var cq = document.createElement('canvas'); cq.width = Math.round(qw); cq.height = Math.round(qh);
+          cq.getContext('2d').drawImage(v, qx, qy, qw, qh, 0, 0, cq.width, cq.height);
+          var dk = d;
+          fotoCheia(fluxo, vw, vh, [qx, qy, qw, qh]).then(function(full){ return guardarFoto(dk, full || cq, { silencioso: true }); })
+            .then(function(){ processando(false); if (c.isConnected) mostrarPrevia(dk); }, function(){ processando(false); retomar(); });
+          return;
+        }
         var bordas = tipo !== 'livre' && c.classList.contains('certo') && ultimoQ && Date.now() - quandoQ < 800 ? ultimoQ.map(function(p){ return p.slice(); }) : null;
         if (bordas){
           // linha verde na tela: foto inteira (resolução cheia quando o celular deixa) recortada exatamente por ela
@@ -3644,12 +3689,12 @@ html[data-tema="dark"] .tuto-pts i.on{background:#c49be6}
     var t = tela('<div id="tuto-palco">' + tutoCena(TD[0][0], TD[0][1]) + '</div><div class="tuto-pts">' + TD.map(function(x, i){ return '<i' + (i ? '' : ' class="on"') + '></i>'; }).join('') + '</div>' +
       '<b>Como tirar a foto</b><ol class="tuto-passos"><li><b>1</b>Documento em cima de uma mesa, com luz e sem reflexo</li><li><b>2</b>Celular reto, por cima do documento</li><li><b>3</b>Encaixe no quadro: quando a linha ficar verde, toque no botão</li></ol>' +
       '<button id="tuto-ok">' + (depois ? 'Entendi, abrir a câmera' : 'Entendi') + '</button>');
-    // passa uma vez por cada cena (recria o desenho para a animação recomeçar) e para na última
+    // passa por cada cena e recomeça do RG (recria o desenho para a animação recomeçar), até tocar em Entendi
     var n = 0, troca = null;
     var proxima = function(){
       troca = setTimeout(function(){
-        if (!t.isConnected || n >= TD.length - 1) return;
-        n++;
+        if (!t.isConnected) return;
+        n = (n + 1) % TD.length;
         t.querySelector('#tuto-palco').innerHTML = tutoCena(TD[n][0], TD[n][1]);
         Array.prototype.forEach.call(t.querySelectorAll('.tuto-pts i'), function(p, i){ p.className = i === n ? 'on' : ''; });
         proxima();
