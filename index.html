@@ -2773,12 +2773,14 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
         </div>
         <div class="card integ" data-painel="zapsign">
           <div><p class="integ-d">Gera o contrato e a procuração já preenchidos (nome, CPF e endereço da mãe) a partir do modelo do escritório no ZapSign. A mãe assina com o dedo no aplicativo, logo depois da data do parto; só depois vêm a senha gov.br e as fotos. O PDF assinado vai sozinho para a pasta dela. Sem internet na hora (exceção), o contrato é gerado quando o cadastro chega e o link vai para ela no WhatsApp.</p>
-          <p class="integ-d">O token fica no ZapSign, em Configurações › Integração (precisa do plano com API). O ID do modelo aparece no modelo do contrato, em Modelos. No Word do modelo, escreva os campos assim: <code>{{NOME}}</code> <code>{{CPF}}</code> <code>{{ENDERECO}}</code> <code>{{RUA}}</code> <code>{{NUMERO}}</code> <code>{{COMPLEMENTO}}</code> <code>{{BAIRRO}}</code> <code>{{CIDADE}}</code> <code>{{UF}}</code> <code>{{CEP}}</code> <code>{{TELEFONE}}</code> <code>{{DATA}}</code> <code>{{MODALIDADE}}</code> (RURAL ou URBANO). Onde a mãe assina, deixe o texto <code>&lt;&lt;assinatura&gt;&gt;</code> em branco: o ZapSign põe a assinatura ali. O modelo pronto está em contrato/Contrato e procuração - modelo ZapSign.docx.</p></div>
+          <p class="integ-d">O token fica no ZapSign, em Configurações › Integração (precisa do plano com API). Contrato e procuração são dois modelos separados (os arquivos prontos estão em contrato/Contrato - modelo ZapSign.docx e contrato/Procuração - modelo ZapSign.docx); o ID de cada um aparece no modelo, em Modelos. No Word, escreva os campos assim: <code>{{NOME}}</code> <code>{{CPF}}</code> <code>{{ENDERECO}}</code> <code>{{RUA}}</code> <code>{{NUMERO}}</code> <code>{{COMPLEMENTO}}</code> <code>{{BAIRRO}}</code> <code>{{CIDADE}}</code> <code>{{UF}}</code> <code>{{CEP}}</code> <code>{{TELEFONE}}</code> <code>{{DATA}}</code> <code>{{MODALIDADE}}</code> (RURAL ou URBANO). Onde a mãe assina, deixe o texto <code>&lt;&lt;assinatura&gt;&gt;</code> em branco: o ZapSign põe a assinatura ali. O modelo pronto está em contrato/Contrato e procuração - modelo ZapSign.docx.</p></div>
           <form id="form-zs" class="integ-form" novalidate autocomplete="off">
             <label for="zs-token">Token da API do ZapSign</label>
             <div class="pw"><input id="zs-token" type="text" class="mask" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Cole aqui o token da API"></div>
             <label for="zs-modelo">ID do modelo do contrato</label>
-            <div class="pw"><input id="zs-modelo" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Cole aqui o ID do modelo"></div>
+            <div class="pw"><input id="zs-modelo" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Cole aqui o ID do modelo do contrato"></div>
+            <label for="zs-modelo-proc">ID do modelo da procuração</label>
+            <div class="pw"><input id="zs-modelo-proc" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Cole aqui o ID do modelo da procuração"></div>
             <label class="zs-teste"><input type="checkbox" id="zs-teste"> Conta de teste do ZapSign (sandbox): os contratos não valem</label>
             <div class="integ-btns"><button class="btn lh-save" type="submit" id="zs-salvar"><svg class="i"><use href="#i-save"/></svg>Salvar</button><button type="button" class="btn" id="zs-testar"><svg class="i"><use href="#i-sync"/></svg>Testar</button></div>
             <small class="integ-s" id="zs-status">Verificando…</small>
@@ -4705,7 +4707,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
     if (doFluxoNovo(r) && faseDe(r) === 'k'){
       var zpN = zapUrl(foneDe(r));
       acao = !r.tipoSegurada ? ativSeg(r)
-        : ctPend(r) && r.contrato.url && zpN ? '<a class="kb-btn" target="_blank" rel="noopener" href="' + esc(zpN + '?text=' + encodeURIComponent(msgCobranca(r))) + '" title="Abre o WhatsApp com o link do contrato; você confere e envia">' + svgI('i-zap') + 'Mandar o contrato</a>'
+        : ctPend(r) && (r.contrato.url || r.contrato.urlProc) && zpN ? '<a class="kb-btn" target="_blank" rel="noopener" href="' + esc(zpN + '?text=' + encodeURIComponent(msgCobranca(r))) + '" title="Abre o WhatsApp com o link do contrato; você confere e envia">' + svgI('i-zap') + 'Mandar o contrato</a>'
         : !r.senhaGovOk ? '<button type="button" class="kb-btn" data-act="abrir" data-id="' + id + '" title="Abre a ficha: a senha gov.br fica logo abaixo do CPF">' + svgI('i-chave') + 'Cadastrar senha</button>'
         : zpN ? '<a class="kb-btn" target="_blank" rel="noopener" href="' + esc(zpN + '?text=' + encodeURIComponent(msgCobranca(r))) + '" title="Abre o WhatsApp com a mensagem pronta; você confere e envia">' + svgI('i-zap') + 'Cobrar no WhatsApp</a>'
         : '<button type="button" class="kb-btn" data-act="edit" data-id="' + id + '" title="Sem telefone: abra o cadastro e informe o WhatsApp da mãe">' + svgI('i-pencil') + 'Pôr o telefone</button>';
@@ -5560,7 +5562,11 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
     var n = String(r.nome || '').trim().split(/\s+/)[0] || 'tudo bem';
     var falta = docsApp(r).filter(function(x){ return !x.ok; }).map(function(x){ return x.n; });
     var base = 'Olá, ' + n + '! Aqui é da equipe Nascer com Direitos. ';
-    if (ctPend(r) && r.contrato.url) return base + 'Para seguir com o seu salário-maternidade, falta assinar o contrato e a procuração. É só abrir este link e assinar com o dedo: ' + r.contrato.url;
+    if (ctPend(r) && (r.contrato.url || r.contrato.urlProc)){
+      var lc = r.contrato.url || '', lp = r.contrato.urlProc || '';
+      if (lc && lp) return base + 'Para seguir com o seu salário-maternidade, falta assinar o contrato e a procuração. É só abrir cada link e assinar com o dedo.' + '\nContrato: ' + lc + '\nProcuração: ' + lp;
+      return base + 'Para seguir com o seu salário-maternidade, falta assinar ' + (lc ? 'o contrato' : 'a procuração') + '. É só abrir este link e assinar com o dedo: ' + (lc || lp);
+    }
     if (noContratos(r) && falta.length) return base + 'Para seguir com o seu salário-maternidade, ainda falta: ' + falta.join(', ') + '. Pode mandar a foto por aqui?';
     if (noContratos(r) && posEtapaDe(r) === 'senha') return base + 'Precisamos regularizar o seu acesso ao Meu INSS (gov.br) para seguir com o pedido. Podemos falar agora?';
     if (noContratos(r) && posEtapaDe(r) === 'cert') return base + 'O bebê já nasceu? Por favor, mande a foto da certidão de nascimento para darmos entrada no seu benefício.';
@@ -7415,34 +7421,37 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
   /* ZapSign: token da API, ID do modelo e conta de teste no cofre; só o script do Google lê */
   var zsTem = false;
   async function zsStatus(){
-    var rs = await Promise.all(['zapsign', 'zapsign_modelo', 'zapsign_teste'].map(function(n){ return SB.rpc('status_segredo', { p_nome: n }); }));
-    var t = rs[0].data && rs[0].data[0], m = rs[1].data && rs[1].data[0], te = !!(rs[2].data && rs[2].data[0]);
+    var rs = await Promise.all(['zapsign', 'zapsign_modelo', 'zapsign_teste', 'zapsign_modelo_proc'].map(function(n){ return SB.rpc('status_segredo', { p_nome: n }); }));
+    var t = rs[0].data && rs[0].data[0], m = rs[1].data && rs[1].data[0], te = !!(rs[2].data && rs[2].data[0]), mp = rs[3].data && rs[3].data[0];
+    if (mp && !$('zs-modelo-proc').dataset.editando) $('zs-modelo-proc').value = '•'.repeat(12) + mp.final;
     zsTem = !!(t && m);
     if (t && !$('zs-token').dataset.editando){ $('zs-token').value = '•'.repeat(24) + t.final; $('zs-token').classList.remove('mask'); }
     if (m && !$('zs-modelo').dataset.editando) $('zs-modelo').value = '•'.repeat(12) + m.final;
     $('zs-teste').checked = te;
     $('zs-status').textContent = rs[0].error ? 'Não consegui ler o cofre: ' + rs[0].error.message
-      : zsTem ? 'Token (termina em ••' + t.final + ') e modelo (termina em ••' + m.final + ') guardados' + (te ? ', na conta de teste' : '') + '. Toque em Testar para ver se o script do Google já está pronto.'
+      : zsTem ? 'Token (termina em ••' + t.final + '), modelo do contrato (••' + m.final + ')' + (mp ? ' e modelo da procuração (••' + mp.final + ')' : '; falta o modelo da procuração') + ' guardados' + (te ? ', na conta de teste' : '') + '. Toque em Testar para ver se o script do Google já está pronto.'
       : !t ? 'Falta o token da API.' : 'Falta o ID do modelo.';
     pintarInteg();
   }
-  ['zs-token', 'zs-modelo'].forEach(function(id){
+  ['zs-token', 'zs-modelo', 'zs-modelo-proc'].forEach(function(id){
     $(id).addEventListener('focus', function(){ if (this.value.indexOf('•') === 0) this.select(); });
     $(id).addEventListener('input', function(){ this.dataset.editando = '1'; var v = this.value.replace(/•/g, '').replace(/\s+/g, ''); if (v !== this.value) this.value = v; if (id === 'zs-token') this.classList.add('mask'); });
   });
   $('form-zs').addEventListener('submit', async function(e){
     e.preventDefault();
-    var tk = $('zs-token').value, md = $('zs-modelo').value;
-    var novoT = tk.indexOf('•') === 0 ? null : tk.trim(), novoM = md.indexOf('•') === 0 ? null : md.trim();
+    var tk = $('zs-token').value, md = $('zs-modelo').value, mdp = $('zs-modelo-proc').value;
+    var novoT = tk.indexOf('•') === 0 ? null : tk.trim(), novoM = md.indexOf('•') === 0 ? null : md.trim(), novoMP = mdp.indexOf('•') === 0 ? null : mdp.trim();
+    if (novoMP && novoMP.length < 8){ toast('Cole o ID completo do modelo da procuração'); return; }
     if (novoT && novoT.length < 20){ toast('Cole o token completo do ZapSign'); return; }
     if (novoM && novoM.length < 8){ toast('Cole o ID completo do modelo'); return; }
     var feitos = [];
     if (novoT !== null) feitos.push(SB.rpc('salvar_segredo', { p_nome: 'zapsign', p_valor: novoT }));
     if (novoM !== null) feitos.push(SB.rpc('salvar_segredo', { p_nome: 'zapsign_modelo', p_valor: novoM }));
+    if (novoMP !== null) feitos.push(SB.rpc('salvar_segredo', { p_nome: 'zapsign_modelo_proc', p_valor: novoMP }));
     feitos.push(SB.rpc('salvar_segredo', { p_nome: 'zapsign_teste', p_valor: $('zs-teste').checked ? '1' : '' }));
     var rs = await Promise.all(feitos), err = rs.filter(function(r){ return r.error; })[0];
     if (err){ toast('Não foi possível salvar: ' + err.error.message); return; }
-    delete $('zs-token').dataset.editando; delete $('zs-modelo').dataset.editando;
+    delete $('zs-token').dataset.editando; delete $('zs-modelo').dataset.editando; delete $('zs-modelo-proc').dataset.editando;
     toast('ZapSign salvo'); await zsStatus();
   });
   $('zs-testar').addEventListener('click', async function(){

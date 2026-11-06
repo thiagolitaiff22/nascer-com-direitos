@@ -1293,7 +1293,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 98;
+  var APP_VERSAO = 99;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -2010,14 +2010,16 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   function ctFase(){
     var c = ctEstado();
     if (c.sem) return 'sem';
-    if (c.doc && c.marca === ctMarca()) return c.assinado ? 'assinado' : 'assinar';
+    if (c.doc && c.marca === ctMarca()) return c.assinado && (!c.docProc || c.procAssinado) ? 'assinado' : 'assinar';
     if (c.depois) return 'depois';
     if (c.semRede) return 'semrede';
     return 'gerar';
   }
   function ctOk(){ var f = ctFase(); return f === 'assinado' || f === 'depois' || f === 'sem'; }
   function ctResumo(){ var f = ctFase(); return f === 'assinado' ? 'assinado' : f === 'depois' ? 'vai pelo WhatsApp (sem internet)' : f === 'sem' ? 'o escritório faz depois' : 'falta assinar'; }
-  function ctEnvio(){ var f = ctFase(), c = ctEstado(); return f === 'assinado' ? { doc: c.doc } : f === 'depois' ? { depois: true } : null; }
+  function ctEnvio(){ var f = ctFase(), c = ctEstado(); return f === 'assinado' ? (c.docProc ? { doc: c.doc, docProc: c.docProc } : { doc: c.doc }) : f === 'depois' ? { depois: true } : null; }
+  // qual documento falta assinar agora: primeiro o contrato, depois a procuração
+  function ctProximo(c){ c = c || ctEstado(); return !c.assinado ? 'contrato' : (c.docProc && !c.procAssinado ? 'procuracao' : ''); }
   function ctDados(){ return { nome: lsGet('campo_nome'), trabalho: lsGet('campo_q_trab'), cpf: lsGet('campo_cpf'), fone: lsGet('campo_fone'), endereco: { cep: lsGet('campo_cep'), rua: lsGet('campo_rua'), numero: lsGet('campo_num'), complemento: lsGet('campo_compl'), bairro: lsGet('campo_bairro'), cidade: lsGet('campo_cidade'), uf: lsGet('campo_uf_cep') } }; }
   function semRede(e){ return !navigator.onLine || /sem conexão|demorou demais|Failed to fetch|Load failed|NetworkError|network/i.test(String(e && e.message || e)); }
   function ctErro(t){ var er = $('wz-erro'); if (er){ er.textContent = t; er.hidden = false; } }
@@ -2032,7 +2034,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
       .then(function(d){
         var n = ctEstado(); n.id = n.id || c.id;
         if (d.semZapsign) n.sem = true;
-        else { n.doc = d.doc; n.url = d.url; n.marca = marca; n.assinado = false; n.depois = false; n.semRede = false; }
+        else { n.doc = d.doc; n.url = d.url; n.docProc = d.docProc || ''; n.urlProc = d.urlProc || ''; n.marca = marca; n.assinado = false; n.procAssinado = false; n.depois = false; n.semRede = false; }
         ctGuardar(n); telaInicial(); if (!n.sem) ctAbrir();
       }, function(e){
         var n = ctEstado();
@@ -2046,9 +2048,12 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     var c = ctEstado(); if (!c.doc) return;
     var rot = btn ? btn.textContent : '';
     if (btn){ btn.disabled = true; btn.textContent = 'Conferindo…'; }
-    post({ acao: 'contratoStatus', token: token, envio: c.id, doc: c.doc }).then(function(d){
+    post({ acao: 'contratoStatus', token: token, envio: c.id, doc: c.doc, docProc: c.docProc || '' }).then(function(d){
       var n = ctEstado();
-      if (d.assinado){ n.assinado = true; n.assinadoEm = new Date().toISOString(); ctGuardar(n); telaInicial(); return; }
+      if (d.assinado) n.assinado = true; if (d.procAssinado) n.procAssinado = true;
+      if (d.assinado || d.procAssinado){ ctGuardar(n); }
+      if (ctFase() === 'assinado'){ telaInicial(); return; }
+      if (d.assinado){ telaInicial(); ctAbrir(); return; }   // contrato assinado: abre a procuração
       if (btn){ btn.disabled = false; btn.textContent = rot; }
       ctErro('Ainda não aparece como assinado. Termine a assinatura na tela acima.');
     }, function(e){ if (btn){ btn.disabled = false; btn.textContent = rot; } ctErro(semRede(e) ? 'Sem internet para conferir agora.' : 'Não deu para conferir: ' + (e && e.message || e)); });
@@ -2056,10 +2061,12 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   // tela cheia com a assinatura do ZapSign (a mãe lê e assina com o dedo)
   function ctFechar(){ var t = $('ct-tela'); if (t){ t.remove(); corTopo(); } document.documentElement.style.overflow = ''; }
   function ctAbrir(){
-    var c = ctEstado(); if (!c.url) return;
+    var c = ctEstado(), qual = ctProximo(c), url = qual === 'procuracao' ? c.urlProc : c.url; if (!qual || !url) return;
+    c.abrindo = qual; ctGuardar(c);
     ctFechar();
-    var t = document.createElement('div'); t.className = 'ct-tela'; t.id = 'ct-tela'; t.setAttribute('role', 'dialog'); t.setAttribute('aria-label', 'Assinatura do contrato');
-    t.innerHTML = '<div class="ct-tela-topo"><b>Contrato da ' + esc(nomeMae()) + '</b><button type="button" id="ct-fechar">Fechar</button></div><iframe src="' + esc(c.url) + '" allow="camera" title="Assinatura do contrato"></iframe>';
+    var t = document.createElement('div'); t.className = 'ct-tela'; t.id = 'ct-tela'; t.setAttribute('role', 'dialog'); t.setAttribute('aria-label', qual === 'procuracao' ? 'Assinatura da procuração' : 'Assinatura do contrato');
+    var passo = c.docProc ? (qual === 'procuracao' ? ' · 2 de 2' : ' · 1 de 2') : '';
+    t.innerHTML = '<div class="ct-tela-topo"><b>' + (qual === 'procuracao' ? 'Procuração da ' : 'Contrato da ') + esc(nomeMae()) + passo + '</b><button type="button" id="ct-fechar">Fechar</button></div><iframe src="' + esc(url) + '" allow="camera" title="' + (qual === 'procuracao' ? 'Assinatura da procuração' : 'Assinatura do contrato') + '"></iframe>';
     document.body.appendChild(t); document.documentElement.style.overflow = 'hidden';
     corTopo('#7633b2');
     $('ct-fechar').onclick = function(){ ctFechar(); telaInicial(); };
@@ -2069,9 +2076,12 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     if (!/^https:\/\/([a-z0-9-]+\.)*zapsign\.(co|com\.br)$/.test(String(e.origin || ''))) return;
     var d = typeof e.data === 'string' ? e.data : '';
     if (d !== 'zs-doc-signed' && d !== 'zs-signed-file-ready') return;
-    var c = ctEstado(); if (!c.doc || c.assinado) return;
-    c.assinado = true; c.assinadoEm = new Date().toISOString(); ctGuardar(c);
-    setTimeout(function(){ ctFechar(); if (aba === 'novo' && !completando) telaInicial(); }, 1200);   // deixa ela ver o "assinado" do ZapSign
+    var c = ctEstado(); if (!c.doc) return;
+    var qual = c.abrindo || ctProximo(c); if (!qual) return;
+    if (qual === 'procuracao') c.procAssinado = true; else c.assinado = true;
+    c.assinadoEm = new Date().toISOString(); ctGuardar(c);
+    // deixa ela ver o "assinado" do ZapSign; se ainda falta a procuração, ela abre em seguida
+    setTimeout(function(){ ctFechar(); if (aba === 'novo' && !completando) telaInicial(); if (ctProximo()) ctAbrir(); }, 1200);
   });
   function montarPassos(){
     if (completando) return;
@@ -2135,7 +2145,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
           '<div class="wz-res">' + lin.map(function(l){ return '<button type="button" class="wz-lin" data-ir-passo="' + l[2] + '"><span>' + l[0] + '</span><b>' + esc(l[1] || '—') + '</b><u>editar</u></button>'; }).join('') + '</div>' +
           '<p class="ct-dica">O nome tem que estar igual ao do RG.</p>';
       } else if (fase === 'assinar'){
-        slot.innerHTML = '<div class="ct-fim">' + ico('<path d="M7 3h7l5 5v13H7zM14 3v5h5M9.5 17c1.2-2.4 2.3-2.4 3 0s1.8 2.4 3 0"/>') + '<b>Contrato pronto para a ' + esc(nm) + ' assinar</b><p>Entregue o celular para ela ler e assinar com o dedo. Quando ela terminar, a tela fecha sozinha.</p><button type="button" class="wz-pular" id="ct-conferir">Já assinou? Conferir</button></div>';
+        slot.innerHTML = '<div class="ct-fim">' + ico('<path d="M7 3h7l5 5v13H7zM14 3v5h5M9.5 17c1.2-2.4 2.3-2.4 3 0s1.8 2.4 3 0"/>') + '<b>' + (ctProximo(cE) === 'procuracao' ? 'Falta a procuração da ' + esc(nm) : (cE.docProc ? 'Contrato e procuração prontos para a ' : 'Contrato pronto para a ') + esc(nm) + ' assinar') + '</b><p>Entregue o celular para ela ler e assinar com o dedo. Quando ela terminar, a tela fecha sozinha.</p><button type="button" class="wz-pular" id="ct-conferir">Já assinou? Conferir</button></div>';
       } else if (fase === 'assinado'){
         slot.innerHTML = '<div class="ct-fim ok">' + ico('<path d="M5 12.5l4.5 4.5L19 7.5"/>') + '<b>Contrato e procuração assinados</b><p>Agora a senha gov.br e as fotos dos documentos.</p></div>';
       } else if (fase === 'semrede'){

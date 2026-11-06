@@ -183,18 +183,20 @@ function fechar(p, quem){
   return { ok: true, id: id, nome: dados.nome || '' };
 }
 
-/* ---------- contrato e procuração pelo ZapSign ----------
- * Gerado e assinado no aplicativo logo depois da data do parto (antes da senha gov.br e das fotos). Sem internet na hora
- * (exceção), o parceiro segue e o contrato é gerado aqui, no envio: o link vai para a mãe junto com as boas-vindas.
- * Token da API, ID do modelo e conta de teste: colados no sistema (Configurações › Integrações › Contrato ZapSign).
- * Campos que o modelo (Word) pode usar: {{NOME}} {{CPF}} {{ENDERECO}} {{RUA}} {{NUMERO}} {{COMPLEMENTO}} {{BAIRRO}}
+/* ---------- contrato e procuração pelo ZapSign (dois documentos separados) ----------
+ * Gerados e assinados no aplicativo logo depois da data do parto (antes da senha gov.br e das fotos): primeiro o contrato,
+ * depois a procuração. Sem internet na hora (exceção), o parceiro segue e os dois são gerados aqui, no envio: os links vão
+ * para a mãe junto com as boas-vindas.
+ * Token da API, ID do modelo do contrato, ID do modelo da procuração e conta de teste: colados no sistema
+ * (Configurações › Integrações › Contrato ZapSign). Sem o modelo da procuração, só o contrato é gerado.
+ * Campos que os modelos (Word) podem usar: {{NOME}} {{CPF}} {{ENDERECO}} {{RUA}} {{NUMERO}} {{COMPLEMENTO}} {{BAIRRO}}
  * {{CIDADE}} {{UF}} {{CEP}} {{TELEFONE}} {{DATA}} {{MODALIDADE}} (RURAL ou URBANO); e o texto branco <<assinatura>> onde a mãe assina.
- * O documento leva external_id "parceiro|cadastro": só quem gerou consegue conferir e anexar. */
+ * Os documentos levam external_id "parceiro|cadastro": só quem gerou consegue conferir e anexar. */
 function zapsign_(){
   var cache = CacheService.getScriptCache(), c = cache.get('zapsign');
   if (c) return JSON.parse(c);
   var d = {}; try { d = rpc('campo_zapsign_config', { p_segredo: segredoScript_() }) || {}; } catch (x){ d = {}; }   // sem o SQL 56: desligado
-  var o = { token: d.token || '', modelo: d.modelo || '', teste: !!d.teste };
+  var o = { token: d.token || '', modelo: d.modelo || '', modeloProc: d.modeloProc || '', teste: !!d.teste };
   cache.put('zapsign', JSON.stringify(o), 300);
   return o;
 }
@@ -226,15 +228,12 @@ function camposContrato_(d){
 }
 function foneDigitos_(f){ return String(f || '').replace(/\D/g, '').replace(/^55(?=\d{10,11}$)/, ''); }
 function foneContrato_(f){ var n = foneDigitos_(f); return n.length >= 10 ? '(' + n.slice(0, 2) + ') ' + n.slice(2, -4) + '-' + n.slice(-4) : ''; }
-function gerarContrato_(cfg, quem, ref, d, c){
-  c = c || camposContrato_(d);
-  var fone = foneDigitos_(d.fone);
+// um documento a partir de um modelo do ZapSign (o modelo tem o texto branco <<assinatura>> onde a mãe assina)
+function docDoModelo_(cfg, quem, ref, modelo, c, fone){
   var corpo = {
-    template_id: cfg.modelo, signer_name: c.NOME, lang: 'pt-br',
+    template_id: modelo, signer_name: c.NOME, lang: 'pt-br',
     send_automatic_email: false, send_automatic_whatsapp: false, disable_signer_emails: true,
     brand_primary_color: '#7633b2', external_id: quem.prospId + '|' + ref, folder_path: '/Nascer com Direitos/',
-    // o modelo (contrato/Contrato e procuração - modelo ZapSign.docx) tem o texto branco <<assinatura>> onde a mãe assina:
-    // no fim do contrato e no fim da procuração; ela assina uma vez e a assinatura vai para os dois lugares
     signature_placement: '<<assinatura>>',
     data: Object.keys(c).map(function(k){ return { de: '{{' + k + '}}', para: c[k] }; })
   };
@@ -243,16 +242,23 @@ function gerarContrato_(cfg, quem, ref, d, c){
   if (!r.token || !s.sign_url) throw new Error('O ZapSign não devolveu o link de assinatura.');
   return { doc: r.token, url: s.sign_url };
 }
-// no aplicativo: gera (ou devolve o mesmo, se os dados não mudaram) e o app abre a tela de assinatura
+// contrato e, se houver o modelo, a procuração: { doc, url, docProc, urlProc }
+function gerarContrato_(cfg, quem, ref, d, c){
+  c = c || camposContrato_(d);
+  var fone = foneDigitos_(d.fone), g = docDoModelo_(cfg, quem, ref, cfg.modelo, c, fone);
+  if (cfg.modeloProc){ var pr = docDoModelo_(cfg, quem, ref, cfg.modeloProc, c, fone); g.docProc = pr.doc; g.urlProc = pr.url; }
+  return g;
+}
+// no aplicativo: gera (ou devolve os mesmos, se os dados não mudaram) e o app abre a tela de assinatura
 function contrato(p, quem){
   var cfg = zapsign_();
   if (!cfg.token || !cfg.modelo) return { ok: true, semZapsign: true };
-  var c = camposContrato_(p.dados || {}), marca = JSON.stringify(c).replace(/"DATA":"[^"]*"/, '');
+  var c = camposContrato_(p.dados || {}), marca = JSON.stringify(c).replace(/"DATA":"[^"]*"/, '') + '|' + cfg.modelo + '|' + cfg.modeloProc;
   var cache = CacheService.getScriptCache(), k = 'zs_' + String(quem.prospId).slice(0, 60) + '_' + p.envio, velho = cache.get(k);
-  if (velho){ velho = JSON.parse(velho); if (velho.marca === marca) return { ok: true, doc: velho.doc, url: velho.url }; }
+  if (velho){ velho = JSON.parse(velho); if (velho.marca === marca) return { ok: true, doc: velho.doc, url: velho.url, docProc: velho.docProc || '', urlProc: velho.urlProc || '' }; }
   var g = gerarContrato_(cfg, quem, p.envio, p.dados || {}, c);
-  cache.put(k, JSON.stringify({ doc: g.doc, url: g.url, marca: marca }), 21600);
-  return { ok: true, doc: g.doc, url: g.url };
+  cache.put(k, JSON.stringify({ doc: g.doc, url: g.url, docProc: g.docProc || '', urlProc: g.urlProc || '', marca: marca }), 21600);
+  return { ok: true, doc: g.doc, url: g.url, docProc: g.docProc || '', urlProc: g.urlProc || '' };
 }
 function zsDoc_(cfg, doc, quem){
   if (!/^[A-Za-z0-9-]{10,80}$/.test(String(doc || ''))) throw new Error('Contrato inválido.');
@@ -263,49 +269,61 @@ function zsDoc_(cfg, doc, quem){
 function zsAssinado_(d){ var s = (d.signers || [])[0] || {}; return s.status === 'signed' || d.status === 'signed'; }
 function contratoStatus(p, quem){
   var cfg = zapsign_(); if (!cfg.token) return { ok: true, semZapsign: true };
-  return { ok: true, assinado: zsAssinado_(zsDoc_(cfg, p.doc, quem)) };
+  var r = { ok: true, assinado: zsAssinado_(zsDoc_(cfg, p.doc, quem)) };
+  if (p.docProc) r.procAssinado = zsAssinado_(zsDoc_(cfg, p.docProc, quem));
+  return r;
 }
-function anexarContrato_(url, pasta){
-  var nome = 'CONTRATO E PROCURAÇÃO.pdf';
+var NOME_PDF_ = { contrato: 'CONTRATO.pdf', procuracao: 'PROCURAÇÃO.pdf' };
+function anexarContrato_(url, pasta, nome){
+  nome = nome || 'CONTRATO E PROCURAÇÃO.pdf';
   if (pasta.getFilesByName(nome).hasNext()) return;
   pasta.createFile(UrlFetchApp.fetch(url).getBlob().setName(nome).setContentType('application/pdf'));
 }
-// no envio do cadastro: devolve o contrato que vai para a ficha da mãe ({ doc, url, status }) ou null
+// documento assinado no aplicativo: o PDF vai para a pasta (ou fica para a conferência de hora em hora); devolve se está assinado
+function guardarAssinado_(cfg, quem, doc, pasta, tipo){
+  var d = zsDoc_(cfg, doc, quem);
+  if (!zsAssinado_(d)){ zsPendente_(doc, pasta, tipo); return { ok: false, url: ((d.signers || [])[0] || {}).sign_url || '' }; }
+  for (var i = 0; i < 3 && !d.signed_file; i++){ Utilities.sleep(2500); d = zsApi_(cfg, 'get', '/api/v1/docs/' + doc + '/'); }
+  if (d.signed_file) anexarContrato_(d.signed_file, pasta, NOME_PDF_[tipo]); else zsPendente_(doc, pasta, tipo);
+  return { ok: true };
+}
+// no envio do cadastro: devolve o que vai para a ficha da mãe ({ doc, url, docProc, urlProc, status }) ou null
 function contratoNoEnvio_(p, quem, pasta, dados, nota){
   var pc = p.contrato || null; if (!pc) return null;
   var cfg = zapsign_();
-  if (!cfg.token){ if (pc.doc) nota.push('Contrato assinado no ZapSign: baixe o PDF lá (a chave do ZapSign não está mais no sistema).'); return null; }
+  if (!cfg.token){ if (pc.doc) nota.push('Contrato assinado no ZapSign: baixe os PDFs lá (a chave do ZapSign não está mais no sistema).'); return null; }
   try {
-    if (pc.doc){   // assinado no aplicativo: o PDF assinado vai para a pasta
-      var d = zsDoc_(cfg, pc.doc, quem);
-      if (!zsAssinado_(d)){ zsPendente_(pc.doc, pasta); return { doc: pc.doc, url: ((d.signers || [])[0] || {}).sign_url || '', status: 'pendente' }; }
-      for (var i = 0; i < 3 && !d.signed_file; i++){ Utilities.sleep(2500); d = zsApi_(cfg, 'get', '/api/v1/docs/' + pc.doc + '/'); }
-      if (d.signed_file) anexarContrato_(d.signed_file, pasta); else zsPendente_(pc.doc, pasta);
-      return { doc: pc.doc, status: 'assinado' };
+    if (pc.doc){   // assinados no aplicativo: os PDFs assinados vão para a pasta, separados
+      var a = guardarAssinado_(cfg, quem, pc.doc, pasta, 'contrato'), b = pc.docProc ? guardarAssinado_(cfg, quem, pc.docProc, pasta, 'procuracao') : { ok: true };
+      var ct = { doc: pc.doc, status: a.ok && b.ok ? 'assinado' : 'pendente' };
+      if (!a.ok) ct.url = a.url;
+      if (pc.docProc){ ct.docProc = pc.docProc; if (!b.ok) ct.urlProc = b.url; }
+      return ct;
     }
-    if (pc.depois && cfg.modelo){   // sem internet na hora: gera agora; o link vai nas boas-vindas
-      // envio repetido (a internet caiu no meio): usa o mesmo contrato, não gera outro
+    if (pc.depois && cfg.modelo){   // sem internet na hora: gera agora; os links vão nas boas-vindas
+      // envio repetido (a internet caiu no meio): usa os mesmos documentos, não gera outros
       var cc = CacheService.getScriptCache(), ck = 'zs_env_' + p.envio, g = cc.get(ck);
       if (g) g = JSON.parse(g);
       else { g = gerarContrato_(cfg, quem, p.envio, { nome: dados.nome, cpf: p.cpf, fone: p.contato, endereco: p.endereco || {}, tipoSegurada: p.tipoSegurada }); cc.put(ck, JSON.stringify(g), 21600); }
-      zsPendente_(g.doc, pasta);
-      nota.push('Contrato gerado no envio (o parceiro estava sem internet): o link vai para a mãe no WhatsApp.');
-      return { doc: g.doc, url: g.url, status: 'pendente' };
+      zsPendente_(g.doc, pasta, 'contrato'); if (g.docProc) zsPendente_(g.docProc, pasta, 'procuracao');
+      nota.push('Contrato' + (g.docProc ? ' e procuração gerados' : ' gerado') + ' no envio (o parceiro estava sem internet): os links vão para a mãe no WhatsApp.');
+      var r = { doc: g.doc, url: g.url, status: 'pendente' }; if (g.docProc){ r.docProc = g.docProc; r.urlProc = g.urlProc; }
+      return r;
     }
   } catch (x){ nota.push('Contrato pelo ZapSign: ' + (x && x.message || x)); }
   return null;
 }
-// contratos esperando assinatura ou o PDF: conferidos de hora em hora
-function zsPendente_(doc, pasta){ PropertiesService.getScriptProperties().setProperty('zs_pend_' + doc, pasta.getId()); }
+// documentos esperando assinatura ou o PDF: conferidos de hora em hora (valor = "pasta|tipo")
+function zsPendente_(doc, pasta, tipo){ PropertiesService.getScriptProperties().setProperty('zs_pend_' + doc, pasta.getId() + '|' + (tipo || 'contrato')); }
 function contratosPendentes_(){
   var props = PropertiesService.getScriptProperties(), todos = props.getProperties(), cfg = null;
   Object.keys(todos).filter(function(k){ return k.indexOf('zs_pend_') === 0; }).forEach(function(k){
     try {
       cfg = cfg || zapsign_(); if (!cfg.token) return;
-      var doc = k.slice(8), d = zsApi_(cfg, 'get', '/api/v1/docs/' + doc + '/');
+      var doc = k.slice(8), v = String(todos[k]).split('|'), d = zsApi_(cfg, 'get', '/api/v1/docs/' + doc + '/');
       if (d.deleted || d.status === 'deleted' || d.status === 'refused'){ props.deleteProperty(k); return; }
       if (!zsAssinado_(d) || !d.signed_file) return;
-      anexarContrato_(d.signed_file, DriveApp.getFolderById(todos[k]));
+      anexarContrato_(d.signed_file, DriveApp.getFolderById(v[0]), v[1] ? NOME_PDF_[v[1]] : null);
       rpc('campo_contrato_assinado', { p_segredo: segredoScript_(), p_doc: doc });
       props.deleteProperty(k);
     } catch (x){}

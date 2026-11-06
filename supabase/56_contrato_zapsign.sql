@@ -1,6 +1,7 @@
 -- 56 · Contrato e procuração pelo ZapSign
--- 1) O token da API, o ID do modelo e a conta de teste são colados no BI (Configurações › Integrações › Contrato ZapSign)
---    e ficam no cofre (segredos: zapsign, zapsign_modelo, zapsign_teste). Só o script do Google, com o código dele, consegue ler.
+-- 1) O token da API, o ID do modelo do contrato, o ID do modelo da procuração e a conta de teste são colados no BI
+--    (Configurações › Integrações › Contrato ZapSign) e ficam no cofre (segredos: zapsign, zapsign_modelo, zapsign_modelo_proc,
+--    zapsign_teste). Só o script do Google, com o código dele, consegue ler. Contrato e procuração são dois documentos separados.
 -- 2) A mãe cadastrada pelo aplicativo guarda o contrato: { doc, url, status pendente|assinado }. Normalmente ela assina no app,
 --    na hora; sem internet (exceção), o script gera o contrato no envio e o link vai para ela junto com as boas-vindas (WhatsApp).
 -- 3) Quando ela assina depois, o script marca como assinado e o contrato conta como entregue (Contrato e procuração).
@@ -12,6 +13,7 @@ returns jsonb language sql stable security definer set search_path = public as $
     then jsonb_build_object(
       'token', coalesce((select valor from public.segredos where nome = 'zapsign'), ''),
       'modelo', coalesce((select valor from public.segredos where nome = 'zapsign_modelo'), ''),
+      'modeloProc', coalesce((select valor from public.segredos where nome = 'zapsign_modelo_proc'), ''),
       'teste', coalesce((select valor from public.segredos where nome = 'zapsign_teste'), '') = '1') end
 $$;
 revoke all on function public.campo_zapsign_config(text) from public;
@@ -43,6 +45,9 @@ begin
     ct := jsonb_strip_nulls(jsonb_build_object(
       'doc', p_dados -> 'contrato' ->> 'doc',
       'url', case when p_dados -> 'contrato' ->> 'url' ~ '^https://[a-z0-9.-]*zapsign[.](co|com[.]br)/' then left(p_dados -> 'contrato' ->> 'url', 300) end,
+      -- procuração: documento separado no ZapSign (pode faltar, se o escritório só tiver o modelo do contrato)
+      'docProc', case when coalesce(p_dados -> 'contrato' ->> 'docProc', '') ~ '^[A-Za-z0-9-]{10,80}$' then p_dados -> 'contrato' ->> 'docProc' end,
+      'urlProc', case when p_dados -> 'contrato' ->> 'urlProc' ~ '^https://[a-z0-9.-]*zapsign[.](co|com[.]br)/' then left(p_dados -> 'contrato' ->> 'urlProc', 300) end,
       'status', case when p_dados -> 'contrato' ->> 'status' = 'assinado' then 'assinado' else 'pendente' end,
       'assinadoEm', case when p_dados -> 'contrato' ->> 'status' = 'assinado' then agora end,
       'geradoEm', agora));
@@ -84,9 +89,16 @@ begin
   if not exists (select 1 from public.segredos s where s.nome = 'campo_script' and s.valor = p_segredo and length(p_segredo) >= 32) then
     raise exception 'Script não autorizado.';
   end if;
-  select id, data into cid, atual from public.clientes where data -> 'contrato' ->> 'doc' = p_doc limit 1;
+  select id, data into cid, atual from public.clientes where data -> 'contrato' ->> 'doc' = p_doc or data -> 'contrato' ->> 'docProc' = p_doc limit 1;
   if cid is null then return null; end if;
   if atual -> 'contrato' ->> 'status' = 'assinado' then return cid; end if;
+  -- marca o documento que foi assinado; o contrato só conta como entregue quando os dois (ou só o contrato, sem procuração) estiverem
+  if atual -> 'contrato' ->> 'doc' = p_doc then atual := jsonb_set(atual, '{contrato,contratoOk}', 'true'::jsonb);
+  else atual := jsonb_set(atual, '{contrato,procOk}', 'true'::jsonb); end if;
+  if not ((atual -> 'contrato' ->> 'contratoOk') = 'true' and ((atual -> 'contrato' ->> 'docProc') is null or (atual -> 'contrato' ->> 'procOk') = 'true')) then
+    update public.clientes set data = data || jsonb_build_object('contrato', atual -> 'contrato', 'atualizadoEm', agora) where id = cid;
+    return cid;
+  end if;
   docs := case when jsonb_typeof(atual -> 'campoDocs') = 'array' then atual -> 'campoDocs' else '[]'::jsonb end;
   if not docs ? 'procuracao' then docs := docs || '["procuracao"]'::jsonb; end if;
   falta := case when jsonb_typeof(atual -> 'faltaDocs') = 'array' then (atual -> 'faltaDocs') - 'procuracao' end;
