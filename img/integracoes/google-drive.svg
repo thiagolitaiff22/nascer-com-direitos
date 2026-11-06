@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 1186">
+  <defs>
+    <linearGradient id="gdTopo" gradientUnits="userSpaceOnUse" x1="230" y1="540" x2="520" y2="400">
+      <stop offset="0" stop-color="#7DC8FF"/>
+      <stop offset="1" stop-color="#7DC8FF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="gdAzul" gradientUnits="userSpaceOnUse" x1="470" y1="900" x2="730" y2="1160">
+      <stop offset="0" stop-color="#3385FF"/>
+      <stop offset="1" stop-color="#A8A6FF"/>
+    </linearGradient>
+    <linearGradient id="gdAmarelo" gradientUnits="userSpaceOnUse" x1="860" y1="640" x2="1260" y2="1140">
+      <stop offset="0" stop-color="#FFC800"/>
+      <stop offset="1" stop-color="#FFE51F"/>
+    </linearGradient>
+  </defs>
+  <path id="gdVerde" fill="#10BA5E" d="M140 573 L385 145 C440 50 530 0 640 0 C750 0 840 55 892 145 L993 320 L847 573 Z"/>
+  <path fill="url(#gdTopo)" d="M140 573 L385 145 C440 50 530 0 640 0 C750 0 840 55 892 145 L993 320 L847 573 Z"/>
+  <path fill="url(#gdAzul)" d="M140 573 L432 573 L785 1186 L290 1186 C120 1186 0 1050 0 890 C0 840 12 790 38 745 Z"/>
+  <path fill="url(#gdAmarelo)" d="M993 320 L1240 745 C1268 790 1280 840 1280 890 C1280 1050 1160 1186 990 1186 L785 1186 L640 935 L847 573 Z"/>
+</svg>

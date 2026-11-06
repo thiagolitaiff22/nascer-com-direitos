@@ -43,7 +43,7 @@ var NOMES = {
 // o sistema usa esta resposta para mostrar Drive e Claude como ativados em Configurações
 function doGet(e){
   var conferir = !!(e && e.parameter && e.parameter.zs === '1');   // botão Testar do BI: lê a configuração de novo e pergunta ao ZapSign
-  if (conferir) try { CacheService.getScriptCache().remove('zapsign'); } catch (x){}
+  if (conferir) try { CacheService.getScriptCache().removeAll(['zapsign', 'zs_modelos']); } catch (x){}
   var g = 'ok'; try { gatilho(); } catch (x){ g = String(x && x.message || x); }
   var c = ''; try { c = chaveClaude(); } catch (x){}
   var ac = []; try { ac = ScriptApp.getProjectTriggers().map(function(t){ return t.getHandlerFunction(); }); } catch (x){ ac = ['erro: ' + x]; }
@@ -57,7 +57,8 @@ var ZS_CAMPOS_ = ['NOME', 'CPF', 'ENDERECO', 'TELEFONE', 'CIDADE', 'UF', 'DATA']
 // confere no ZapSign: o token vale? os dois modelos existem e têm os campos?
 function zsConferir_(){
   var cfg = zapsign_(); if (!cfg.token) return { erro: 'Falta o token da API.' };
-  var r = { token: true, conta: cfg.teste ? 'teste' : 'oficial' };
+  var r = { token: true, conta: cfg.teste ? 'teste' : 'oficial', auto: !!cfg.auto };
+  if (cfg.erroModelos){ r.token = !/\b(401|403)\b|token|credenc|autentica|unauthor|forbidden/i.test(cfg.erroModelos); r.erroModelos = cfg.erroModelos; }
   [['contrato', cfg.modelo], ['procuracao', cfg.modeloProc]].forEach(function(p){
     if (!p[1]){ r[p[0]] = { falta: true }; return; }
     try {
@@ -69,6 +70,8 @@ function zsConferir_(){
       if (/\b(401|403)\b|token|credenc|autentica|unauthor|forbidden/i.test(m)) r.token = false;
     }
   });
+  // não achou pelo nome: devolve os nomes dos modelos da conta, para o escritório dizer qual é qual
+  if ((r.contrato && r.contrato.falta) || (r.procuracao && r.procuracao.falta)) r.modelosDaConta = cfg.nomesModelos || [];
   return r;
 }
 
@@ -254,8 +257,39 @@ function zapsign_(){
   if (c) return JSON.parse(c);
   var d = {}; try { d = rpc('campo_zapsign_config', { p_segredo: segredoScript_() }) || {}; } catch (x){ d = {}; }   // sem o SQL 56: desligado
   var o = { token: d.token || '', modelo: d.modelo || '', modeloProc: d.modeloProc || '', teste: !!d.teste };
+  // só a chave foi colada: acha os modelos no ZapSign pelo nome ("Contrato…" e "Procuração…")
+  if (o.token && (!o.modelo || !o.modeloProc)){
+    try {
+      var a = zsModelosPeloNome_(o);
+      if (!o.modelo && a.contrato){ o.modelo = a.contrato.id; o.modeloNome = a.contrato.nome; o.auto = true; }
+      if (!o.modeloProc && a.procuracao){ o.modeloProc = a.procuracao.id; o.modeloProcNome = a.procuracao.nome; o.auto = true; }
+      o.nomesModelos = a.nomes || [];
+    } catch (x){ o.erroModelos = String(x && x.message || x); }
+  }
   cache.put('zapsign', JSON.stringify(o), 300);
   return o;
+}
+// lista os modelos da conta e escolhe, pelo nome, o do contrato e o da procuração (o mais novo, se houver mais de um)
+function zsModelosPeloNome_(cfg){
+  var cache = CacheService.getScriptCache(), c = cache.get('zs_modelos');
+  if (c) return JSON.parse(c);
+  var todos = [], url = '/api/v1/templates/';
+  for (var pag = 0; pag < 6 && url; pag++){
+    var r = zsApi_(cfg, 'get', url), lista = Array.isArray(r) ? r : (r.results || r.templates || []);
+    todos = todos.concat(lista);
+    url = !Array.isArray(r) && r.next ? String(r.next).replace(/^https?:\/\/[^/]+/, '') : '';
+  }
+  var sem = function(s){ return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); };
+  var ativos = todos.filter(function(t){ return t && (t.token || t.id) && t.active !== false; })
+    .sort(function(a, b){ return String(b.created_at || '').localeCompare(String(a.created_at || '')); });
+  var acha = function(f){ var t = ativos.filter(function(x){ return f(sem(x.name)); })[0]; return t ? { id: t.token || t.id, nome: String(t.name || '') } : null; };
+  var res = {
+    contrato: acha(function(n){ return /contrato/.test(n) && !/procura/.test(n); }) || acha(function(n){ return /contrato/.test(n); }),
+    procuracao: acha(function(n){ return /procura/.test(n); }),
+    total: ativos.length, nomes: ativos.slice(0, 15).map(function(t){ return String(t.name || '').slice(0, 60); })
+  };
+  cache.put('zs_modelos', JSON.stringify(res), 3600);
+  return res;
 }
 function zsApi_(cfg, metodo, caminho, corpo){
   var base = cfg.teste ? 'https://sandbox.api.zapsign.com.br' : 'https://api.zapsign.com.br';

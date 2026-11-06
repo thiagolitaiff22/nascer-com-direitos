@@ -695,6 +695,8 @@ form.f{display:flex;flex-direction:column;max-height:calc(100dvh - 34px)}
 .ig-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
 .ig-logo{width:40px;height:40px;flex:none}
 .ig-logo svg{width:100%;height:100%;display:block}
+.ig-logo img{width:100%;height:100%;display:block;object-fit:contain}
+.ig-logo img.ig-fav{border-radius:10px}
 .ig-logo.sm{width:30px;height:30px}
 .ig-st{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-3)}
 .ig-st.on{color:var(--green)}
@@ -2263,6 +2265,51 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
   .auth-marca{text-align:left}
   .auth-marca .auth-logo{margin:0 0 20px!important;height:128px!important}
 }
+/* ---------- integrações no jeito do BI de Vendas (06/11/2026): logo no meio, "Integração com …", um campo só para a chave ---------- */
+#dlg-integ{width:min(460px,calc(100vw - 32px))}
+.ig-dlg{position:relative;padding:28px 26px 22px!important}
+.ig-x{position:absolute;top:14px;right:14px;width:34px;height:34px;border:0;border-radius:50%;background:none;color:var(--ink-3);display:grid;place-items:center;cursor:pointer;z-index:1}
+.ig-x:hover{background:hsl(var(--c-sec));color:var(--ink)}
+.ig-x .i{width:18px;height:18px}
+.ig-dlg-cab{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;margin-bottom:10px}
+.ig-logo.grande{width:56px;height:56px;border-radius:16px;overflow:hidden;box-shadow:0 10px 24px rgba(41,24,56,.18);flex:none}
+.ig-logo.grande svg{width:100%;height:100%;display:block}
+.ig-logo.grande img{width:100%;height:100%;object-fit:contain;display:block}
+.ig-logo.grande:has(img){box-shadow:0 10px 24px rgba(41,24,56,.14);background:#fff}
+.ig-dlg-cab h2{margin:0;font-size:19px;font-weight:600;color:var(--ink)}
+#ig-dlg-body{padding:0!important}
+#ig-dlg-body > .integ{max-width:none;padding:0!important;border:0!important;box-shadow:none!important;background:none!important;border-radius:0!important}
+.ig-simples{display:flex;flex-direction:column;gap:14px}
+.ig-desc{margin:0;text-align:center;font-size:13.5px;line-height:1.5;color:var(--ink-2)}
+.ig-campo{display:flex;align-items:center;gap:4px;padding:5px;border:1px solid var(--line-2);border-radius:14px;background:hsl(var(--c-sec)/.5);transition:border-color .15s,box-shadow .15s}
+.ig-campo:focus-within{border-color:hsl(var(--c-pri)/.6);box-shadow:0 0 0 3px hsl(var(--c-pri)/.18)}
+.ig-campo input{flex:1;min-width:0;height:38px;border:0!important;background:transparent!important;box-shadow:none!important;padding:0 10px!important;font-size:14px;font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--ink);outline:0}
+.ig-campo input::placeholder{font-family:var(--font);font-size:13px;color:var(--ink-3)}
+.ig-olho{width:36px;height:36px;flex:none;border:0;border-radius:10px;background:none;color:var(--ink-3);display:grid;place-items:center;cursor:pointer}
+.ig-olho:hover{background:var(--panel);color:var(--ink)}
+.ig-olho .i{width:17px;height:17px}
+.ig-salvar{flex:none;min-height:36px!important;border-radius:10px!important;padding:0 14px!important}
+.ig-ok{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;border:1px solid hsl(var(--c-green)/.3);background:hsl(var(--c-green)/.1);color:hsl(var(--c-green));font-size:13px}
+.ig-ok[hidden]{display:none}
+.ig-ok .i{width:16px;height:16px;flex:none}
+.ig-conf{display:flex;flex-direction:column;gap:7px}
+.ig-conf:empty{display:none}
+.ig-conf-l{margin:0;display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4;color:var(--ink-2)}
+.ig-conf-l .i{width:16px;height:16px;flex:none;margin-top:1px}
+.ig-conf-l.ok .i{color:hsl(var(--c-green))}
+.ig-conf-l.erro .i{color:hsl(var(--c-red))}
+.ig-conf-l.esp .i{color:var(--ink-3);animation:igGira 1s linear infinite}
+@keyframes igGira{to{transform:rotate(360deg)}}
+.ig-conf-nomes{margin:0 0 0 24px;font-size:12px;color:var(--ink-3)}
+.ig-de-novo{align-self:flex-start;margin-left:24px;border:0;background:none;padding:0;font-size:12px;color:var(--primary);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.ig-passos-lnk{align-self:center;display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:4px;font-size:12.5px;color:var(--ink-3);cursor:pointer}
+.ig-passos-lnk:hover{color:var(--primary)}
+.ig-passos-lnk .i{width:14px;height:14px}
+.ig-passos{margin:0;padding:12px 14px 12px 34px;border-radius:12px;background:hsl(var(--c-sec)/.5);font-size:13px;line-height:1.55;color:var(--ink-2)}
+.ig-passos[hidden]{display:none}
+.ig-passos li+li{margin-top:6px}
+html[data-fx="novo"] .ig-dlg-cab h2{font-family:'Fraunces',Georgia,serif;font-size:22px}
+
 /* ================= BI no estilo do aplicativo (06/11/2026, a pedido: "fonte, etc., para ficar bem bonitinho, igual o meu app") =================
    Só no Fluxo novo. Mesmo visual do app: fundo lilás claro, cartões brancos bem arredondados com sombra leve,
    títulos em Fraunces, texto em Inter, números em roxo e botões com degradê roxo. */
@@ -2945,20 +2992,23 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
             <small class="integ-s" id="cl-status">Verificando…</small>
           </form>
         </div>
-        <div class="card integ" data-painel="zapsign">
-          <div><p class="integ-d">Gera o contrato e a procuração já preenchidos (nome, CPF e endereço da mãe) a partir do modelo do escritório no ZapSign. A mãe assina com o dedo no aplicativo, logo depois da data do parto; só depois vêm a senha gov.br e as fotos. O PDF assinado vai sozinho para a pasta dela. Sem internet na hora (exceção), o contrato é gerado quando o cadastro chega e o link vai para ela no WhatsApp.</p>
-          <p class="integ-d">O token fica no ZapSign, em Configurações › Integração (precisa do plano com API). Contrato e procuração são dois modelos separados (os arquivos prontos estão em contrato/Contrato - modelo ZapSign.docx e contrato/Procuração - modelo ZapSign.docx); o ID de cada um aparece no modelo, em Modelos. No Word, escreva os campos assim: <code>{{NOME}}</code> <code>{{CPF}}</code> <code>{{ENDERECO}}</code> <code>{{RUA}}</code> <code>{{NUMERO}}</code> <code>{{COMPLEMENTO}}</code> <code>{{BAIRRO}}</code> <code>{{CIDADE}}</code> <code>{{UF}}</code> <code>{{CEP}}</code> <code>{{TELEFONE}}</code> <code>{{DATA}}</code> <code>{{MODALIDADE}}</code> (RURAL ou URBANO). Onde a mãe assina, deixe o texto <code>&lt;&lt;assinatura&gt;&gt;</code> em branco: o ZapSign põe a assinatura ali. O modelo pronto está em contrato/Contrato e procuração - modelo ZapSign.docx.</p></div>
-          <form id="form-zs" class="integ-form" novalidate autocomplete="off">
-            <label for="zs-token">Token da API do ZapSign</label>
-            <div class="pw"><input id="zs-token" type="text" class="mask" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Cole aqui o token da API"></div>
-            <label for="zs-modelo">ID do modelo do contrato</label>
-            <div class="pw"><input id="zs-modelo" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Cole aqui o ID do modelo do contrato"></div>
-            <label for="zs-modelo-proc">ID do modelo da procuração</label>
-            <div class="pw"><input id="zs-modelo-proc" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Cole aqui o ID do modelo da procuração"></div>
-            <label class="zs-teste"><input type="checkbox" id="zs-teste"> Conta de teste do ZapSign (sandbox): os contratos não valem</label>
-            <div class="integ-btns"><button class="btn lh-save" type="submit" id="zs-salvar"><svg class="i"><use href="#i-save"/></svg>Salvar</button><button type="button" class="btn" id="zs-testar"><svg class="i"><use href="#i-sync"/></svg>Testar</button></div>
-            <small class="integ-s" id="zs-status">Verificando…</small>
+        <div class="card integ ig-simples" data-painel="zapsign">
+          <p class="ig-desc">Cole a chave da API do ZapSign. O sistema acha sozinho os modelos do contrato e da procuração, e a mãe assina com o dedo no aplicativo.</p>
+          <form id="form-zs" class="ig-chave" novalidate autocomplete="off">
+            <div class="ig-campo">
+              <input id="zs-token" type="password" aria-label="Chave da API do ZapSign" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Cole aqui a chave da API">
+              <button type="button" class="ig-olho" id="zs-olho" aria-label="Mostrar a chave" title="Mostrar a chave"><svg class="i"><use href="#i-eye"/></svg></button>
+              <button class="btn primary ig-salvar" type="submit" id="zs-salvar"><svg class="i"><use href="#i-save"/></svg><span>Salvar</span></button>
+            </div>
           </form>
+          <div class="ig-ok" id="zs-ok" role="status" hidden></div>
+          <div class="ig-conf" id="zs-conf" aria-live="polite"></div>
+          <button type="button" class="ig-passos-lnk" id="zs-passos-lnk"><svg class="i"><use href="#i-help"/></svg>Não sabe onde pegar? Veja o passo a passo</button>
+          <ol class="ig-passos" id="zs-passos" hidden>
+            <li>Entre no <b>ZapSign</b> com a conta do escritório.</li>
+            <li>Vá em <b>Configurações › Integração › API</b> e copie a chave (o token).</li>
+            <li>Cole aqui e clique em <b>Salvar</b>. O sistema confere a chave e acha os modelos que têm <b>Contrato</b> e <b>Procuração</b> no nome.</li>
+          </ol>
         </div>
         <div class="card integ" data-painel="celular">
           <div><b class="integ-t">Cadastro pelo celular</b><p class="integ-d">Script do Google que recebe as fotos dos parceiros, cria a pasta da cliente no Drive (CLIENTES › PENDENTES DE REQUERIMENTO; vai para NO INSS quando há requerimento, NA JUSTIÇA quando há processo e ARQUIVADOS quando é paga) e confere os documentos com a IA. O código e o passo a passo estão em <b>google/campo.gs</b>. O link de cada parceiro fica no cartão dele, em Parceiros.</p></div>
@@ -3140,7 +3190,8 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
 
 <dialog id="dlg-integ">
   <div class="f ig-dlg">
-    <div class="f-head"><div class="ig-logo sm" id="ig-dlg-logo"></div><h2 id="ig-dlg-t"></h2><button type="button" class="btn" id="ig-fechar" style="margin-left:auto">Fechar</button></div>
+    <button type="button" class="ig-x" id="ig-fechar" aria-label="Fechar" title="Fechar"><svg class="i"><use href="#i-x"/></svg></button>
+    <div class="ig-dlg-cab"><div class="ig-logo grande" id="ig-dlg-logo"></div><h2 id="ig-dlg-t"></h2></div>
     <div class="f-body" id="ig-dlg-body"></div>
   </div>
 </dialog>
@@ -7441,17 +7492,17 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     liderhub: '<svg viewBox="0 0 40 40"><rect width="40" height="40" rx="9" fill="#2F6BF2"/><path d="M13 27l7-14 7 14M16.5 22h7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     regua: '<svg viewBox="0 0 40 40"><rect width="40" height="40" rx="9" fill="#16A34A"/><path d="M14 17a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S14 23 14 17M18.3 28a2 2 0 0 0 3.4 0" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     lembrete: '<svg viewBox="0 0 40 40"><rect width="40" height="40" rx="9" fill="#0F9F8F"/><path d="M29 11L18 22M29 11l-6.5 18-4.5-7-7-4.5z" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-    datajud: '<svg viewBox="0 0 40 40"><rect width="40" height="40" rx="9" fill="#334155"/><path d="M20 10v20M14 30h12M11 15h18M11 15l-3 7a3 3 0 0 0 6 0zM29 15l-3 7a3 3 0 0 0 6 0z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-    claude: '<svg viewBox="0 0 40 40"><rect width="40" height="40" rx="9" fill="#10A37F"/><path d="M11 13.5a3.5 3.5 0 0 1 3.5-3.5h11a3.5 3.5 0 0 1 3.5 3.5v8a3.5 3.5 0 0 1-3.5 3.5H18l-5 4v-4h-.5A1.5 1.5 0 0 1 11 23.5z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><path d="M16 17.5h8M16 21h5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>',
-    drive: '<svg viewBox="0 0 40 40"><path d="M15 6h10l11 19h-10z" fill="#8e30cf"/><path d="M15 6L4 25l5 9 11-19z" fill="#0F9D58"/><path d="M9 34h22l5-9H14z" fill="#4285F4"/></svg>',
-    zapsign: '<svg viewBox="0 0 40 40"><rect width="40" height="40" rx="9" fill="#5B21B6"/><path d="M14 9h9l5 5v17H14z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><path d="M23 9v5h5M17.5 25.5c1.4-2.8 2.7-2.8 3.5 0s2.1 2.8 3.5 0" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    datajud: '<img class="ig-fav" src="https://www.google.com/s2/favicons?domain=cnj.jus.br&sz=128" alt="">',
+    claude: '<img src="img/integracoes/openai.svg" alt="">',
+    drive: '<img src="img/integracoes/google-drive.svg" alt="">',
+    zapsign: '<img class="ig-fav" src="https://www.google.com/s2/favicons?domain=zapsign.com.br&sz=128" alt="">',
     celular: '<svg viewBox="0 0 40 40"><rect width="40" height="40" rx="9" fill="#7C3AED"/><rect x="14" y="9" width="12" height="22" rx="2.5" fill="none" stroke="#fff" stroke-width="2.4"/><path d="M18.5 26.5h3" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>'
   };
   var IG = [
-    { k: 'datajud', t: 'Tribunal (DataJud)', d: 'Consulta os processos no tribunal escolhido todo dia às 7h: audiência, sentença, RPV.', ajuda: 'Chave pública do CNJ. Escolha o tribunal (TRF1 ou TJAM) no cartão.' },
-    { k: 'claude', t: 'IA (ChatGPT)', d: 'Só confere quais documentos estão na pasta do cliente (botão Conferir documentos). Não preenche dados.', ajuda: 'Clique para colar a chave da API do ChatGPT.' },
-    { k: 'drive', t: 'Google Drive', d: 'Cria a pasta de cada cliente em CLIENTES e move entre Pendentes, No INSS, No Judicial e Arquivados.', ajuda: 'Funciona pelo script do Google do Cadastro pelo celular.', painel: 'celular' },
-    { k: 'zapsign', t: 'Contrato (ZapSign)', d: 'Contrato e procuração preenchidos sozinhos; a mãe assina com o dedo no aplicativo, antes das fotos.', ajuda: 'Clique para colar o token da API e o ID do modelo do ZapSign.' },
+    { k: 'datajud', dt: 'Integração com o DataJud', t: 'Tribunal (DataJud)', d: 'Consulta os processos no tribunal escolhido todo dia às 7h: audiência, sentença, RPV.', ajuda: 'Chave pública do CNJ. Escolha o tribunal (TRF1 ou TJAM) no cartão.' },
+    { k: 'claude', dt: 'Integração com o ChatGPT', t: 'IA (ChatGPT)', d: 'Só confere quais documentos estão na pasta do cliente (botão Conferir documentos). Não preenche dados.', ajuda: 'Clique para colar a chave da API do ChatGPT.' },
+    { k: 'drive', dt: 'Integração com o Google Drive', t: 'Google Drive', d: 'Cria a pasta de cada cliente em CLIENTES e move entre Pendentes, No INSS, No Judicial e Arquivados.', ajuda: 'Funciona pelo script do Google do Cadastro pelo celular.', painel: 'celular' },
+    { k: 'zapsign', dt: 'Integração com o ZapSign', t: 'Contrato (ZapSign)', d: 'Contrato e procuração preenchidos sozinhos; a mãe assina com o dedo no aplicativo, antes das fotos.', ajuda: 'Clique para colar a chave da API do ZapSign.' },
     { k: 'celular', t: 'Cadastro pelo celular', d: 'O parceiro tira as fotos dos documentos e a cliente cai no Cadastro.', ajuda: 'O link de cada parceiro fica no cartão dele, em Parceiros.' }
   ];
   var igScript = null; // resposta do script do Google (Drive e Claude)
@@ -7473,7 +7524,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     return on ? 'Ativado' : 'Desativado';
   }
   var IG_GRUPOS = [
-    ['Documentos e arquivos', 'Pastas das clientes, fotos enviadas pelos parceiros e conferência dos documentos', ['zapsign', 'drive', 'celular', 'claude']],
+    ['Documentos e arquivos', 'Contrato, pastas das clientes e conferência dos documentos', ['zapsign', 'drive', 'claude']],
     ['Processos', 'Acompanhamento das ações no tribunal', ['datajud']]
   ];
   function pintarInteg(){
@@ -7501,9 +7552,10 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     var p = document.querySelector('[data-painel="' + (x.painel || x.k) + '"]'); if (!p) return;
     guardarInteg(); igAberto = p;
     if (cpUrl && !$('cp-url').value) $('cp-url').value = cpUrl;
-    $('ig-dlg-logo').innerHTML = IG_LOGO[x.k]; $('ig-dlg-t').textContent = x.t;
+    $('ig-dlg-logo').innerHTML = IG_LOGO[x.k]; $('ig-dlg-t').textContent = x.dt || x.t;
     $('ig-dlg-body').appendChild(p);
     $('dlg-integ').showModal();
+    if (k === 'zapsign'){ $('zs-ok').hidden = true; $('zs-passos').hidden = true; zsConferir(); }
   }
   // devolve o painel ao lugar dele (não depende só do evento close, que alguns navegadores atrasam)
   function guardarInteg(){ if (igAberto){ $('ig-paineis').appendChild(igAberto); igAberto = null; } pintarInteg(); }
@@ -7615,61 +7667,62 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   });
   /* ZapSign: token da API, ID do modelo e conta de teste no cofre; só o script do Google lê */
   var zsTem = false;
+  // ZapSign no jeito do BI de Vendas: só a chave; os modelos o script do Google acha pelo nome
   async function zsStatus(){
-    var rs = await Promise.all(['zapsign', 'zapsign_modelo', 'zapsign_teste', 'zapsign_modelo_proc'].map(function(n){ return SB.rpc('status_segredo', { p_nome: n }); }));
-    var t = rs[0].data && rs[0].data[0], m = rs[1].data && rs[1].data[0], te = !!(rs[2].data && rs[2].data[0]), mp = rs[3].data && rs[3].data[0];
-    if (mp && !$('zs-modelo-proc').dataset.editando) $('zs-modelo-proc').value = '•'.repeat(12) + mp.final;
-    zsTem = !!(t && m);
-    if (t && !$('zs-token').dataset.editando){ $('zs-token').value = '•'.repeat(24) + t.final; $('zs-token').classList.remove('mask'); }
-    if (m && !$('zs-modelo').dataset.editando) $('zs-modelo').value = '•'.repeat(12) + m.final;
-    $('zs-teste').checked = te;
-    $('zs-status').textContent = rs[0].error ? 'Não consegui ler o cofre: ' + rs[0].error.message
-      : zsTem ? 'Token (termina em ••' + t.final + '), modelo do contrato (••' + m.final + ')' + (mp ? ' e modelo da procuração (••' + mp.final + ')' : '; falta o modelo da procuração') + ' guardados' + (te ? ', na conta de teste' : '') + '. Toque em Testar para ver se o script do Google já está pronto.'
-      : !t ? 'Falta o token da API.' : 'Falta o ID do modelo.';
+    var r = await SB.rpc('status_segredo', { p_nome: 'zapsign' });
+    var t = r.data && r.data[0];
+    zsTem = !!t;
+    $('zs-token').placeholder = t ? 'Chave guardada (••' + t.final + ')' : 'Cole aqui a chave da API'; $('zs-token').title = t ? 'Para trocar a chave, cole a nova e salve' : '';
+    if (r.error) zsConfPintar([[false, 'Não consegui ler o cofre: ' + esc(r.error.message)]]);
     pintarInteg();
   }
-  ['zs-token', 'zs-modelo', 'zs-modelo-proc'].forEach(function(id){
-    $(id).addEventListener('focus', function(){ if (this.value.indexOf('•') === 0) this.select(); });
-    $(id).addEventListener('input', function(){ this.dataset.editando = '1'; var v = this.value.replace(/•/g, '').replace(/\s+/g, ''); if (v !== this.value) this.value = v; if (id === 'zs-token') this.classList.add('mask'); });
-  });
-  $('form-zs').addEventListener('submit', async function(e){
-    e.preventDefault();
-    var tk = $('zs-token').value, md = $('zs-modelo').value, mdp = $('zs-modelo-proc').value;
-    var novoT = tk.indexOf('•') === 0 ? null : tk.trim(), novoM = md.indexOf('•') === 0 ? null : md.trim(), novoMP = mdp.indexOf('•') === 0 ? null : mdp.trim();
-    if (novoMP && novoMP.length < 8){ toast('Cole o ID completo do modelo da procuração'); return; }
-    if (novoT && novoT.length < 20){ toast('Cole o token completo do ZapSign'); return; }
-    if (novoM && novoM.length < 8){ toast('Cole o ID completo do modelo'); return; }
-    var feitos = [];
-    if (novoT !== null) feitos.push(SB.rpc('salvar_segredo', { p_nome: 'zapsign', p_valor: novoT }));
-    if (novoM !== null) feitos.push(SB.rpc('salvar_segredo', { p_nome: 'zapsign_modelo', p_valor: novoM }));
-    if (novoMP !== null) feitos.push(SB.rpc('salvar_segredo', { p_nome: 'zapsign_modelo_proc', p_valor: novoMP }));
-    feitos.push(SB.rpc('salvar_segredo', { p_nome: 'zapsign_teste', p_valor: $('zs-teste').checked ? '1' : '' }));
-    var rs = await Promise.all(feitos), err = rs.filter(function(r){ return r.error; })[0];
-    if (err){ toast('Não foi possível salvar: ' + err.error.message); return; }
-    delete $('zs-token').dataset.editando; delete $('zs-modelo').dataset.editando; delete $('zs-modelo-proc').dataset.editando;
-    toast('ZapSign salvo'); await zsStatus();
-  });
-  $('zs-testar').addEventListener('click', async function(){
-    var u = cpUrl || $('cp-url').value.trim(); if (!u){ $('zs-status').textContent = 'Ligue primeiro o Cadastro pelo celular (endereço do script).'; return; }
-    $('zs-status').textContent = 'Testando…';
+  function zsConfPintar(linhas, extra){
+    $('zs-conf').innerHTML = linhas.map(function(l){ return '<p class="ig-conf-l ' + (l[0] === null ? 'esp' : l[0] ? 'ok' : 'erro') + '">' + svgI(l[0] === null ? 'i-sync' : l[0] ? 'i-check' : 'i-alert') + '<span>' + l[1] + '</span></p>'; }).join('') + (extra || '');
+  }
+  var zsConferindo = false;
+  async function zsConferir(){
+    if (zsConferindo) return;
+    if (!zsTem){ $('zs-conf').innerHTML = ''; return; }
+    var u = cpUrl || $('cp-url').value.trim();
+    if (!u){ zsConfPintar([[false, 'O script do Google ainda não está ligado.']]); return; }
+    zsConferindo = true; zsConfPintar([[null, 'Conferindo no ZapSign…']]);
     try {
       var d = await fetch(u + (u.indexOf('?') < 0 ? '?' : '&') + 'zs=1').then(function(r){ return r.json(); }); igScript = d; pintarInteg();
-      var z = d && d.zapsign, zt = d && d.zsTeste;
-      // o script perguntou ao ZapSign: token, modelos e campos
-      if (zt && (z === 'ok' || z === 'teste')){
-        var NOMES_ZS = { contrato: 'Contrato', procuracao: 'Procuração' };
-        var linha = function(k){ var m = zt[k] || {}; return NOMES_ZS[k] + ': ' + (m.falta ? 'falta colar o ID do modelo' : m.erro ? 'o ZapSign não achou este modelo (' + m.erro.replace(/^ZapSign: /, '') + ')' : m.faltam && m.faltam.length ? 'faltam no modelo os campos ' + m.faltam.map(function(c){ return '{{' + c + '}}'; }).join(', ') : m.faltam ? 'modelo certo, com todos os campos' : 'modelo encontrado' + (m.nome ? ' (' + m.nome + ')' : '')); };
-        $('zs-status').textContent = zt.erro ? 'O ZapSign respondeu: ' + zt.erro
-          : zt.token === false ? 'O ZapSign não aceitou o token. Copie de novo em ZapSign › Configurações › Integração › API, cole aqui e salve.' + (z === 'teste' ? ' (Está marcada a conta de teste: o token da conta oficial não vale lá.)' : '')
-          : (z === 'teste' ? 'Conta de teste (os contratos não valem). ' : 'Token aceito. ') + linha('contrato') + ' · ' + linha('procuracao') + '.';
-        return;
+      var zt = d && d.zsTeste, L = [];
+      if (!zt) L.push([false, 'O script do Google está numa versão antiga.']);
+      else if (zt.token === false) L.push([false, 'O ZapSign não aceitou a chave. Copie de novo em Configurações › Integração › API, cole aqui e salve.']);
+      else if (zt.erro) L.push([false, esc(String(zt.erro).replace(/^ZapSign: /, ''))]);
+      else {
+        L.push([true, 'Chave aceita pelo ZapSign']);
+        [['contrato', 'Contrato'], ['procuracao', 'Procuração']].forEach(function(p){
+          var m = zt[p[0]] || {};
+          if (m.falta) L.push([false, p[1] + ': não achei um modelo com <b>' + p[1] + '</b> no nome']);
+          else if (m.erro) L.push([false, p[1] + ': ' + esc(String(m.erro).replace(/^ZapSign: /, ''))]);
+          else if (m.faltam && m.faltam.length) L.push([false, p[1] + ': o modelo <b>' + esc(m.nome || '') + '</b> não tem ' + m.faltam.map(function(c){ return '{{' + c + '}}'; }).join(', ')]);
+          else L.push([true, p[1] + ': modelo <b>' + esc(m.nome || 'encontrado') + '</b>']);
+        });
       }
-      $('zs-status').textContent = z === undefined ? 'O script do Google ainda é a versão antiga: cole o google/campo.gs novo no projeto do script e implante uma nova versão.'
-        : z === 'ok' ? 'Tudo pronto: o aplicativo já gera o contrato pelo ZapSign.'
-        : z === 'teste' ? 'Pronto, na conta de teste do ZapSign (os contratos não valem).'
-        : /^erro/.test(z) ? 'O script do Google respondeu: ' + z
-        : 'O script ainda não encontrou o token e o modelo. Confira se o SQL 56 foi rodado, salve e teste de novo em 5 minutos.';
-    } catch(err){ $('zs-status').textContent = 'Não consegui falar com o script do Google.'; }
+      var nomes = zt && zt.modelosDaConta && zt.modelosDaConta.length ? '<p class="ig-conf-nomes">Modelos na conta: ' + zt.modelosDaConta.map(esc).join(' · ') + '</p>' : '';
+      zsConfPintar(L, nomes + '<button type="button" class="ig-de-novo" id="zs-de-novo">Conferir de novo</button>');
+    } catch(err){ zsConfPintar([[false, 'Não consegui falar com o script do Google.']], '<button type="button" class="ig-de-novo" id="zs-de-novo">Tentar de novo</button>'); }
+    zsConferindo = false;
+  }
+  $('zs-conf').addEventListener('click', function(e){ if (e.target.closest('#zs-de-novo')) zsConferir(); });
+  $('zs-olho').addEventListener('click', function(){ var i = $('zs-token'), ver = i.type === 'password'; i.type = ver ? 'text' : 'password'; this.querySelector('use').setAttribute('href', ver ? '#i-eyeoff' : '#i-eye'); this.setAttribute('aria-label', ver ? 'Esconder a chave' : 'Mostrar a chave'); this.title = this.getAttribute('aria-label'); });
+  $('zs-passos-lnk').addEventListener('click', function(){ var p = $('zs-passos'); p.hidden = !p.hidden; });
+  $('form-zs').addEventListener('submit', async function(e){
+    e.preventDefault();
+    var tk = $('zs-token').value.replace(/\s+/g, '');
+    if (!tk){ $('zs-token').focus(); toast(zsTem ? 'A chave já está guardada. Para trocar, cole a nova.' : 'Cole a chave da API do ZapSign'); return; }
+    if (tk.length < 20){ toast('Cole a chave completa do ZapSign'); return; }
+    $('zs-salvar').disabled = true;
+    var r = await SB.rpc('salvar_segredo', { p_nome: 'zapsign', p_valor: tk });
+    $('zs-salvar').disabled = false;
+    if (r.error){ toast('Não foi possível salvar: ' + r.error.message); return; }
+    $('zs-token').value = ''; $('zs-token').type = 'password';
+    var hora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    $('zs-ok').innerHTML = svgI('i-check') + '<span>Deu certo! A chave do <b>ZapSign</b> foi salva às ' + hora + '.</span>'; $('zs-ok').hidden = false;
+    await zsStatus(); zsConferir();
   });
   async function cpStatus(){
     if (!isAdmin() || !SB) return;
