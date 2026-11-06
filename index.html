@@ -2232,10 +2232,41 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
 .ativ-sel:hover{background:hsl(var(--c-pri)/.06)}
 .ativ-sel:focus-visible{outline:2px solid hsl(var(--c-pri));outline-offset:2px}
 .ativ-sel option{color:var(--ink);background:var(--bg);font-weight:400}
+
+/* tela de entrar no estilo do aplicativo (05/11): roxo com degradê, marca branca e balão branco */
+.auth{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:32px 20px;overflow:auto;background:radial-gradient(70% 36% at 50% 34%,rgba(24,5,48,.30),rgba(24,5,48,0) 72%),radial-gradient(46% 30% at 94% 28%,rgba(140,72,215,.34),rgba(140,72,215,0) 70%),radial-gradient(40% 26% at 4% 46%,rgba(124,60,200,.26),rgba(124,60,200,0) 70%),linear-gradient(180deg,#6a2bae 0%,#5c2499 20%,#4c1c82 45%,#3a146a 72%,#280c4c 100%);background-color:#6a2bae}
+.auth::before{content:"";position:absolute;right:-12vmax;bottom:-10vmax;width:56vmax;height:56vmax;background:url(img/marca-suave.png) no-repeat center/contain;opacity:.12;pointer-events:none}
+.auth[hidden]{display:none!important}
+.auth-marca{position:relative;z-index:1;text-align:center;color:#fff;flex:none}
+.auth-marca .auth-logo{width:auto!important;height:96px!important;margin:0 auto 16px!important;background:none!important;padding:0!important;border-radius:0!important;filter:none!important;display:block}
+.auth-marca h1{margin:0;font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:clamp(30px,3.4vw,46px);line-height:1.05;color:#fff;letter-spacing:-.01em}
+.auth-marca .eyebrow{margin-top:12px;font-family:'Inter',system-ui,sans-serif;font-weight:700;font-size:12.5px;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.9)}
+.auth-card.card{position:relative;z-index:1;width:min(440px,100%);background:#fff!important;color:#1f1229;border:0!important;border-radius:30px!important;padding:32px 32px 24px!important;box-shadow:0 30px 80px rgba(20,6,40,.38)!important;gap:12px!important}
+.auth-tit h2{margin:0;font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:32px;line-height:1.1;color:#1f1229}
+.auth-card #auth-intro{color:#5d4a6e!important;font-size:14.5px;margin:-2px 0 4px}
+.auth-card form{gap:12px!important}
+.auth-card label{font-size:12px!important;font-weight:700!important;letter-spacing:.08em;text-transform:uppercase;color:#4b3a5c!important}
+.auth-card .field input{min-height:54px!important;border-radius:16px!important;border:1.5px solid transparent!important;background-color:#efe7f6!important;padding:0 16px 0 48px!important;font-size:15.5px!important;color:#1f1229!important;background-repeat:no-repeat!important;background-position:16px center!important;background-size:20px 20px!important;box-shadow:none!important}
+.auth-card .field input::placeholder{color:#8f7fa0}
+.auth-card .field input:focus{border-color:#8a43d3!important;background-color:#fff!important;box-shadow:0 0 0 4px rgba(138,67,211,.14)!important;outline:none}
+.auth-card #af-email{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237633b2' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6'/%3E%3C/svg%3E")!important}
+.auth-card #af-senha,.auth-card #af-senha2{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237633b2' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='10' rx='2.5'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E")!important;padding-right:52px!important}
+.auth-card .pw-eye{right:10px!important;color:#6a2bae!important}
+.auth-card .btn.primary{min-height:54px!important;margin-top:6px;border:0!important;border-radius:16px!important;background:linear-gradient(120deg,#8a43d3,#5c2499)!important;color:#fff!important;font-size:16px!important;font-weight:700!important;box-shadow:0 14px 30px rgba(92,36,153,.30)!important}
+.auth-card .btn.primary:hover{filter:brightness(1.06)}
+.auth-card .auth-links{justify-content:center;gap:8px 18px!important;font-size:14px!important;margin-top:4px}
+.auth-card .auth-links .linkbtn{color:#5c2499!important;font-weight:600}
+.auth-card .auth-msg.err{color:#c0392b!important}
+/* computador: a marca à esquerda e o balão à direita */
+@media (min-width:900px){
+  .auth{flex-direction:row;gap:clamp(48px,9vw,140px)}
+  .auth-marca{text-align:left}
+  .auth-marca .auth-logo{margin:0 0 20px!important;height:128px!important}
+}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -2296,12 +2327,13 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
 </svg>
 
 <div class="auth" id="auth" hidden>
+  <div class="auth-marca">
+    <img class="auth-logo" src="img/marca-branca.png" alt="">
+    <h1>Nascer com Direitos</h1>
+    <div class="eyebrow">Salário-maternidade</div>
+  </div>
   <div class="card auth-card">
-    <div>
-      <img class="auth-logo" src="img/logo-nascer-t.png" alt="Nascer com Direitos">
-      <div class="eyebrow">Salário-maternidade</div>
-      <h1>Nascer com Direitos</h1>
-    </div>
+    <div class="auth-tit"><h2 id="auth-titulo">Entrar</h2></div>
     <form id="auth-form" novalidate>
       <p class="auth-msg" id="auth-intro">Entre com o seu CPF e a senha.</p>
       <div class="field" id="af-email-wrap"><label for="af-email">CPF</label><input id="af-email" type="text" inputmode="numeric" maxlength="14" autocomplete="off" name="cpf-nc" autocapitalize="none" spellcheck="false" placeholder="000.000.000-00"></div>
@@ -9310,6 +9342,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
     authMode = mode; $('app').hidden = true; $('auth').hidden = false;
     var t = AUTH_TXT[mode];
     $('auth-intro').className = 'auth-msg'; $('auth-intro').textContent = extra || t.intro;
+    if ($('auth-titulo')) $('auth-titulo').textContent = { entrar: 'Entrar', primeiro: 'Primeiro acesso', esqueci: 'Esqueci a senha', nova: 'Nova senha', bloqueado: 'Acesso' }[mode] || 'Entrar';
     $('af-email-wrap').hidden = mode === 'nova' || mode === 'bloqueado';
     $('af-senha-wrap').hidden = mode === 'esqueci' || mode === 'bloqueado';
     $('af-senha2-wrap').hidden = !(mode === 'primeiro' || mode === 'nova');
