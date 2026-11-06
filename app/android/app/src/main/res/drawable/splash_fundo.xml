@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- abertura do aplicativo: roxo com a logo branca no meio, igual à abertura do sistema (Android 12 ou mais) -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/abertura_roxo"/>
+    <item>
+        <bitmap android:src="@drawable/splash_icone" android:gravity="center"/>
+    </item>
+</layer-list>

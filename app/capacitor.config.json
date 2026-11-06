@@ -13,12 +13,14 @@
     ]
   },
   "android": {
-    "allowMixedContent": false
+    "allowMixedContent": false,
+    "backgroundColor": "#6a2bae"
   },
   "plugins": {
     "SystemBars": {
       "insetsHandling": "css",
       "initialViewportFitValueHint": "auto"
     }
-  }
+  },
+  "backgroundColor": "#6a2bae"
 }
