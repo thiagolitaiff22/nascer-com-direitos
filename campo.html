@@ -1130,7 +1130,7 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
 html[data-tema="dark"] .lg.balao .lg-links a,html[data-tema="dark"] .lg.balao .lg-campo button{color:#66279d}
 html[data-tema="dark"] .lg.balao .lg-campo svg{stroke:#7633b2}
 html[data-tema="dark"] .lg.balao .lg-cartao{box-shadow:0 26px 60px rgba(0,0,0,.5)}
-html[data-tema="dark"] .lg.balao{background:radial-gradient(70% 36% at 50% 34%,rgba(14,3,30,.34),rgba(14,3,30,0) 72%),radial-gradient(46% 30% at 94% 28%,rgba(120,62,190,.28),rgba(120,62,190,0) 70%),radial-gradient(40% 26% at 4% 46%,rgba(100,50,170,.22),rgba(100,50,170,0) 70%),linear-gradient(180deg,#4e1d86 0%,#431877 20%,#381465 45%,#2a0f50 72%,#1b0836 100%);background-color:#4e1d86}
+/* tema escuro: a tela de entrar usa o mesmo roxo do claro (a faixa do relógio do iPhone fica igual) */
 @media (max-height:640px){ .lg.balao{gap:12px} .lg.balao .lg-cartao{padding:18px 18px 14px} .lg.balao .lg-tag{display:none} }
 @media (max-height:540px){ .lg.balao .lg-marca{display:none} .lg.balao .lg-nome{margin-top:0;font-size:21px} .lg.balao .lg-inst{display:none} }
 /* celular deitado: a marca à esquerda e o balão à direita */
@@ -1228,7 +1228,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
 
 </style>
 <link rel="preload" as="image" href="img/marca-suave.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
-<script>document.documentElement.classList.add('abrindo');try{document.querySelector('meta[name="theme-color"]').setAttribute('content','#6a2bae');}catch(e){}
+<script>try{if(!localStorage.getItem('nascer_campo_token')){document.documentElement.classList.add('abrindo');document.querySelector('meta[name="theme-color"]').setAttribute('content','#6a2bae');}}catch(e){}
 /* segurança: se algo travar, a abertura sai sozinha */setTimeout(function(){var a=document.getElementById('abertura');if(a)a.remove();document.documentElement.classList.remove('abrindo');},6000);</script>
 <style>
 html.abrindo,html.abrindo body{background:#6a2bae!important;overflow:hidden}
@@ -1279,7 +1279,7 @@ html.abrindo,html.abrindo body{background:#6a2bae!important;overflow:hidden}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 95;
+  var APP_VERSAO = 96;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -3834,7 +3834,7 @@ html.abrindo,html.abrindo body{background:#6a2bae!important;overflow:hidden}
       .catch(function(){ return false; });
   }
   function pedirLink(msg){
-    tirarEsqueleto(true); corTopo(document.documentElement.getAttribute('data-tema') === 'dark' ? '#4e1d86' : '#6a2bae');   // mesmo roxo da borda de cima da tela de entrar
+    tirarEsqueleto(true); corTopo('#6a2bae');   // mesmo roxo da borda de cima da tela de entrar
     lsSet('campo_usuario', '');   // o app não guarda o CPF: quem lembra o login é o celular (Senhas do iPhone, Google)
     document.documentElement.classList.remove('inicio-fixo'); document.documentElement.classList.add('lg-fixo');
     $('app').innerHTML = '<div class="lg balao">' +
