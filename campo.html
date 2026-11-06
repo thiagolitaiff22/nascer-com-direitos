@@ -1101,10 +1101,10 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
 
 
 /* tela de entrar (05/11, como o usuário descreveu): a tela toda roxa com a marca e, no centro, um balão branco com o login */
-.lg.balao{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(16px,3.6dvh,32px);padding:calc(16px + env(safe-area-inset-top)) 20px calc(16px + env(safe-area-inset-bottom));overflow:hidden;background:radial-gradient(62% 34% at 50% 30%,rgba(255,255,255,.17),rgba(255,255,255,0) 70%),radial-gradient(48% 30% at 92% 24%,rgba(222,190,255,.26),rgba(222,190,255,0) 70%),radial-gradient(40% 26% at 6% 40%,rgba(190,140,255,.18),rgba(190,140,255,0) 70%),linear-gradient(180deg,#8a43d3 0%,#7b36c0 28%,#6a2aa3 58%,#4d1a7c 100%)}
+.lg.balao{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(16px,3.6dvh,32px);padding:calc(16px + env(safe-area-inset-top)) 20px calc(16px + env(safe-area-inset-bottom));overflow:hidden;background:radial-gradient(70% 36% at 50% 34%,rgba(24,5,48,.30),rgba(24,5,48,0) 72%),radial-gradient(46% 30% at 94% 28%,rgba(140,72,215,.34),rgba(140,72,215,0) 70%),radial-gradient(40% 26% at 4% 46%,rgba(124,60,200,.26),rgba(124,60,200,0) 70%),linear-gradient(180deg,#6a2bae 0%,#5c2499 20%,#4c1c82 45%,#3a146a 72%,#280c4c 100%)}
 .lg.balao::before{content:"";position:absolute;right:-16vmax;bottom:-12vmax;width:64vmax;height:64vmax;background:url(img/marca-suave.png) no-repeat center/contain;opacity:.15;pointer-events:none}
 .lg.balao::after{display:none;content:"";position:absolute;left:-26vmax;top:4vmax;width:56vmax;height:56vmax;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none}
-.lg.balao{background-color:#8a43d3}
+.lg.balao{background-color:#6a2bae}
 /* logo e balão de entrar mais para cima (sobra mais espaço embaixo nas telas altas) */
 @media (min-height:700px){ .lg.balao{padding-bottom:calc(16px + env(safe-area-inset-bottom) + min(15dvh,140px))} }
 .lg.balao .lg-topo{position:relative;z-index:1;flex:none;height:auto;min-height:0;padding:0;background:none;overflow:visible;animation:lgFundo .6s ease both}
@@ -1116,7 +1116,7 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
 html[data-tema="dark"] .lg.balao .lg-links a,html[data-tema="dark"] .lg.balao .lg-campo button{color:#66279d}
 html[data-tema="dark"] .lg.balao .lg-campo svg{stroke:#7633b2}
 html[data-tema="dark"] .lg.balao .lg-cartao{box-shadow:0 26px 60px rgba(0,0,0,.5)}
-html[data-tema="dark"] .lg.balao{background:radial-gradient(62% 34% at 50% 30%,rgba(255,255,255,.10),rgba(255,255,255,0) 70%),radial-gradient(48% 30% at 92% 24%,rgba(200,160,255,.18),rgba(200,160,255,0) 70%),radial-gradient(40% 26% at 6% 40%,rgba(170,120,240,.14),rgba(170,120,240,0) 70%),linear-gradient(180deg,#6a2aa3 0%,#5a2290 28%,#4d1a7c 58%,#2e0e4c 100%);background-color:#6a2aa3}
+html[data-tema="dark"] .lg.balao{background:radial-gradient(70% 36% at 50% 34%,rgba(14,3,30,.34),rgba(14,3,30,0) 72%),radial-gradient(46% 30% at 94% 28%,rgba(120,62,190,.28),rgba(120,62,190,0) 70%),radial-gradient(40% 26% at 4% 46%,rgba(100,50,170,.22),rgba(100,50,170,0) 70%),linear-gradient(180deg,#4e1d86 0%,#431877 20%,#381465 45%,#2a0f50 72%,#1b0836 100%);background-color:#4e1d86}
 @media (max-height:640px){ .lg.balao{gap:12px} .lg.balao .lg-cartao{padding:18px 18px 14px} .lg.balao .lg-tag{display:none} }
 @media (max-height:540px){ .lg.balao .lg-marca{display:none} .lg.balao .lg-nome{margin-top:0;font-size:21px} .lg.balao .lg-inst{display:none} }
 /* celular deitado: a marca à esquerda e o balão à direita */
@@ -1255,7 +1255,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 92;
+  var APP_VERSAO = 93;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -3809,7 +3809,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
       .catch(function(){ return false; });
   }
   function pedirLink(msg){
-    tirarEsqueleto(true); corTopo(document.documentElement.getAttribute('data-tema') === 'dark' ? '#6a2aa3' : '#8a43d3');   // mesmo roxo da borda de cima da tela de entrar
+    tirarEsqueleto(true); corTopo(document.documentElement.getAttribute('data-tema') === 'dark' ? '#4e1d86' : '#6a2bae');   // mesmo roxo da borda de cima da tela de entrar
     lsSet('campo_usuario', '');   // o app não guarda o CPF: quem lembra o login é o celular (Senhas do iPhone, Google)
     document.documentElement.classList.remove('inicio-fixo'); document.documentElement.classList.add('lg-fixo');
     $('app').innerHTML = '<div class="lg balao">' +
