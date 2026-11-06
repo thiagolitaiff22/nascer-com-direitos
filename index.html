@@ -6604,9 +6604,9 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   function lerGuardado(k, pad){ try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? pad : v; } catch(e){ return pad; } }
   function guardar(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
   /* ---------- dois fluxos (como Advogados | Educação no BI de Vendas) ----------
-     novo: mãe marcada fluxo:'novo' (o app novo marca; por enquanto só o Novo cadastro feito com o BI no Fluxo novo);
+     novo: mãe marcada fluxo:'novo' (desde 06/11/2026 o cadastro do app com contrato ZapSign vem marcado pelo SQL 58; e o Novo cadastro feito com o BI no Fluxo novo);
            sem closer e sem Controladoria: entra direto no Pós-venda
-     antigo: todas as outras; segue como era, com closer, Controladoria e Fila (o app atual continua mandando para cá) */
+     antigo: todas as outras; segue como era, com closer, Controladoria e Fila (cadastros antigos e app desatualizado, sem contrato) */
   function diaCadastro(r){ return r.criadoEm ? diaLocal(r.criadoEm) : String(r.dataCadastro || '').slice(0, 10); }
   function doFluxoNovo(r){ return r.fluxo === 'novo'; }
   var fluxoVista = lerGuardado('nascer-fluxo', 'antigo') === 'novo' ? 'novo' : 'antigo';
