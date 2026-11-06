@@ -1279,6 +1279,18 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
 .tela .sq-n{display:block;margin-bottom:4px;font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#7633b2}
 .tela .sq-perg{margin:2px 0 16px;font-size:17px;line-height:1.4;color:var(--ink)}
 .tela button.sq-parar{background:transparent;color:var(--ink2);border:0;height:44px;font-size:15px;text-decoration:underline;text-underline-offset:3px}
+html[data-tema="dark"] .sq-ini{background:linear-gradient(160deg,#241a2e,#1c1424);border-color:#3a2a4a}
+html[data-tema="dark"] .sq-ini p{color:#cdb4e6}
+html[data-tema="dark"] .sq-lin u,html[data-tema="dark"] .sq-mais button,html[data-tema="dark"] .tela .sq-n{color:#c49be6}
+html[data-tema="dark"] .sq-lin i{background:#2c2236;color:#a990c0}
+html[data-tema="dark"] .sq-lin.ok i{background:#16351f;color:#6fd59a}
+html[data-tema="dark"] .sq-lin.pend i{background:#3d1a1a;color:#f19c9c}
+html[data-tema="dark"] .sq-lin.pend span small{color:#f19c9c}
+html[data-tema="dark"] .sq-pend{background:#2a1517;border-color:#4a2226;color:#f5c2c2}
+html[data-tema="dark"] .tuto-cena{background:radial-gradient(120% 90% at 50% 20%,#2c2238,#1f1729)}
+html[data-tema="dark"] .tuto-leg{color:#d9bff2}
+html[data-tema="dark"] .tuto-pts i{background:#3a2c48}
+html[data-tema="dark"] .tuto-pts i.on{background:#c49be6}
 /* animação de como tirar a foto */
 .tuto-cena{--dur:2.4s;--k:1;position:relative;height:232px;margin:4px 0 10px;border-radius:18px;overflow:hidden;background:radial-gradient(120% 90% at 50% 20%,#f8f3fc,#eadcf5)}
 .tuto-cena.peq{--k:.7;height:160px;margin:0 0 12px}
@@ -1377,7 +1389,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 107;
+  var APP_VERSAO = 108;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1586,21 +1598,22 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   /* ---------- casca do aplicativo: barra de cima, três abas e as vistas ---------- */
   var aba = lsGet('campo_aba') || 'painel', painel = null, filtroCli = 'todos', buscaCli = '';
   var NOME_DOC = { procuracao: 'Contrato e procuração', rg_frente: 'RG', cpf: 'CPF', titulo: 'Título de eleitor', titulo_verso: 'Título de eleitor - verso', video: 'Vídeo de concordância', certidao: 'Certidão de nascimento', residencia: 'Comprovante de residência', cliente: 'Foto da cliente', autodeclaracao: 'Autodeclaração rural', rural: 'Provas rurais', ctps: 'CTPS / CNIS', arogo: 'Documentos a rogo', outro: 'Outro documento' };
-  var NAO_PEDE = { titulo: 1, titulo_verso: 1, residencia: 1, rural: 1, autodeclaracao: 1 };   // não são mais pedidos pelo app (06/11/2026)
-  function faltas(c){ return (c && Array.isArray(c.faltaDocs) ? c.faltaDocs : []).filter(function(k){ return NOME_DOC[k] && !NAO_PEDE[k]; }); }
+  // o app só pede RG e CPF (06/11/2026); o resto que o escritório marcar como faltando (procuração, CTPS…) não é foto do app
+  var PEDE_APP = { rg_frente: 1, cpf: 1 };
+  function faltas(c){ return (c && Array.isArray(c.faltaDocs) ? c.faltaDocs : []).filter(function(k){ return PEDE_APP[k]; }); }
   function nomesFaltas(l){ return l.map(function(k){ return NOME_DOC[k]; }).join(', '); }
   // completando: cliente já cadastrado que o prospectador está completando ({ id, nome, faltaDocs })
   var completando = null;
   try { completando = JSON.parse(lsGet('campo_completando') || 'null'); } catch(e){}
   function iniciarComplemento(c){
     if (Object.keys(fotos).length && !completando) return alert('Há um cadastro novo em andamento com fotos. Envie ou apague esse cadastro antes de completar os documentos de outra cliente.');
-    completando = { id: c.id, nome: c.nome, faltaDocs: faltas(c) };
+    completando = { id: c.id, nome: c.nome, faltaDocs: faltas(c) }; seqAtiva = false;
     lsSet('campo_completando', JSON.stringify(completando));
     irPara('novo');
   }
   function cancelarComplemento(){
     if (Object.keys(fotos).length && !confirm('Descartar as fotos tiradas para completar os documentos?')) return;
-    fotos = {}; completando = null; lsSet('campo_completando', ''); telaInicial();
+    fotos = {}; completando = null; seqAtiva = false; lsSet('campo_completando', ''); telaInicial();
   }
   // no aplicativo o nome do cliente aparece sempre em maiúsculas (no sistema fica 'Maria dos Santos')
   function maiusculas(d){ if (d && d.clientes) d.clientes.forEach(function(c){ if (c.nome) c.nome = bonito(c.nome); if (c.crianca) c.crianca = bonito(c.crianca); }); return d; }   // (nome da função antigo) padrão: Primeira letra maiúscula
@@ -1979,7 +1992,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     };
   }
   function etapaMae(m){ return m.desqualificada ? ['Não seguiu', 'no'] : m.liberada ? ['Benefício liberado', 'ok'] : m.confirmada ? ['Mãe confirmada', 'ok'] : ['Em análise', 'an']; }
-  function linhaMae(m, comParceiro){
+  function linhaMaeRede(m, comParceiro){
     var e = etapaMae(m), falta = Array.isArray(m.faltaDocs) && m.faltaDocs.length;
     return '<div class="mr-lin"><div class="mr-n"><b>' + esc(bonito(m.nome || 'Sem nome')) + '</b><small>' + (comParceiro && m.parceiro ? 'indicada por ' + esc(bonito(m.parceiro)) + ' · ' : '') + (m.cadastro ? 'cadastrada em ' + esc(isoParaBr(m.cadastro)) : '') + (falta ? ' · falta documento' : '') + '</small></div><span class="mr-s ' + e[1] + '">' + e[0] + '</span></div>';
   }
@@ -1988,7 +2001,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     var todas = maesDaRede();
     var t = tela('<b>Mães dos seus parceiros</b><p>' + todas.length + (todas.length === 1 ? ' mãe indicada' : ' mães indicadas') + '</p><input class="mr-busca" type="search" placeholder="Buscar pelo nome" autocomplete="off"><div class="mr-lista"></div><button class="sec2" id="t-fecha">Fechar</button>');
     var box = t.querySelector('.mr-lista'), q = t.querySelector('.mr-busca');
-    function pintar(){ var s = semAcento(q.value), v = todas.filter(function(m){ return !s || semAcento((m.nome || '') + ' ' + (m.parceiro || '')).indexOf(s) >= 0; }); box.innerHTML = v.length ? v.map(function(m){ return linhaMae(m, true); }).join('') : '<p class="mr-vazio">Nenhuma mãe encontrada.</p>'; }
+    function pintar(){ var s = semAcento(q.value), v = todas.filter(function(m){ return !s || semAcento((m.nome || '') + ' ' + (m.parceiro || '')).indexOf(s) >= 0; }); box.innerHTML = v.length ? v.map(function(m){ return linhaMaeRede(m, true); }).join('') : '<p class="mr-vazio">Nenhuma mãe encontrada.</p>'; }
     pintar(); q.addEventListener('input', pintar);
     t.querySelector('#t-fecha').onclick = function(){ t.remove(); };
   }
@@ -1998,7 +2011,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
       '<div class="acesso-caixa"><span>Usuário</span><b>' + esc(x.usuario || '—') + '</b><span>Situação</span><b>' + (x.ativo === false ? 'Acesso bloqueado' : 'Ativo') + '</b>' +
       '<span>Ganhos</span><b>' + (x.ganho === false ? 'Sem ganhos' : (Number(x.comConf) || Number(x.comLib) ? reaisCurto(x.comConf) + ' + ' + reaisCurto(x.comLib) : 'sem valor definido')) + '</b>' +
       '<span>Indicações</span><b>' + (+x.indicacoes || 0) + '</b><span>Contratos</span><b>' + (+x.contratos || 0) + '</b><span>Concedidos</span><b>' + (+x.concedidos || 0) + '</b></div>' +
-      ((x.maes || []).length ? '<div class="mr-rot">Mães indicadas</div><div class="mr-lista">' + x.maes.map(function(m){ return linhaMae(m, false); }).join('') + '</div>' : '') +
+      ((x.maes || []).length ? '<div class="mr-rot">Mães indicadas</div><div class="mr-lista">' + x.maes.map(function(m){ return linhaMaeRede(m, false); }).join('') + '</div>' : '') +
       '<button id="t-ganho">Editar os ganhos deste parceiro</button><button class="sec2" id="t-senha">Gerar nova senha e mandar</button>' + (x.telefone ? '<button class="sec2" id="t-ligar">Ligar para o parceiro</button>' : '') +
       '<button class="sec2" id="t-ativo">' + (x.ativo === false ? 'Liberar o acesso' : 'Bloquear o acesso') + '</button><button class="sec2" id="t-fecha">Fechar</button>');
     t.querySelector('#t-fecha').onclick = function(){ t.remove(); };
@@ -2084,7 +2097,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     if (!confirm('Descartar este cadastro? Os dados digitados e as fotos serão apagados deste celular.')) return;
     fotos = {}; local = null; guardarRascunho();   // sem fotos, o rascunho guardado é apagado
     CAMPOS_CADASTRO.forEach(function(k){ lsSet(k, ''); });
-    senhaGovRascunho = ''; passoNovo = null;
+    senhaGovRascunho = ''; passoNovo = null; seqAtiva = false;
     telaInicial(); if ($('vista')) $('vista').scrollTop = 0;
   }
   /* contrato e procuração pelo ZapSign: gerados já preenchidos e assinados com o dedo aqui no app, antes da senha gov.br e das fotos.
@@ -2175,14 +2188,20 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     var gest = gestante(), txt = function(k){ return String(lsGet(k) || '').trim(); };
     var nm = nomeMae();
     var P = [
-      { k: 'nome', t: 'Qual é o nome da mãe?', s: 'Nome completo, como está no documento.', el: ['l-nome'], foco: 'nome', ok: function(){ return txt('campo_nome').length >= 3; }, erro: 'Digite o nome completo da mãe.' },
+      { k: 'nome', t: 'Qual é o nome da mãe?', s: 'Nome completo, como está no documento.', el: ['l-nome'], foco: 'nome', ok: function(){ return txt('campo_nome').split(/\s+/).filter(function(p){ return p.length > 1; }).length >= 2; }, erro: 'Digite o nome completo da mãe (nome e sobrenome).' },
       { k: 'trab', t: 'O que a ' + nm + ' faz hoje?', s: '', opcoes: Q_TRAB, chave: 'campo_q_trab', el: [], ok: function(){ var q = qualif(); return !q.nao && q.falta !== 'trabalho'; }, erro: 'Escolha uma opção.' },
       { k: 'benef', t: 'A ' + nm + ' recebe algum benefício?', s: '', opcoes: Q_BENEF, chave: 'campo_q_benef', el: [], ok: function(){ var q = qualif(); return !q.nao && !!lsGet('campo_q_benef'); }, erro: 'Escolha uma opção.' },
       { k: 'cpf', t: 'Qual é o CPF dela?', s: 'Só os números.', el: ['l-cpf'], foco: 'cpf', ok: function(){ return cpfOk(($('cpf') || {}).value); }, erro: 'Confira o CPF: são 11 números.' },
       { k: 'fone', t: 'Qual é o WhatsApp dela?', s: 'Com DDD. É por ele que o escritório vai falar com ela.', el: ['l-fone'], foco: 'fone', ok: function(){ return foneOk(($('fone') || {}).value); }, erro: 'Digite o celular com DDD.' },
       { k: 'end', t: 'Onde ela mora?', s: '', el: ['l-cep', 'end-auto'], foco: 'cep',
         ok: function(){ return cepOk(txt('campo_cep')) && txt('campo_rua') && txt('campo_num') && txt('campo_cidade') && txt('campo_uf_cep').length === 2; }, erro: 'Falta o CEP, a rua, o número, a cidade ou a UF.' },
-      gest ? { k: 'parto', t: 'Quando o bebê deve nascer?', s: 'Atendemos só gestantes: o bebê ainda não pode ter nascido.', el: ['l-dpp'], foco: 'dpp', ok: function(){ return !!txt('campo_dpp'); }, erro: 'Digite a data prevista do parto.' }
+      gest ? { k: 'parto', t: 'Quando o bebê deve nascer?', s: 'Atendemos só gestantes: o bebê ainda não pode ter nascido.', el: ['l-dpp'], foco: 'dpp', ok: function(){
+             var v = txt('campo_dpp'); if (!v){ this.erro = 'Digite a data prevista do parto.'; return false; }
+             var dp = new Date(v + 'T12:00:00'), hj = new Date(); hj.setHours(12, 0, 0, 0); var n = Math.round((dp - hj) / 86400000);
+             if (isNaN(n)){ this.erro = 'Confira a data prevista do parto.'; return false; }
+             if (n < 0){ this.erro = 'Essa data já passou. Atendemos só gestantes: confira a data.'; return false; }
+             if (n > 300){ this.erro = 'Data longe demais (mais de 10 meses). Confira o ano.'; return false; }
+             return true; }, erro: 'Digite a data prevista do parto.' }
            : { k: 'parto', t: 'Quando o bebê nasceu?', s: '', el: ['l-cnasc'], foco: 'cnasc', ok: function(){ return !!txt('campo_crianca_nasc'); }, erro: 'Digite a data de nascimento do bebê.' },
       (function(){ var f = ctFase(); return { k: 'contrato', contrato: true, el: [], ok: ctOk, erro: 'A ' + nm + ' precisa assinar o contrato antes das fotos.',
         t: f === 'assinar' ? 'Assinatura da ' + nm : f === 'assinado' ? 'Contrato assinado' : f === 'semrede' ? 'Sem internet agora' : f === 'depois' ? 'Contrato pelo WhatsApp' : 'Contrato e procuração da ' + nm,
@@ -2191,6 +2210,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
       { k: 'docs', t: 'Fotos dos documentos', s: 'Tire as fotos e envie.', el: [], grid: true, ok: function(){ return true; }, final: true }
     ].filter(Boolean);
     var idx = function(k){ for (var i = 0; i < P.length; i++) if (P[i].k === k) return i; return 0; };
+    if (pedePasso){ passoNovo = idx(pedePasso); pedePasso = null; }   // o Enviar achou algo faltando: abre essa pergunta
     if (passoNovo == null){ passoNovo = 0; for (var k = 0; k < P.length - 1 && P[k].ok() && !P[k].pular; k++) passoNovo = k + 1; }   // rascunho: volta para a primeira pergunta sem resposta
     passoNovo = Math.max(0, Math.min(P.length - 1, passoNovo));
     // guarda escondidos os campos de todas as etapas (continuam ligados, o envio lê deles)
@@ -2256,12 +2276,14 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
         $('wz-desc2').onclick = descartarCadastro;
       } else {
         slot.innerHTML = '<div class="wz-opcoes wz-linhas">' + pas.opcoes.map(function(o){ return '<button type="button" class="wz-op" data-op="' + o[0] + '" aria-pressed="' + (o[0] === marcado) + '"><i></i><span><b>' + esc(o[1]) + '</b>' + (o[2] ? '<small>' + esc(o[2]) + '</small>' : '') + '</span></button>'; }).join('') + '</div>';
+        var noPasso = passoNovo;
         Array.prototype.forEach.call(slot.querySelectorAll('[data-op]'), function(b){ b.onclick = function(){
+          if (passoNovo !== noPasso) return;
           lsSet(pas.chave, b.dataset.op);
           if (pas.chave === 'campo_q_trab' && b.dataset.op !== marcado) lsSet('campo_q_saida', '');
           Array.prototype.forEach.call(slot.querySelectorAll('[data-op]'), function(x){ x.setAttribute('aria-pressed', String(x === b)); });
           var o2 = qOpcao(pas.opcoes, b.dataset.op);
-          setTimeout(function(){ if (!(o2 && o2[3] === 'nao')) passoNovo++; telaInicial(); }, 220);   // não se enquadra: fica e mostra o porquê
+          setTimeout(function(){ if (passoNovo !== noPasso) return; if (!(o2 && o2[3] === 'nao')) passoNovo++; telaInicial(); }, 220);   // não se enquadra: fica e mostra o porquê
         }; });
       }
     } else {
@@ -2347,7 +2369,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
       var g1 = document.querySelector('#vista .grid'), ops = Array.prototype.slice.call(document.querySelectorAll('#vista .doc[data-k="video"], #vista .doc[data-k="procuracao"], #vista .doc[data-k="outro"]'));
       if (!g1 || !ops.length || completando) return;
       var box = document.createElement('div'); box.className = 'grupo-opc';
-      box.innerHTML = '<div class="rot">Quando possível<small>o closer também pode fazer depois</small></div><div class="grid"></div>';
+      box.innerHTML = '<div class="rot">Quando possível<small>o escritório também pode pedir depois</small></div><div class="grid"></div>';
       ops.forEach(function(c){ c.classList.add('opc'); box.querySelector('.grid').appendChild(c); });
       g1.parentNode.insertBefore(box, g1.nextSibling);
     })();
@@ -2375,6 +2397,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
       var mostraEnd = function(){ if ($('bairro')) $('bairro').value = lsGet('campo_bairro'); if ($('cid2')){ $('cid2').value = lsGet('campo_cidade'); $('l-cid2').classList.toggle('falta', !lsGet('campo_cidade')); } if ($('uf2')){ $('uf2').value = lsGet('campo_uf_cep'); $('l-uf2').classList.toggle('falta', !lsGet('campo_uf_cep')); } };
       var buscarCep = function(){
         var d = $('cep').value.replace(/\D/g, ''), st = $('cep-st'); if (d.length !== 8 || d === ultimoCep) return; var cepAntes = cepGuardado; ultimoCep = d; cepGuardado = d;
+        if (cepAntes && cepAntes !== d){ ['campo_rua', 'campo_num', 'campo_compl', 'campo_bairro', 'campo_cidade', 'campo_uf_cep'].forEach(function(k){ lsSet(k, ''); }); ['rua', 'num', 'compl', 'bairro', 'cid2', 'uf2', 'cidade'].forEach(function(id){ if ($(id)) $(id).value = ''; }); }
         st.textContent = 'buscando…'; st.className = 'cep-st';
         fetch('https://viacep.com.br/ws/' + d + '/json/').then(function(r){ return r.json(); }).then(function(x){
           if (!x || x.erro){ st.textContent = 'CEP não encontrado'; st.className = 'cep-st erro'; $('end-auto').hidden = false; return; }
@@ -3067,9 +3090,12 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
       if (n) return alert('Ainda há ' + n + (n === 1 ? ' cadastro' : ' cadastros') + ' esperando internet neste celular. Espere enviar antes de sair.');
       if (Object.keys(fotos).length && !confirm('Há fotos de um cadastro em andamento. Sair mesmo assim? As fotos serão apagadas.')) return;
       if (!confirm('Sair desta conta? Para entrar de novo você vai precisar do usuário e da senha.')) return;
-      fotos = {}; guardarRascunho();
-      ['campo_token', 'campo_quem', 'campo_painel', 'campo_receb', 'campo_nome', 'campo_fone', 'campo_cpf', 'campo_cidade', 'campo_aba', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp', 'campo_nasceu'].forEach(function(k){ lsSet(k, ''); });
+      var pc = {}; try { pc = JSON.parse(lsGet('campo_completar') || '{}') || {}; } catch(e){}
+      if (Object.keys(pc).length && !confirm('Ainda há dados de um cadastro (endereço ou senha gov.br) esperando internet para chegar ao escritório. Se sair agora, eles serão apagados deste celular. Sair mesmo assim?')) return;
+      fotos = {}; local = null; guardarRascunho();
+      ['campo_token', 'campo_quem', 'campo_painel', 'campo_receb', 'campo_aba', 'campo_completando', 'campo_completar', 'campo_pp', 'campo_apelido', 'campo_foto', 'campo_push', 'campo_ini_filtro'].concat(CAMPOS_CADASTRO).forEach(function(k){ lsSet(k, ''); });
       token = ''; quem = null; painel = null; receb = null; aba = 'painel';
+      senhaGovRascunho = ''; passoNovo = null; completando = null; seqAtiva = false; pp = null; ppSig = ''; painelSig = '';
       pedirLink();
     });
   }
@@ -3454,7 +3480,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
       this.disabled = true; this.textContent = 'Recortando…';
       setTimeout(function(){ var r; try { r = endireitar(src, cantos); } catch(e){ r = src; } fim(); guardarFoto(d, r, { src: src, q: cantos.slice(), troca: op.troca }); }, 30);
     };
-    t.querySelector('.xis').onclick = function(){ fim(); telaInicial(); };
+    t.querySelector('.xis').onclick = function(){ seqAtiva = false; fim(); telaInicial(); };
     t.querySelector('[data-a="inteira"]').onclick = function(){ fim(); guardarFoto(d, src, { src: src, q: [[0, 0], [W, 0], [W, H], [0, H]], troca: op.troca }); };
     t.querySelector('[data-a="denovo"]').onclick = function(){ fim(); fotografar(d); };
     // gira a foto (e os cantos) 90° no sentido do relógio
@@ -3487,7 +3513,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
       telaInicial();
       processando(false);
       conferir(d, true);
-    }).catch(function(){ processando(false); alert('Não deu para usar esta foto. Tire de novo.'); });
+    }).catch(function(){ processando(false); seqAtiva = false; alert('Não deu para usar esta foto. Tire de novo.'); });
   }
   function miniatura(x){ return x.video ? '<span class="pdf-mini video-mini">VÍDEO</span>' : x.pdf ? '<span class="pdf-mini">PDF</span>' : '<img alt="" src="' + x.url + '">'; }
   function figuraDe(x, rotulo){ return '<figure>' + (x.pdf ? '<div class="pdf-fig"><b>PDF anexado</b><span>' + esc(x.nome || '') + '</span></div>' : '<img alt="" src="' + x.url + '">') + (rotulo ? '<figcaption>' + rotulo + '</figcaption>' : ''); }
@@ -3540,7 +3566,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
      RG (frente e verso, direto na câmera) → CPF (pergunta se já está no RG) → título de eleitor → comprovante de residência
      → provas da atividade (pescadora, agricultora ou indígena). Documento que ela não tem agora vira pendência:
      o cadastro vai assim mesmo e o escritório cobra a mãe depois. */
-  var seqAtiva = false;
+  var seqAtiva = false, pedePasso = null;
   var SEQ = {
     rg: { doc: 'rg_frente', nome: 'RG', ver: 'frente e verso' },
     cpf: { doc: 'cpf', nome: 'CPF', ver: 'frente e verso', perg: 'O número do CPF aparece no RG dela?' },
@@ -3555,7 +3581,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   function seqPassos(){ return ['rg', 'cpf']; }
   function seqPend(k){ return (seqEstado().pend || []).indexOf(SEQ[k].doc) >= 0; }
   function seqTemFoto(k){ return k === 'rg' ? !!(fotos.rg_frente && fotos.rg_verso) : k === 'cpf' ? !!(fotos.cpf && fotos.cpf_verso) : !!(fotos[SEQ[k].doc] && fotos[SEQ[k].doc].length); }
-  function seqFeito(k){ return seqTemFoto(k) || seqPend(k) || (k === 'cpf' && !!seqEstado().cpfNoRg); }
+  function seqFeito(k){ return seqTemFoto(k) || seqPend(k) || (k === 'cpf' && !!seqEstado().cpfNoRg && !!fotos.rg_frente); }
   function seqTudo(){ return seqPassos().every(seqFeito); }
   function seqMarcar(k, como){   // como: 'pend' | 'norg' | '' (tirar a marca)
     var s = seqEstado(), d = SEQ[k].doc; s.pend = (s.pend || []).filter(function(x){ return x !== d; });
@@ -3571,11 +3597,14 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     var passos = seqPassos(), k = passos.filter(function(x){ return !seqFeito(x); })[0];
     if (!k){ seqAtiva = false; telaInicial(); return; }   // terminou: volta para o resumo, com as pendências
     if (k === 'rg') return seqFoto('rg');
-    var info = SEQ[k], n = passos.indexOf(k) + 1;
-    var bts = k === 'cpf'
+    var info = SEQ[k], n = passos.indexOf(k) + 1, perg = info.perg;
+    if (k === 'cpf' && !fotos.rg_frente) perg = 'Ela está com o CPF aí?';
+    var bts = k === 'cpf' && !fotos.rg_frente
+      ? '<button id="sq-foto">Sim, tirar a foto do CPF</button><button class="sec2" id="sq-nao">Ela não está com o CPF</button>'
+      : k === 'cpf'
       ? '<button id="sq-sim">Sim, está no RG</button><button class="sec2" id="sq-foto">Não, tirar a foto do CPF</button><button class="sec2" id="sq-nao">Ela não está com o CPF</button>'
       : '<button id="sq-foto">Sim, tirar a foto</button><button class="sec2" id="sq-nao">Não está com ela agora</button>';
-    var t = tela('<span class="sq-n">Documento ' + n + ' de ' + passos.length + '</span><b>' + esc(info.nome) + '</b><p class="sq-perg">' + esc(info.perg) + '</p>' + bts + '<button class="sq-parar" id="sq-parar">Parar as fotos</button>');
+    var t = tela('<span class="sq-n">Documento ' + n + ' de ' + passos.length + '</span><b>' + esc(info.nome) + '</b><p class="sq-perg">' + esc(perg) + '</p>' + bts + '<button class="sq-parar" id="sq-parar">Parar as fotos</button>');
     var so = function(id, f){ var b = t.querySelector('#' + id); if (b) b.onclick = function(){ t.remove(); f(); }; };
     so('sq-sim', function(){ seqMarcar('cpf', 'norg'); seqContinuar(); });
     so('sq-foto', function(){ seqMarcar(k, ''); seqFoto(k); });
@@ -3592,14 +3621,14 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   }
   // fechou a câmera no meio da sequência: tentar de novo, deixar pendente ou parar
   function seqCameraFechada(){
-    if (!seqAtiva) return;
+    if (!seqAtiva || completando){ seqAtiva = false; return; }
     var k = seqPassos().filter(function(x){ return !seqFeito(x); })[0]; if (!k){ seqParar(); return; }
     var t = tela('<b>' + esc(SEQ[k].nome) + '</b><p class="sq-perg">A câmera foi fechada. O que fazer com este documento?</p><button id="sq-de-novo">Tirar a foto</button><button class="sec2" id="sq-pend">Ela não está com ele (fica pendente)</button><button class="sq-parar" id="sq-parar">Parar as fotos</button>');
     t.querySelector('#sq-de-novo').onclick = function(){ t.remove(); seqFoto(k); };
     t.querySelector('#sq-pend').onclick = function(){ t.remove(); seqMarcar(k, 'pend'); seqContinuar(); };
     t.querySelector('#sq-parar').onclick = function(){ t.remove(); seqParar(); };
   }
-  function seqDepois(){ if (seqAtiva) setTimeout(seqContinuar, 120); }
+  function seqDepois(){ if (seqAtiva && !completando && aba === 'novo') setTimeout(seqContinuar, 120); else seqAtiva = false; }
   // desenho animado de um documento: o celular chega por cima, a moldura fica verde e a foto é tirada
   // cenas do vídeo: RG frente, RG verso (ele vira) e CPF; o tempo de cada uma acompanha a animação dela
   var TUTO_DOCS = [['rg', 'RG · frente', 2400], ['rgv', 'RG · verso', 3200], ['cpf', 'CPF · frente', 2400], ['cpfv', 'CPF · verso', 3200]];
@@ -3631,15 +3660,15 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   }
   // o bloco dos documentos no fim do cadastro: um botão (antes de começar) ou a lista do que já foi feito e das pendências
   function seqPainel(){
-    var passos = seqPassos(), algum = passos.some(seqFeito), s = seqEstado(), cam = '<svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>';
+    var passos = seqPassos(), algum = passos.some(function(k){ return seqFeito(k) || !!fotos[SEQ[k].doc]; }), s = seqEstado(), cam = '<svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>';
     var box = document.createElement('div'); box.className = 'sq';
     if (!algum){
       box.innerHTML = '<div class="sq-ini"><span class="sq-ic">' + cam + '</span><p>A câmera vai pedindo um de cada vez: ' + passos.map(function(k){ return SEQ[k].nome; }).join(', ').replace(/, ([^,]*)$/, ' e $1') + '. O que ela não tiver agora fica como pendência.</p>' +
         '<button type="button" class="sq-go" id="sq-go">' + cam + 'Começar as fotos</button></div>';
     } else {
       var linha = function(k){
-        var ok = seqTemFoto(k) || (k === 'cpf' && s.cpfNoRg), pend = !ok && seqPend(k);
-        var sub = k === 'cpf' && s.cpfNoRg ? 'está no RG' : ok ? (SEQ[k].ver || (fotos[SEQ[k].doc].length > 1 ? fotos[SEQ[k].doc].length + ' fotos' : 'foto tirada')) : pend ? 'pendente: ela não está com ele agora' : 'falta tirar';
+        var noRg = k === 'cpf' && s.cpfNoRg && fotos.rg_frente, ok = seqTemFoto(k) || noRg, pend = !ok && seqPend(k), meio = !ok && !!fotos[SEQ[k].doc];
+        var sub = noRg ? 'está no RG' : ok ? (SEQ[k].ver || (fotos[SEQ[k].doc].length > 1 ? fotos[SEQ[k].doc].length + ' fotos' : 'foto tirada')) : pend ? (meio ? 'pendente: falta o verso' : 'pendente: ela não está com ele agora') : meio ? 'falta o verso' : 'falta tirar';
         return '<button type="button" class="sq-lin' + (ok ? ' ok' : pend ? ' pend' : '') + '" data-sq="' + k + '"><i>' + (ok ? '✓' : pend ? '!' : '·') + '</i><span><b>' + esc(SEQ[k].nome) + '</b><small>' + sub + '</small></span><u>' + (ok ? 'ver' : 'tirar') + '</u></button>';
       };
       var pends = passos.filter(function(k){ return !seqTemFoto(k) && seqPend(k); });
@@ -3656,7 +3685,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
       var k = b.dataset.sq, d = docK(SEQ[k].doc);
       seqAtiva = false;
       if (k === 'cpf' && seqEstado().cpfNoRg){ seqMarcar('cpf', ''); seqAtiva = true; return seqContinuar(); }   // pergunta de novo
-      if (seqTemFoto(k)) return PARES[d.k] ? conferirRG(null, d.k) : conferir(d);
+      if (seqTemFoto(k) || (PARES[d.k] && parFotos(PARES[d.k]).length)) return PARES[d.k] ? conferirRG(null, d.k) : conferir(d);
       seqMarcar(k, ''); escolher(d);   // tirar agora (ou anexar)
     });
     return box;
@@ -3689,6 +3718,8 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(function(p){ local = { lat: +p.coords.latitude.toFixed(6), lng: +p.coords.longitude.toFixed(6), prec: Math.round(p.coords.accuracy) }; }, function(){}, { enableHighAccuracy: true, timeout: 20000, maximumAge: 60000 });
   }
+  // a câmera do próprio celular (ou a galeria) foi fechada sem foto: na sequência, pergunta o que fazer com o documento
+  $('foto').addEventListener('cancel', function(){ if (seqAtiva) seqCameraFechada(); });
   $('foto').addEventListener('change', function(){
     var arq = this.files && this.files[0]; this.value = ''; if (!arq || !atual) return;
     var d = atual;
@@ -3719,15 +3750,18 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     pede(foneOk(($('fone') || {}).value), 'telefone com DDD', 'fone');
     pede(String(lsGet('campo_cidade') || '').trim(), 'cidade', 'cidade');
     pede(cpfOk(($('cpf') || {}).value), 'CPF (11 números)', 'cpf');
-    if (!completando) pede(qualif().ok, 'situação de trabalho e benefício (qualificação)', 'nome');
-    if (!completando) pede(ctOk(), ctEstado().doc ? 'assinatura do contrato (os dados mudaram: gere e assine de novo)' : 'assinatura do contrato', 'nome');
+    if (!completando) pede(qualif().ok, 'situação de trabalho e benefício (qualificação)', 'qualif');
+    if (!completando) pede(ctOk(), ctEstado().doc ? 'assinatura do contrato (os dados mudaram: gere e assine de novo)' : 'assinatura do contrato', 'contrato');
     if ($('cep')){ pede(cepOk(($('cep') || {}).value), 'CEP', 'cep'); pede(String(lsGet('campo_rua') || '').trim(), 'rua', 'rua'); pede(String(lsGet('campo_num') || '').trim(), 'número da casa', 'num'); }
     if (gestante()) pede(lsGet('campo_dpp'), 'data prevista do parto', 'dpp');
     else pede(lsGet('campo_crianca_nasc'), 'data de nascimento da criança', 'cnasc');
     if (faltaDados.length){
       ['l-nome', 'l-fone', 'l-cidade', 'l-cpf', 'l-cep', 'l-rua', 'l-num', 'l-dpp', 'l-cnasc'].forEach(function(i){ var l = $(i); if (l && l.querySelector('input') && !l.querySelector('input').value.trim()) l.classList.add('falta'); });
       var msg = 'Para enviar o cadastro, falta preencher: ' + faltaDados.join(', ') + '.';
-      falar(msg); alert(msg); if ($(primeiro)) $(primeiro).focus(); return;
+      falar(msg); alert(msg);
+      var PASSO_DE = { nome: 'nome', qualif: 'trab', contrato: 'contrato', cpf: 'cpf', fone: 'fone', cidade: 'end', cep: 'end', rua: 'end', num: 'end', dpp: 'parto', cnasc: 'parto' };
+      if (!completando && PASSO_DE[primeiro]){ pedePasso = PASSO_DE[primeiro]; telaInicial(); return; }
+      if ($(primeiro)) $(primeiro).focus(); return;
     }
     if (gestante()){
       var dp = new Date(lsGet('campo_dpp') + 'T12:00:00'), hjp = new Date(); hjp.setHours(12, 0, 0, 0);
@@ -3743,11 +3777,13 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
       if (dias > 90){ var m1 = 'Só cadastramos bebês com até 3 meses de nascidos. Este bebê tem ' + Math.floor(dias / 30) + ' meses.'; falar(m1); alert(m1); if ($('cnasc')) $('cnasc').focus(); return; }
     }
     var sqE = seqEstado(), sqPend = sqE.pend || [];
-    var falta = DOCS.filter(function(d){ return obrig(d) && !fotos[d.k] && !(d.k === 'cpf' && sqE.cpfNoRg); });
+    var semVerso = function(d){ var p = PARES[d.k]; return !!(p && p.f === d.k && fotos[p.f] && !fotos[p.v]); };
+    var falta = DOCS.filter(function(d){ return obrig(d) && (!fotos[d.k] || semVerso(d)) && !(d.k === 'cpf' && sqE.cpfNoRg && fotos.rg_frente); });
     if (falta.length && falta.every(function(d){ return sqPend.indexOf(d.k) >= 0; })) return montar(falta);   // pendências que o parceiro já marcou
     if (falta.length){
-      falar('Está faltando: ' + falta.map(function(d){ return d.t; }).join(', ') + '. Quer enviar assim mesmo?');
-      var t = tela('<svg viewBox="0 0 24 24" style="stroke:var(--warn)"><use href="#i-doc"/></svg><b>Faltam fotos</b><p>' + falta.map(function(d){ return esc(d.t); }).join(', ') + '</p><button id="t-voltar">Voltar e tirar</button><button class="sec2" id="t-mesmo">Enviar assim mesmo</button>');
+      var nomeF = function(d){ return d.t + (semVerso(d) ? ' (falta o verso)' : ''); };
+      falar('Está faltando: ' + falta.map(nomeF).join(', ') + '. Quer enviar assim mesmo?');
+      var t = tela('<svg viewBox="0 0 24 24" style="stroke:var(--warn)"><use href="#i-doc"/></svg><b>Faltam fotos</b><p>' + falta.map(function(d){ return esc(nomeF(d)); }).join(', ') + '</p><button id="t-voltar">Voltar e tirar</button><button class="sec2" id="t-mesmo">Enviar assim mesmo</button>');
       t.querySelector('#t-voltar').onclick = function(){ t.remove(); };
       t.querySelector('#t-mesmo').onclick = function(){ t.remove(); montar(falta); };
       return;
@@ -3799,14 +3835,14 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
          tipoSegurada: tipoAtual(), crianca: '', criancaNasc: comp || gestante() ? '' : lsGet('campo_crianca_nasc'),
          fatoGerador: comp || gestante() ? 'gestante' : 'parto', dpp: !comp && gestante() ? lsGet('campo_dpp') : '',
          contrato: comp ? null : ctEnvio(),
-         docs: DOCS.filter(function(d){ return fotos[d.k]; }).map(function(d){ return d.k; }).concat(!comp && seqEstado().cpfNoRg && !fotos.cpf ? ['cpf'] : []).concat(!comp && ctFase() === 'assinado' && !fotos.procuracao ? ['procuracao'] : []), arquivos: [] };
+         docs: DOCS.filter(function(d){ var p = PARES[d.k]; return fotos[d.k] && !(p && p.f === d.k && !fotos[p.v] && falta.some(function(x){ return x.k === d.k; })); }).map(function(d){ return d.k; }).concat(!comp && seqEstado().cpfNoRg && fotos.rg_frente && !fotos.cpf ? ['cpf'] : []).concat(!comp && ctFase() === 'assinado' && !fotos.procuracao ? ['procuracao'] : []), arquivos: [] };
        return Promise.all(arquivos.map(function(a){ return paraBytes(a.blob).then(function(b){ return { nome: a.nome, mime: a.mime, buf: b, tam: b.byteLength, ok: false }; }, function(){ return { nome: a.nome, mime: a.mime, blob: a.blob, tam: a.blob.size, ok: false }; }); }))
          .then(function(l){ envio.arquivos = l; return filaPor(envio); }).then(function(){ return histPor({ id: envio.id, token: token, cliente: envio.cliente + (comp ? ' · documentos' : ''), clienteId: comp ? comp.id : '', criado: envio.criado, enviado: null }); }).then(function(){ return envio; });
      })
      .then(function(envio){
        fotos = {}; local = null; guardarRascunho();   // apaga o rascunho dessas fotos
        if (comp){ completando = null; lsSet('campo_completando', ''); if (painel) painel.clientes.forEach(function(c){ if (c.id === comp.id) c.faltaDocs = comp.faltaDocs.filter(function(k){ return envio.docs.indexOf(k) < 0; }); }); }
-       else { ['campo_fone', 'campo_cpf', 'campo_cidade', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp', 'campo_nasceu', 'campo_cep', 'campo_rua', 'campo_num', 'campo_compl', 'campo_bairro', 'campo_uf_cep', 'campo_q_trab', 'campo_q_saida', 'campo_q_benef', 'campo_contrato', 'campo_docs_seq'].forEach(function(k){ lsSet(k, ''); }); senhaGovRascunho = ''; passoNovo = null; seqAtiva = false; }
+       else { CAMPOS_CADASTRO.forEach(function(k){ lsSet(k, ''); }); senhaGovRascunho = ''; passoNovo = null; seqAtiva = false; }
        t.remove(); aba = comp ? 'painel' : 'novo'; telaInicial(); window.scrollTo(0, 0); if ($('vista')) $('vista').scrollTop = 0;
        var ok = tela('<svg viewBox="0 0 24 24" style="stroke:var(--ok)"><use href="#i-ok"/></svg><b>' + (comp ? 'Documentos guardados' : 'Cadastro guardado') + '</b><p>' + esc(envio.cliente || '') + '<br>' + (comp ? 'Vão para a pasta da cliente sozinhos quando tiver internet.' : 'Está sendo enviado agora: acompanhe na barra embaixo. Pode cadastrar a próxima cliente.') + '</p><button id="t-ok">' + (comp ? 'Entendi' : 'Cadastrar a próxima') + '</button>');
        ok.querySelector('#t-ok').onclick = function(){ ok.remove(); };
@@ -3865,7 +3901,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     enviando = true;
     var tot = envio.arquivos.length + 1, feitos = envio.arquivos.filter(function(a){ return a.ok; }).length;
     // andamento pelo tamanho (bytes) de cada arquivo
-    var pesos = envio.arquivos.map(function(a){ return a.tam || (a.buf && a.buf.byteLength) || (a.blob && a.blob.size) || 1; }), total = pesos.reduce(function(x, y){ return x + y; }, 0) * 1.02, pronto = 0;
+    var pesos = envio.arquivos.map(function(a){ return a.tam || (a.buf && a.buf.byteLength) || (a.blob && a.blob.size) || 1; }), total = Math.max(1, pesos.reduce(function(x, y){ return x + y; }, 0) * 1.02), pronto = 0;
     envio.arquivos.forEach(function(a, i){ if (a.ok) pronto += pesos[i]; });
     var nArq = envio.arquivos.length;
     var barra = function(parcial, passo){
@@ -3927,7 +3963,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     Object.keys(pend).forEach(function(cid){
       var x = pend[cid];
       chamar('campo_completar_dados', { p_token: x.token, p_cliente: cid, p_endereco: x.endereco, p_senha_gov: x.senhaGov || null, p_qualif: x.qualificacao || null }).then(function(r){
-        if (r && (r.ok || r.erro)){ var p2 = {}; try { p2 = JSON.parse(lsGet('campo_completar') || '{}') || {}; } catch(e){} delete p2[cid]; lsSet('campo_completar', JSON.stringify(p2)); }
+        if (r && (r.ok || r.erro || r.code || r.message)){ var p2 = {}; try { p2 = JSON.parse(lsGet('campo_completar') || '{}') || {}; } catch(e){} delete p2[cid]; lsSet('campo_completar', JSON.stringify(p2)); }
       }).catch(function(){});
     });
   }
@@ -4158,10 +4194,11 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     // botão voltar do Android: fecha a tela aberta (câmera, recorte, conferir); na tela inicial, só minimiza
     var Pl = window.Capacitor.Plugins || {};
     if (Pl.App) Pl.App.addListener('backButton', function(){
+      if ($('ct-tela')){ ctFechar(); telaInicial(); return; }
       var cam = document.querySelector('.cam .fechar'); if (cam) return cam.click();
-      var rec = document.querySelector('.rec'); if (rec){ rec.remove(); return; }
-      var ver = document.querySelector('.ver .boa'); if (ver) return ver.click();
-      var tl = document.querySelector('.tela'); if (tl){ tl.remove(); return; }
+      var rec = document.querySelector('.rec'); if (rec){ seqAtiva = false; rec.remove(); return; }
+      var ver = document.querySelector('.ver .xis'); if (ver) return ver.click();
+      var tl = document.querySelector('.tela'); if (tl){ seqAtiva = false; tl.remove(); return; }
       var fo = document.querySelector('.folha'); if (fo){ fo.remove(); return; }
       if (aba !== 'painel') return irPara('painel');
       Pl.App.minimizeApp();
