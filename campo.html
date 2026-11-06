@@ -1101,10 +1101,12 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
 
 
 /* tela de entrar (05/11, como o usuário descreveu): a tela toda roxa com a marca e, no centro, um balão branco com o login */
-.lg.balao{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(16px,3.6dvh,32px);padding:calc(16px + env(safe-area-inset-top)) 20px calc(16px + env(safe-area-inset-bottom));overflow:hidden;background:linear-gradient(180deg,#8a43d3 0%,#7b36c0 28%,#6a2aa3 58%,#4d1a7c 100%)}
+.lg.balao{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(16px,3.6dvh,32px);padding:calc(16px + env(safe-area-inset-top)) 20px calc(16px + env(safe-area-inset-bottom));overflow:hidden;background:radial-gradient(62% 34% at 50% 30%,rgba(255,255,255,.17),rgba(255,255,255,0) 70%),radial-gradient(48% 30% at 92% 24%,rgba(222,190,255,.26),rgba(222,190,255,0) 70%),radial-gradient(40% 26% at 6% 40%,rgba(190,140,255,.18),rgba(190,140,255,0) 70%),linear-gradient(180deg,#8a43d3 0%,#7b36c0 28%,#6a2aa3 58%,#4d1a7c 100%)}
 .lg.balao::before{content:"";position:absolute;right:-16vmax;bottom:-12vmax;width:64vmax;height:64vmax;background:url(img/marca-suave.png) no-repeat center/contain;opacity:.15;pointer-events:none}
 .lg.balao::after{display:none;content:"";position:absolute;left:-26vmax;top:4vmax;width:56vmax;height:56vmax;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none}
 .lg.balao{background-color:#8a43d3}
+/* logo e balão de entrar mais para cima (sobra mais espaço embaixo nas telas altas) */
+@media (min-height:700px){ .lg.balao{padding-bottom:calc(16px + env(safe-area-inset-bottom) + min(15dvh,140px))} }
 .lg.balao .lg-topo{position:relative;z-index:1;flex:none;height:auto;min-height:0;padding:0;background:none;overflow:visible;animation:lgFundo .6s ease both}
 .lg.balao .lg-topo::before,.lg.balao .lg-topo::after{display:none}
 .lg.balao .lg-marca{width:clamp(54px,10dvh,86px)}
@@ -1114,7 +1116,7 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
 html[data-tema="dark"] .lg.balao .lg-links a,html[data-tema="dark"] .lg.balao .lg-campo button{color:#66279d}
 html[data-tema="dark"] .lg.balao .lg-campo svg{stroke:#7633b2}
 html[data-tema="dark"] .lg.balao .lg-cartao{box-shadow:0 26px 60px rgba(0,0,0,.5)}
-html[data-tema="dark"] .lg.balao{background:linear-gradient(180deg,#6a2aa3 0%,#5a2290 28%,#4d1a7c 58%,#2e0e4c 100%);background-color:#6a2aa3}
+html[data-tema="dark"] .lg.balao{background:radial-gradient(62% 34% at 50% 30%,rgba(255,255,255,.10),rgba(255,255,255,0) 70%),radial-gradient(48% 30% at 92% 24%,rgba(200,160,255,.18),rgba(200,160,255,0) 70%),radial-gradient(40% 26% at 6% 40%,rgba(170,120,240,.14),rgba(170,120,240,0) 70%),linear-gradient(180deg,#6a2aa3 0%,#5a2290 28%,#4d1a7c 58%,#2e0e4c 100%);background-color:#6a2aa3}
 @media (max-height:640px){ .lg.balao{gap:12px} .lg.balao .lg-cartao{padding:18px 18px 14px} .lg.balao .lg-tag{display:none} }
 @media (max-height:540px){ .lg.balao .lg-marca{display:none} .lg.balao .lg-nome{margin-top:0;font-size:21px} .lg.balao .lg-inst{display:none} }
 /* celular deitado: a marca à esquerda e o balão à direita */
@@ -1253,7 +1255,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 91;
+  var APP_VERSAO = 92;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -3816,7 +3818,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
         '<label class="lg-campo"><span>CPF</span><div><svg viewBox="0 0 24 24"><use href="#i-pessoa"/></svg><input id="usuario" name="username" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false"></div></label>' +
         '<label class="lg-campo"><span>Senha</span><div><svg viewBox="0 0 24 24"><use href="#i-cadeado"/></svg><input id="senha" name="password" type="password" placeholder="sua senha" autocomplete="current-password"><button type="button" id="ver-senha">mostrar</button></div></label>' +
         '<button type="submit" class="lg-entrar" id="entrar">Entrar</button>' +
-        '<div class="lg-links"><a href="equipe-cadastro.html">Primeiro acesso</a><i></i><a href="#" id="esqueci">Esqueci a senha</a></div>' +
+        '<div class="lg-links"><a href="#" id="esqueci">Esqueci a senha</a></div>' +
         (podeInstalar() ? '<button type="button" class="lg-inst" id="inst-login"><svg viewBox="0 0 24 24"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/></svg>Instalar o aplicativo no celular</button>' : '') +
       '</form></div>';
     $('usuario').addEventListener('input', function(){ this.value = maskCpf(this.value); });   // só números
