@@ -3074,7 +3074,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
       <div class="field"><label for="f-cpf">CPF</label><input id="f-cpf" inputmode="numeric" placeholder="000.000.000-00" class="tnum"><span class="hint" id="h-cpf"></span></div>
       <div class="field"><label for="f-contato">Contato (telefone / WhatsApp)</label><input id="f-contato" inputmode="tel" placeholder="(97) 00000-0000" class="tnum"></div>
       <div class="field" id="f-senha-box" hidden><label for="f-senha">Senha gov.br</label><input id="f-senha" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" data-lpignore="true" placeholder="Senha do gov.br da mãe"><span class="hint" id="f-senha-hint">Fica guardada no cofre; aparece só na ficha da mãe.</span></div>
-      <div class="field" id="f-ativn-box" hidden><label for="f-ativn">É pescadora, agricultora ou indígena?</label><select id="f-ativn"></select><span class="hint">As três não pagam GPS e precisam da prova da atividade. Nenhuma das três: paga a GPS.</span></div>
+      <div class="field" id="f-ativn-box" hidden><label for="f-ativn">É pescadora, agricultora ou indígena?</label><select id="f-ativn"></select><span class="hint">As três não pagam GPS. Nenhuma das três: paga a GPS.</span></div>
       <div class="field"><label for="f-uf">Estado</label><div class="cid-wrap"><span id="f-uf-flag" class="cid-uf-flag"></span><select id="f-uf"></select></div></div>
       <div class="field"><label for="f-cidade">Cidade</label><div class="cid-wrap"><span id="f-cid-flag" class="cid-uf-flag"></span><input id="f-cidade" readonly autocomplete="off" placeholder="Escolher a cidade" style="cursor:pointer"></div></div>
       <div class="field"><label for="f-tipo">Salário-maternidade</label><select id="f-tipo"><option value="">Rural ou urbano? (escolher)</option><option value="urbana">Urbano · paga a GPS (facultativa)</option><option value="especial">Rural · segurada especial (prova rural)</option><option value="individual" hidden>Urbano · contribuinte individual (antigo)</option><option value="desempregada" hidden>Urbano · desempregada (antigo)</option></select><span class="hint">Urbano segue pela guia GPS; rural segue pela prova da atividade rural.</span></div>
@@ -3723,7 +3723,8 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   function docsApp(r){
     var campo = Array.isArray(r.campoDocs) ? r.campoDocs : null, antigo = Array.isArray(r.faltaDocs) ? r.faltaDocs : null;
     // urbano: precisa do NIT (é dele que sai a GPS); rural (segurada especial): precisa da prova da atividade rural e não do NIT
-    return DOCS_APP.filter(function(d){ return !(doFluxoNovo(r) && (d[0] === 'titulo' || d[0] === 'residencia')); }).filter(function(d){ return d[0] === 'procuracao' ? !!r.contrato :   /* contrato e procuração: só os gerados pelo ZapSign (SQL 56), cobrados até a mãe assinar */ d[0] === 'rural' ? (rural(r) || !!(campo && campo.indexOf('rural') >= 0)) : d[0] === 'nit' ? !rural(r) : true; }).map(function(d){
+    // fluxo novo: só RG e CPF (06/11/2026: sem título de eleitor, sem comprovante de residência e sem prova da atividade rural)
+    return DOCS_APP.filter(function(d){ return !(doFluxoNovo(r) && (d[0] === 'titulo' || d[0] === 'residencia' || d[0] === 'rural')); }).filter(function(d){ return d[0] === 'procuracao' ? !!r.contrato :   /* contrato e procuração: só os gerados pelo ZapSign (SQL 56), cobrados até a mãe assinar */ d[0] === 'rural' ? (rural(r) || !!(campo && campo.indexOf('rural') >= 0)) : d[0] === 'nit' ? !rural(r) : true; }).map(function(d){
       if (d[0] === 'senha') return { k: 'senha', n: d[1], ok: !!r.senhaGovOk || (!doFluxoNovo(r) && !!(campo && campo.indexOf('senha') >= 0)) };
       if (d[0] === 'nit') return { k: 'nit', n: d[1], ok: nitOk(r.nit) };
       if (d[0] === 'procuracao') return { k: 'procuracao', n: d[1], ok: !ctPend(r) || !!(campo && campo.indexOf('procuracao') >= 0) };
@@ -3738,7 +3739,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   function docsExigidos(r){
     var l = [['procuracao', 'procuracao'], ['rg', 'rg_frente'], ['cpf', 'cpf']].concat(doFluxoNovo(r) ? [] : [['residencia', 'residencia']]);   // fluxo novo: só RG e CPF (06/11/2026)
     if (r.fatoGerador !== 'gestante') l.push(['certidao', 'certidao']);
-    if (r.tipoSegurada === 'especial') l.push(['autodeclaracao', 'autodeclaracao'], ['rural', 'rural']);
+    if (r.tipoSegurada === 'especial' && !doFluxoNovo(r)) l.push(['autodeclaracao', 'autodeclaracao'], ['rural', 'rural']);
     else if (r.tipoSegurada) l.push(['ctps', 'ctps']);
     return l;
   }
@@ -3997,7 +3998,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   function fcResp(r, t){ return t === 'd' ? [r.atendente, r.atendenteEmail] : t === 'h' ? [r.filaPor, ''] : [r.posResp, r.posRespEmail]; }
   function fcGuia(r){
     if (!noContratos(r) || nascido(r)) return '';
-    if (rural(r)){ var pr = docsApp(r).filter(function(x){ return x.k === 'rural'; })[0]; return doFluxoNovo(r) ? '<p class="fc-sec">' + esc(ativNovoTxt(r)) + ' · segurada especial</p><p class="fc-nota">Não paga GPS. O que garante o benefício é a prova da atividade' + (pr && pr.ok ? ' (já recebida).' : ' (ainda não chegou: a Ana cobra a mãe pelo WhatsApp).') + '</p>' : '<p class="fc-sec">Salário-maternidade rural</p><p class="fc-nota">Segurada especial: não paga GPS. O que garante o benefício é a prova da atividade rural' + (pr && pr.ok ? ' (já recebida).' : ' (ainda não chegou: cobrar da mãe).') + '</p>'; }
+    if (rural(r)){ var pr = docsApp(r).filter(function(x){ return x.k === 'rural'; })[0]; return doFluxoNovo(r) ? '<p class="fc-sec">' + esc(ativNovoTxt(r)) + ' · segurada especial</p><p class="fc-nota">Não paga GPS.</p>' : '<p class="fc-sec">Salário-maternidade rural</p><p class="fc-nota">Segurada especial: não paga GPS. O que garante o benefício é a prova da atividade rural' + (pr && pr.ok ? ' (já recebida).' : ' (ainda não chegou: cobrar da mãe).') + '</p>'; }
     var pago = gpsPaga(r), emitida = !!gpsGerar(r);
     return '<p class="fc-sec">Guia GPS (segurada facultativa)</p><div class="fc-guia">' +
       fcLeitura('Código de pagamento', gpsCodigoDe(r) + (gpsCodigoDe(r) === '1163' ? ' · contribuinte individual, plano simplificado (11%)' : ' · facultativa, plano simplificado (11%)')) + fcLeitura('Valor', moedaTxt(gpsValor())) + fcLeitura('Prazo', prazoGps(r) ? fmtDate(prazoGps(r)) : 'informe a data do parto') + fcLeitura('Situação', pago ? 'Paga' + (r.guiaPagaEm ? ' em ' + fmtDate(r.guiaPagaEm) : '') : emitida ? 'Guia pronta, aguardando pagamento' : 'Falta o NIT para gerar a guia') + '</div>' +
@@ -4973,7 +4974,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   }
   // fluxo novo: o Pós-venda só mostra quem tem pendência (pescadora/agricultora/indígena, senha, documento, prova da atividade)
   function posDaTela(r){ return noContratos(r) && (fluxoVista !== 'novo' || faseDe(r) === 'k'); }
-  var CTR_SITS_NOVO = [['', 'Status: todas'], ['semsenha', 'Sem senha gov.br'], ['docs', 'Documentos faltando'], ['rprova', 'Prova da atividade faltando'], ['rur', 'Pescadora, agricultora ou indígena'], ['urb', 'Nenhuma das três (GPS)'], ['atr', 'GPS vencida']];
+  var CTR_SITS_NOVO = [['', 'Status: todas'], ['semsenha', 'Sem senha gov.br'], ['docs', 'Documentos faltando'], ['rur', 'Pescadora, agricultora ou indígena'], ['urb', 'Nenhuma das três (GPS)'], ['atr', 'GPS vencida']];
   function ctrSitsAtivos(){ return fluxoVista === 'novo' ? CTR_SITS_NOVO : CTR_SITS; }
   var CTR_SITS = [['', 'Status: todas'], ['urb', 'Urbanas (com GPS)'], ['rur', 'Rurais (prova rural)'], ['semtipo', 'Sem rural/urbano'], ['completa', 'Pastas completas'], ['gest', 'Gestantes'], ['nasc', 'Bebê já nasceu'], ['atr', 'Atrasadas'], ['gps', 'GPS a pagar'], ['docs', 'Documentos faltando'], ['dev', 'Devolvidas pela Controladoria']];
   function passaCtr(r, f){ return !f || (f === 'semsenha' ? (doFluxoNovo(r) ? !r.senhaGovOk : posEtapaDe(r) === 'senha') : f === 'rprova' ? rural(r) && faltaDocs(r).indexOf('rural') >= 0 : f === 'urb' ? tipoChave(r) === 'urbana' : f === 'rur' ? rural(r) : f === 'semtipo' ? !r.tipoSegurada : f === 'completa' ? !faltamTxt(r) : f === 'gest' ? !nascido(r) : f === 'nasc' ? nascido(r) : f === 'atr' ? atrasada(r) : f === 'gps' ? gpsTarefa(r) : f === 'docs' ? !!faltamTxt(r) : f === 'dev' ? r.pvAnalise === 'devolvido' : true); }
@@ -4984,8 +4985,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
       if (fluxoVista === 'novo'){
         $('ctr-stats').innerHTML = cardLista('data-ctr-kpi', 'i-users', 'Com pendência', pos.length, 'o resto do fluxo anda sozinho', '', 'x') +
           cardLista('data-ctr-kpi', 'i-chave', 'Sem senha gov.br', pos.filter(function(r){ return passaCtr(r, 'semsenha'); }).length, 'recuperar a senha', 'semsenha', ctrSit) +
-          cardLista('data-ctr-kpi', 'i-file', 'Documentos faltando', pos.filter(function(r){ return passaCtr(r, 'docs'); }).length, 'a mãe não mandou', 'docs', ctrSit) +
-          cardLista('data-ctr-kpi', 'i-alert', 'Prova da atividade faltando', pos.filter(function(r){ return passaCtr(r, 'rprova'); }).length, 'pescadora, agricultora ou indígena', 'rprova', ctrSit);
+          cardLista('data-ctr-kpi', 'i-file', 'Documentos faltando', pos.filter(function(r){ return passaCtr(r, 'docs'); }).length, 'a mãe não mandou', 'docs', ctrSit);
         return;
       }
       var compl = pos.filter(function(r){ return !faltamTxt(r); }).length, atrDoc = pos.filter(function(r){ return /documenta/.test(atrasoTxt(r)); }).length;
@@ -5065,7 +5065,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     var box = $('nan-list'); if (!box) return;
     var todos = state.rows.filter(function(r){ return faseDe(r) === 'an'; });
     var sem = todos.filter(function(r){ var d = daysUntil(r.dpp); return d != null && d <= 7; }).length, mes = todos.filter(function(r){ var d = daysUntil(r.dpp); return d != null && d <= 30; }).length;
-    statsNovo('nan-stats', [['i-baby', 'Aguardando nascimento', todos.length, 'GPS paga ou prova da atividade completa'], ['i-alert', 'Parto em até 7 dias', sem, 'a IA já está falando com a mãe'], ['i-cal', 'Parto em até 30 dias', mes, 'no próximo mês'], ['i-users', 'Rurais', todos.filter(rural).length, 'sem GPS, com prova rural']]);
+    statsNovo('nan-stats', [['i-baby', 'Aguardando nascimento', todos.length, 'GPS paga ou pescadora, agricultora ou indígena'], ['i-alert', 'Parto em até 7 dias', sem, 'a IA já está falando com a mãe'], ['i-cal', 'Parto em até 30 dias', mes, 'no próximo mês'], ['i-users', 'Rurais', todos.filter(rural).length, 'sem GPS']]);
     var l = ordenar(listaNovo('an', nanQ), function(a, b){ return String(a.dpp || '9999').localeCompare(String(b.dpp || '9999')); });
     kbInfo('nan', 'an', l.length, 'gestante', 'gestantes');
     tabelaFase(box, l, nascInfoN, 'Parto previsto', 'Nenhuma gestante aguardando o nascimento.');
@@ -8911,7 +8911,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     g: ['Parceiros', 'Estados de atuação, responsável de cada um e os parceiros que cadastram as clientes'],
     e: ['Configurações', 'Equipe, integrações e parceiros'],
     gp: ['GPS (urbana)', 'Guia da segurada facultativa: gerada pelo NIT e paga automaticamente pelo Asaas, 5 dias antes do prazo'],
-    an: ['Aguardando parto', 'GPS paga ou prova da atividade completa: esperando o parto; a IA fala com a mãe uma semana antes'],
+    an: ['Aguardando parto', 'GPS paga (ou pescadora, agricultora ou indígena): esperando o parto; a IA fala com a mãe uma semana antes'],
     rq: ['Requerimento', 'A IA pede a certidão à mãe e o sistema faz o requerimento no Meu INSS']
   };
   function showTab(which){
