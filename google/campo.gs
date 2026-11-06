@@ -57,9 +57,10 @@ var ZS_CAMPOS_ = ['NOME', 'CPF', 'ENDERECO', 'TELEFONE', 'CIDADE', 'UF', 'DATA']
 // confere no ZapSign: o token vale? os dois modelos existem e têm os campos?
 function zsConferir_(){
   var cfg = zapsign_(); if (!cfg.token) return { erro: 'Falta o token da API.' };
-  var r = { token: true, conta: cfg.teste ? 'teste' : 'oficial', auto: !!cfg.auto };
+  var r = { token: true, conta: cfg.teste ? 'teste' : 'oficial', auto: !!cfg.auto, travado: !!cfg.travado };
   if (cfg.erroModelos){ r.token = !/\b(401|403)\b|token|credenc|autentica|unauthor|forbidden/i.test(cfg.erroModelos); r.erroModelos = cfg.erroModelos; }
   [['contrato', cfg.modelo], ['procuracao', cfg.modeloProc]].forEach(function(p){
+    if (p[0] === 'procuracao' && !p[1] && !ZS_PROC_SEPARADA_){ r.procuracao = { junto: true }; return; }   // vai dentro do contrato
     if (!p[1]){ r[p[0]] = { falta: true }; return; }
     try {
       var t = zsApi_(cfg, 'get', '/api/v1/templates/' + encodeURIComponent(p[1]) + '/');
@@ -67,6 +68,7 @@ function zsConferir_(){
       r[p[0]] = { nome: String(t.name || '').slice(0, 80), campos: achou, faltam: achou.length ? ZS_CAMPOS_.filter(function(k){ return achou.indexOf(k) < 0; }) : null };
     } catch (x){
       var m = String(x && x.message || x); r[p[0]] = { erro: m };
+      if (cfg.auto && /n[ãa]o encontrad|not found|\b404\b/i.test(m)) zsDestravar_(p[0]);
       if (/\b(401|403)\b|token|credenc|autentica|unauthor|forbidden/i.test(m)) r.token = false;
     }
   });
@@ -257,19 +259,44 @@ function zapsign_(){
   if (c) return JSON.parse(c);
   var d = {}; try { d = rpc('campo_zapsign_config', { p_segredo: segredoScript_() }) || {}; } catch (x){ d = {}; }   // sem o SQL 56: desligado
   var o = { token: d.token || '', modelo: d.modelo || '', modeloProc: d.modeloProc || '', teste: !!d.teste };
-  // só a chave foi colada: acha os modelos no ZapSign pelo nome ("Contrato…" e "Procuração…")
+  // só a chave foi colada: acha os modelos no ZapSign pelo nome ("Contrato…" e "Procuração…").
+  // Depois de achados ficam TRAVADOS: a conta do escritório tem modelos de outros benefícios e um modelo novo
+  // com "contrato" no nome não pode tomar o lugar do nosso. Só procura de novo se a chave mudar ou o modelo sumir.
   if (o.token && (!o.modelo || !o.modeloProc)){
-    try {
-      var a = zsModelosPeloNome_(o);
-      if (!o.modelo && a.contrato){ o.modelo = a.contrato.id; o.modeloNome = a.contrato.nome; o.auto = true; }
-      if (!o.modeloProc && a.procuracao){ o.modeloProc = a.procuracao.id; o.modeloProcNome = a.procuracao.nome; o.auto = true; }
-      o.nomesModelos = a.nomes || [];
-    } catch (x){ o.erroModelos = String(x && x.message || x); }
+    var trava = zsTrava_(o);
+    if (!o.modelo && trava.contrato){ o.modelo = trava.contrato.id; o.modeloNome = trava.contrato.nome; o.auto = true; o.travado = true; }
+    if (ZS_PROC_SEPARADA_ && !o.modeloProc && trava.procuracao){ o.modeloProc = trava.procuracao.id; o.modeloProcNome = trava.procuracao.nome; o.auto = true; o.travado = true; }
+    if (!o.modelo || (ZS_PROC_SEPARADA_ && !o.modeloProc)){
+      try {
+        var a = zsModelosPeloNome_(o);
+        if (!o.modelo && a.contrato){ o.modelo = a.contrato.id; o.modeloNome = a.contrato.nome; o.auto = true; trava.contrato = a.contrato; }
+        if (ZS_PROC_SEPARADA_ && !o.modeloProc && a.procuracao){ o.modeloProc = a.procuracao.id; o.modeloProcNome = a.procuracao.nome; o.auto = true; trava.procuracao = a.procuracao; }
+        o.nomesModelos = a.nomes || [];
+        zsTravar_(o, trava);
+      } catch (x){ o.erroModelos = String(x && x.message || x); }
+    }
   }
   cache.put('zapsign', JSON.stringify(o), 300);
   return o;
 }
-// lista os modelos da conta e escolhe, pelo nome, o do contrato e o da procuração (o mais novo, se houver mais de um)
+// modelos travados (propriedades do script), valem só para a mesma chave do ZapSign
+function zsTrava_(cfg){
+  var t = {}; try { t = JSON.parse(PropertiesService.getScriptProperties().getProperty('ZS_MODELOS') || '{}'); } catch (x){ t = {}; }
+  return t && t.chave === String(cfg.token).slice(-6) ? t : { chave: String(cfg.token).slice(-6) };
+}
+function zsTravar_(cfg, t){
+  t.chave = String(cfg.token).slice(-6);
+  if (t.contrato || t.procuracao) PropertiesService.getScriptProperties().setProperty('ZS_MODELOS', JSON.stringify(t));
+}
+// o modelo travado sumiu do ZapSign (apagado): destrava só ele, para achar de novo na próxima vez
+function zsDestravar_(qual){
+  var p = PropertiesService.getScriptProperties(), t = {};
+  try { t = JSON.parse(p.getProperty('ZS_MODELOS') || '{}'); } catch (x){ return; }
+  delete t[qual]; p.setProperty('ZS_MODELOS', JSON.stringify(t));
+  try { CacheService.getScriptCache().removeAll(['zapsign', 'zs_modelos']); } catch (x){}
+}
+// lista os modelos da conta e escolhe, pelo nome, o do contrato e o da procuração
+// (prefere o que tem "Nascer" no nome; contrato "com procuração" de outro benefício não conta; empate: o mais novo)
 function zsModelosPeloNome_(cfg){
   var cache = CacheService.getScriptCache(), c = cache.get('zs_modelos');
   if (c) return JSON.parse(c);
@@ -282,10 +309,14 @@ function zsModelosPeloNome_(cfg){
   var sem = function(s){ return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); };
   var ativos = todos.filter(function(t){ return t && (t.token || t.id) && t.active !== false; })
     .sort(function(a, b){ return String(b.created_at || '').localeCompare(String(a.created_at || '')); });
-  var acha = function(f){ var t = ativos.filter(function(x){ return f(sem(x.name)); })[0]; return t ? { id: t.token || t.id, nome: String(t.name || '') } : null; };
+  var acha = function(f){
+    var l = ativos.filter(function(x){ return f(sem(x.name)); });
+    var t = l.filter(function(x){ return /nascer/.test(sem(x.name)); })[0] || l[0];
+    return t ? { id: t.token || t.id, nome: String(t.name || '') } : null;
+  };
   var res = {
-    contrato: acha(function(n){ return /contrato/.test(n) && !/procura/.test(n); }) || acha(function(n){ return /contrato/.test(n); }),
-    procuracao: acha(function(n){ return /procura/.test(n); }),
+    contrato: acha(function(n){ return /contrato/.test(n) && !/procura/.test(n); }),
+    procuracao: acha(function(n){ return /procura/.test(n) && !/contrato/.test(n); }),
     total: ativos.length, nomes: ativos.slice(0, 15).map(function(t){ return String(t.name || '').slice(0, 60); })
   };
   cache.put('zs_modelos', JSON.stringify(res), 3600);
@@ -364,7 +395,10 @@ function contratoStatus(p, quem){
   if (p.docProc) r.procAssinado = zsAssinado_(zsDoc_(cfg, p.docProc, quem));
   return r;
 }
-var NOME_PDF_ = { contrato: 'CONTRATO.pdf', procuracao: 'PROCURAÇÃO.pdf' };
+// a procuração vem DENTRO do modelo do contrato ("CONTRATO SM NASCER C/ DIREITOS"): um documento e um link só para a mãe.
+// Para voltar a ter a procuração num modelo separado, mude para true.
+var ZS_PROC_SEPARADA_ = false;
+var NOME_PDF_ = { contrato: ZS_PROC_SEPARADA_ ? 'CONTRATO.pdf' : 'CONTRATO E PROCURAÇÃO.pdf', procuracao: 'PROCURAÇÃO.pdf' };
 function anexarContrato_(url, pasta, nome){
   nome = nome || 'CONTRATO E PROCURAÇÃO.pdf';
   if (pasta.getFilesByName(nome).hasNext()) return;

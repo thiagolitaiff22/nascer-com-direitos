@@ -1293,7 +1293,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 99;
+  var APP_VERSAO = 100;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -2064,9 +2064,9 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     var c = ctEstado(), qual = ctProximo(c), url = qual === 'procuracao' ? c.urlProc : c.url; if (!qual || !url) return;
     c.abrindo = qual; ctGuardar(c);
     ctFechar();
-    var t = document.createElement('div'); t.className = 'ct-tela'; t.id = 'ct-tela'; t.setAttribute('role', 'dialog'); t.setAttribute('aria-label', qual === 'procuracao' ? 'Assinatura da procuração' : 'Assinatura do contrato');
+    var t = document.createElement('div'); t.className = 'ct-tela'; t.id = 'ct-tela'; t.setAttribute('role', 'dialog'); t.setAttribute('aria-label', qual === 'procuracao' ? 'Assinatura da procuração' : c.docProc ? 'Assinatura do contrato' : 'Assinatura do contrato e da procuração');
     var passo = c.docProc ? (qual === 'procuracao' ? ' · 2 de 2' : ' · 1 de 2') : '';
-    t.innerHTML = '<div class="ct-tela-topo"><b>' + (qual === 'procuracao' ? 'Procuração da ' : 'Contrato da ') + esc(nomeMae()) + passo + '</b><button type="button" id="ct-fechar">Fechar</button></div><iframe src="' + esc(url) + '" allow="camera" title="' + (qual === 'procuracao' ? 'Assinatura da procuração' : 'Assinatura do contrato') + '"></iframe>';
+    t.innerHTML = '<div class="ct-tela-topo"><b>' + (qual === 'procuracao' ? 'Procuração da ' : c.docProc ? 'Contrato da ' : 'Contrato e procuração da ') + esc(nomeMae()) + passo + '</b><button type="button" id="ct-fechar">Fechar</button></div><iframe src="' + esc(url) + '" allow="camera" title="' + (qual === 'procuracao' ? 'Assinatura da procuração' : 'Assinatura do contrato') + '"></iframe>';
     document.body.appendChild(t); document.documentElement.style.overflow = 'hidden';
     corTopo('#7633b2');
     $('ct-fechar').onclick = function(){ ctFechar(); telaInicial(); };
@@ -2099,7 +2099,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
       gest ? { k: 'parto', t: 'Quando o bebê deve nascer?', s: 'Atendemos só gestantes: o bebê ainda não pode ter nascido.', el: ['l-dpp'], foco: 'dpp', ok: function(){ return !!txt('campo_dpp'); }, erro: 'Digite a data prevista do parto.' }
            : { k: 'parto', t: 'Quando o bebê nasceu?', s: '', el: ['l-cnasc'], foco: 'cnasc', ok: function(){ return !!txt('campo_crianca_nasc'); }, erro: 'Digite a data de nascimento do bebê.' },
       (function(){ var f = ctFase(); return { k: 'contrato', contrato: true, el: [], ok: ctOk, erro: 'A ' + nm + ' precisa assinar o contrato antes das fotos.',
-        t: f === 'assinar' ? 'Assinatura da ' + nm : f === 'assinado' ? 'Contrato assinado' : f === 'semrede' ? 'Sem internet agora' : f === 'depois' ? 'Contrato pelo WhatsApp' : 'Contrato da ' + nm,
+        t: f === 'assinar' ? 'Assinatura da ' + nm : f === 'assinado' ? 'Contrato assinado' : f === 'semrede' ? 'Sem internet agora' : f === 'depois' ? 'Contrato pelo WhatsApp' : 'Contrato e procuração da ' + nm,
         s: f === 'gerar' ? 'Confira os dados: o contrato e a procuração saem preenchidos e ela assina com o dedo, aqui no celular.' : f === 'assinar' ? 'Entregue o celular para ela ler e assinar com o dedo.' : '' }; })(),
       { k: 'senha', t: 'Qual é a senha do gov.br dela?', s: 'Se ela não souber agora, toque em Pular: o escritório pede depois.', el: ['l-sgov'], foco: 'sgov', ok: function(){ return true; }, pular: true },
       { k: 'docs', t: 'Fotos dos documentos', s: 'Toque em cada um para tirar a foto. Confira os dados e envie.', el: [], grid: true, ok: function(){ return true; }, final: true }
@@ -2145,7 +2145,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
           '<div class="wz-res">' + lin.map(function(l){ return '<button type="button" class="wz-lin" data-ir-passo="' + l[2] + '"><span>' + l[0] + '</span><b>' + esc(l[1] || '—') + '</b><u>editar</u></button>'; }).join('') + '</div>' +
           '<p class="ct-dica">O nome tem que estar igual ao do RG.</p>';
       } else if (fase === 'assinar'){
-        slot.innerHTML = '<div class="ct-fim">' + ico('<path d="M7 3h7l5 5v13H7zM14 3v5h5M9.5 17c1.2-2.4 2.3-2.4 3 0s1.8 2.4 3 0"/>') + '<b>' + (ctProximo(cE) === 'procuracao' ? 'Falta a procuração da ' + esc(nm) : (cE.docProc ? 'Contrato e procuração prontos para a ' : 'Contrato pronto para a ') + esc(nm) + ' assinar') + '</b><p>Entregue o celular para ela ler e assinar com o dedo. Quando ela terminar, a tela fecha sozinha.</p><button type="button" class="wz-pular" id="ct-conferir">Já assinou? Conferir</button></div>';
+        slot.innerHTML = '<div class="ct-fim">' + ico('<path d="M7 3h7l5 5v13H7zM14 3v5h5M9.5 17c1.2-2.4 2.3-2.4 3 0s1.8 2.4 3 0"/>') + '<b>' + (ctProximo(cE) === 'procuracao' ? 'Falta a procuração da ' + esc(nm) : 'Contrato e procuração prontos para a ' + esc(nm) + ' assinar') + '</b><p>Entregue o celular para ela ler e assinar com o dedo. Quando ela terminar, a tela fecha sozinha.</p><button type="button" class="wz-pular" id="ct-conferir">Já assinou? Conferir</button></div>';
       } else if (fase === 'assinado'){
         slot.innerHTML = '<div class="ct-fim ok">' + ico('<path d="M5 12.5l4.5 4.5L19 7.5"/>') + '<b>Contrato e procuração assinados</b><p>Agora a senha gov.br e as fotos dos documentos.</p></div>';
       } else if (fase === 'semrede'){

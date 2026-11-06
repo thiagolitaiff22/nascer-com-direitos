@@ -2993,7 +2993,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
           </form>
         </div>
         <div class="card integ ig-simples" data-painel="zapsign">
-          <p class="ig-desc">Cole a chave da API do ZapSign. O sistema acha sozinho os modelos do contrato e da procuração, e a mãe assina com o dedo no aplicativo.</p>
+          <p class="ig-desc">Cole a chave da API do ZapSign. O sistema acha sozinho o modelo do contrato (a procuração vai dentro dele) e a mãe assina tudo com o dedo no aplicativo, num link só.</p>
           <form id="form-zs" class="ig-chave" novalidate autocomplete="off">
             <div class="ig-campo">
               <input id="zs-token" type="password" aria-label="Chave da API do ZapSign" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore placeholder="Cole aqui a chave da API">
@@ -3007,7 +3007,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
           <ol class="ig-passos" id="zs-passos" hidden>
             <li>Entre no <b>ZapSign</b> com a conta do escritório.</li>
             <li>Vá em <b>Configurações › Integração › API</b> e copie a chave (o token).</li>
-            <li>Cole aqui e clique em <b>Salvar</b>. O sistema confere a chave e acha os modelos que têm <b>Contrato</b> e <b>Procuração</b> no nome.</li>
+            <li>Cole aqui e clique em <b>Salvar</b>. O sistema confere a chave e acha o modelo com <b>Contrato</b> e <b>Nascer</b> no nome (a procuração vai dentro dele). Depois de achado, ele fica fixo.</li>
           </ol>
         </div>
         <div class="card integ" data-painel="celular">
@@ -7696,6 +7696,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
         L.push([true, 'Chave aceita pelo ZapSign']);
         [['contrato', 'Contrato'], ['procuracao', 'Procuração']].forEach(function(p){
           var m = zt[p[0]] || {};
+          if (m.junto){ L.push([true, 'Procuração: vai junto, no mesmo documento (a mãe assina os dois com um link só)']); return; }
           if (m.falta) L.push([false, p[1] + ': não achei um modelo com <b>' + p[1] + '</b> no nome']);
           else if (m.erro) L.push([false, p[1] + ': ' + esc(String(m.erro).replace(/^ZapSign: /, ''))]);
           else if (m.faltam && m.faltam.length) L.push([false, p[1] + ': o modelo <b>' + esc(m.nome || '') + '</b> não tem ' + m.faltam.map(function(c){ return '{{' + c + '}}'; }).join(', ')]);
