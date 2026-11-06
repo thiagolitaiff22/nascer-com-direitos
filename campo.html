@@ -1364,7 +1364,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 102;
+  var APP_VERSAO = 103;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1375,9 +1375,9 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     { k: 'rg_frente', arq: 'RG - frente', t: 'RG', s: 'da mãe, frente e verso', lado: 'Frente', ic: 'i-id', req: true, fala: 'Tire a foto da frente do RG, o lado com a foto.' },
     { k: 'rg_verso', arq: 'RG - verso', t: 'RG', s: 'verso', lado: 'Verso', oculto: true, ic: 'i-idv', fala: 'Agora o verso do RG.' },
     { k: 'cpf', arq: 'CPF', t: 'CPF', s: 'da mãe', ic: 'i-id', req: true, fala: 'Tire a foto do CPF da cliente.' },
-    { k: 'titulo', arq: 'Título de eleitor - frente', t: 'Título de eleitor', s: 'frente e verso, se tiver', lado: 'Frente', ic: 'i-id', req: true, fala: 'Tire a foto da frente do título de eleitor.' },
+    { k: 'titulo', arq: 'Título de eleitor - frente', t: 'Título de eleitor', s: 'frente e verso, se tiver', lado: 'Frente', ic: 'i-id', req: false, oculto: true, fala: 'Tire a foto da frente do título de eleitor.' },
     { k: 'titulo_verso', arq: 'Título de eleitor - verso', t: 'Título de eleitor', s: 'verso', lado: 'Verso', oculto: true, ic: 'i-idv', fala: 'Agora o verso do título de eleitor, se tiver.' },
-    { k: 'residencia', arq: 'Comprovante de residência', t: 'Comprovante de residência', s: 'da mãe', ic: 'i-casa', req: true, fala: 'Tire a foto do comprovante de residência.' },
+    { k: 'residencia', arq: 'Comprovante de residência', t: 'Comprovante de residência', s: 'da mãe', ic: 'i-casa', req: false, oculto: true, fala: 'Tire a foto do comprovante de residência.' },
     { k: 'rural', arq: 'Provas de atividade rural', t: 'Provas de atividade rural (se tiver)', s: 'opcional: só se a mãe tiver', ic: 'i-doc', req: false, multi: true, fala: 'Tire a foto das provas de atividade rural. Toque de novo para cada documento a mais.' },
     { k: 'video', arq: 'Vídeo de concordância', t: 'Vídeo de concordância', s: 'a cliente aceitando os termos do contrato', ic: 'i-video', opcional: true, oculto: true, video: true, fala: 'Grave um vídeo curto com a cliente concordando com os termos do contrato.' },
     { k: 'procuracao', arq: 'Contrato e procuração', t: 'Contrato e procuração', s: 'fotografe os dois, um em seguida do outro', ic: 'i-pena', opcional: true, oculto: true, multi: true, fala: 'Tire a foto do contrato e, em seguida, da procuração. Toque de novo para cada folha.' },
@@ -1572,7 +1572,8 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   /* ---------- casca do aplicativo: barra de cima, três abas e as vistas ---------- */
   var aba = lsGet('campo_aba') || 'painel', painel = null, filtroCli = 'todos', buscaCli = '';
   var NOME_DOC = { procuracao: 'Contrato e procuração', rg_frente: 'RG', cpf: 'CPF', titulo: 'Título de eleitor', titulo_verso: 'Título de eleitor - verso', video: 'Vídeo de concordância', certidao: 'Certidão de nascimento', residencia: 'Comprovante de residência', cliente: 'Foto da cliente', autodeclaracao: 'Autodeclaração rural', rural: 'Provas rurais', ctps: 'CTPS / CNIS', arogo: 'Documentos a rogo', outro: 'Outro documento' };
-  function faltas(c){ return (c && Array.isArray(c.faltaDocs) ? c.faltaDocs : []).filter(function(k){ return NOME_DOC[k]; }); }
+  var NAO_PEDE = { titulo: 1, titulo_verso: 1, residencia: 1 };   // não são mais pedidos (06/11/2026)
+  function faltas(c){ return (c && Array.isArray(c.faltaDocs) ? c.faltaDocs : []).filter(function(k){ return NOME_DOC[k] && !NAO_PEDE[k]; }); }
   function nomesFaltas(l){ return l.map(function(k){ return NOME_DOC[k]; }).join(', '); }
   // completando: cliente já cadastrado que o prospectador está completando ({ id, nome, faltaDocs })
   var completando = null;
@@ -3536,7 +3537,8 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   function docK(k){ return DOCS.filter(function(x){ return x.k === k; })[0]; }
   function seqEstado(){ try { var s = JSON.parse(lsGet('campo_docs_seq') || '{}'); return s && typeof s === 'object' ? s : {}; } catch(e){ return {}; } }
   function seqGuardar(s){ lsSet('campo_docs_seq', JSON.stringify(s)); }
-  function seqPassos(){ var l = ['rg', 'cpf', 'titulo', 'residencia']; if (tipoAtual() === 'especial') l.push('rural'); return l; }
+  // só RG e CPF (06/11/2026: título de eleitor e comprovante de residência não são mais pedidos); pescadora, agricultora ou indígena: provas da atividade
+  function seqPassos(){ var l = ['rg', 'cpf']; if (tipoAtual() === 'especial') l.push('rural'); return l; }
   function seqPend(k){ return (seqEstado().pend || []).indexOf(SEQ[k].doc) >= 0; }
   function seqTemFoto(k){ return k === 'rg' ? !!(fotos.rg_frente && fotos.rg_verso) : !!(fotos[SEQ[k].doc] && fotos[SEQ[k].doc].length); }
   function seqFeito(k){ return seqTemFoto(k) || seqPend(k) || (k === 'cpf' && !!seqEstado().cpfNoRg); }
@@ -3584,7 +3586,8 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   }
   function seqDepois(){ if (seqAtiva) setTimeout(seqContinuar, 120); }
   // desenho animado de um documento: o celular chega por cima, a moldura fica verde e a foto é tirada
-  var TUTO_DOCS = [['rg', 'RG · frente e verso'], ['cpf', 'CPF'], ['titulo', 'Título de eleitor · frente e verso'], ['folha', 'Comprovante de residência']];
+  var TUTO_DOCS = [['rg', 'RG · frente e verso'], ['cpf', 'CPF'], ['folha', 'Provas da atividade (pescadora, agricultora ou indígena)']];
+  function tutoDocs(){ return tipoAtual() === 'especial' ? TUTO_DOCS : TUTO_DOCS.slice(0, 2); }
   var TUTO_DE = { rg: 'rg', cpf: 'cpf', titulo: 'titulo', residencia: 'folha', rural: 'folha' };
   function tutoCena(tipo, legenda, peq){
     return '<div class="tuto-cena' + (peq ? ' peq' : '') + '" data-doc="' + tipo + '" aria-hidden="true"><div class="tuto-in"><div class="tuto-doc"></div><div class="tuto-cel"><span class="tuto-mold"></span><span class="tuto-flash"></span></div></div><span class="tuto-ok">✓</span></div>' +
@@ -3592,14 +3595,15 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   }
   // animação curtinha de como tirar a foto, passando por todos os documentos (aparece sozinha na primeira foto; depois, no "Como tirar a foto")
   function tutoFoto(depois){
-    var t = tela('<div id="tuto-palco">' + tutoCena(TUTO_DOCS[0][0], TUTO_DOCS[0][1]) + '</div><div class="tuto-pts">' + TUTO_DOCS.map(function(x, i){ return '<i' + (i ? '' : ' class="on"') + '></i>'; }).join('') + '</div>' +
+    var TD = tutoDocs();
+    var t = tela('<div id="tuto-palco">' + tutoCena(TD[0][0], TD[0][1]) + '</div><div class="tuto-pts">' + TD.map(function(x, i){ return '<i' + (i ? '' : ' class="on"') + '></i>'; }).join('') + '</div>' +
       '<b>Como tirar a foto</b><ol class="tuto-passos"><li><b>1</b>Documento em cima de uma mesa, com luz e sem reflexo</li><li><b>2</b>Celular reto, por cima do documento</li><li><b>3</b>Encaixe no quadro: quando a linha ficar verde, toque no botão</li></ol>' +
       '<button id="tuto-ok">' + (depois ? 'Entendi, abrir a câmera' : 'Entendi') + '</button>');
     // troca de documento a cada volta da animação (recria o desenho para a animação recomeçar)
     var n = 0, troca = setInterval(function(){
-      if (!t.isConnected || n >= TUTO_DOCS.length - 1){ clearInterval(troca); return; }
+      if (!t.isConnected || n >= TD.length - 1){ clearInterval(troca); return; }
       n++;
-      t.querySelector('#tuto-palco').innerHTML = tutoCena(TUTO_DOCS[n][0], TUTO_DOCS[n][1]);
+      t.querySelector('#tuto-palco').innerHTML = tutoCena(TD[n][0], TD[n][1]);
       Array.prototype.forEach.call(t.querySelectorAll('.tuto-pts i'), function(p, i){ p.className = i === n ? 'on' : ''; });
     }, 2200);
     t.querySelector('#tuto-ok').onclick = function(){ clearInterval(troca); lsSet('campo_tuto_foto', '1'); t.remove(); if (depois) depois(); };

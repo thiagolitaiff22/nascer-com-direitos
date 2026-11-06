@@ -3723,7 +3723,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   function docsApp(r){
     var campo = Array.isArray(r.campoDocs) ? r.campoDocs : null, antigo = Array.isArray(r.faltaDocs) ? r.faltaDocs : null;
     // urbano: precisa do NIT (é dele que sai a GPS); rural (segurada especial): precisa da prova da atividade rural e não do NIT
-    return DOCS_APP.filter(function(d){ return d[0] === 'procuracao' ? !!r.contrato :   /* contrato e procuração: só os gerados pelo ZapSign (SQL 56), cobrados até a mãe assinar */ d[0] === 'rural' ? (rural(r) || !!(campo && campo.indexOf('rural') >= 0)) : d[0] === 'nit' ? !rural(r) : true; }).map(function(d){
+    return DOCS_APP.filter(function(d){ return !(doFluxoNovo(r) && (d[0] === 'titulo' || d[0] === 'residencia')); }).filter(function(d){ return d[0] === 'procuracao' ? !!r.contrato :   /* contrato e procuração: só os gerados pelo ZapSign (SQL 56), cobrados até a mãe assinar */ d[0] === 'rural' ? (rural(r) || !!(campo && campo.indexOf('rural') >= 0)) : d[0] === 'nit' ? !rural(r) : true; }).map(function(d){
       if (d[0] === 'senha') return { k: 'senha', n: d[1], ok: !!r.senhaGovOk || (!doFluxoNovo(r) && !!(campo && campo.indexOf('senha') >= 0)) };
       if (d[0] === 'nit') return { k: 'nit', n: d[1], ok: nitOk(r.nit) };
       if (d[0] === 'procuracao') return { k: 'procuracao', n: d[1], ok: !ctPend(r) || !!(campo && campo.indexOf('procuracao') >= 0) };
@@ -3736,7 +3736,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   function ctPend(r){ return !!(r && r.contrato && r.contrato.status !== 'assinado'); }
   // documentos que a IA confere, conforme o tipo de segurada: [chave que a IA devolve, chave do faltaDocs]
   function docsExigidos(r){
-    var l = [['procuracao', 'procuracao'], ['rg', 'rg_frente'], ['cpf', 'cpf'], ['residencia', 'residencia']];
+    var l = [['procuracao', 'procuracao'], ['rg', 'rg_frente'], ['cpf', 'cpf']].concat(doFluxoNovo(r) ? [] : [['residencia', 'residencia']]);   // fluxo novo: só RG e CPF (06/11/2026)
     if (r.fatoGerador !== 'gestante') l.push(['certidao', 'certidao']);
     if (r.tipoSegurada === 'especial') l.push(['autodeclaracao', 'autodeclaracao'], ['rural', 'rural']);
     else if (r.tipoSegurada) l.push(['ctps', 'ctps']);
