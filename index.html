@@ -2432,6 +2432,10 @@ html[data-fx="novo"] .fc-cx-nome b,html[data-fx="novo"] .fc-cx-nome h3,html[data
 html[data-fx="novo"] .fc-sec{font-family:'Fraunces',Georgia,serif;letter-spacing:0;text-transform:none;font-size:15px;font-weight:600;color:var(--ink)}
 html[data-fx="novo"] .fc-salvar .btn{min-height:44px;border-radius:14px;font-size:14px}
 html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:14px!important}
+html[data-fx="novo"] .kb-ana{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;font-size:12.5px;font-weight:500;color:var(--ink-3)}
+html[data-fx="novo"] .kb-ana .i,html[data-fx="novo"] .fc-ana .i{width:14px;height:14px;color:var(--ap-g1);flex:none}
+html[data-fx="novo"]:root[data-theme="dark"] .kb-ana .i,html[data-fx="novo"]:root[data-theme="dark"] .fc-ana .i{color:#c9a3ea}
+html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:13px}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -3840,7 +3844,7 @@ html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:14px!impor
       ['Nome completo', r.nome], ['CPF', r.cpf], ['Telefone', contato], ['Cidade', cidadeCli(r)], ['Parceiro', prospName(r.responsavelId)],
       ['RG', r.rg ? r.rg : null], ['Nascimento', r.nascimento ? fmtDate(r.nascimento) : null], ['NIT / PIS', r.nit ? r.nit : null], ['Endereço', r.endereco ? r.endereco : null],
       ['Atendente', r.atendente || r.contratoPor || null], ['Proposta', r.propostaAceita ? 'aceita pela cliente' + (r.propostaObs ? ' · ' + r.propostaObs : '') : null],
-      ['Fechamento', r.contratoEm ? 'fechado' + (r.contratoPor ? ' por ' + r.contratoPor : '') + ' em ' + fmtDate(String(r.contratoEm).slice(0, 10)) : null], ['Criança', crianca],
+      [doFluxoNovo(r) ? 'Contrato' : 'Fechamento', r.contratoEm ? (doFluxoNovo(r) ? 'assinado em ' : 'fechado' + (r.contratoPor ? ' por ' + r.contratoPor : '') + ' em ') + fmtDate(String(r.contratoEm).slice(0, 10)) : null], ['Criança', crianca],
       ['Testemunhas', r.tipoSegurada === 'especial' || r.testemunhas ? r.testemunhas : null],
       ['INSS', inss], ['Exigência', r.inssStatus === 'exigencia' ? (r.exigenciaObs || 'sem descrição') + (r.exigenciaPrazo ? ' · prazo ' + fmtDate(r.exigenciaPrazo) : '') : null],
       ['Motivo do indeferimento', r.inssStatus === 'indeferido' ? r.motivoIndeferimento : null],
@@ -3850,7 +3854,7 @@ html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:14px!impor
       ['Pagamento', r.pagamento && PAG[r.pagamento] ? PAG[r.pagamento][0] : ''], ['Penalidades', penalidadesTxt(r)], ['Observações', obsDaEquipe(r) || null]
     ].filter(function(c){ return c[1] !== null; });
     campos = campos.filter(function(c){ return String(c[1] == null ? '' : c[1]).trim() || ['Nome completo', 'CPF', 'Telefone', 'Cidade', 'Parceiro', 'Criança'].indexOf(c[0]) >= 0; });
-    if (compacto) campos = campos.filter(function(c){ return ['Nome completo', 'CPF', 'RG', 'Nascimento', 'NIT / PIS', 'Telefone', 'Cidade', 'Endereço', 'Parceiro', 'Atendente', 'Proposta', 'Fechamento', 'Criança', 'Testemunhas', 'Penalidades', 'Observações'].indexOf(c[0]) >= 0; });
+    if (compacto) campos = campos.filter(function(c){ return ['Nome completo', 'CPF', 'RG', 'Nascimento', 'NIT / PIS', 'Telefone', 'Cidade', 'Endereço', 'Parceiro', 'Atendente', 'Proposta', 'Fechamento', 'Contrato', 'Criança', 'Testemunhas', 'Penalidades', 'Observações'].indexOf(c[0]) >= 0; });
     var fl = faltaDocs(r);
     var ok = '<i class="fc-ok"><svg class="i"><use href="#i-check"/></svg></i>', nada = '<i class="fc-nao">–</i>';
     var fotoOk = /^data:image\/(jpeg|png);base64,[A-Za-z0-9+\/=]+$/.test(r.fotoCliente || '');
@@ -3942,7 +3946,7 @@ html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:14px!impor
   function fcResp(r, t){ return t === 'd' ? [r.atendente, r.atendenteEmail] : t === 'h' ? [r.filaPor, ''] : [r.posResp, r.posRespEmail]; }
   function fcGuia(r){
     if (!noContratos(r) || nascido(r)) return '';
-    if (rural(r)){ var pr = docsApp(r).filter(function(x){ return x.k === 'rural'; })[0]; return doFluxoNovo(r) ? '<p class="fc-sec">' + esc(ativNovoTxt(r)) + ' · segurada especial</p><p class="fc-nota">Não paga GPS. O que garante o benefício é a prova da atividade' + (pr && pr.ok ? ' (já recebida).' : ' (ainda não chegou: cobrar da mãe).') + '</p>' : '<p class="fc-sec">Salário-maternidade rural</p><p class="fc-nota">Segurada especial: não paga GPS. O que garante o benefício é a prova da atividade rural' + (pr && pr.ok ? ' (já recebida).' : ' (ainda não chegou: cobrar da mãe).') + '</p>'; }
+    if (rural(r)){ var pr = docsApp(r).filter(function(x){ return x.k === 'rural'; })[0]; return doFluxoNovo(r) ? '<p class="fc-sec">' + esc(ativNovoTxt(r)) + ' · segurada especial</p><p class="fc-nota">Não paga GPS. O que garante o benefício é a prova da atividade' + (pr && pr.ok ? ' (já recebida).' : ' (ainda não chegou: a Ana cobra a mãe pelo WhatsApp).') + '</p>' : '<p class="fc-sec">Salário-maternidade rural</p><p class="fc-nota">Segurada especial: não paga GPS. O que garante o benefício é a prova da atividade rural' + (pr && pr.ok ? ' (já recebida).' : ' (ainda não chegou: cobrar da mãe).') + '</p>'; }
     var pago = gpsPaga(r), emitida = !!gpsGerar(r);
     return '<p class="fc-sec">Guia GPS (segurada facultativa)</p><div class="fc-guia">' +
       fcLeitura('Código de pagamento', gpsCodigoDe(r) + (gpsCodigoDe(r) === '1163' ? ' · contribuinte individual, plano simplificado (11%)' : ' · facultativa, plano simplificado (11%)')) + fcLeitura('Valor', moedaTxt(gpsValor())) + fcLeitura('Prazo', prazoGps(r) ? fmtDate(prazoGps(r)) : 'informe a data do parto') + fcLeitura('Situação', pago ? 'Paga' + (r.guiaPagaEm ? ' em ' + fmtDate(r.guiaPagaEm) : '') : emitida ? 'Guia pronta, aguardando pagamento' : 'Falta o NIT para gerar a guia') + '</div>' +
@@ -3969,11 +3973,11 @@ html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:14px!impor
       '<label class="fc-c"><span class="fc-rot">Anotações gerais</span><textarea id="fc-obs" rows="3" placeholder="Anotações sobre a cliente">' + esc(obsDaEquipe(r)) + '</textarea></label>' +
       (requerido(r) ? '<label class="fc-c"><span class="fc-rot">Número do protocolo/requerimento</span><input id="fc-prot" value="' + esc(r.protocoloInss || '') + '"></label><label class="fc-c"><span class="fc-rot">Data do requerimento</span><input id="fc-der" type="date" value="' + esc(r.der || '') + '"></label><label class="fc-c"><span class="fc-rot">NB</span><input id="fc-nb" value="' + esc(r.nb || '') + '"></label>' : '') +
       (String(r.processo || '').trim() ? '<label class="fc-c"><span class="fc-rot">Número do processo (CNJ)</span><input id="fc-proc" value="' + esc(r.processo) + '"></label>' : '') +
-      '<p class="fc-sec">Linha do tempo</p><div>' + fcLeitura('Data do cadastro', dc ? fmtDate(dc) : '—') + fcLeitura('Data do fechamento', r.contratoEm ? fmtDate(String(r.contratoEm).slice(0, 10)) : '—') + '</div>' +
+      '<p class="fc-sec">Linha do tempo</p><div>' + fcLeitura('Data do cadastro', dc ? fmtDate(dc) : '—') + fcLeitura(doFluxoNovo(r) ? 'Data do contrato' : 'Data do fechamento', r.contratoEm ? fmtDate(String(r.contratoEm).slice(0, 10)) : '—') + '</div>' +
       '<p class="fc-sec">Fase do processo</p>' + (pode ? '<label class="fc-c"><span class="fc-rot">Responsável</span>' + respSel + '</label>' + (doFluxoNovo(r) ? '<label class="fc-c"><span class="fc-rot">Pescadora, agricultora ou indígena?*</span><select id="fc-ativn">' + ativOpts(r) + '</select></label>' : '<label class="fc-c"><span class="fc-rot">Salário-maternidade*</span><select id="fc-tipo">' + tipoOpts(r.tipoSegurada) + '</select></label>') : '') +
       '<label class="fc-c"><span class="fc-rot">Fase*</span><input disabled value="' + esc(TITULOS[t] ? TITULOS[t][0] : '') + '"></label><label class="fc-c"><span class="fc-rot">Etapa*</span>' + etapaSel + '</label>' +
       (t === 'h' ? '<p class="fc-nota">Para avançar, use o botão do card.</p>' : '') +
-      '<p class="fc-sec">Fechamento</p><div>' + fcLeitura('Situação', doFluxoNovo(r) ? 'Contrato e procuração assinados no app' : t === 'd' ? (LEAD[leadDe(r)] || '—') : t === 'q' ? (desqualificada(r) ? 'Desqualificado' : 'Perda') : 'Contrato fechado') + (doFluxoNovo(r) ? '' : fcLeitura('Closer', r.contratoPor || r.atendente || '—')) + (doFluxoNovo(r) ? '' : fcLeitura('Proposta', r.propostaAceita ? 'Aceita pela cliente' + (r.propostaObs ? ' · ' + r.propostaObs : '') : '')) +
+      '<p class="fc-sec">' + (doFluxoNovo(r) ? 'Contrato' : 'Fechamento') + '</p><div>' + fcLeitura('Situação', doFluxoNovo(r) ? 'Contrato e procuração assinados no app' : t === 'd' ? (LEAD[leadDe(r)] || '—') : t === 'q' ? (desqualificada(r) ? 'Desqualificado' : 'Perda') : 'Contrato fechado') + (doFluxoNovo(r) ? '' : fcLeitura('Closer', r.contratoPor || r.atendente || '—')) + (doFluxoNovo(r) ? '' : fcLeitura('Proposta', r.propostaAceita ? 'Aceita pela cliente' + (r.propostaObs ? ' · ' + r.propostaObs : '') : '')) +
         fcLeitura('Origem do contrato', parNome || '—') + fcLeitura('Cidade', cidadeCli(r)) + fcLeitura('Criança', r.crianca) +
         fcLeitura('Exigência', r.inssStatus === 'exigencia' ? (r.exigenciaObs || 'Sem descrição') + (r.exigenciaPrazo ? ' · prazo ' + fmtDate(r.exigenciaPrazo) : '') : '') + fcLeitura('Motivo', r.desqualMotivo || r.motivoIndeferimento || r.motivoArquivo) +
         fcLeitura('Resultado', r.resultado && RES[r.resultado] ? RES[r.resultado][0] : '') + fcLeitura('Pagamento', r.pagamento && PAG[r.pagamento] ? PAG[r.pagamento][0] : '') + (doFluxoNovo(r) ? '' : fcLeitura('Penalidades', penalidadesTxt(r))) + '</div>' +
@@ -3983,7 +3987,8 @@ html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:14px!impor
   function fcArquivos(r){
     var docs = docsApp(r), ok = docs.filter(function(x){ return x.ok; }).length, zp = zapUrl(foneDe(r)), id = esc(r.id);
     return '<div class="fc-p p-arq"><p class="fc-sec0">Documentos juntados no app · ' + ok + '/' + docs.length + '</p>' + docs.map(function(x){ return '<div class="fc-doc ' + (x.ok ? 'ok' : 'no') + '"><i>' + svgI(x.ok ? 'i-ok' : 'i-x') + '</i><span>' + esc(x.n) + '</span>' + (x.ok ? '' : doFluxoNovo(r) && x.k === 'senha' ? '<small class="fc-doc-dica">cadastre na aba Dados, abaixo do CPF</small>' : doFluxoNovo(r) && x.k === 'nit' ? '<small class="fc-doc-dica">pegue no Meu INSS com a senha gov.br e digite na aba Dados</small>' : '<button type="button" class="btn" data-act="recebido" data-id="' + id + '" data-doc="' + x.k + '" title="Chegou por outro meio: marcar como recebido">Recebi</button>') + '</div>'; }).join('') +
-      (zp && (ctPend(r) || docs.some(function(x){ return !x.ok && !(doFluxoNovo(r) && x.k === 'nit'); })) ? '<a class="btn fc-cobrar" target="_blank" rel="noopener" href="' + esc(zp + '?text=' + encodeURIComponent(msgCobranca(r))) + '" title="Abre o WhatsApp com a mensagem pronta; você confere e envia">' + svgI('i-zap') + 'Cobrar a mãe pelo WhatsApp</a>' : '') + '</div>';
+      (doFluxoNovo(r) ? (ctPend(r) || docs.some(function(x){ return !x.ok && x.k !== 'nit' && x.k !== 'senha'; }) ? '<p class="fc-nota fc-ana">' + svgI('i-zap') + 'A Ana cobra a mãe pelo WhatsApp (LiderHub).</p>' : '') :
+      zp && (ctPend(r) || docs.some(function(x){ return !x.ok; })) ? '<a class="btn fc-cobrar" target="_blank" rel="noopener" href="' + esc(zp + '?text=' + encodeURIComponent(msgCobranca(r))) + '" title="Abre o WhatsApp com a mensagem pronta; você confere e envia">' + svgI('i-zap') + 'Cobrar a mãe pelo WhatsApp</a>' : '') + '</div>';
   }
   function fcHistorico(r){ return '<div class="fc-p p-hist">' + (htmlLinhaTempo(r) || '<p class="fc-nota">Nada registrado ainda.</p>') + '</div>'; }
   function pintarCard(){
@@ -4789,6 +4794,12 @@ html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:14px!impor
     return diasDesdeIso(e === 'cadastro' ? (r.leadMudouEm || r.ultimoContatoEm || r.dataCadastro || r.criadoEm) : e === 'fila' ? (r.filaMudouEm || r.encaminhadoEm) : (r.posMudouEm || r.contratoEm));
   }
   function atrasoTxt(r){
+    // fluxo novo: o único prazo que conta é o da GPS (os 7 dias para juntar a documentação eram do fluxo antigo)
+    if (doFluxoNovo(r)){
+      if (r.fatoGerador !== 'gestante' || nascido(r) || rural(r) || semGps(r) || gpsPaga(r)) return '';
+      var vg = prazoGps(r); if (!vg || vg >= iso(new Date())) return '';
+      var dg = -daysUntil(vg); return 'GPS vencida há ' + dg + (dg === 1 ? ' dia' : ' dias');
+    }
     var e = etapaAtual(r); if (!e) return '';
     if (e === 'pos' && posEtapaDe(r) !== 'ok'){
       var hj = iso(new Date()), parto = r.criancaNasc || (r.fatoGerador === 'gestante' ? r.dpp : '');
@@ -4868,7 +4879,7 @@ html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:14px!impor
   function iniciais(n){ var p = String(n || '?').trim().split(/\s+/); return ((p[0] || '?').charAt(0) + (p.length > 1 ? p[p.length - 1].charAt(0) : '')).toUpperCase(); }
   // pendência principal da mãe no Pós-venda do fluxo novo
   function pendNovoTxt(r){
-    if (!r.tipoSegurada) return 'Pescadora, agricultora ou indígena?';
+    if (!r.tipoSegurada) return 'Atividade não informada';
     if (ctPend(r)) return 'Contrato';
     if (!r.senhaGovOk) return 'Senha gov.br';
     var f = faltaDocs(r);
@@ -4889,13 +4900,13 @@ html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:14px!impor
       : et === 'ok' || r.pvAnalise === 'devolvido' ? (doFluxoNovo(r) ? '<button type="button" class="kb-btn" data-pv-enc="' + id + '" title="Pasta pronta: vai direto para a Fila de protocolo">' + svgI('i-file') + 'Encaminhar para protocolo</button>' : '<button type="button" class="kb-btn" data-pv-enc="' + id + '" title="Manda para a Controladoria: se estiver OK, vai para o protocolo; se não, volta para regularizar">' + svgI('i-file') + 'Encaminhar para análise</button>') : '';
     if (doFluxoNovo(r) && faseDe(r) === 'k'){
       var zpN = zapUrl(foneDe(r));
-      acao = !r.tipoSegurada ? ativSeg(r)
-        : ctPend(r) && (r.contrato.url || r.contrato.urlProc) && zpN ? '<a class="kb-btn" target="_blank" rel="noopener" href="' + esc(zpN + '?text=' + encodeURIComponent(msgCobranca(r))) + '" title="Abre o WhatsApp com o link do contrato; você confere e envia">' + svgI('i-zap') + 'Mandar o contrato</a>'
+      // falar com a mãe (contrato, documentos, prova da atividade) é com a Ana, a IA do LiderHub: aqui só ficam as tarefas da equipe
+      acao = !r.tipoSegurada ? '<button type="button" class="kb-btn sec" data-act="abrir" data-id="' + id + '" title="O questionário do app não trouxe a resposta da atividade: informe na ficha">' + svgI('i-pencil') + 'Informar na ficha</button>'
+        : !zpN ? '<button type="button" class="kb-btn" data-act="edit" data-id="' + id + '" title="Sem telefone a Ana não consegue falar com a mãe: abra o cadastro e informe o WhatsApp">' + svgI('i-pencil') + 'Pôr o telefone</button>'
         : !r.senhaGovOk ? '<button type="button" class="kb-btn" data-act="abrir" data-id="' + id + '" title="Abre a ficha: a senha gov.br fica logo abaixo do CPF">' + svgI('i-chave') + 'Cadastrar senha</button>'
         // NIT: não se pede à mãe; com a senha gov.br a equipe pega no Meu INSS e digita na ficha
         : faltaDocs(r).indexOf('nit') >= 0 ? '<button type="button" class="kb-btn" data-act="abrir" data-id="' + id + '" title="Com a senha gov.br da ficha, entre no Meu INSS, copie o NIT e digite no campo NIT da guia">' + svgI('i-inss') + 'Pegar NIT no Meu INSS</button>'
-        : zpN ? '<a class="kb-btn" target="_blank" rel="noopener" href="' + esc(zpN + '?text=' + encodeURIComponent(msgCobranca(r))) + '" title="Abre o WhatsApp com a mensagem pronta; você confere e envia">' + svgI('i-zap') + 'Cobrar no WhatsApp</a>'
-        : '<button type="button" class="kb-btn" data-act="edit" data-id="' + id + '" title="Sem telefone: abra o cadastro e informe o WhatsApp da mãe">' + svgI('i-pencil') + 'Pôr o telefone</button>';
+        : '<span class="kb-ana" title="A Ana fala com a mãe pelo WhatsApp (LiderHub)">' + svgI('i-zap') + (ctPend(r) ? 'A Ana manda o contrato' : 'A Ana cobra a mãe') + '</span>';
     }
     var novoK = doFluxoNovo(r) && faseDe(r) === 'k';
     return { etapa: novoK ? pendNovoTxt(r) : posNome(r, POS_COLS.filter(function(c){ return c[0] === et; })[0] || [et, '']), etapaSel: novoK ? '' : '<select data-pos="' + id + '" aria-label="Etapa de ' + esc(r.nome) + '">' + opts + '</select>',
@@ -4911,7 +4922,7 @@ html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:14px!impor
   }
   // fluxo novo: o Pós-venda só mostra quem tem pendência (pescadora/agricultora/indígena, senha, documento, prova da atividade)
   function posDaTela(r){ return noContratos(r) && (fluxoVista !== 'novo' || faseDe(r) === 'k'); }
-  var CTR_SITS_NOVO = [['', 'Status: todas'], ['semsenha', 'Sem senha gov.br'], ['docs', 'Documentos faltando'], ['rprova', 'Prova da atividade faltando'], ['semtipo', 'Falta perguntar a atividade'], ['rur', 'Pescadora, agricultora ou indígena'], ['urb', 'Nenhuma das três (GPS)'], ['atr', 'Atrasadas']];
+  var CTR_SITS_NOVO = [['', 'Status: todas'], ['semsenha', 'Sem senha gov.br'], ['docs', 'Documentos faltando'], ['rprova', 'Prova da atividade faltando'], ['rur', 'Pescadora, agricultora ou indígena'], ['urb', 'Nenhuma das três (GPS)'], ['atr', 'GPS vencida']];
   function ctrSitsAtivos(){ return fluxoVista === 'novo' ? CTR_SITS_NOVO : CTR_SITS; }
   var CTR_SITS = [['', 'Status: todas'], ['urb', 'Urbanas (com GPS)'], ['rur', 'Rurais (prova rural)'], ['semtipo', 'Sem rural/urbano'], ['completa', 'Pastas completas'], ['gest', 'Gestantes'], ['nasc', 'Bebê já nasceu'], ['atr', 'Atrasadas'], ['gps', 'GPS a pagar'], ['docs', 'Documentos faltando'], ['dev', 'Devolvidas pela Controladoria']];
   function passaCtr(r, f){ return !f || (f === 'semsenha' ? (doFluxoNovo(r) ? !r.senhaGovOk : posEtapaDe(r) === 'senha') : f === 'rprova' ? rural(r) && faltaDocs(r).indexOf('rural') >= 0 : f === 'urb' ? tipoChave(r) === 'urbana' : f === 'rur' ? rural(r) : f === 'semtipo' ? !r.tipoSegurada : f === 'completa' ? !faltamTxt(r) : f === 'gest' ? !nascido(r) : f === 'nasc' ? nascido(r) : f === 'atr' ? atrasada(r) : f === 'gps' ? gpsTarefa(r) : f === 'docs' ? !!faltamTxt(r) : f === 'dev' ? r.pvAnalise === 'devolvido' : true); }
@@ -4920,12 +4931,10 @@ html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:14px!impor
     (function(){
       var pos = state.rows.filter(posDaTela), fila = state.rows.filter(naFila);
       if (fluxoVista === 'novo'){
-        var nTipo = pos.filter(function(r){ return !r.tipoSegurada; }).length;
         $('ctr-stats').innerHTML = cardLista('data-ctr-kpi', 'i-users', 'Com pendência', pos.length, 'o resto do fluxo anda sozinho', '', 'x') +
           cardLista('data-ctr-kpi', 'i-chave', 'Sem senha gov.br', pos.filter(function(r){ return passaCtr(r, 'semsenha'); }).length, 'recuperar a senha', 'semsenha', ctrSit) +
           cardLista('data-ctr-kpi', 'i-file', 'Documentos faltando', pos.filter(function(r){ return passaCtr(r, 'docs'); }).length, 'a mãe não mandou', 'docs', ctrSit) +
-          cardLista('data-ctr-kpi', 'i-alert', 'Prova da atividade faltando', pos.filter(function(r){ return passaCtr(r, 'rprova'); }).length, 'pescadora, agricultora ou indígena', 'rprova', ctrSit) +
-          cardLista('data-ctr-kpi', 'i-users', 'Falta perguntar a atividade', nTipo, 'pescadora, agricultora ou indígena?', 'semtipo', ctrSit);
+          cardLista('data-ctr-kpi', 'i-alert', 'Prova da atividade faltando', pos.filter(function(r){ return passaCtr(r, 'rprova'); }).length, 'pescadora, agricultora ou indígena', 'rprova', ctrSit);
         return;
       }
       var compl = pos.filter(function(r){ return !faltamTxt(r); }).length, atrDoc = pos.filter(function(r){ return /documenta/.test(atrasoTxt(r)); }).length;
@@ -4941,9 +4950,9 @@ html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:14px!impor
     $('ctr-sit').innerHTML = ctrSitsAtivos().map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === ctrSit ? ' selected' : '') + '>' + o[1] + ' · ' + n(o[0]) + '</option>'; }).join('');
     $('ctr-sit').classList.toggle('ativo', !!ctrSit);
     var nA = n('atr'), nG = n('gps'), nD = n('docs'), nV = n('dev');
-    if (fluxoVista === 'novo'){ var nS = n('semsenha'), nR = n('rprova'), nT = n('semtipo'); nG = 0; nV = 0;
+    if (fluxoVista === 'novo'){ var nS = n('semsenha'), nR = n('rprova'); nG = 0; nV = 0;
       $('ctr-chips').innerHTML = (nS ? fbChip('ver', 'i-chave', plural(nS, 'sem senha gov.br', 'sem senha gov.br'), 'ctr:semsenha', 'ctr:' + ctrSit) : '') + (nD ? fbChip('ver', 'i-file', plural(nD, 'sem documento', 'sem documento'), 'ctr:docs', 'ctr:' + ctrSit) : '') +
-        (nR ? fbChip('ver', 'i-alert', plural(nR, 'sem prova da atividade', 'sem prova da atividade'), 'ctr:rprova', 'ctr:' + ctrSit) : '') + (nT ? fbChip('ver', 'i-users', plural(nT, 'falta perguntar a atividade', 'falta perguntar a atividade'), 'ctr:semtipo', 'ctr:' + ctrSit) : '') + (nS || nD || nR || nT ? '' : FB_NADA);
+        (nR ? fbChip('ver', 'i-alert', plural(nR, 'sem prova da atividade', 'sem prova da atividade'), 'ctr:rprova', 'ctr:' + ctrSit) : '') + (nA ? fbChip('lar', 'i-clock', plural(nA, 'com GPS vencida', 'com GPS vencida'), 'ctr:atr', 'ctr:' + ctrSit) : '') + (nS || nD || nR || nA ? '' : FB_NADA);
     } else
     $('ctr-chips').innerHTML = (nA ? fbChip('lar', 'i-clock', plural(nA, 'atrasada', 'atrasadas'), 'ctr:atr', 'ctr:' + ctrSit) : '') + (nG ? fbChip('ver', 'i-cash', plural(nG, 'GPS a pagar', 'GPS a pagar'), 'ctr:gps', 'ctr:' + ctrSit) : '') +
       (nD ? fbChip('ver', 'i-file', plural(nD, 'sem documento', 'sem documento'), 'ctr:docs', 'ctr:' + ctrSit) : '') + (nV ? fbChip('ver', 'i-undo', plural(nV, 'devolvida', 'devolvidas'), 'ctr:dev', 'ctr:' + ctrSit) : '') + (nA || nG || nD || nV ? '' : FB_NADA);
@@ -5687,20 +5696,20 @@ html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:14px!impor
       if (noCadastro(r) && prioridadeNasc(r) != null) add('Parto perto e sem contrato', r, 'parto em ' + prioridadeNasc(r) + ' dias');
       if (r.inssStatus === 'exigencia' && r.exigenciaPrazo){ var n = daysUntil(r.exigenciaPrazo); if (n != null && n <= 5) add('Exigência do INSS vencendo', r, n < 0 ? 'prazo venceu há ' + (-n) + ' dias' : 'faltam ' + n + ' dias'); }
       var respPos = primeiroNome(r.posResp || (doFluxoNovo(r) ? '' : r.contratoPor)), comResp = respPos ? ' · responsável: ' + respPos : '';
-      if (gpsTarefa(r)) add(!nitOk(r.nit) ? 'Pegar o NIT para a GPS' : 'Pagar a GPS', r, (prazoGps(r) ? 'vence ' + fmtDate(prazoGps(r)) + ' · parto ' + fmtDate(r.dpp) : 'sem data do parto') + comResp);
+      if (gpsTarefa(r) && !(doFluxoNovo(r) && nitOk(r.nit))) add(!nitOk(r.nit) ? 'Pegar o NIT para a GPS' : 'Pagar a GPS', r, (prazoGps(r) ? 'vence ' + fmtDate(prazoGps(r)) + ' · parto ' + fmtDate(r.dpp) : 'sem data do parto') + comResp);
       if (noContratos(r) && r.fatoGerador === 'gestante' && !r.criancaNasc && !r.dpp) add('Informar a data do parto', r, 'gestante sem data prevista');
-      if (noContratos(r) && !r.tipoSegurada){ if (doFluxoNovo(r)) add('Perguntar se é pescadora, agricultora ou indígena', r, 'as três não pagam GPS e precisam da prova da atividade; nenhuma das três paga a GPS' + comResp); else add('Informar se é rural ou urbano', r, 'urbano paga a GPS; rural precisa da prova rural' + comResp); }
+      if (noContratos(r) && !r.tipoSegurada){ if (doFluxoNovo(r)) add('Atividade não informada', r, 'o questionário do app não trouxe se é pescadora, agricultora ou indígena' + comResp); else add('Informar se é rural ou urbano', r, 'urbano paga a GPS; rural precisa da prova rural' + comResp); }
       if (doFluxoNovo(r) && noContratos(r) && posEtapaDe(r) === 'ok') add('Fazer o requerimento no INSS', r, 'pasta pronta' + (r.criancaNasc ? ' · nasceu em ' + fmtDate(r.criancaNasc) : '') + comResp);
-      if (noContratos(r) && posEtapaDe(r) === 'cert') add('Falar com a mãe: pedir a certidão', r, (r.criancaNasc ? 'nasceu em ' + fmtDate(r.criancaNasc) : 'parto previsto ' + fmtDate(r.dpp)) + comResp);
+      if (noContratos(r) && !doFluxoNovo(r) && posEtapaDe(r) === 'cert') add('Falar com a mãe: pedir a certidão', r, (r.criancaNasc ? 'nasceu em ' + fmtDate(r.criancaNasc) : 'parto previsto ' + fmtDate(r.dpp)) + comResp);
       if (naFila(r) && filaEtapaDe(r) === 'conferir') add('Conferir a documentação', r, 'encaminhada ' + fmtDate(diaLocal(r.encaminhadoEm)) + ' · prazo ' + prazoTarefa(r.filaMudouEm || r.encaminhadoEm, 2));
       if (naFila(r) && filaEtapaDe(r) === 'protocolar') add('Protocolar no INSS', r, 'prazo ' + prazoTarefa(r.filaMudouEm, 3) + (r.filaPor ? ' · responsável: ' + primeiroNome(r.filaPor) : ''));
       if (ganhou(r) && !(r.recebimento && r.recebimento.data)) add('Registrar o pagamento do benefício', r, origem(r) === 'inss' ? 'concedido' + (r.inssDecisaoEm ? ' em ' + fmtDate(r.inssDecisaoEm) : '') : 'ganho no Judicial');
       if (ganhou(r) && r.recebimento && r.recebimento.data && !(r.repasse && r.repasse.data)) add('Fazer o acerto de honorários', r, 'benefício pago em ' + fmtDate(r.recebimento.data));
       if (noInss(r) && r.der && !String(r.protocoloInss || '').trim() && (diasDesdeIso(r.der) || 0) >= 7) add('Pôr o número do protocolo', r, 'requerido em ' + fmtDate(r.der) + ' e ainda sem número');
-      if (noContratos(r) && faltamTxt(r) && (diasDesdeIso(r.contratoEm) || 0) >= 5 && (diasDesdeIso(r.ultimoContatoEm) == null || diasDesdeIso(r.ultimoContatoEm) >= 5)) add('Cobrar documentos da mãe', r, 'falta: ' + faltamTxt(r) + comResp);
+      if (noContratos(r) && !doFluxoNovo(r) && faltamTxt(r) && (diasDesdeIso(r.contratoEm) || 0) >= 5 && (diasDesdeIso(r.ultimoContatoEm) == null || diasDesdeIso(r.ultimoContatoEm) >= 5)) add('Cobrar documentos da mãe', r, 'falta: ' + faltamTxt(r) + comResp);
       if (r.pvProblema && (noContratos(r) || naFila(r))) add('Problema registrado', r, r.pvProblema);
       if (r.pvAnalise === 'devolvido' && noContratos(r)) add('Devolvida pela Controladoria', r, r.analiseMotivo || '');
-      if (atrasada(r)) add('Parada além do prazo', r, atrasoTxt(r));
+      if (atrasada(r)) add(doFluxoNovo(r) ? 'GPS vencida' : 'Parada além do prazo', r, atrasoTxt(r));
       if (r.fatoGerador === 'gestante' && !r.criancaNasc && r.dpp){ var p = daysUntil(r.dpp); if (p != null && (p < -45 || p > 300)) add('Data para conferir', r, 'parto previsto ' + fmtDate(r.dpp) + (p < 0 ? ' (já passou: o bebê nasceu?)' : ' (muito distante)')); }
       if (r.criancaNasc && r.criancaNasc > hoje) add('Data para conferir', r, 'nascimento no futuro: ' + fmtDate(r.criancaNasc));
     });
@@ -5779,8 +5788,8 @@ html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:14px!impor
     var tab = function(cab, linhas){ return '<div class="card list rel-tab"><table><thead><tr>' + cab.map(function(c, i){ return '<th' + (i ? ' class="n"' : '') + '>' + c + '</th>'; }).join('') + '</tr></thead><tbody>' + (linhas.length ? linhas.join('') : '<tr><td colspan="' + cab.length + '" class="vz">Nada no período.</td></tr>') + '</tbody></table></div>'; };
     var td = function(v, i){ return '<td' + (i ? ' class="n tnum"' : '') + '>' + esc(String(v)) + '</td>'; };
     box.innerHTML = '<div class="seg-bi" id="rel-per" style="flex:none;align-self:flex-start"><button type="button" data-p="30" aria-pressed="' + (relPer === '30') + '">30 dias</button><button type="button" data-p="mes" aria-pressed="' + (relPer === 'mes') + '">Este mês</button><button type="button" data-p="0" aria-pressed="' + (relPer === '0') + '">Tudo</button></div>' +
-      '<div class="sec-rot">Por pessoa da equipe</div>' + tab(['Pessoa', 'Contatos', 'Contratos fechados', 'Penalidades (closer)', 'Encaminhadas', 'Penalidades (pós-venda)'], Object.keys(por).sort().map(function(k){ var x = por[k]; return '<tr>' + [k, x.contatos, x.fechamentos, x.penClo, x.regs, x.penPos].map(td).join('') + '</tr>'; })) +
-      '<div class="sec-rot">Por parceiro / prospectador</div>' + tab(['Parceiro', 'Mães indicadas', 'Contratos', 'Desqualificadas'], Object.keys(parc).sort(function(a, b){ return parc[b].maes - parc[a].maes; }).map(function(k){ var x = parc[k]; return '<tr>' + [k, x.maes, x.contratos, x.desq].map(td).join('') + '</tr>'; })) +
+      (fluxoVista === 'novo' ? '' : '<div class="sec-rot">Por pessoa da equipe</div>' + tab(['Pessoa', 'Contatos', 'Contratos fechados', 'Penalidades (closer)', 'Encaminhadas', 'Penalidades (pós-venda)'], Object.keys(por).sort().map(function(k){ var x = por[k]; return '<tr>' + [k, x.contatos, x.fechamentos, x.penClo, x.regs, x.penPos].map(td).join('') + '</tr>'; }))) +
+      '<div class="sec-rot">Por parceiro / prospectador</div>' + tab(fluxoVista === 'novo' ? ['Parceiro', 'Mães indicadas', 'Contratos'] : ['Parceiro', 'Mães indicadas', 'Contratos', 'Desqualificadas'], Object.keys(parc).sort(function(a, b){ return parc[b].maes - parc[a].maes; }).map(function(k){ var x = parc[k]; return '<tr>' + (fluxoVista === 'novo' ? [k, x.maes, x.contratos] : [k, x.maes, x.contratos, x.desq]).map(td).join('') + '</tr>'; })) +
       '<div class="sec-rot">Por estado</div>' + tab(['Estado', 'Mães cadastradas', 'Contratos'], Object.keys(est).sort().map(function(k){ var x = est[k]; return '<tr>' + [((typeof ESTADOS_BI !== 'undefined' && ESTADOS_BI) || {})[k] || k, x.maes, x.contratos].map(td).join('') + '</tr>'; }));
   }
   document.addEventListener('click', function(e){
@@ -6592,7 +6601,8 @@ html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:14px!impor
     var marc = jud.filter(isFuture).length, pagos = arq.filter(arquivadoPago).length, contatar = arq.filter(function(r){ return arquivadoPago(r) && !r.contatadoRetorno; }).length;
     return {
       d: [cad.length, prio ? plural(prio, 'com parto perto', 'com parto perto') : lig ? plural(lig, 'para ligar', 'para ligar') : parCad ? plural(parCad, 'parada', 'paradas') : 'Tudo em dia', plural(cad.length, 'em cadastro', 'em cadastro') + (prio ? ' · ' + prio + ' prioridade' : '') + (lig ? ' · ' + lig + ' para ligar' : '')],
-      k: [pos.length, atr ? plural(atr, 'atrasada', 'atrasadas') : 'Tudo em dia', plural(pos.length, 'cliente', 'clientes') + ' · ' + plural(atr, 'atrasada', 'atrasadas')],
+      k: fluxoVista === 'novo' ? [pos.length, atr ? plural(atr, 'com GPS vencida', 'com GPS vencida') : 'Só exceções', plural(pos.length, 'cliente', 'clientes') + (atr ? ' · ' + plural(atr, 'com GPS vencida', 'com GPS vencida') : '')]
+        : [pos.length, atr ? plural(atr, 'atrasada', 'atrasadas') : 'Tudo em dia', plural(pos.length, 'cliente', 'clientes') + ' · ' + plural(atr, 'atrasada', 'atrasadas')],
       h: [fila.length, par ? plural(par, 'parada', 'paradas') : 'Tudo em dia', plural(fila.length, 'na fila', 'na fila') + ' · ' + plural(par, 'parada', 'paradas')],
       i: [ins.length, exi ? plural(exi, 'em exigência', 'em exigência') : lat ? plural(lat, 'análise atrasada', 'análises atrasadas') : 'requerimentos no INSS', plural(ins.length, 'requerimento', 'requerimentos') + ' · ' + plural(exi, 'exigência', 'exigências')],
       c: [jud.length, marc ? plural(marc, 'audiência marcada', 'audiências marcadas') : 'ações em andamento', plural(jud.length, 'ação', 'ações') + ' · ' + plural(marc, 'audiência marcada', 'audiências marcadas')],
@@ -8129,7 +8139,7 @@ html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:14px!impor
     var cont = { closer: 0, operacional: 0, judicial: 0, posvenda: 0, admin: 0 }, bloq = 0;
     eq.forEach(function(u){ cont[cargoDe(u)]++; if (!u.ativo) bloq++; });
     var res = $('eq-resumo');
-    if (res) res.innerHTML = CARGOS_ORDEM.map(function(k){ return '<div class="eq-chip"><b>' + cont[k] + '</b><span>' + CARGOS[k][0] + '</span></div>'; }).join('') +
+    if (res) res.innerHTML = CARGOS_ORDEM.filter(function(k){ return fluxoVista !== 'novo' || cont[k]; }).map(function(k){ return '<div class="eq-chip"><b>' + cont[k] + '</b><span>' + CARGOS[k][0] + '</span></div>'; }).join('') +
       '<div class="eq-chip' + (bloq ? ' alerta' : '') + '"><b>' + bloq + '</b><span>Bloqueados</span></div>';
     if (!eq.length){ box.innerHTML = '<div class="card empty">Ninguém cadastrado ainda. Clique em <b>Novo funcionário</b>.</div>'; return; }
     box.innerHTML = CARGOS_ORDEM.map(function(k){
@@ -8303,7 +8313,8 @@ html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:14px!impor
   /* ---------- estado e cidade com bandeiras (igual ao aplicativo) ---------- */
   var ESTADOS_BI = { AC: 'Acre', AL: 'Alagoas', AP: 'Amapá', AM: 'Amazonas', BA: 'Bahia', CE: 'Ceará', DF: 'Distrito Federal', ES: 'Espírito Santo', GO: 'Goiás', MA: 'Maranhão', MT: 'Mato Grosso', MS: 'Mato Grosso do Sul', MG: 'Minas Gerais', PA: 'Pará', PB: 'Paraíba', PR: 'Paraná', PE: 'Pernambuco', PI: 'Piauí', RJ: 'Rio de Janeiro', RN: 'Rio Grande do Norte', RS: 'Rio Grande do Sul', RO: 'Rondônia', RR: 'Roraima', SC: 'Santa Catarina', SP: 'São Paulo', SE: 'Sergipe', TO: 'Tocantins' };
   var UFS_ATUACAO = ['AM', 'PA', 'AP'];
-  function ufsForm(){ var l = state.regioes.map(function(g){ return String(g.uf || g.id).toUpperCase(); }); UFS_ATUACAO.forEach(function(u){ if (l.indexOf(u) < 0) l.push(u); }); return l; }
+  function ufsForm(){ if (fluxoVista === 'novo') return UFS.slice().sort(function(a, b){ return (ESTADOS_BI[a] || a).localeCompare(ESTADOS_BI[b] || b, 'pt'); });
+    var l = state.regioes.map(function(g){ return String(g.uf || g.id).toUpperCase(); }); UFS_ATUACAO.forEach(function(u){ if (l.indexOf(u) < 0) l.push(u); }); return l; }
   function flagUfImg(uf){ return uf ? '<img src="img/flags/' + esc(uf) + '.svg" alt="" onerror="this.remove()">' : ''; }
   function preencherUfForm(sel){ $('f-uf').innerHTML = '<option value="">Escolher o estado</option>' + ufsForm().map(function(u){ return '<option value="' + u + '"' + (u === sel ? ' selected' : '') + '>' + esc(ESTADOS_BI[u] || u) + '</option>'; }).join(''); $('f-uf').value = sel || ''; $('f-uf-flag').innerHTML = flagUfImg(sel); }
   function cidadesDoUf(uf, cb){
@@ -9977,7 +9988,9 @@ function tentarParceiro(cpf, senha){
     $('fe-senha-dica').innerHTML = !u ? 'O próprio funcionário pode trocar a senha depois, dentro do sistema.'
       : dtSenha ? '<span class="senha-ok">✔ Senha cadastrada em ' + dtSenha.toLocaleDateString('pt-BR') + ' às ' + dtSenha.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + '.</span> Deixe em branco para manter.'
       : '<span class="senha-falta">Ainda não tem senha cadastrada.</span> Digite uma para liberar a entrada.';
-    $('fe-funcao').value = u ? cargoDe(u) : 'operacional'; $('fe-ativo').value = !u || u.ativo ? 'sim' : 'nao';
+    // fluxo novo: funcionário novo não é closer nem operacional (não existem mais nesse fluxo)
+    Array.prototype.forEach.call($('fe-funcao').options, function(o){ o.hidden = fluxoVista === 'novo' && !u && (o.value === 'closer' || o.value === 'operacional'); });
+    $('fe-funcao').value = u ? cargoDe(u) : (fluxoVista === 'novo' ? 'posvenda' : 'operacional'); $('fe-ativo').value = !u || u.ativo ? 'sim' : 'nao';
     var mEst = (u && Array.isArray(u.estados)) ? u.estados : [];
     $('fe-estados').className = 'est-chips';
     var boxEst = $('fe-estados-box'); if (boxEst) boxEst.hidden = $('fe-funcao').value !== 'admin';
