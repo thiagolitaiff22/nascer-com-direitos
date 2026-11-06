@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-title" content="Nascer com Direitos">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="apple-touch-icon" href="img/icone-180.png">
-<!-- tela de abertura do iPhone (img/abertura, geradas com o mesmo desenho da abertura animada da página) -->
+<!-- tela de abertura do iPhone (img/abertura): roxa com a logo e o nome; é a única abertura, depois vem o login -->
 <link rel="apple-touch-startup-image" media="screen and (device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="img/abertura/1320x2868.png">
 <link rel="apple-touch-startup-image" media="screen and (device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="img/abertura/1260x2736.png">
 <link rel="apple-touch-startup-image" media="screen and (device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="img/abertura/1206x2622.png">
@@ -1226,20 +1226,34 @@ html[data-tema="dark"] .ct-fim .ct-ic{color:#c49be6}
 .wz-nao-b2{border:0;background:none;padding:6px;font:inherit;font-size:14px;font-weight:600;color:#c0392b}
 html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema="dark"] .wz-nao-ic svg{fill:#c49be6}
 
+
+/* tablet e telas largas (05/11): o app usa a largura da tela em vez de uma coluna de celular no meio.
+   Conteúdo até 960 pt (tablet em pé) e 1180 pt (deitado); listas em 2 ou 3 colunas; cadastro e conta centralizados até 760 pt. */
+@media (min-width:760px){
+  :root{--larg:min(960px, calc(100vw - 64px))}
+  .vista,.wrap{max-width:var(--larg)!important;padding-left:0!important;padding-right:0!important}
+  #app > .tit-tela{max-width:var(--larg)!important;padding-left:0!important;padding-right:0!important}
+  #app > .topo{padding-left:calc((100% - var(--larg)) / 2)!important;padding-right:calc((100% - var(--larg)) / 2)!important}
+  #app .topo .sinc{right:calc((100% - var(--larg)) / 2 - 2px)}
+  .abas{width:min(720px,calc(100% - 48px))!important;max-width:none!important}
+  .pm-lista{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .vista.inicio .pm-lista{gap:10px}
+  .pm-busca{max-width:none}
+  /* cadastro (perguntas), conta e o botão de baixo: centralizados e mais largos */
+  .wz,.vista > .ct-perfil,.vista > .ct-bloco{max-width:760px;width:100%;margin-left:auto;margin-right:auto}
+  .barra .enviar{max-width:760px}
+  .esq-corpo,.esq-nav,.folha > div{max-width:var(--larg)}
+}
+@media (min-width:1100px){
+  :root{--larg:min(1180px, calc(100vw - 96px))}
+  .pm-lista{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .abas{width:min(760px,calc(100% - 64px))!important}
+}
 </style>
 <link rel="preload" as="image" href="img/marca-suave.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
-<script>try{if(!localStorage.getItem('nascer_campo_token')){document.documentElement.classList.add('abrindo');document.querySelector('meta[name="theme-color"]').setAttribute('content','#6a2bae');}}catch(e){}
-/* segurança: se algo travar, a abertura sai sozinha */setTimeout(function(){var a=document.getElementById('abertura');if(a)a.remove();document.documentElement.classList.remove('abrindo');},6000);</script>
-<style>
-html.abrindo,html.abrindo body{background:#6a2bae!important;overflow:hidden}
-#abertura{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:linear-gradient(180deg,#6a2bae 0%,#5c2499 30%,#4c1c82 62%,#3a146a 100%);transition:opacity .45s ease}
-#abertura .ab-m{position:relative;width:min(76vw,340px)}
-#abertura .ab-m img{display:block;width:100%;height:auto}
-#abertura.sai{opacity:0;pointer-events:none}
-</style>
+
 </head>
 <body>
-<div id="abertura" aria-hidden="true"><div class="ab-m"><img src="img/abertura-marca.png" alt=""></div></div>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/><path d="M8 9h2"/></symbol>
   <symbol id="i-video" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="3"/><path d="M16 10l5-3v10l-5-3z"/></symbol>
@@ -1279,7 +1293,7 @@ html.abrindo,html.abrindo body{background:#6a2bae!important;overflow:hidden}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 96;
+  var APP_VERSAO = 97;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -3976,16 +3990,6 @@ html.abrindo,html.abrindo body{background:#6a2bae!important;overflow:hidden}
   window.addEventListener('online', verificarAtualizacao);
   window.addEventListener('focus', verificarAtualizacao);
   setInterval(verificarAtualizacao, 10 * 60 * 1000);
-  // abertura: some esmaecendo assim que o app está pronto por baixo (fica pelo menos 0,7 s)
-  (function tirarAbertura(){
-    var a = document.getElementById('abertura'); if (!a) return;
-    var falta = Math.max(0, 700 - (window.performance && performance.now ? performance.now() : 0));
-    setTimeout(function(){
-      a.classList.add('sai'); document.documentElement.classList.remove('abrindo');
-      if (!document.querySelector('.lg.balao')) corTopo();   // dentro do app: topo claro de novo; no login, fica o roxo
-      setTimeout(function(){ if (a.parentNode) a.parentNode.removeChild(a); }, 650);
-    }, falta);
-  })();
 })();
 </script>
 

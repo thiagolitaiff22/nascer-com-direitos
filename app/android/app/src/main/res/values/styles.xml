@@ -16,7 +16,11 @@
     </style>
 
 
+    <!-- abertura: roxo com a logo (Android 12 ou mais usa o fundo e o ícone abaixo; antes, a imagem splash) -->
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
         <item name="android:background">@drawable/splash</item>
+        <item name="windowSplashScreenBackground">#6a2bae</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icone</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
     </style>
 </resources>
