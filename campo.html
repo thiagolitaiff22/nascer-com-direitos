@@ -1293,7 +1293,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 97;
+  var APP_VERSAO = 98;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -2751,8 +2751,19 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   var instalarEv = null;
   window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); instalarEv = e; });
   window.addEventListener('appinstalled', function(){ instalarEv = null; lsSet('campo_instalado', '1'); var b = $('inst-btn'); if (b) b.remove(); });
-  function podeInstalar(){ return !APP && !instaladoNaTela(); }
+  function android(){ return /Android/i.test(navigator.userAgent); }
+  var APK_URL = SITE + 'app/download/nascer-com-direitos.apk';
+  function podeInstalar(){ return !APP && (android() || !instaladoNaTela()); }
   function instalarApp(){
+    if (android()){   // Android: baixa o APK (aplicativo de verdade, com ícone, abertura e avisos)
+      var fa = document.createElement('div'); fa.className = 'folha';
+      fa.innerHTML = '<div><div class="puxa"></div><h3>Instalar o aplicativo</h3><div class="sub">O aplicativo do Nascer com Direitos para Android. Depois de instalado, ele se atualiza sozinho.</div><ol class="inst-passos">' +
+        '<li>Toque em <b>Baixar o aplicativo</b>.</li><li>Abra o arquivo baixado e toque em <b>Instalar</b>. Se o celular perguntar, permita instalar aplicativos deste navegador.</li><li>Abra o <b>Nascer com Direitos</b> pelo ícone e entre com o seu CPF e a sua senha.</li></ol>' +
+        '<a class="enviar" style="text-decoration:none;margin:6px 0 8px" href="' + APK_URL + '" download>Baixar o aplicativo</a><button type="button" class="sair" data-fecha>Agora não</button></div>';
+      document.body.appendChild(fa);
+      fa.addEventListener('click', function(e){ if (e.target === fa || e.target.closest('[data-fecha]')) fa.remove(); });
+      return Promise.resolve();
+    }
     if (instalarEv){ var ev = instalarEv; ev.prompt(); return ev.userChoice.then(function(r){ if (r && r.outcome === 'accepted') instalarEv = null; }).catch(function(){}); }
     var f = document.createElement('div'); f.className = 'folha';
     var passos = ios()
@@ -2781,7 +2792,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
         '<div class="ct-linha"><input id="ct-s2" type="password" inputmode="numeric" autocomplete="new-password" placeholder="Repita a nova senha"></div>' +
         '<button type="button" class="ct-btn" id="ct-senha-ok">Salvar a nova senha</button></div>' +
       '<div class="ct-rot" style="margin-top:18px">Aplicativo</div>' +
-      '<div class="pm-conta">' + (podeInstalar() ? '<button type="button" id="inst-btn"><b>Instalar o aplicativo</b><small>Sem baixar arquivo e sem alertas. Atualiza sozinho.</small></button>' : '') + (pushSuporte() ? '<button type="button" id="avisos-btn"><b>Avisos no celular</b><small id="avisos-sub">' + (avisosAtivos() ? 'Ativados · toque para desativar' : 'Desativados · toque para ativar') + '</small></button>' : '') + '<button type="button" id="verif-atu"><b>Verificar atualização</b><small>Veja se há uma versão nova do aplicativo</small></button>' +
+      '<div class="pm-conta">' + (podeInstalar() ? '<button type="button" id="inst-btn"><b>Instalar o aplicativo</b><small>' + (android() ? 'Baixe o aplicativo para Android. Atualiza sozinho.' : 'Sem baixar arquivo e sem alertas. Atualiza sozinho.') + '</small></button>' : '') + (pushSuporte() ? '<button type="button" id="avisos-btn"><b>Avisos no celular</b><small id="avisos-sub">' + (avisosAtivos() ? 'Ativados · toque para desativar' : 'Desativados · toque para ativar') + '</small></button>' : '') + '<button type="button" id="verif-atu"><b>Verificar atualização</b><small>Veja se há uma versão nova do aplicativo</small></button>' +
       '<button type="button" class="sair" id="sair"><svg><use href="#i-sair"/></svg>Sair desta conta</button></div>' +
       '<div class="versao">Nascer com Direitos · versão ' + APP_VERSAO + '</div>';
     $('sair').onclick = sair;
