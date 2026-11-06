@@ -929,6 +929,21 @@ html:has(#app > #vista) body{position:fixed;inset:0;width:100%}
 .ct-cam svg{width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2;stroke-linejoin:round}
 .ct-nome{min-width:0;flex:1}.ct-nome b{display:block;font-family:'Fraunces',Georgia,serif;font-size:20px;font-weight:600;line-height:1.15;color:var(--ink);overflow-wrap:anywhere}
 .ct-nome small{display:block;margin-top:2px;font-size:12.5px;color:var(--ink2)}
+/* foto de perfil: recorte (arrastar e aproximar) e menu trocar/remover */
+.rf{position:fixed;inset:0;z-index:9500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:24px 20px calc(24px + env(safe-area-inset-bottom));background:rgba(14,8,22,.94);color:#fff;animation:rfEntra .2s ease-out}
+@keyframes rfEntra{from{opacity:0}to{opacity:1}}
+.rf b{font-size:17px;font-weight:700}.rf small{display:block;margin-top:4px;font-size:13px;color:rgba(255,255,255,.7);text-align:center}
+.rf-quadro{position:relative;overflow:hidden;border-radius:50%;background:#000;box-shadow:0 0 0 3px rgba(255,255,255,.85),0 12px 40px rgba(0,0,0,.5);touch-action:none;cursor:grab}
+.rf-quadro img{position:absolute;left:50%;top:50%;max-width:none;transform-origin:center center;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.rf-zoom{display:flex;align-items:center;gap:12px;width:min(320px,100%)}.rf-zoom input{flex:1;accent-color:#c49be6}.rf-zoom span{font-size:18px;opacity:.8}
+.rf-bts{display:flex;gap:12px;width:min(320px,100%)}
+.rf-bts button{flex:1;border:0;border-radius:14px;padding:14px;font:inherit;font-size:15.5px;font-weight:700}
+.rf-bts .rf-nao{background:rgba(255,255,255,.14);color:#fff}.rf-bts .rf-sim{background:#8a43d3;color:#fff}
+.fm{position:fixed;inset:0;z-index:9400;display:flex;align-items:flex-end;justify-content:center;background:rgba(14,8,22,.45);animation:rfEntra .15s ease-out}
+.fm-caixa{width:min(480px,100%);margin:0 10px calc(10px + env(safe-area-inset-bottom));display:grid;gap:8px}
+.fm-caixa div{border-radius:16px;overflow:hidden;background:var(--card)}
+.fm button{display:block;width:100%;border:0;border-bottom:1px solid var(--line);background:none;padding:16px;font:inherit;font-size:16px;font-weight:600;color:var(--ink);text-align:center}
+.fm button:last-child{border-bottom:0}.fm .fm-tira{color:#c0392b}.fm .fm-sai{border-radius:16px;background:var(--card);font-weight:700}
 .ct-tirar{margin-top:6px;border:0;background:none;padding:0;font:inherit;font-size:13px;font-weight:600;color:#66279d}
 .ct-bloco{margin-top:12px;padding:14px 16px 16px;border-radius:20px;background:var(--card);border:1px solid var(--line)}
 .ct-rot{margin:0 0 8px 2px;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
@@ -1089,6 +1104,7 @@ html:has(#app > #vista),html:has(#app > #vista) body{height:100%;overflow:hidden
 .lg.balao{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(16px,3.6dvh,32px);padding:calc(16px + env(safe-area-inset-top)) 20px calc(16px + env(safe-area-inset-bottom));overflow:hidden;background:radial-gradient(110% 70% at 85% 0%,rgba(255,255,255,.17),transparent 55%),linear-gradient(160deg,#8a43d3 0%,#6a2aa3 52%,#4d1a7c 100%)}
 .lg.balao::before{content:"";position:absolute;right:-16vmax;bottom:-12vmax;width:64vmax;height:64vmax;background:url(img/marca-suave.png) no-repeat center/contain;opacity:.15;pointer-events:none}
 .lg.balao::after{content:"";position:absolute;left:-22vmax;top:-22vmax;width:56vmax;height:56vmax;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none}
+.lg.balao{background-color:#8a43d3}
 .lg.balao .lg-topo{position:relative;z-index:1;flex:none;height:auto;min-height:0;padding:0;background:none;overflow:visible;animation:lgFundo .6s ease both}
 .lg.balao .lg-topo::before,.lg.balao .lg-topo::after{display:none}
 .lg.balao .lg-marca{width:clamp(54px,10dvh,86px)}
@@ -1237,7 +1253,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 89;
+  var APP_VERSAO = 90;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1268,10 +1284,10 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   // data digitada como dd/mm/aaaa; guardada como aaaa-mm-dd
   function isoParaBr(iso){ var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return m ? m[3] + '/' + m[2] + '/' + m[1] : ''; }
   function brParaIso(br){
-    var m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(br || ''); if (!m) return '';
-    var d = +m[1], mes = +m[2], a = +m[3], dt = new Date(a, mes - 1, d);
+    var m = /^(\d{2})\/(\d{2})\/(\d{2}|\d{4})$/.exec(br || ''); if (!m) return '';
+    var d = +m[1], mes = +m[2], a = m[3].length === 2 ? 2000 + +m[3] : +m[3], dt = new Date(a, mes - 1, d);   // ano com 2 dígitos: 26 = 2026
     if (a < 2000 || a > 2100 || dt.getFullYear() !== a || dt.getMonth() !== mes - 1 || dt.getDate() !== d) return '';
-    return m[3] + '-' + m[2] + '-' + m[1];
+    return a + '-' + m[2] + '-' + m[1];
   }
   function gestante(){ return true; }   // o escritório atende só gestantes: sempre a data prevista do parto
   // telefone no padrão (DDD) 00000-0000
@@ -2217,14 +2233,15 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     }
     if ($('cpf')) $('cpf').addEventListener('input', function(){ this.value = maskCpf(this.value); lsSet('campo_cpf', this.value); var l = $('l-cpf'); if (l) l.classList.toggle('falta', !cpfOk(this.value)); });
     if ($('cep')){
-      var ultimoCep = '';
+      var ultimoCep = '', cepGuardado = String(lsGet('campo_cep') || '').replace(/\D/g, '');   // CEP do endereço que está na tela
       var mostraEnd = function(){ if ($('bairro')) $('bairro').value = lsGet('campo_bairro'); if ($('cid2')){ $('cid2').value = lsGet('campo_cidade'); $('l-cid2').classList.toggle('falta', !lsGet('campo_cidade')); } if ($('uf2')){ $('uf2').value = lsGet('campo_uf_cep'); $('l-uf2').classList.toggle('falta', !lsGet('campo_uf_cep')); } };
       var buscarCep = function(){
-        var d = $('cep').value.replace(/\D/g, ''), st = $('cep-st'); if (d.length !== 8 || d === ultimoCep) return; ultimoCep = d;
+        var d = $('cep').value.replace(/\D/g, ''), st = $('cep-st'); if (d.length !== 8 || d === ultimoCep) return; var cepAntes = cepGuardado; ultimoCep = d; cepGuardado = d;
         st.textContent = 'buscando…'; st.className = 'cep-st';
         fetch('https://viacep.com.br/ws/' + d + '/json/').then(function(r){ return r.json(); }).then(function(x){
           if (!x || x.erro){ st.textContent = 'CEP não encontrado'; st.className = 'cep-st erro'; $('end-auto').hidden = false; return; }
           lsSet('campo_rua', x.logradouro || ''); lsSet('campo_bairro', x.bairro || ''); lsSet('campo_cidade', x.localidade || ''); lsSet('campo_uf_cep', x.uf || '');
+          if (cepAntes && cepAntes !== d){ lsSet('campo_num', ''); lsSet('campo_compl', ''); if ($('num')){ $('num').value = ''; $('l-num').classList.add('falta'); } if ($('compl')) $('compl').value = ''; }
           $('rua').value = x.logradouro || ''; $('l-rua').classList.toggle('falta', !x.logradouro);
           if ($('cidade')){ $('cidade').value = x.localidade || ''; var lc = $('l-cidade'); if (lc) lc.classList.toggle('falta', !x.localidade); }
           $('end-auto').hidden = false; mostraEnd(); st.textContent = '✓'; st.className = 'cep-st ok';
@@ -2232,7 +2249,19 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
           setTimeout(function(){ var n = $(x.logradouro ? 'num' : 'rua'); if (n) n.focus(); }, 60);   // a parceira só põe o número
         }).catch(function(){ ultimoCep = ''; st.textContent = 'sem internet: digite a rua'; st.className = 'cep-st erro'; $('end-auto').hidden = false; });
       };
-      $('cep').addEventListener('input', function(){ this.value = maskCep(this.value); lsSet('campo_cep', this.value); $('l-cep').classList.toggle('falta', !cepOk(this.value)); if (cepOk(this.value)) buscarCep(); });
+      // apagou (ou deixou incompleto) o CEP: a rua, o número, o bairro, a cidade e a UF do endereço antigo somem
+      var limpaEnd = function(){
+        ['campo_rua', 'campo_num', 'campo_compl', 'campo_bairro', 'campo_cidade', 'campo_uf_cep'].forEach(function(k){ lsSet(k, ''); });
+        ['rua', 'num', 'compl', 'bairro', 'cid2', 'uf2', 'cidade'].forEach(function(id){ if ($(id)) $(id).value = ''; });
+        ['l-rua', 'l-num', 'l-cid2', 'l-uf2'].forEach(function(id){ if ($(id)) $(id).classList.add('falta'); });
+        $('end-auto').hidden = true; ultimoCep = ''; cepGuardado = '';
+        var st = $('cep-st'); if (st){ st.textContent = ''; st.className = 'cep-st'; }
+      };
+      $('cep').addEventListener('input', function(){
+        this.value = maskCep(this.value); lsSet('campo_cep', this.value); $('l-cep').classList.toggle('falta', !cepOk(this.value));
+        if (!cepOk(this.value)){ if (cepGuardado || ultimoCep || !$('end-auto').hidden || lsGet('campo_rua')) limpaEnd(); return; }
+        buscarCep();
+      });
       $('rua').addEventListener('input', function(){ lsSet('campo_rua', this.value); $('l-rua').classList.toggle('falta', !this.value.trim()); });
       $('num').addEventListener('input', function(){ lsSet('campo_num', this.value); $('l-num').classList.toggle('falta', !this.value.trim()); });
       $('compl').addEventListener('input', function(){ lsSet('campo_compl', this.value); });
@@ -2255,6 +2284,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
       var iso = brParaIso(t); lsSet('campo_crianca_nasc', iso);
       var l = $('l-cnasc'); if (l) l.classList.toggle('falta', !iso);
     });
+    ['cnasc', 'dpp'].forEach(function(id){ var e = $(id); if (e) e.addEventListener('blur', function(){ var m = /^(\d{2}\/\d{2}\/)(\d{2})$/.exec(this.value); if (m && brParaIso(this.value)) this.value = m[1] + '20' + m[2]; }); });
     if ($('dpp')) $('dpp').addEventListener('input', function(){
       var d = this.value.replace(/\D/g, '').slice(0, 8), t = d;
       if (d.length > 4) t = d.slice(0, 2) + '/' + d.slice(2, 4) + '/' + d.slice(4); else if (d.length > 2) t = d.slice(0, 2) + '/' + d.slice(2);
@@ -2365,7 +2395,13 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   // Início sem rolagem: tira do fim da lista as linhas que não cabem na tela (as outras ficam na aba Mães ou Parceiros)
   // esqueleto de carregamento: o desenho do app em quadradinhos com brilho, enquanto entra; some devagar quando o Início fica pronto
   var esqDesde = 0;
-  function corTopo(c){ var m = document.querySelector('meta[name="theme-color"]'); if (!c) c = document.documentElement.getAttribute('data-tema') === 'dark' ? '#110d14' : '#f6f3f9'; if (m) m.setAttribute('content', c); }
+  function corTopo(c){
+    var m = document.querySelector('meta[name="theme-color"]'), padrao = !c;
+    if (!c) c = document.documentElement.getAttribute('data-tema') === 'dark' ? '#110d14' : '#f6f3f9';
+    if (m) m.setAttribute('content', c);
+    // iPhone (Safari 26): a faixa de cima pega a cor de fundo; 'important' porque o CSS fixa o fundo claro com !important
+    [document.documentElement, document.body].forEach(function(el){ if (!el) return; if (padrao) el.style.removeProperty('background-color'); else el.style.setProperty('background-color', c, 'important'); });
+  }
   function mostrarEsqueleto(){
     if (document.getElementById('esq')) return;
     var r = function(st){ return '<i style="' + st + '"></i>'; }, linhas = '';
@@ -2413,6 +2449,59 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
       if (Object.keys(sobe).length) salvarPerfil(sobe);
       tituloTopo(); if (aba === 'painel' && $('vista') && $('vista').classList.contains('inicio')) telaInicial();
     }).catch(function(){});
+  }
+  function recortarFoto(arq){
+    return new Promise(function(ok, falha){
+      var url = URL.createObjectURL(arq), img = new Image();
+      img.onload = function(){
+        var nw = img.naturalWidth, nh = img.naturalHeight, Q = Math.min(window.innerWidth - 48, window.innerHeight - 300, 320);
+        var base = Q / Math.min(nw, nh), z = 1, x = 0, y = 0, toques = {}, pinca = null;
+        var t = document.createElement('div'); t.className = 'rf'; t.setAttribute('role', 'dialog');
+        t.innerHTML = '<div><b>Ajuste a sua foto</b><small>Arraste para posicionar. Afaste dois dedos para aproximar.</small></div>' +
+          '<div class="rf-quadro" style="width:' + Q + 'px;height:' + Q + 'px"><img alt="" src="' + url + '"></div>' +
+          '<label class="rf-zoom"><span>−</span><input type="range" min="1" max="4" step="0.01" value="1" aria-label="Aproximar"><span>+</span></label>' +
+          '<div class="rf-bts"><button type="button" class="rf-nao">Cancelar</button><button type="button" class="rf-sim">Usar esta foto</button></div>';
+        document.body.appendChild(t);
+        var q = t.querySelector('.rf-quadro'), im = t.querySelector('img'), zr = t.querySelector('input');
+        im.style.width = nw + 'px'; im.style.height = nh + 'px';
+        var pinta = function(){
+          var s = base * z, mx = Math.max(0, (nw * s - Q) / 2), my = Math.max(0, (nh * s - Q) / 2);
+          x = Math.max(-mx, Math.min(mx, x)); y = Math.max(-my, Math.min(my, y));
+          im.style.transform = 'translate(-50%,-50%) translate(' + x + 'px,' + y + 'px) scale(' + s + ')';
+        };
+        pinta();
+        zr.oninput = function(){ z = +this.value; pinta(); };
+        var dist = function(){ var p = Object.keys(toques).map(function(k){ return toques[k]; }); return p.length < 2 ? 0 : Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y); };
+        q.addEventListener('pointerdown', function(e){ q.setPointerCapture(e.pointerId); toques[e.pointerId] = { x: e.clientX, y: e.clientY }; if (Object.keys(toques).length === 2) pinca = { d: dist(), z: z }; });
+        q.addEventListener('pointermove', function(e){
+          var a = toques[e.pointerId]; if (!a) return;
+          if (Object.keys(toques).length === 1){ x += e.clientX - a.x; y += e.clientY - a.y; }
+          toques[e.pointerId] = { x: e.clientX, y: e.clientY };
+          if (pinca && pinca.d){ z = Math.max(1, Math.min(4, pinca.z * dist() / pinca.d)); zr.value = z; }
+          pinta();
+        });
+        var solta = function(e){ delete toques[e.pointerId]; if (Object.keys(toques).length < 2) pinca = null; };
+        q.addEventListener('pointerup', solta); q.addEventListener('pointercancel', solta);
+        q.addEventListener('wheel', function(e){ e.preventDefault(); z = Math.max(1, Math.min(4, z * (e.deltaY < 0 ? 1.08 : 0.92))); zr.value = z; pinta(); }, { passive: false });
+        var fecha = function(){ t.remove(); URL.revokeObjectURL(url); };
+        t.querySelector('.rf-nao').onclick = function(){ fecha(); falha(new Error('cancelado')); };
+        t.querySelector('.rf-sim').onclick = function(){
+          var T = 192, k = T / Q, c = document.createElement('canvas'), g = c.getContext('2d'); c.width = c.height = T;
+          g.fillStyle = '#fff'; g.fillRect(0, 0, T, T);
+          g.translate(T / 2 + x * k, T / 2 + y * k); g.scale(base * z * k, base * z * k); g.drawImage(img, -nw / 2, -nh / 2);
+          var foto = c.toDataURL('image/jpeg', 0.85); fecha(); ok(foto);
+        };
+      };
+      img.onerror = function(){ URL.revokeObjectURL(url); falha(new Error('foto')); };
+      img.src = url;
+    });
+  }
+  // menu da foto: trocar ou remover
+  function menuFoto(trocar, remover){
+    var m = document.createElement('div'); m.className = 'fm';
+    m.innerHTML = '<div class="fm-caixa"><div><button type="button" data-f="troca">Escolher outra foto</button><button type="button" class="fm-tira" data-f="tira">Remover foto</button></div><button type="button" class="fm-sai" data-f="sai">Cancelar</button></div>';
+    document.body.appendChild(m);
+    m.onclick = function(e){ var b = e.target.closest('[data-f]'); if (!b && e.target !== m) return; m.remove(); if (b && b.dataset.f === 'troca') trocar(); if (b && b.dataset.f === 'tira') remover(); };
   }
   function fotoQuadrada(arq){
     return new Promise(function(ok, falha){
@@ -2640,7 +2729,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     $('vista').innerHTML =
       '<div class="pm-ola"><h2>Sua conta</h2><span>' + esc(oficial) + ' · ' + papel + '</span></div>' +
       '<div class="ct-perfil"><button type="button" class="ct-foto" id="ct-foto" aria-label="Trocar a foto de perfil">' + avatarHtml(nomeExibicao()) + '<span class="ct-cam"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span></button>' +
-        '<div class="ct-nome"><b id="ct-nome-b">' + esc(nomeExibicao()) + '</b><small>' + esc(oficial) + ' · ' + papel + '</small>' + (p.foto ? '<button type="button" class="ct-tirar" id="ct-tirar">Tirar a foto</button>' : '<button type="button" class="ct-tirar" id="ct-por">Pôr uma foto</button>') + '</div></div>' +
+        '<div class="ct-nome"><b id="ct-nome-b">' + esc(nomeExibicao()) + '</b><small>' + esc(oficial) + ' · ' + papel + '</small>' + (p.foto ? '<button type="button" class="ct-tirar" id="ct-tirar">Remover foto</button>' : '<button type="button" class="ct-tirar" id="ct-por">Pôr uma foto</button>') + '</div></div>' +
       '<input type="file" id="ct-arq" accept="image/*" hidden>' +
       '<div class="ct-bloco"><div class="ct-rot">Como você quer ser chamado</div>' +
         '<div class="ct-linha"><input id="ct-apelido" maxlength="40" autocomplete="off" placeholder="' + esc(primeiroNome(oficial)) + '" value="' + esc(p.apelido) + '"><button type="button" id="ct-apelido-ok">Salvar</button></div>' +
@@ -2665,11 +2754,13 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     $('verif-atu').onclick = function(){ var b = this; b.querySelector('small').textContent = 'Verificando…'; ultimaChecagem = 0; verificarAtualizacao(); setTimeout(function(){ if (document.body.contains(b)) b.querySelector('small').textContent = document.querySelector('.atu') ? 'Há uma versão nova: use o aviso no topo' : 'Seu aplicativo está atualizado'; }, 1800); };
     // foto: escolhe da galeria ou tira na hora; o app recorta quadrada e diminui (192 x 192)
     var escolher = function(){ $('ct-arq').value = ''; $('ct-arq').click(); };
-    $('ct-foto').onclick = escolher; if ($('ct-por')) $('ct-por').onclick = escolher;
-    if ($('ct-tirar')) $('ct-tirar').onclick = function(){ if (!confirm('Tirar a sua foto de perfil?')) return; salvarPerfil({ foto: '' }).then(function(){ vistaConta(); }); };
+    var remover = function(){ if (!confirm('Remover a sua foto de perfil?')) return; salvarPerfil({ foto: '' }).then(function(){ vistaConta(); }); };
+    $('ct-foto').onclick = function(){ if (fotoOk(perfilLocal().foto)) menuFoto(escolher, remover); else escolher(); };
+    if ($('ct-por')) $('ct-por').onclick = escolher;
+    if ($('ct-tirar')) $('ct-tirar').onclick = remover;
     $('ct-arq').onchange = function(){
       var a = this.files && this.files[0]; if (!a) return;
-      fotoQuadrada(a).then(function(url){ return salvarPerfil({ foto: url }); }).then(function(){ vistaConta(); }, function(){ alert('Não foi possível usar essa foto. Tente outra.'); });
+      recortarFoto(a).then(function(url){ return salvarPerfil({ foto: url }); }).then(function(){ vistaConta(); }, function(e){ if (!(e && e.message === 'cancelado')) alert('Não foi possível usar essa foto. Tente outra.'); });
     };
     $('ct-apelido-ok').onclick = function(){
       var b = this, v = $('ct-apelido').value.replace(/\s+/g, ' ').trim().slice(0, 40);
@@ -3716,7 +3807,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
       .catch(function(){ return false; });
   }
   function pedirLink(msg){
-    tirarEsqueleto(true); corTopo('#8340cb');
+    tirarEsqueleto(true); corTopo('#8a43d3');   // mesmo roxo do começo do degradê da tela de entrar
     lsSet('campo_usuario', '');   // o app não guarda o CPF: quem lembra o login é o celular (Senhas do iPhone, Google)
     document.documentElement.classList.remove('inicio-fixo'); document.documentElement.classList.add('lg-fixo');
     $('app').innerHTML = '<div class="lg balao">' +
