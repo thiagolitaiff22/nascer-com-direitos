@@ -1374,6 +1374,27 @@ html[data-tema="dark"] .db-tile.aviso b{color:#fb923c}
 html[data-tema="dark"] .tela b.festa-t{background:linear-gradient(135deg,#d6b3f5,#a865e6);-webkit-background-clip:text;background-clip:text}
 html[data-tema="dark"] .tela p.festa-p strong{color:#c49be6}
 @media (prefers-reduced-motion:reduce){.festa-conf{display:none}.tela .festa-ic,.tela .festa-ic svg,.db-corpo{animation:none}}
+/* permissões ao abrir (06/11) */
+#perm-tela .perm-cab{text-align:center}
+#perm-tela .perm-ic{width:64px;height:64px;margin:0 auto 4px;border-radius:20px;display:grid;place-items:center;background:linear-gradient(135deg,#b06fe8,#7633b2 60%,#5b2491);box-shadow:0 12px 26px -8px rgba(118,51,178,.5)}
+#perm-tela .perm-ic svg{width:34px;height:34px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#perm-tela .perm-lista{display:flex;flex-direction:column;gap:8px;margin:0 0 14px;text-align:left}
+#perm-tela .perm-lin{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:16px;background:var(--soft,#f6f0fb)}
+#perm-tela .perm-i{width:40px;height:40px;flex:none;border-radius:12px;display:grid;place-items:center;background:#efe4f8;color:#7633b2}
+#perm-tela .perm-i svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#perm-tela .perm-t{flex:1;min-width:0}
+#perm-tela .perm-t b{display:block;margin:0;font-size:15.5px}
+#perm-tela .perm-t small{display:block;font-size:12.5px;line-height:1.3;color:var(--ink2)}
+#perm-tela .perm-lin em{flex:none;font-style:normal;font-size:12.5px;font-weight:800}
+#perm-tela .perm-lin.granted{border-color:rgba(22,163,74,.35);background:rgba(22,163,74,.07)}
+#perm-tela .perm-lin.granted em{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#16a34a;color:#fff;font-size:14px}
+#perm-tela .perm-lin.granted .perm-i{background:#dcfce7;color:#15803d}
+#perm-tela .perm-lin.denied{border-color:rgba(220,38,38,.35);background:rgba(220,38,38,.06)}
+#perm-tela .perm-lin.denied em{color:#b91c1c}
+#perm-tela .perm-bloq{margin:-4px 0 14px;padding:10px 12px;border-radius:14px;background:#fff5f5;border:1px solid #f6d3d3;color:#7f1d1d;font-size:13.5px;line-height:1.4;text-align:left}
+html[data-tema="dark"] #perm-tela .perm-i{background:#2c2236;color:#c49be6}
+html[data-tema="dark"] #perm-tela .perm-lin.granted .perm-i{background:#16351f;color:#6fd59a}
+html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a2226;color:#f5c2c2}
 /* animação de como tirar a foto */
 .tuto-cena{--dur:2.4s;--k:1;position:relative;height:232px;margin:4px 0 10px;border-radius:18px;overflow:hidden;background:radial-gradient(120% 90% at 50% 20%,#f8f3fc,#eadcf5)}
 .tuto-cena.peq{--k:.7;height:160px;margin:0 0 12px}
@@ -1472,7 +1493,7 @@ html[data-tema="dark"] .tela p.festa-p strong{color:#c49be6}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 111;
+  var APP_VERSAO = 112;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -3039,7 +3060,7 @@ html[data-tema="dark"] .tela p.festa-p strong{color:#c49be6}
         '<div class="ct-linha"><input id="ct-s2" type="password" inputmode="numeric" autocomplete="new-password" placeholder="Repita a nova senha"></div>' +
         '<button type="button" class="ct-btn" id="ct-senha-ok">Salvar a nova senha</button></div>' +
       '<div class="ct-rot" style="margin-top:18px">Aplicativo</div>' +
-      '<div class="pm-conta">' + (podeInstalar() ? '<button type="button" id="inst-btn"><b>Instalar o aplicativo</b><small>' + (android() ? 'Baixe o aplicativo para Android. Atualiza sozinho.' : 'Sem baixar arquivo e sem alertas. Atualiza sozinho.') + '</small></button>' : '') + (pushSuporte() ? '<button type="button" id="avisos-btn"><b>Avisos no celular</b><small id="avisos-sub">' + (avisosAtivos() ? 'Ativados · toque para desativar' : 'Desativados · toque para ativar') + '</small></button>' : '') + '<button type="button" id="verif-atu"><b>Verificar atualização</b><small>Veja se há uma versão nova do aplicativo</small></button>' +
+      '<div class="pm-conta">' + (podeInstalar() ? '<button type="button" id="inst-btn"><b>Instalar o aplicativo</b><small>' + (android() ? 'Baixe o aplicativo para Android. Atualiza sozinho.' : 'Sem baixar arquivo e sem alertas. Atualiza sozinho.') + '</small></button>' : '') + (pushSuporte() ? '<button type="button" id="avisos-btn"><b>Avisos no celular</b><small id="avisos-sub">' + (avisosAtivos() ? 'Ativados · toque para desativar' : 'Desativados · toque para ativar') + '</small></button>' : '') + '<button type="button" id="verif-perm"><b>Permissões do celular</b><small>Câmera, localização e avisos</small></button><button type="button" id="verif-atu"><b>Verificar atualização</b><small>Veja se há uma versão nova do aplicativo</small></button>' +
       '<button type="button" class="sair" id="sair"><svg><use href="#i-sair"/></svg>Sair desta conta</button></div>' +
       '<div class="versao">Nascer com Direitos · versão ' + APP_VERSAO + '</div>';
     $('sair').onclick = sair;
@@ -3050,6 +3071,7 @@ html[data-tema="dark"] .tela p.festa-p strong{color:#c49be6}
       sub.textContent = 'Ativando…';
       ativarAvisos().then(function(r){ if (r.ok) sub.textContent = 'Ativados · toque para desativar'; else { sub.textContent = 'Desativados · toque para ativar'; alert(r.msg); } pintarSino(); });
     };
+    $('verif-perm').onclick = function(){ pedirPermissoes(true); };
     $('verif-atu').onclick = function(){ var b = this; b.querySelector('small').textContent = 'Verificando…'; ultimaChecagem = 0; verificarAtualizacao(); setTimeout(function(){ if (document.body.contains(b)) b.querySelector('small').textContent = document.querySelector('.atu') ? 'Há uma versão nova: use o aviso no topo' : 'Seu aplicativo está atualizado'; }, 1800); };
     // foto: escolhe da galeria ou tira na hora; o app recorta quadrada e diminui (192 x 192)
     var escolher = function(){ $('ct-arq').value = ''; $('ct-arq').click(); };
@@ -3312,6 +3334,7 @@ html[data-tema="dark"] .tela p.festa-p strong{color:#c49be6}
   function cameraFalhou(d, e){
     processando(false);
     var nome = (e && e.name) || '', negada = /NotAllowed|Security|PermissionDenied/.test(nome), ocupada = /NotReadable|TrackStart|Abort/.test(nome);
+    if (negada) lsSet('campo_perm_cam', '');
     var como = APP ? 'Para liberar: Configurações do celular › Apps › Nascer com Direitos › Permissões › Câmera › Permitir. Depois volte e toque em Tentar de novo.'
       : 'Para liberar: toque no cadeado ao lado do endereço do site › Permissões › Câmera › Permitir. Depois toque em Tentar de novo.';
     var t = tela('<svg viewBox="0 0 24 24" style="stroke:var(--warn)"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/>' + (negada ? '<path d="M3 3l18 18"/>' : '') + '</svg>' +
@@ -4365,6 +4388,80 @@ html[data-tema="dark"] .tela p.festa-p strong{color:#c49be6}
   }
   // toque num aviso com o aplicativo já aberto (Web Push) ou chegada pelo endereço
   if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', function(e){ if (e.data && e.data.tipo === 'abrir' && e.data.aba) irPara(e.data.aba); });
+  /* ---------- permissões: ao abrir, o aplicativo pede de uma vez a câmera, a localização e os avisos ---------- */
+  function estadoPerm(nome){
+    try { if (navigator.permissions && navigator.permissions.query) return navigator.permissions.query({ name: nome }).then(function(r){ return r.state; }, function(){ return 'prompt'; }); } catch(e){}
+    return Promise.resolve('prompt');
+  }
+  function permsAgora(){
+    return Promise.all([estadoPerm('camera'), estadoPerm('geolocation')]).then(function(r){
+      var cam = r[0], loc = r[1];
+      // vale o que funcionou de verdade (a consulta do celular às vezes erra); a marca sai quando a câmera é recusada na hora da foto
+      if (lsGet('campo_perm_cam') === '1') cam = 'granted';
+      if (lsGet('campo_perm_loc') === '1') loc = 'granted';
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) cam = 'granted';   // sem câmera ao vivo: usa a do celular, sem pedir
+      if (!navigator.geolocation) loc = 'granted';
+      var av = !pushSuporte() || avisosAtivos() ? 'granted' : (!pushNativo() && typeof Notification !== 'undefined' && Notification.permission === 'denied' ? 'denied' : 'prompt');
+      return { camera: cam, local: loc, avisos: av };
+    });
+  }
+  function pedirCam(){
+    return navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: 'environment' } } })
+      .then(function(s){ s.getTracks().forEach(function(t){ t.stop(); }); lsSet('campo_perm_cam', '1'); return 'granted'; },
+            function(e){ lsSet('campo_perm_cam', ''); return e && /NotAllowed|Security|PermissionDenied/.test(e.name || '') ? 'denied' : 'prompt'; });
+  }
+  function pedirLoc(){
+    return new Promise(function(ok){
+      navigator.geolocation.getCurrentPosition(function(){ lsSet('campo_perm_loc', '1'); ok('granted'); },
+        function(e){ if (e && e.code === 1){ lsSet('campo_perm_loc', ''); ok('denied'); } else { lsSet('campo_perm_loc', '1'); ok('granted'); } },   // sem sinal de GPS agora, mas permitido
+        { timeout: 15000, maximumAge: 600000 });
+    });
+  }
+  function pedirAvisos(){ return ativarAvisos().then(function(r){ return r && r.ok ? 'granted' : 'denied'; }, function(){ return 'denied'; }); }
+  var PERM_ITENS = [
+    ['camera', 'Câmera', 'Para fotografar o RG e o CPF da mãe', '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/>'],
+    ['local', 'Localização', 'Para marcar onde a mãe mora no cadastro', '<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>'],
+    ['avisos', 'Avisos', 'Para saber quando a mãe for confirmada ou faltar documento', '<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/>']
+  ];
+  function pedirPermissoes(forcar){
+    if (!token || $('perm-tela') || (!forcar && document.querySelector('.tela, .cam, .folha, .ver, .rec, .ct-tela'))) return;
+    if (!forcar && lsGet('campo_perm_adiada') === new Date().toDateString()) return;
+    permsAgora().then(function(st){
+      var falta = PERM_ITENS.filter(function(x){ return st[x[0]] !== 'granted'; });
+      // ao abrir: só insiste se a câmera não está liberada ou se algo nunca foi perguntado (aviso e localização recusados não são cobrados todo dia)
+      if (!forcar && st.camera === 'granted' && st.local !== 'prompt' && st.avisos !== 'prompt') return;
+      if (!falta.length && !forcar) return;
+      var como = APP ? 'Configurações do celular › Apps › Nascer com Direitos › Permissões' : 'o cadeado ao lado do endereço do site › Permissões';
+      var t = tela('<div class="perm-cab"><span class="perm-ic"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/><path d="m9 12 2 2 4-4"/></svg></span><b>Permissões do aplicativo</b><p>Para tudo funcionar no cadastro, o aplicativo precisa de:</p></div>' +
+        '<div class="perm-lista">' + PERM_ITENS.map(function(x){ return '<div class="perm-lin" data-perm="' + x[0] + '"><span class="perm-i"><svg viewBox="0 0 24 24">' + x[3] + '</svg></span><span class="perm-t"><b>' + x[1] + '</b><small>' + x[2] + '</small></span><em></em></div>'; }).join('') + '</div>' +
+        '<p class="perm-bloq" hidden>Alguma permissão está bloqueada. Para liberar, abra ' + como + ' e permita. Depois volte aqui.</p>' +
+        '<button id="perm-ok">Permitir</button><button class="sec2" id="perm-nao">Agora não</button>');
+      t.id = 'perm-tela';
+      var pinta = function(s){
+        Array.prototype.forEach.call(t.querySelectorAll('[data-perm]'), function(l){ var v = s[l.dataset.perm]; l.className = 'perm-lin ' + v; l.querySelector('em').textContent = v === 'granted' ? '✓' : v === 'denied' ? 'bloqueada' : ''; });
+        var bloq = PERM_ITENS.some(function(x){ return s[x[0]] === 'denied'; }), pend = PERM_ITENS.some(function(x){ return s[x[0]] === 'prompt'; });
+        t.querySelector('.perm-bloq').hidden = !bloq;
+        var b = t.querySelector('#perm-ok'); b.textContent = pend ? 'Permitir' : bloq ? 'Já liberei: conferir de novo' : 'Pronto'; b.dataset.fim = pend || bloq ? '' : '1';
+        t.querySelector('#perm-nao').hidden = !pend && !bloq;
+      };
+      pinta(st);
+      t.querySelector('#perm-nao').onclick = function(){ lsSet('campo_perm_adiada', new Date().toDateString()); t.remove(); };
+      t.querySelector('#perm-ok').onclick = function(){
+        var b = this; if (b.dataset.fim){ t.remove(); return; }
+        b.disabled = true; b.textContent = 'Pedindo…';
+        // um de cada vez: o celular mostra uma pergunta por vez
+        var s = st, seq = Promise.resolve();
+        if (s.camera === 'prompt' || s.camera === 'denied') seq = seq.then(pedirCam).then(function(v){ s.camera = v; pinta(s); });
+        if (s.local === 'prompt' || s.local === 'denied') seq = seq.then(pedirLoc).then(function(v){ s.local = v; pinta(s); });
+        if (s.avisos === 'prompt') seq = seq.then(pedirAvisos).then(function(v){ s.avisos = v; pinta(s); });
+        seq.then(function(){ return permsAgora(); }).then(function(s2){
+          ['camera', 'local', 'avisos'].forEach(function(k){ if (s[k] === 'granted') s2[k] = 'granted'; });
+          st = s2; pinta(s2); b.disabled = false;
+          if (PERM_ITENS.every(function(x){ return s2[x[0]] === 'granted'; })) setTimeout(function(){ if (t.isConnected) t.remove(); }, 1200);
+        });
+      };
+    });
+  }
   function iniciar(){
     if (!CFG_OK) return semConfiguracao();
     if (!token) return pedirLink();
@@ -4384,6 +4481,7 @@ html[data-tema="dark"] .tela p.festa-p strong{color:#c49be6}
       telaInicial();
       carregarPainel();
       if (quem.envioUrl) proximo();
+      setTimeout(function(){ pedirPermissoes(false); }, 1500);
     });
   }
   iniciar();
