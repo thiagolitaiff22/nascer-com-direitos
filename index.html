@@ -3982,8 +3982,8 @@ html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:14px!impor
   }
   function fcArquivos(r){
     var docs = docsApp(r), ok = docs.filter(function(x){ return x.ok; }).length, zp = zapUrl(foneDe(r)), id = esc(r.id);
-    return '<div class="fc-p p-arq"><p class="fc-sec0">Documentos juntados no app · ' + ok + '/' + docs.length + '</p>' + docs.map(function(x){ return '<div class="fc-doc ' + (x.ok ? 'ok' : 'no') + '"><i>' + svgI(x.ok ? 'i-ok' : 'i-x') + '</i><span>' + esc(x.n) + '</span>' + (x.ok ? '' : doFluxoNovo(r) && x.k === 'senha' ? '<small class="fc-doc-dica">cadastre na aba Dados, abaixo do CPF</small>' : doFluxoNovo(r) && x.k === 'nit' ? '<small class="fc-doc-dica">digite no campo NIT da guia, na aba Dados</small>' : '<button type="button" class="btn" data-act="recebido" data-id="' + id + '" data-doc="' + x.k + '" title="Chegou por outro meio: marcar como recebido">Recebi</button>') + '</div>'; }).join('') +
-      (zp ? '<a class="btn fc-cobrar" target="_blank" rel="noopener" href="' + esc(zp + '?text=' + encodeURIComponent(msgCobranca(r))) + '" title="Abre o WhatsApp com a mensagem pronta; você confere e envia">' + svgI('i-zap') + 'Cobrar a mãe pelo WhatsApp</a>' : '') + '</div>';
+    return '<div class="fc-p p-arq"><p class="fc-sec0">Documentos juntados no app · ' + ok + '/' + docs.length + '</p>' + docs.map(function(x){ return '<div class="fc-doc ' + (x.ok ? 'ok' : 'no') + '"><i>' + svgI(x.ok ? 'i-ok' : 'i-x') + '</i><span>' + esc(x.n) + '</span>' + (x.ok ? '' : doFluxoNovo(r) && x.k === 'senha' ? '<small class="fc-doc-dica">cadastre na aba Dados, abaixo do CPF</small>' : doFluxoNovo(r) && x.k === 'nit' ? '<small class="fc-doc-dica">pegue no Meu INSS com a senha gov.br e digite na aba Dados</small>' : '<button type="button" class="btn" data-act="recebido" data-id="' + id + '" data-doc="' + x.k + '" title="Chegou por outro meio: marcar como recebido">Recebi</button>') + '</div>'; }).join('') +
+      (zp && (ctPend(r) || docs.some(function(x){ return !x.ok && !(doFluxoNovo(r) && x.k === 'nit'); })) ? '<a class="btn fc-cobrar" target="_blank" rel="noopener" href="' + esc(zp + '?text=' + encodeURIComponent(msgCobranca(r))) + '" title="Abre o WhatsApp com a mensagem pronta; você confere e envia">' + svgI('i-zap') + 'Cobrar a mãe pelo WhatsApp</a>' : '') + '</div>';
   }
   function fcHistorico(r){ return '<div class="fc-p p-hist">' + (htmlLinhaTempo(r) || '<p class="fc-nota">Nada registrado ainda.</p>') + '</div>'; }
   function pintarCard(){
@@ -4892,6 +4892,8 @@ html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:14px!impor
       acao = !r.tipoSegurada ? ativSeg(r)
         : ctPend(r) && (r.contrato.url || r.contrato.urlProc) && zpN ? '<a class="kb-btn" target="_blank" rel="noopener" href="' + esc(zpN + '?text=' + encodeURIComponent(msgCobranca(r))) + '" title="Abre o WhatsApp com o link do contrato; você confere e envia">' + svgI('i-zap') + 'Mandar o contrato</a>'
         : !r.senhaGovOk ? '<button type="button" class="kb-btn" data-act="abrir" data-id="' + id + '" title="Abre a ficha: a senha gov.br fica logo abaixo do CPF">' + svgI('i-chave') + 'Cadastrar senha</button>'
+        // NIT: não se pede à mãe; com a senha gov.br a equipe pega no Meu INSS e digita na ficha
+        : faltaDocs(r).indexOf('nit') >= 0 ? '<button type="button" class="kb-btn" data-act="abrir" data-id="' + id + '" title="Com a senha gov.br da ficha, entre no Meu INSS, copie o NIT e digite no campo NIT da guia">' + svgI('i-inss') + 'Pegar NIT no Meu INSS</button>'
         : zpN ? '<a class="kb-btn" target="_blank" rel="noopener" href="' + esc(zpN + '?text=' + encodeURIComponent(msgCobranca(r))) + '" title="Abre o WhatsApp com a mensagem pronta; você confere e envia">' + svgI('i-zap') + 'Cobrar no WhatsApp</a>'
         : '<button type="button" class="kb-btn" data-act="edit" data-id="' + id + '" title="Sem telefone: abra o cadastro e informe o WhatsApp da mãe">' + svgI('i-pencil') + 'Pôr o telefone</button>';
     }
@@ -5743,7 +5745,7 @@ html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:14px!impor
   /* ---------- cobrar a mãe pelo WhatsApp (mensagem pronta; a equipe envia) ---------- */
   function msgCobranca(r){
     var n = String(r.nome || '').trim().split(/\s+/)[0] || 'tudo bem';
-    var falta = docsApp(r).filter(function(x){ return !x.ok; }).map(function(x){ return x.n; });
+    var falta = docsApp(r).filter(function(x){ return !x.ok && !(doFluxoNovo(r) && x.k === 'nit'); }).map(function(x){ return x.n; });   // NIT: a equipe pega no Meu INSS
     var base = 'Olá, ' + n + '! Aqui é da equipe Nascer com Direitos. ';
     if (ctPend(r) && (r.contrato.url || r.contrato.urlProc)){
       var lc = r.contrato.url || '', lp = r.contrato.urlProc || '';
