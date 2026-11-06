@@ -1249,6 +1249,52 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   .pm-lista{grid-template-columns:repeat(3,minmax(0,1fr))}
   .abas{width:min(760px,calc(100% - 64px))!important}
 }
+
+/* fotos dos documentos em sequência (06/11): um botão abre a câmera e ela vai pedindo um documento de cada vez */
+.sq{display:flex;flex-direction:column;gap:12px;margin-top:6px}
+.sq-ini{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:22px 18px;border-radius:22px;background:linear-gradient(160deg,#f6f0fb,#efe4f8);border:1px solid #e4d6f0}
+.sq-ic{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,#7633b2,#5b2491);color:#fff;box-shadow:0 10px 22px rgba(102,46,153,.28)}
+.sq-ic svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sq-ini b{font-family:'Fraunces',Georgia,serif;font-size:21px;font-weight:600;color:var(--ink)}
+.sq-ini p{margin:0;font-size:14px;line-height:1.45;color:var(--ink2)}
+.sq-go{width:100%;height:56px;border:0;border-radius:16px;background:linear-gradient(135deg,#7633b2,#5b2491);color:#fff;font:inherit;font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 10px 22px rgba(102,46,153,.25)}
+.sq-go svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.sq-tuto{border:0;background:none;padding:6px;font:inherit;font-size:14px;font-weight:600;color:#7633b2;text-decoration:underline;text-underline-offset:3px}
+.sq-lista{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:18px;background:var(--card);overflow:hidden}
+.sq-lin{display:flex;align-items:center;gap:12px;width:100%;min-height:58px;padding:10px 14px;border:0;border-top:1px solid var(--line);background:none;font:inherit;text-align:left;color:var(--ink)}
+.sq-lin:first-child{border-top:0}
+.sq-lin i{width:30px;height:30px;flex:none;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:15px;background:#eee;color:#888}
+.sq-lin.ok i{background:#e7f6ec;color:#15803d}
+.sq-lin.pend i{background:#fde8e8;color:#b91c1c}
+.sq-lin span{flex:1;min-width:0}
+.sq-lin span b{display:block;font-size:15.5px;font-weight:700}
+.sq-lin span small{display:block;margin-top:1px;font-size:13px;color:var(--ink2)}
+.sq-lin.pend span small{color:#b91c1c;font-weight:600}
+.sq-lin u{flex:none;font-size:13px;font-weight:700;color:#7633b2;text-decoration:none}
+.sq-pend{margin:0;padding:12px 14px;border-radius:16px;background:#fff5f5;border:1px solid #f6d3d3;font-size:13.5px;line-height:1.45;color:#7f1d1d}
+.sq-mais{margin:0;text-align:center;font-size:13px;color:var(--ink2)}
+.sq-mais button{border:0;background:none;padding:2px;font:inherit;font-weight:700;color:#7633b2}
+.tela .sq-n{display:block;margin-bottom:4px;font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#7633b2}
+.tela .sq-perg{margin:2px 0 16px;font-size:17px;line-height:1.4;color:var(--ink)}
+.tela button.sq-parar{background:transparent;color:var(--ink2);border:0;height:44px;font-size:15px;text-decoration:underline;text-underline-offset:3px}
+/* animação de como tirar a foto */
+.tuto-cena{position:relative;height:200px;margin:4px 0 14px;border-radius:18px;overflow:hidden;background:radial-gradient(120% 90% at 50% 20%,#f8f3fc,#eadcf5)}
+.tuto-doc{position:absolute;left:50%;top:50%;width:132px;height:84px;margin:-42px 0 0 -66px;border-radius:9px;background:#fff;box-shadow:0 8px 18px rgba(41,24,56,.16);transform:rotate(-4deg);animation:tutoDoc 5.6s ease-in-out infinite}
+.tuto-doc::before{content:"";position:absolute;left:10px;top:12px;width:30px;height:38px;border-radius:5px;background:#e9dcf5}
+.tuto-doc::after{content:"";position:absolute;left:50px;right:12px;top:16px;height:44px;background:repeating-linear-gradient(180deg,#d9c8ea 0 6px,transparent 6px 13px)}
+.tuto-cel{position:absolute;left:50%;top:50%;width:118px;height:196px;margin:-98px 0 0 -59px;border:5px solid #2a1d38;border-radius:22px;box-shadow:0 14px 30px rgba(41,24,56,.28);animation:tutoCel 5.6s ease-in-out infinite}
+.tuto-mold{position:absolute;left:50%;top:50%;width:96px;height:62px;margin:-31px 0 0 -48px;border:2.5px dashed rgba(255,255,255,.95);border-radius:7px;animation:tutoMold 5.6s ease-in-out infinite}
+.tuto-flash{position:absolute;inset:0;border-radius:17px;background:#fff;opacity:0;animation:tutoFlash 5.6s ease-in-out infinite}
+.tuto-ok{position:absolute;right:14px;top:14px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#16a34a;color:#fff;font-weight:800;font-size:20px;opacity:0;transform:scale(.6);animation:tutoOk 5.6s ease-in-out infinite}
+@keyframes tutoCel{0%,8%{transform:translate(64px,70px) rotate(20deg);background:rgba(42,29,56,.06)}42%,100%{transform:translate(0,0) rotate(-4deg);background:rgba(42,29,56,.10)}}
+@keyframes tutoMold{0%,48%{border-color:rgba(255,255,255,.95);border-style:dashed;transform:rotate(0)}56%,100%{border-color:#22c55e;border-style:solid;box-shadow:0 0 0 3px rgba(34,197,94,.25)}}
+@keyframes tutoFlash{0%,62%{opacity:0}66%{opacity:.85}74%,100%{opacity:0}}
+@keyframes tutoOk{0%,70%{opacity:0;transform:scale(.6)}78%,94%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1)}}
+@keyframes tutoDoc{0%,100%{transform:rotate(-4deg)}}
+.tuto-passos{margin:0 0 14px;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;text-align:left}
+.tuto-passos li{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.4;color:var(--ink)}
+.tuto-passos li b{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#efe4f8;color:#7633b2;font-size:13px;margin:0}
+@media (prefers-reduced-motion:reduce){.tuto-cel,.tuto-mold,.tuto-flash,.tuto-ok{animation:none}.tuto-cel{transform:rotate(-4deg)}.tuto-mold{border-color:#22c55e;border-style:solid}}
 </style>
 <link rel="preload" as="image" href="img/marca-suave.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
 
@@ -1293,7 +1339,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 100;
+  var APP_VERSAO = 101;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1991,7 +2037,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     if (ob[3] === 'nao') return { nao: bf };
     return { ok: true, caminho: caminho, analisar: ob[3] === 'analisar', trabalho: t, saida: '', beneficio: bf };
   }
-  var CAMPOS_CADASTRO = ['campo_fone', 'campo_cpf', 'campo_cidade', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp', 'campo_nasceu', 'campo_cep', 'campo_rua', 'campo_num', 'campo_compl', 'campo_bairro', 'campo_uf_cep', 'campo_q_trab', 'campo_q_saida', 'campo_q_benef', 'campo_contrato'];
+  var CAMPOS_CADASTRO = ['campo_fone', 'campo_cpf', 'campo_cidade', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp', 'campo_nasceu', 'campo_cep', 'campo_rua', 'campo_num', 'campo_compl', 'campo_bairro', 'campo_uf_cep', 'campo_q_trab', 'campo_q_saida', 'campo_q_benef', 'campo_contrato', 'campo_docs_seq'];
   function temRascunhoCadastro(){ return !!(Object.keys(fotos).length || senhaGovRascunho || CAMPOS_CADASTRO.some(function(k){ return String(lsGet(k) || '').trim(); })); }
   function descartarCadastro(){
     if (!temRascunhoCadastro()) return;
@@ -2102,7 +2148,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
         t: f === 'assinar' ? 'Assinatura da ' + nm : f === 'assinado' ? 'Contrato assinado' : f === 'semrede' ? 'Sem internet agora' : f === 'depois' ? 'Contrato pelo WhatsApp' : 'Contrato e procuração da ' + nm,
         s: f === 'gerar' ? 'Confira os dados: o contrato e a procuração saem preenchidos e ela assina com o dedo, aqui no celular.' : f === 'assinar' ? 'Entregue o celular para ela ler e assinar com o dedo.' : '' }; })(),
       { k: 'senha', t: 'Qual é a senha do gov.br dela?', s: 'Se ela não souber agora, toque em Pular: o escritório pede depois.', el: ['l-sgov'], foco: 'sgov', ok: function(){ return true; }, pular: true },
-      { k: 'docs', t: 'Fotos dos documentos', s: 'Toque em cada um para tirar a foto. Confira os dados e envie.', el: [], grid: true, ok: function(){ return true; }, final: true }
+      { k: 'docs', t: 'Fotos dos documentos', s: 'Tire as fotos, confira os dados e envie.', el: [], grid: true, ok: function(){ return true; }, final: true }
     ].filter(Boolean);
     var idx = function(k){ for (var i = 0; i < P.length; i++) if (P[i].k === k) return i; return 0; };
     if (passoNovo == null){ passoNovo = 0; for (var k = 0; k < P.length - 1 && P[k].ok() && !P[k].pular; k++) passoNovo = k + 1; }   // rascunho: volta para a primeira pergunta sem resposta
@@ -2135,7 +2181,8 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
       var res = document.createElement('div'); res.className = 'wz-res';
       res.innerHTML = linhas.map(function(l){ return '<button type="button" class="wz-lin" data-ir-passo="' + l[2] + '"><span>' + l[0] + '</span><b>' + esc(l[1] || '—') + '</b><u>editar</u></button>'; }).join('');
       slot.appendChild(res);
-      docsEls.forEach(function(c){ slot.appendChild(c); });
+      if (completando) docsEls.forEach(function(c){ slot.appendChild(c); });
+      else slot.insertBefore(seqPainel(), res);   // as fotos vêm primeiro; os quadrinhos ficam escondidos (continuam ligados para "outro documento" e vídeo)
     } else if (pas.contrato){
       var fase = ctFase(), cE = ctEstado(), ico = function(d){ return '<span class="ct-ic"><svg viewBox="0 0 24 24">' + d + '</svg></span>'; };
       if (fase === 'gerar'){
@@ -2216,7 +2263,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   }
   function vistaNovo(){
     guardarRascunho();
-    var n = Object.keys(fotos).length;
+    var n = Object.keys(fotos).length || (!completando && seqTudo() ? 1 : 0);   // tudo resolvido (fotos ou pendências): já dá para enviar
     var falta = DOCS.filter(function(d){ return obrig(d) && !fotos[d.k]; });
     var visiveis = DOCS.filter(function(d){ return !d.oculto && (completando ? completando.faltaDocs.indexOf(d.k) >= 0 : serve(d)); });
     var gest = gestante();
@@ -3114,8 +3161,8 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
       }
       v.addEventListener('playing', detectarVivo, { once: true });
       function sair(){ vivo = false; window.removeEventListener('resize', posicionar); pararCamera(); c.remove(); }
-      c.querySelector('.fechar').onclick = sair;
-      c.querySelector('.xis').onclick = sair;
+      c.querySelector('.fechar').onclick = function(){ sair(); seqCameraFechada(); };
+      c.querySelector('.xis').onclick = function(){ sair(); seqCameraFechada(); };
       c.querySelector('.galeria').onclick = function(){ sair(); $('foto').removeAttribute('capture'); $('foto').click(); };
       c.querySelector('.disparo').onclick = function(){
         if (!v.videoWidth || this.disabled) return;
@@ -3445,9 +3492,111 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     document.body.appendChild(t);
     botoesAjuste(t, lados.filter(function(l){ return fotos[l[0]]; }).map(function(l){ return { doc: DOCS.filter(function(x){ return x.k === l[0]; })[0], foto: fotos[l[0]][0], i: 0 }; }));
     var foto = function(k){ t.remove(); telaInicial(); fotografar(DOCS.filter(function(x){ return x.k === k; })[0]); };
-    t.querySelector('.xis').onclick = function(){ t.remove(); telaInicial(); };
-    t.querySelector('.boa').onclick = function(){ if (faltaFrente) return foto(par.f); if (faltaVerso) return foto(par.v); t.remove(); telaInicial(); };
+    t.querySelector('.xis').onclick = function(){ t.remove(); seqAtiva = false; telaInicial(); };
+    t.querySelector('.boa').onclick = function(){ if (faltaFrente) return foto(par.f); if (faltaVerso) return foto(par.v); t.remove(); telaInicial(); seqDepois(); };
     t.addEventListener('click', function(e){ var b = e.target.closest('[data-l]'); if (b) foto(b.dataset.l); });
+  }
+  /* ---------- fotos em sequência (06/11/2026, pedido: "câmera em sequência", sem quadrinhos) ----------
+     RG (frente e verso, direto na câmera) → CPF (pergunta se já está no RG) → título de eleitor → comprovante de residência
+     → provas da atividade (pescadora, agricultora ou indígena). Documento que ela não tem agora vira pendência:
+     o cadastro vai assim mesmo e o escritório cobra a mãe depois. */
+  var seqAtiva = false;
+  var SEQ = {
+    rg: { doc: 'rg_frente', nome: 'RG', ver: 'frente e verso' },
+    cpf: { doc: 'cpf', nome: 'CPF', perg: 'O número do CPF aparece no RG dela?' },
+    titulo: { doc: 'titulo', nome: 'Título de eleitor', perg: 'Ela está com o título de eleitor aí?', ver: 'frente e verso' },
+    residencia: { doc: 'residencia', nome: 'Comprovante de residência', perg: 'Ela está com o comprovante de residência aí? (conta de luz, água ou telefone)' },
+    rural: { doc: 'rural', nome: 'Provas da atividade', perg: 'Ela tem provas de que é pescadora, agricultora ou indígena? (carteira de pescadora, declaração do sindicato, documento da terra…)' }
+  };
+  function docK(k){ return DOCS.filter(function(x){ return x.k === k; })[0]; }
+  function seqEstado(){ try { var s = JSON.parse(lsGet('campo_docs_seq') || '{}'); return s && typeof s === 'object' ? s : {}; } catch(e){ return {}; } }
+  function seqGuardar(s){ lsSet('campo_docs_seq', JSON.stringify(s)); }
+  function seqPassos(){ var l = ['rg', 'cpf', 'titulo', 'residencia']; if (tipoAtual() === 'especial') l.push('rural'); return l; }
+  function seqPend(k){ return (seqEstado().pend || []).indexOf(SEQ[k].doc) >= 0; }
+  function seqTemFoto(k){ return k === 'rg' ? !!(fotos.rg_frente && fotos.rg_verso) : !!(fotos[SEQ[k].doc] && fotos[SEQ[k].doc].length); }
+  function seqFeito(k){ return seqTemFoto(k) || seqPend(k) || (k === 'cpf' && !!seqEstado().cpfNoRg); }
+  function seqTudo(){ return seqPassos().every(seqFeito); }
+  function seqMarcar(k, como){   // como: 'pend' | 'norg' | '' (tirar a marca)
+    var s = seqEstado(), d = SEQ[k].doc; s.pend = (s.pend || []).filter(function(x){ return x !== d; });
+    if (k === 'cpf') s.cpfNoRg = como === 'norg';
+    if (como === 'pend') s.pend.push(d);
+    seqGuardar(s);
+  }
+  function seqComecar(){ seqAtiva = true; seqContinuar(); }
+  function seqParar(){ seqAtiva = false; telaInicial(); }
+  function seqContinuar(){
+    if (!seqAtiva) return;
+    var passos = seqPassos(), k = passos.filter(function(x){ return !seqFeito(x); })[0];
+    if (!k){ seqAtiva = false; telaInicial(); return; }   // terminou: volta para o resumo, com as pendências
+    if (k === 'rg') return seqFoto('rg');
+    var info = SEQ[k], n = passos.indexOf(k) + 1;
+    var bts = k === 'cpf'
+      ? '<button id="sq-sim">Sim, está no RG</button><button class="sec2" id="sq-foto">Não, tirar a foto do CPF</button><button class="sec2" id="sq-nao">Ela não está com o CPF</button>'
+      : '<button id="sq-foto">Sim, tirar a foto</button><button class="sec2" id="sq-nao">Não está com ela agora</button>';
+    var t = tela('<span class="sq-n">Documento ' + n + ' de ' + passos.length + '</span><b>' + esc(info.nome) + '</b><p class="sq-perg">' + esc(info.perg) + '</p>' + bts + '<button class="sq-parar" id="sq-parar">Parar as fotos</button>');
+    var so = function(id, f){ var b = t.querySelector('#' + id); if (b) b.onclick = function(){ t.remove(); f(); }; };
+    so('sq-sim', function(){ seqMarcar('cpf', 'norg'); seqContinuar(); });
+    so('sq-foto', function(){ seqMarcar(k, ''); seqFoto(k); });
+    so('sq-nao', function(){ seqMarcar(k, 'pend'); seqContinuar(); });
+    so('sq-parar', seqParar);
+  }
+  // a câmera do documento (na primeira foto, antes, a animação de como tirar)
+  function seqFoto(k){
+    var d = docK(SEQ[k].doc);
+    if (k === 'rg' && fotos.rg_frente && !fotos.rg_verso) d = docK('rg_verso');
+    if (k === 'titulo' && fotos.titulo && !fotos.titulo_verso) d = docK('titulo_verso');
+    if (lsGet('campo_tuto_foto') !== '1') return tutoFoto(function(){ fotografar(d); });
+    fotografar(d);
+  }
+  // fechou a câmera no meio da sequência: tentar de novo, deixar pendente ou parar
+  function seqCameraFechada(){
+    if (!seqAtiva) return;
+    var k = seqPassos().filter(function(x){ return !seqFeito(x); })[0]; if (!k){ seqParar(); return; }
+    var t = tela('<b>' + esc(SEQ[k].nome) + '</b><p class="sq-perg">A câmera foi fechada. O que fazer com este documento?</p><button id="sq-de-novo">Tirar a foto</button><button class="sec2" id="sq-pend">Ela não está com ele (fica pendente)</button><button class="sq-parar" id="sq-parar">Parar as fotos</button>');
+    t.querySelector('#sq-de-novo').onclick = function(){ t.remove(); seqFoto(k); };
+    t.querySelector('#sq-pend').onclick = function(){ t.remove(); seqMarcar(k, 'pend'); seqContinuar(); };
+    t.querySelector('#sq-parar').onclick = function(){ t.remove(); seqParar(); };
+  }
+  function seqDepois(){ if (seqAtiva) setTimeout(seqContinuar, 120); }
+  // animação curtinha de como tirar a foto (aparece sozinha na primeira foto; depois, no botão "Como tirar a foto")
+  function tutoFoto(depois){
+    var t = tela('<div class="tuto-cena" aria-hidden="true"><div class="tuto-doc"></div><div class="tuto-cel"><span class="tuto-mold"></span><span class="tuto-flash"></span></div><span class="tuto-ok">✓</span></div>' +
+      '<b>Como tirar a foto</b><ol class="tuto-passos"><li><b>1</b>Documento em cima de uma mesa, com luz e sem reflexo</li><li><b>2</b>Celular reto, por cima do documento</li><li><b>3</b>Encaixe no quadro: quando a linha ficar verde, toque no botão</li></ol>' +
+      '<button id="tuto-ok">' + (depois ? 'Entendi, abrir a câmera' : 'Entendi') + '</button>');
+    t.querySelector('#tuto-ok').onclick = function(){ lsSet('campo_tuto_foto', '1'); t.remove(); if (depois) depois(); };
+  }
+  // o bloco dos documentos no fim do cadastro: um botão (antes de começar) ou a lista do que já foi feito e das pendências
+  function seqPainel(){
+    var passos = seqPassos(), algum = passos.some(seqFeito), s = seqEstado(), cam = '<svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>';
+    var box = document.createElement('div'); box.className = 'sq';
+    if (!algum){
+      box.innerHTML = '<div class="sq-ini"><span class="sq-ic">' + cam + '</span><b>Fotos dos documentos</b><p>A câmera vai pedindo um de cada vez: ' + passos.map(function(k){ return SEQ[k].nome; }).join(', ').replace(/, ([^,]*)$/, ' e $1') + '. O que ela não tiver agora fica como pendência.</p>' +
+        '<button type="button" class="sq-go" id="sq-go">' + cam + 'Começar as fotos</button><button type="button" class="sq-tuto" id="sq-tuto">Como tirar a foto</button></div>';
+    } else {
+      var linha = function(k){
+        var ok = seqTemFoto(k) || (k === 'cpf' && s.cpfNoRg), pend = !ok && seqPend(k);
+        var sub = k === 'cpf' && s.cpfNoRg ? 'está no RG' : ok ? (SEQ[k].ver || (fotos[SEQ[k].doc].length > 1 ? fotos[SEQ[k].doc].length + ' fotos' : 'foto tirada')) : pend ? 'pendente: ela não está com ele agora' : 'falta tirar';
+        return '<button type="button" class="sq-lin' + (ok ? ' ok' : pend ? ' pend' : '') + '" data-sq="' + k + '"><i>' + (ok ? '✓' : pend ? '!' : '·') + '</i><span><b>' + esc(SEQ[k].nome) + '</b><small>' + sub + '</small></span><u>' + (ok ? 'ver' : 'tirar') + '</u></button>';
+      };
+      var pends = passos.filter(function(k){ return !seqTemFoto(k) && seqPend(k); });
+      box.innerHTML = '<div class="sq-lista">' + passos.map(linha).join('') + '</div>' +
+        (seqTudo() ? '' : '<button type="button" class="sq-go" id="sq-go">' + cam + 'Continuar as fotos</button>') +
+        (pends.length ? '<p class="sq-pend"><b>Pendências:</b> ' + pends.map(function(k){ return SEQ[k].nome; }).join(', ') + '. O cadastro vai assim mesmo e o escritório cobra a mãe depois.</p>' : '') +
+        '<p class="sq-mais">Opcional: <button type="button" data-sq-opc="outro">outro documento</button> · <button type="button" data-sq-opc="video">vídeo de concordância</button> · <button type="button" id="sq-tuto">como tirar a foto</button></p>';
+    }
+    box.addEventListener('click', function(e){
+      if (e.target.closest('#sq-go')) return seqComecar();
+      if (e.target.closest('#sq-tuto')) return tutoFoto(null);
+      var o = e.target.closest('[data-sq-opc]');
+      if (o){ var dO = docK(o.dataset.sqOpc); if (dO.video) return fotos[dO.k] && fotos[dO.k].length ? verVideo(dO) : escolherVideo(dO); return fotos[dO.k] && fotos[dO.k].length ? conferir(dO) : escolher(dO); }
+      var b = e.target.closest('[data-sq]'); if (!b) return;
+      var k = b.dataset.sq, d = docK(SEQ[k].doc);
+      seqAtiva = false;
+      if (k === 'cpf' && seqEstado().cpfNoRg){ seqMarcar('cpf', ''); seqAtiva = true; return seqContinuar(); }   // pergunta de novo
+      if (seqTemFoto(k)) return PARES[d.k] ? conferirRG(null, d.k) : conferir(d);
+      seqMarcar(k, ''); escolher(d);   // tirar agora (ou anexar)
+    });
+    return box;
   }
   function conferir(d, nova){
     if (parDe(d.k)) return conferirRG(nova, d.k);
@@ -3462,8 +3611,8 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     document.body.appendChild(t);
     botoesAjuste(t, f.map(function(x, i){ return { doc: d, foto: x, i: i }; }));
     var fim = function(){ t.remove(); telaInicial(); };
-    t.querySelector('.boa').onclick = fim;
-    t.querySelector('.xis').onclick = fim;
+    t.querySelector('.boa').onclick = function(){ fim(); seqDepois(); };
+    t.querySelector('.xis').onclick = function(){ seqAtiva = false; fim(); };
     t.addEventListener('click', function(e){
       var b = e.target.closest('.tira, [data-a]'); if (!b) return;
       if (b.classList.contains('tira')){ f.splice(+b.dataset.i, 1); if (!f.length) delete fotos[d.k]; t.remove(); return f.length ? conferir(d) : telaInicial(); }
@@ -3530,7 +3679,9 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
       if (dias < 0){ var m0 = 'A data de nascimento está no futuro. Confira a data.'; falar(m0); alert(m0); if ($('cnasc')) $('cnasc').focus(); return; }
       if (dias > 90){ var m1 = 'Só cadastramos bebês com até 3 meses de nascidos. Este bebê tem ' + Math.floor(dias / 30) + ' meses.'; falar(m1); alert(m1); if ($('cnasc')) $('cnasc').focus(); return; }
     }
-    var falta = DOCS.filter(function(d){ return obrig(d) && !fotos[d.k]; });
+    var sqE = seqEstado(), sqPend = sqE.pend || [];
+    var falta = DOCS.filter(function(d){ return obrig(d) && !fotos[d.k] && !(d.k === 'cpf' && sqE.cpfNoRg); });
+    if (falta.length && falta.every(function(d){ return sqPend.indexOf(d.k) >= 0; })) return montar(falta);   // pendências que o parceiro já marcou
     if (falta.length){
       falar('Está faltando: ' + falta.map(function(d){ return d.t; }).join(', ') + '. Quer enviar assim mesmo?');
       var t = tela('<svg viewBox="0 0 24 24" style="stroke:var(--warn)"><use href="#i-doc"/></svg><b>Faltam fotos</b><p>' + falta.map(function(d){ return esc(d.t); }).join(', ') + '</p><button id="t-voltar">Voltar e tirar</button><button class="sec2" id="t-mesmo">Enviar assim mesmo</button>');
@@ -3585,14 +3736,14 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
          tipoSegurada: tipoAtual(), crianca: '', criancaNasc: comp || gestante() ? '' : lsGet('campo_crianca_nasc'),
          fatoGerador: comp || gestante() ? 'gestante' : 'parto', dpp: !comp && gestante() ? lsGet('campo_dpp') : '',
          contrato: comp ? null : ctEnvio(),
-         docs: DOCS.filter(function(d){ return fotos[d.k]; }).map(function(d){ return d.k; }).concat(!comp && ctFase() === 'assinado' && !fotos.procuracao ? ['procuracao'] : []), arquivos: [] };
+         docs: DOCS.filter(function(d){ return fotos[d.k]; }).map(function(d){ return d.k; }).concat(!comp && seqEstado().cpfNoRg && !fotos.cpf ? ['cpf'] : []).concat(!comp && ctFase() === 'assinado' && !fotos.procuracao ? ['procuracao'] : []), arquivos: [] };
        return Promise.all(arquivos.map(function(a){ return paraBytes(a.blob).then(function(b){ return { nome: a.nome, mime: a.mime, buf: b, tam: b.byteLength, ok: false }; }, function(){ return { nome: a.nome, mime: a.mime, blob: a.blob, tam: a.blob.size, ok: false }; }); }))
          .then(function(l){ envio.arquivos = l; return filaPor(envio); }).then(function(){ return histPor({ id: envio.id, token: token, cliente: envio.cliente + (comp ? ' · documentos' : ''), clienteId: comp ? comp.id : '', criado: envio.criado, enviado: null }); }).then(function(){ return envio; });
      })
      .then(function(envio){
        fotos = {}; local = null; guardarRascunho();   // apaga o rascunho dessas fotos
        if (comp){ completando = null; lsSet('campo_completando', ''); if (painel) painel.clientes.forEach(function(c){ if (c.id === comp.id) c.faltaDocs = comp.faltaDocs.filter(function(k){ return envio.docs.indexOf(k) < 0; }); }); }
-       else { ['campo_fone', 'campo_cpf', 'campo_cidade', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp', 'campo_nasceu', 'campo_cep', 'campo_rua', 'campo_num', 'campo_compl', 'campo_bairro', 'campo_uf_cep', 'campo_q_trab', 'campo_q_saida', 'campo_q_benef', 'campo_contrato'].forEach(function(k){ lsSet(k, ''); }); senhaGovRascunho = ''; passoNovo = null; }
+       else { ['campo_fone', 'campo_cpf', 'campo_cidade', 'campo_nome', 'campo_tipo', 'campo_crianca', 'campo_crianca_nasc', 'campo_gestante', 'campo_dpp', 'campo_nasceu', 'campo_cep', 'campo_rua', 'campo_num', 'campo_compl', 'campo_bairro', 'campo_uf_cep', 'campo_q_trab', 'campo_q_saida', 'campo_q_benef', 'campo_contrato', 'campo_docs_seq'].forEach(function(k){ lsSet(k, ''); }); senhaGovRascunho = ''; passoNovo = null; seqAtiva = false; }
        t.remove(); aba = comp ? 'painel' : 'novo'; telaInicial(); window.scrollTo(0, 0); if ($('vista')) $('vista').scrollTop = 0;
        var ok = tela('<svg viewBox="0 0 24 24" style="stroke:var(--ok)"><use href="#i-ok"/></svg><b>' + (comp ? 'Documentos guardados' : 'Cadastro guardado') + '</b><p>' + esc(envio.cliente || '') + '<br>' + (comp ? 'Vão para a pasta da cliente sozinhos quando tiver internet.' : 'Está sendo enviado agora: acompanhe na barra embaixo. Pode cadastrar a próxima cliente.') + '</p><button id="t-ok">' + (comp ? 'Entendi' : 'Cadastrar a próxima') + '</button>');
        ok.querySelector('#t-ok').onclick = function(){ ok.remove(); };
