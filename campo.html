@@ -1308,7 +1308,8 @@ html[data-tema="dark"] .tuto-pts i.on{background:#c49be6}
 /* Início como painel (06/11) */
 .db-corpo{display:flex;flex-direction:column;gap:10px;animation:dbEntra .28s ease-out}
 @keyframes dbEntra{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.vista.inicio .seg-ini{margin:0 0 10px}
+.vista.inicio .seg-ini{margin:12px 0 10px}
+.db-hero{animation:dbEntra .28s ease-out}
 .db-card{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:12px 14px;font:inherit;color:var(--ink);box-shadow:0 6px 18px rgba(41,24,56,.06)}
 .db-cab{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
 .db-cab b{font-size:14.5px;font-weight:800}
@@ -1850,7 +1851,9 @@ html[data-tema="dark"] .tela p.festa-p strong{color:#c49be6}
         dbMeta('maes', todas.filter(function(m){ return noMes(m.cadastro); }).length, 'mães no mês') +
         dbGrafico(todas.map(function(m){ return m.cadastro; }), 'Cadastros por semana') +
         '<div class="db-tiles db-opc">' + dbAtalho(cl.filter(function(c){ return faltas(c).length; }).length, 'suas com pendência', 'data-ir="maes" data-filtro="faltam"', 'aviso') + dbAtalho(rede.length, 'mães dos parceiros', 'data-maes-rede') + '</div>';
-    $('vista').innerHTML = '<div class="pm-ola"><h2>' + saudacao() + (nomeSaudacao() ? ', ' + esc(nomeSaudacao()) : '') + '</h2><span>' + hojeTxt() + '</span></div>' + seg + '<div class="db-corpo">' + corpo + '</div>';
+    // o balão em cima, o filtro Parceiros | Mães logo abaixo dele e, embaixo, a meta e o resto do painel
+    var mh = corpo.match(/^<div class="pm-hero">[\s\S]*?<div class="pm-trio">[\s\S]*?<\/div><\/div>/), hero = mh ? mh[0] : '', resto = corpo.slice(hero.length);
+    $('vista').innerHTML = '<div class="pm-ola"><h2>' + saudacao() + (nomeSaudacao() ? ', ' + esc(nomeSaudacao()) : '') + '</h2><span>' + hojeTxt() + '</span></div><div class="db-hero">' + hero + '</div>' + seg + '<div class="db-corpo">' + resto + '</div>';
     $('vista').onclick = function(e){
       var fi = e.target.closest('[data-ini]'); if (fi){ if (fi.dataset.ini === filtroIni) return; filtroIni = fi.dataset.ini; lsSet('campo_ini_filtro', filtroIni); return telaInicial(); }
       var mt = e.target.closest('[data-meta]'); if (mt) return editarMeta(mt.dataset.meta);
