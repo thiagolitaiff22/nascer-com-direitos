@@ -2263,6 +2263,175 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
   .auth-marca{text-align:left}
   .auth-marca .auth-logo{margin:0 0 20px!important;height:128px!important}
 }
+/* ================= BI no estilo do aplicativo (06/11/2026, a pedido: "fonte, etc., para ficar bem bonitinho, igual o meu app") =================
+   Só no Fluxo novo. Mesmo visual do app: fundo lilás claro, cartões brancos bem arredondados com sombra leve,
+   títulos em Fraunces, texto em Inter, números em roxo e botões com degradê roxo. */
+html[data-fx="novo"]:root:not([data-theme="dark"]){
+  --c-bg:270 33% 96.5%;--c-card:0 0% 100%;--c-lat:0 0% 100%;--c-fg:276 31% 13%;--c-sec:275 52% 94.5%;--c-muted:271 23% 38%;
+  --c-line:274 30% 89%;--c-input:274 28% 84%;--c-pri:272 55% 45%;
+  --shadow:0 1px 2px rgba(41,24,56,.06),0 6px 18px rgba(41,24,56,.07);--sombra:var(--shadow);--sombra-leve:0 1px 2px rgba(41,24,56,.05);
+  --ap-num:#662e99;--ap-g1:#7633b2;--ap-g2:#662e99;--ap-lil:#faf7fd;--ap-linha:#ece3f3;--ap-hover:#f8f3fc;
+}
+html[data-fx="novo"]:root[data-theme="dark"]{
+  --c-bg:276 21% 6.5%;--c-card:274 20% 9.5%;--c-lat:274 20% 8.5%;--c-fg:276 52% 94%;--c-sec:274 19% 14%;--c-muted:274 42% 72%;
+  --c-line:272 20% 16.5%;--c-input:272 18% 22%;--c-pri:272 58% 64%;
+  --shadow:none;--sombra:none;--sombra-leve:none;
+  --ap-num:#d4b3f0;--ap-g1:#6a2bae;--ap-g2:#4f1f85;--ap-lil:hsl(274 19% 12%);--ap-linha:hsl(272 20% 15%);--ap-hover:hsl(274 19% 13%);
+}
+html[data-fx="novo"]{--font:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--r:18px;--r-sm:12px}
+html[data-fx="novo"] body{font-family:var(--font);font-size:14px;background:var(--bg)}
+html[data-fx="novo"] .app{background:var(--bg)}
+
+/* ---------- moldura: menu lateral branco com a marca em Fraunces; o conteúdo no fundo lilás ---------- */
+html[data-fx="novo"] .main{background:var(--bg)}
+html[data-fx="novo"] .lateral{background:hsl(var(--c-lat));border-right:1px solid var(--ap-linha);box-shadow:4px 0 24px rgba(41,24,56,.04)}
+@media (min-width:1000px){html[data-fx="novo"] .app:not(.collapsed) .lateral{width:248px}}
+@media (max-width:999px){html[data-fx="novo"] .lateral{box-shadow:none;border-right:0}}
+html[data-fx="novo"] .lat-topo{min-height:70px;padding:8px 8px 6px 14px}
+html[data-fx="novo"] .brand b{font-family:'Fraunces',Georgia,serif;font-size:15px;font-weight:600;letter-spacing:-.01em}
+html[data-fx="novo"] .brand span{font-size:11.5px;color:var(--ap-g1);font-weight:500}
+html[data-fx="novo"]:root[data-theme="dark"] .brand span{color:#c9a3ea}
+html[data-fx="novo"] .fluxo-seg{margin:4px 14px 12px;padding:4px;border:0;border-radius:14px;background:hsl(var(--c-sec))}
+html[data-fx="novo"] .fluxo-seg button{height:32px;padding:0 4px;border-radius:10px;font-size:12px;gap:5px}
+html[data-fx="novo"] .fluxo-seg button[aria-pressed="true"]{background:linear-gradient(135deg,var(--ap-g1),var(--ap-g2));color:#fff;box-shadow:0 4px 12px rgba(102,46,153,.25)}
+html[data-fx="novo"] .nav{padding:4px 10px 12px}
+html[data-fx="novo"] .nav-lbl{padding:2px 10px;margin-top:14px;font-size:10.5px;letter-spacing:.12em;color:hsl(var(--c-muted)/.85)}
+html[data-fx="novo"] .nav .tab{height:38px;padding:0 12px;margin:1px 0;border-radius:12px;font-size:14px;color:hsl(var(--c-fg)/.8)}
+html[data-fx="novo"] .nav .tab:hover{background:var(--ap-hover);color:var(--ink)}
+html[data-fx="novo"] .nav .tab[aria-selected="true"]{background:hsl(var(--c-sec));color:var(--ap-g2);font-weight:600}
+html[data-fx="novo"]:root[data-theme="dark"] .nav .tab[aria-selected="true"]{color:#e3ccf6}
+html[data-fx="novo"] .nav .tab[aria-selected="true"]::before{display:none}
+html[data-fx="novo"] .nav .tab[aria-selected="true"] svg.i{color:var(--ap-g1)}
+html[data-fx="novo"]:root[data-theme="dark"] .nav .tab[aria-selected="true"] svg.i{color:#c9a3ea}
+html[data-fx="novo"] .nav-n{min-width:22px;height:20px;padding:0 6px;border-radius:999px;background:hsl(var(--c-sec));color:var(--ap-g2);font-size:11px;font-weight:600;display:inline-grid;place-items:center;margin-left:auto}
+html[data-fx="novo"] .nav-n:empty{display:none}
+html[data-fx="novo"] .nav .tab[aria-selected="true"] .nav-n{background:#fff;color:var(--ap-g2)}
+html[data-fx="novo"]:root[data-theme="dark"] .nav-n{color:#d4b3f0}
+html[data-fx="novo"]:root[data-theme="dark"] .nav .tab[aria-selected="true"] .nav-n{background:hsl(var(--c-card));color:#e3ccf6}
+html[data-fx="novo"] .app.collapsed .nav{padding:4px 6px}
+html[data-fx="novo"] .app.collapsed .nav .tab{padding:0;justify-content:center}
+
+/* topo: transparente sobre o lilás, busca e botões redondos */
+html[data-fx="novo"] .topo{height:64px;padding:0 28px;background:hsl(var(--c-bg)/.86);-webkit-backdrop-filter:saturate(1.4) blur(10px);backdrop-filter:saturate(1.4) blur(10px)}
+html[data-fx="novo"] .busca-geral input:not([type=checkbox]):not([type=radio]){height:40px;background:hsl(var(--c-card));border-color:var(--ap-linha);box-shadow:var(--sombra-leve)}
+html[data-fx="novo"] .topo-add{height:40px;padding:0 14px 0 20px;background:linear-gradient(135deg,var(--ap-g1),var(--ap-g2));font-weight:600;box-shadow:0 6px 16px rgba(102,46,153,.25)}
+html[data-fx="novo"] .topo-user{height:40px;background:hsl(var(--c-card));border:1px solid var(--ap-linha)}
+html[data-fx="novo"] .topo-user .av{background:linear-gradient(145deg,#e2cff1,#cca6ea);color:#561f86;font-family:'Fraunces',Georgia,serif;font-weight:600}
+html[data-fx="novo"] .tema-seg{background:hsl(var(--c-card));border:1px solid var(--ap-linha)}
+html[data-fx="novo"] .tema-seg button[aria-pressed="true"]{background:linear-gradient(135deg,var(--ap-g1),var(--ap-g2));color:#fff}
+html[data-fx="novo"] .topo-sino{border-radius:50%;background:hsl(var(--c-card));border:1px solid var(--ap-linha)}
+html[data-fx="novo"] .av-n{border-radius:999px}
+html[data-fx="novo"] .pop{border-radius:16px;border-color:var(--ap-linha);padding:6px;box-shadow:0 18px 40px rgba(41,24,56,.16)}
+html[data-fx="novo"] .pop button,html[data-fx="novo"] .pop a{border-radius:10px;padding:9px 12px}
+html[data-fx="novo"] .content{padding:30px 36px 56px;gap:22px}
+
+/* ---------- cabeçalho de cada tela: título em Fraunces, ícone num quadradinho lilás ---------- */
+html[data-fx="novo"] .ph-ico,html[data-fx="novo"] .dn-h1-ico{width:44px;height:44px;border:0;border-radius:14px;background:linear-gradient(145deg,#efe2f8,#dcc1f0);color:#5a2591;box-shadow:0 4px 12px rgba(118,51,178,.14)}
+html[data-fx="novo"]:root[data-theme="dark"] .ph-ico,html[data-fx="novo"]:root[data-theme="dark"] .dn-h1-ico{background:linear-gradient(145deg,#3a2350,#2a1a3b);color:#d4b3f0;box-shadow:none}
+html[data-fx="novo"] .ph-ico .i,html[data-fx="novo"] .dn-h1-ico .i{width:20px;height:20px}
+html[data-fx="novo"] .ph-esq{gap:14px}
+html[data-fx="novo"] .ph h1,html[data-fx="novo"] .dn-h1{font-family:'Fraunces',Georgia,serif;font-size:28px;font-weight:600;letter-spacing:-.015em;line-height:1.15}
+html[data-fx="novo"] .ph p{margin-top:4px;font-size:13px}
+html[data-fx="novo"] .dn-tit{font-family:'Fraunces',Georgia,serif;font-size:19px;font-weight:600;letter-spacing:-.01em}
+
+/* ---------- cartões brancos, cantos redondos e sombra leve (como os do app) ---------- */
+html[data-fx="novo"] .app .card,html[data-fx="novo"] .stats > .stat,html[data-fx="novo"] .stats > .card,html[data-fx="novo"] .fn-balao,
+html[data-fx="novo"] .reg-card,html[data-fx="novo"] .reg-det,html[data-fx="novo"] .eq-chip,html[data-fx="novo"] .eq-card,html[data-fx="novo"] .est-cfg-linha,html[data-fx="novo"] .ig-card,html[data-fx="novo"] .integ,html[data-fx="novo"] .prosp,html[data-fx="novo"] .eq-pedidos,html[data-fx="novo"] .ct-cart,html[data-fx="novo"] .list-sum{
+  background:hsl(var(--c-card))!important;border:1px solid var(--ap-linha)!important;border-radius:20px!important;box-shadow:var(--shadow)!important}
+html[data-fx="novo"] .stats > .card[role="button"]:hover,html[data-fx="novo"] .stats > button.card:hover,html[data-fx="novo"] .dn-card.clic:hover,html[data-fx="novo"] .fn-balao:hover,html[data-fx="novo"] .reg-card:hover,html[data-fx="novo"] .ig-card:hover{border-color:hsl(var(--c-pri)/.45)!important}
+html[data-fx="novo"] .stats > .card.ativo,html[data-fx="novo"] .stats > .card[aria-pressed="true"],html[data-fx="novo"] .fn-balao.ativo{border-color:hsl(var(--c-pri))!important;box-shadow:0 0 0 3px hsl(var(--c-pri)/.12),var(--shadow)!important}
+html[data-fx="novo"] .stats{gap:14px}
+html[data-fx="novo"] .stats > .stat,html[data-fx="novo"] .stats > .card,html[data-fx="novo"] .dn-card{padding:16px 18px 16px;position:relative;overflow:hidden}
+/* tracinho colorido embaixo do cartão de número (igual ao app) */
+html[data-fx="novo"] .stats > .stat::after,html[data-fx="novo"] .stats > .card::after,html[data-fx="novo"] .dn-card::after{content:"";position:absolute;left:18px;right:18px;bottom:0;height:3px;border-radius:3px 3px 0 0;background:hsl(var(--c-pri)/.22)}
+html[data-fx="novo"] .dn-grade{gap:14px}
+html[data-fx="novo"] .dn-card{min-height:124px}
+html[data-fx="novo"] .fn-t,html[data-fx="novo"] .stat-h,html[data-fx="novo"] .dn-rot{font-size:12.5px;line-height:16px;font-weight:500;color:var(--ink-3)}
+html[data-fx="novo"] .fn-t .i,html[data-fx="novo"] .stat-h svg.i,html[data-fx="novo"] .dn-rot .i{color:var(--ap-g1)}
+html[data-fx="novo"]:root[data-theme="dark"] .fn-t .i,html[data-fx="novo"]:root[data-theme="dark"] .stat-h svg.i,html[data-fx="novo"]:root[data-theme="dark"] .dn-rot .i{color:#c9a3ea}
+html[data-fx="novo"] .stats .stat-h{min-height:32px}
+html[data-fx="novo"] .fn-v,html[data-fx="novo"] .stat-v{font-size:25px!important}
+html[data-fx="novo"] .fn-v,html[data-fx="novo"] .stat-v,html[data-fx="novo"] .dn-v{margin-top:10px;font-size:28px;font-weight:500;letter-spacing:-.02em;color:var(--ap-num)}
+html[data-fx="novo"] .dn-v.ok,html[data-fx="novo"] .stat-v.ok{color:hsl(var(--c-green))}
+html[data-fx="novo"] .dn-v.alerta{color:hsl(var(--c-red))}
+html[data-fx="novo"] .fn-s,html[data-fx="novo"] .stat-c,html[data-fx="novo"] .dn-sub{font-size:12.5px;color:var(--ink-3)}
+/* o primeiro número do Dashboard é o cartão roxo de destaque, como o do Início do app */
+html[data-fx="novo"] #dash-box > section.dn-sec:first-of-type .dn-grade > .dn-card:first-child{background:linear-gradient(140deg,#7633b2 0%,#662e99 100%)!important;border-color:transparent!important;box-shadow:0 14px 32px rgba(102,46,153,.28)!important;color:#fff}
+html[data-fx="novo"]:root[data-theme="dark"] #dash-box > section.dn-sec:first-of-type .dn-grade > .dn-card:first-child{background:linear-gradient(140deg,#5d2a8b,#461e6a)!important;box-shadow:none!important}
+html[data-fx="novo"] #dash-box > section.dn-sec:first-of-type .dn-grade > .dn-card:first-child::before{content:"";position:absolute;right:-50px;top:-70px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.22),rgba(255,255,255,0) 70%);pointer-events:none}
+html[data-fx="novo"] #dash-box > section.dn-sec:first-of-type .dn-grade > .dn-card:first-child::after{display:none}
+html[data-fx="novo"] #dash-box > section.dn-sec:first-of-type .dn-grade > .dn-card:first-child :is(.dn-rot,.dn-rot .i,.dn-v,.dn-sub,.dn-var,.dn-var b){color:#fff!important}
+html[data-fx="novo"] #dash-box > section.dn-sec:first-of-type .dn-grade > .dn-card:first-child .dn-sub{opacity:.9}
+html[data-fx="novo"] #dash-box > section.dn-sec:first-of-type .dn-grade > .dn-card:first-child .dn-v{font-weight:400;font-size:34px}
+html[data-fx="novo"] .dn-rosca-c b{font-family:'Fraunces',Georgia,serif;font-size:26px;color:var(--ap-num)}
+html[data-fx="novo"] .dn-origem{padding:18px 20px}
+
+/* ---------- botões: roxo com degradê; os de contorno ficam brancos ---------- */
+html[data-fx="novo"] .btn{min-height:36px;padding:0 14px;border-radius:12px;border-color:var(--ap-linha);background:hsl(var(--c-card));font-size:13px;font-weight:600}
+html[data-fx="novo"] .btn:hover{background:var(--ap-hover)}
+html[data-fx="novo"] .btn.primary,html[data-fx="novo"] .btn-primary{background:linear-gradient(135deg,var(--ap-g1),var(--ap-g2));border-color:transparent;color:#fff;box-shadow:0 6px 16px rgba(102,46,153,.22)}
+html[data-fx="novo"] .btn.primary:hover,html[data-fx="novo"] .btn-primary:hover{background:linear-gradient(135deg,var(--ap-g1),var(--ap-g2));opacity:.94}
+html[data-fx="novo"] .btn.danger{background:none;border-color:hsl(var(--c-red)/.5)}
+html[data-fx="novo"] .kb-btn{height:34px;padding:0 12px;border-radius:10px;background:linear-gradient(135deg,var(--ap-g1),var(--ap-g2));font-size:12.5px;font-weight:600;box-shadow:0 4px 12px rgba(102,46,153,.2)}
+html[data-fx="novo"] .kb-btn.sec{background:hsl(var(--c-card));color:var(--ap-g2);border:1px solid var(--ap-linha);box-shadow:none}
+html[data-fx="novo"]:root[data-theme="dark"] .kb-btn.sec{color:#d4b3f0}
+html[data-fx="novo"] .pill{border-radius:999px!important}
+html[data-fx="novo"] .vista-seg{border-radius:12px;padding:3px;border-color:var(--ap-linha);background:hsl(var(--c-card))}
+html[data-fx="novo"] .vista-seg button{border-radius:9px;height:30px}
+html[data-fx="novo"] .vista-seg button[aria-pressed="true"]{background:linear-gradient(135deg,var(--ap-g1),var(--ap-g2))}
+
+/* ---------- campos e filtros: altos, redondos, fundo lilás bem claro ---------- */
+html[data-fx="novo"] .app input:not([type=checkbox]):not([type=radio]):not([type=range]),html[data-fx="novo"] .app select,html[data-fx="novo"] .app textarea,
+html[data-fx="novo"] dialog input:not([type=checkbox]):not([type=radio]):not([type=range]),html[data-fx="novo"] dialog select,html[data-fx="novo"] dialog textarea,
+html[data-fx="novo"] .ficha-card input:not([type=checkbox]):not([type=radio]),html[data-fx="novo"] .ficha-card select,html[data-fx="novo"] .ficha-card textarea{border-radius:12px!important;border-color:var(--ap-linha)}
+html[data-fx="novo"] .field input,html[data-fx="novo"] .field select,html[data-fx="novo"] .field textarea,html[data-fx="novo"] .fc-c input,html[data-fx="novo"] .fc-c select,html[data-fx="novo"] .fc-c textarea{font-size:13.5px}
+html[data-fx="novo"] .field input,html[data-fx="novo"] .field textarea,html[data-fx="novo"] .field select,html[data-fx="novo"] .fc-c input,html[data-fx="novo"] .fc-c select,html[data-fx="novo"] .fc-c textarea{min-height:40px;padding:0 12px;background:var(--ap-lil);border:1px solid var(--ap-linha)}
+html[data-fx="novo"] .field textarea,html[data-fx="novo"] .fc-c textarea{padding:10px 12px}
+html[data-fx="novo"] .fbar{gap:10px;font-size:13px}
+html[data-fx="novo"] .fbar .search input,html[data-fx="novo"] .fbar .tb-sel,html[data-fx="novo"] .fbar .fb-lnk{height:40px;border-radius:12px!important;border:1px solid var(--ap-linha);background:hsl(var(--c-card));font-size:13px;box-shadow:var(--sombra-leve)}
+html[data-fx="novo"] .fbar .search svg{left:13px}
+html[data-fx="novo"] .fbar .search input{padding-left:36px}
+html[data-fx="novo"] .fbar .tb-sel{padding:0 12px}
+html[data-fx="novo"] .fbar .fb-al{height:34px;padding:0 13px;border-radius:999px;font-size:12.5px;font-weight:500}
+html[data-fx="novo"] .fbar .fb-limpar{height:34px;border-radius:999px}
+html[data-fx="novo"] .pop-filtro{border-radius:18px;border-color:var(--ap-linha);background:hsl(var(--c-card));box-shadow:var(--shadow)}
+html[data-fx="novo"] .dn-alterna button,html[data-fx="novo"] .per-btn,html[data-fx="novo"] .dn-topo .tb-sel{height:38px;border-radius:12px;border-color:var(--ap-linha);background:hsl(var(--c-card));box-shadow:var(--sombra-leve)}
+
+/* ---------- listas: um cartão branco, cabeçalho discreto, linha clarinha ao passar o mouse ---------- */
+html[data-fx="novo"] .kb-tab th,html[data-fx="novo"] .ct-tbl th,html[data-fx="novo"] .rel-tab th{padding:14px 14px 10px;font-size:11px!important;font-weight:600!important;letter-spacing:.06em!important;color:hsl(var(--c-muted)/.9)!important}
+html[data-fx="novo"] .kb-tab td,html[data-fx="novo"] .ct-tbl td,html[data-fx="novo"] .rel-tab td{padding:11px 12px;border-top:1px solid var(--ap-linha);font-size:12px}
+html[data-fx="novo"] .kb-tab td.nome,html[data-fx="novo"] .ct-tbl td.nome{font-size:13.5px;font-weight:500;color:var(--ink)}
+html[data-fx="novo"] .kb-tab td.nome small{font-size:12px}
+html[data-fx="novo"] .kb-tab tbody tr:hover,html[data-fx="novo"] .ct-tbl tbody tr:hover,html[data-fx="novo"] .rel-tab tbody tr:hover{background:var(--ap-hover)}
+html[data-fx="novo"] .row{border-top-color:var(--ap-linha);padding:10px 14px}
+html[data-fx="novo"] .row:not(.head):hover,html[data-fx="novo"] .row[data-linha]:hover{background:var(--ap-hover)}
+html[data-fx="novo"] .kb-info{font-size:13px}
+html[data-fx="novo"] .kb-info b{font-family:'Fraunces',Georgia,serif;font-size:15px;font-weight:600}
+html[data-fx="novo"] .empty{border-radius:20px}
+
+/* ---------- abas de Financeiro e Configurações ---------- */
+html[data-fx="novo"] .fin-sub,html[data-fx="novo"] .cfg-tabs{border-bottom-color:var(--ap-linha)!important}
+html[data-fx="novo"] .fin-sub button,html[data-fx="novo"] .cfg-tab{font-size:14px!important}
+html[data-fx="novo"] .fin-sub button[aria-pressed="true"],html[data-fx="novo"] .cfg-tab.on{color:var(--ap-g2)!important;font-weight:600!important}
+html[data-fx="novo"]:root[data-theme="dark"] .fin-sub button[aria-pressed="true"],html[data-fx="novo"]:root[data-theme="dark"] .cfg-tab.on{color:#e3ccf6!important}
+html[data-fx="novo"] .fin-sub button[aria-pressed="true"]::after,html[data-fx="novo"] .cfg-tab.on::after{background:linear-gradient(90deg,var(--ap-g1),var(--ap-g2))!important;height:3px!important;border-radius:3px 3px 0 0!important}
+html[data-fx="novo"] .eq-sec h4{font-family:'Fraunces',Georgia,serif;font-size:17px;font-weight:600}
+html[data-fx="novo"] .eq-chip b{color:var(--ap-num);font-size:20px;font-weight:600}
+html[data-fx="novo"] .eq-av{background:linear-gradient(145deg,#e2cff1,#cca6ea);color:#561f86;font-family:'Fraunces',Georgia,serif;font-weight:600}
+
+/* ---------- janelas e o cartão da cliente ---------- */
+html[data-fx="novo"] dialog{border:0!important;border-radius:24px!important;box-shadow:0 30px 70px rgba(41,24,56,.28)!important}
+html[data-fx="novo"] dialog::backdrop,html[data-fx="novo"] .ficha-card{background:rgba(30,12,48,.45);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+html[data-fx="novo"] .f-head h2{font-family:'Fraunces',Georgia,serif;font-size:22px;font-weight:600;letter-spacing:-.01em}
+html[data-fx="novo"] .field label{font-size:12.5px;font-weight:600}
+html[data-fx="novo"] .ficha-card>div{border:0;border-radius:24px;box-shadow:0 30px 70px rgba(41,24,56,.3)}
+html[data-fx="novo"] .fc-abas{border-radius:999px}
+html[data-fx="novo"] .fc-abas button[aria-pressed="true"]{background:linear-gradient(135deg,var(--ap-g1),var(--ap-g2))}
+html[data-fx="novo"] .fc-caixa{border-radius:18px;border-color:var(--ap-linha);background:var(--ap-lil)}
+html[data-fx="novo"] .fc-cx-nome b,html[data-fx="novo"] .fc-cx-nome h3,html[data-fx="novo"] .fc-cx-nome > :first-child{font-family:'Fraunces',Georgia,serif;font-size:19px;font-weight:600;letter-spacing:-.01em}
+html[data-fx="novo"] .fc-sec{font-family:'Fraunces',Georgia,serif;letter-spacing:0;text-transform:none;font-size:15px;font-weight:600;color:var(--ink)}
+html[data-fx="novo"] .fc-salvar .btn{min-height:44px;border-radius:14px;font-size:14px}
+html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:14px!important}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
