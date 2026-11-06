@@ -95,10 +95,16 @@ input[type=file]{display:none}
 .cam-prev .cp-tit{font-size:15px;font-weight:700;letter-spacing:.02em;color:#e7daf1}
 .cam-prev img{display:block;max-width:100%;max-height:56vh;border-radius:14px;box-shadow:0 18px 40px rgba(0,0,0,.5);background:#fff}
 .cam-prev p{margin:0;font-size:15px;color:#d8c6e8}
-.cam-prev .cp-bts{display:flex;flex-direction:column;gap:10px;width:100%;max-width:420px}
-.cam-prev button{height:56px;border-radius:16px;border:0;font:inherit;font-size:17px;font-weight:700}
-.cam-prev .cp-ok{background:linear-gradient(135deg,#7633b2,#5b2491);color:#fff}
-.cam-prev .cp-denovo{background:rgba(255,255,255,.12);color:#fff}
+.cam-prev .cp-bts{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:380px;margin-top:4px}
+.cam-prev button{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border:0;border-radius:999px;font:inherit;font-weight:700;letter-spacing:.01em;-webkit-tap-highlight-color:transparent;transition:transform .12s ease,filter .12s ease}
+.cam-prev button:active{transform:scale(.97);filter:brightness(.95)}
+.cam-prev button svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.cam-prev .cp-ok{height:60px;padding:0 22px 0 8px;font-size:17px;color:#fff;background:linear-gradient(135deg,#a865e6 0%,#7633b2 55%,#5b2491 100%);box-shadow:0 14px 30px -8px rgba(168,101,230,.6),inset 0 1px 0 rgba(255,255,255,.25)}
+.cam-prev .cp-ok i{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#6a2bae;flex:none;box-shadow:0 4px 10px rgba(0,0,0,.18)}
+.cam-prev .cp-ok span{flex:1;text-align:center;padding-right:30px}
+.cam-prev .cp-denovo{width:auto;height:48px;padding:0 22px;font-size:15.5px;color:#eadcf6;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.cam-prev .cp-tit{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:rgba(168,101,230,.18);border:1px solid rgba(168,101,230,.35)}
+.cam-prev img{border:3px solid rgba(255,255,255,.9)}
 .cam .moldura i{position:absolute;width:28px;height:28px;border:5px solid #4ade80}
 .cam .moldura i:nth-child(1){left:-5px;top:-5px;border-right:0;border-bottom:0;border-top-left-radius:14px}
 .cam .moldura i:nth-child(2){right:-5px;top:-5px;border-left:0;border-bottom:0;border-top-right-radius:14px}
@@ -1299,6 +1305,74 @@ html[data-tema="dark"] .tuto-cena{background:radial-gradient(120% 90% at 50% 20%
 html[data-tema="dark"] .tuto-leg{color:#d9bff2}
 html[data-tema="dark"] .tuto-pts i{background:#3a2c48}
 html[data-tema="dark"] .tuto-pts i.on{background:#c49be6}
+/* Início como painel (06/11) */
+.db-corpo{display:flex;flex-direction:column;gap:10px;animation:dbEntra .28s ease-out}
+@keyframes dbEntra{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.vista.inicio .seg-ini{margin:0 0 10px}
+.db-card{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:12px 14px;font:inherit;color:var(--ink);box-shadow:0 6px 18px rgba(41,24,56,.06)}
+.db-cab{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
+.db-cab b{font-size:14.5px;font-weight:800}
+.db-cab small{font-size:12px;color:var(--ink2)}
+.db-meta{display:flex;align-items:center;gap:12px;padding:10px 14px}
+.db-anel{position:relative;width:52px;height:52px;flex:none}
+.db-anel svg{width:52px;height:52px;transform:rotate(-90deg)}
+.db-anel circle{fill:none;stroke:var(--line);stroke-width:3.6}
+.db-anel circle.pr{stroke:#7633b2;stroke-linecap:round;transition:stroke-dasharray .6s ease}
+.db-meta.bateu .db-anel circle.pr{stroke:#16a34a}
+.db-anel b{position:absolute;inset:0;display:grid;place-items:center;font-size:12.5px;font-weight:800;color:var(--ink)}
+.db-meta.vazia .db-anel circle{stroke-dasharray:3 3}
+.db-meta.vazia .db-anel b{font-size:22px;font-weight:600;color:#7633b2}
+.db-mt{flex:1;min-width:0}
+.db-mt b{display:block;font-size:15px;font-weight:800}
+.db-mt small{display:block;margin-top:2px;font-size:12.5px;color:var(--ink2)}
+.db-meta u{flex:none;font-size:12.5px;font-weight:700;color:#7633b2;text-decoration:none}
+.db-meta.bateu{background:linear-gradient(135deg,rgba(22,163,74,.1),var(--card) 60%);border-color:rgba(22,163,74,.35)}
+.db-barras{display:flex;align-items:flex-end;gap:8px;height:84px}
+.db-bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0}
+.db-bar i{display:block;width:100%;max-width:30px;border-radius:7px 7px 3px 3px;background:#e4d3f3}
+.db-bar.on i{background:linear-gradient(180deg,#a865e6,#7633b2)}
+.db-bar .db-v{font-size:11px;font-weight:800;color:var(--ink2);min-height:14px}
+.db-bar.on .db-v{color:#7633b2}
+.db-bar small{margin-top:4px;font-size:10.5px;color:var(--ink2);white-space:nowrap}
+.db-rank{padding-bottom:6px}
+.db-rl{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:6px 0;font:inherit;color:var(--ink);text-align:left}
+.db-pos{width:24px;height:24px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;background:#f1e7fa;color:#7633b2}
+.db-rl:first-of-type .db-pos{background:linear-gradient(135deg,#a865e6,#7633b2);color:#fff}
+.db-rn{flex:1;min-width:0}
+.db-rn b{display:block;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.db-rn i{display:block;height:6px;margin-top:4px;border-radius:99px;background:#f1e7fa;overflow:hidden}
+.db-rn em{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#a865e6,#7633b2)}
+.db-rv{flex:none;font-family:'Fraunces',Georgia,serif;font-size:18px;font-weight:600;color:var(--ink)}
+.db-vazio{margin:0 0 6px;font-size:13px;color:var(--ink2)}
+.db-tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.db-tile{position:relative;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:11px 30px 11px 14px;font:inherit;color:var(--ink);box-shadow:0 6px 18px rgba(41,24,56,.06)}
+.db-tile b{display:block;font-family:'Fraunces',Georgia,serif;font-size:26px;font-weight:600;line-height:1.05;color:#7633b2}
+.db-tile.aviso b{color:#c2410c}
+.db-tile small{display:block;margin-top:2px;font-size:12.5px;line-height:1.25;color:var(--ink2)}
+.db-tile svg{position:absolute;right:10px;top:50%;width:16px;height:16px;margin-top:-8px;fill:none;stroke:var(--ink2);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.db-card:active,.db-tile:active,.db-rl:active{transform:scale(.985)}
+html[data-tema="dark"] .db-card,html[data-tema="dark"] .db-tile{box-shadow:none}
+html[data-tema="dark"] .db-bar i,html[data-tema="dark"] .db-rn i,html[data-tema="dark"] .db-pos{background:#2c2236}
+html[data-tema="dark"] .db-pos,html[data-tema="dark"] .db-meta u,html[data-tema="dark"] .db-tile b,html[data-tema="dark"] .db-meta.vazia .db-anel b,html[data-tema="dark"] .db-bar.on .db-v{color:#c49be6}
+html[data-tema="dark"] .db-anel circle.pr{stroke:#c49be6}
+html[data-tema="dark"] .db-tile.aviso b{color:#fb923c}
+.meta-in{display:block;width:100%;height:56px;margin:0 0 14px;border:1px solid var(--line2,var(--line));border-radius:16px;background:var(--soft,#f6f0fb);color:var(--ink);font:inherit;font-size:24px;font-weight:700;text-align:center}
+/* parabéns no fim do cadastro */
+.tela.festa > div{position:relative;overflow:hidden;padding-top:30px}
+.festa-conf{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.festa-conf i{position:absolute;top:-14px;width:8px;height:13px;border-radius:2px;opacity:.95;animation:festaCai 2.6s cubic-bezier(.3,.6,.5,1) both}
+@keyframes festaCai{0%{transform:translateY(0) rotate(var(--r,0deg))}100%{transform:translateY(560px) rotate(calc(var(--r,0deg) + 600deg));opacity:0}}
+.tela .festa-ic{width:84px;height:84px;margin:0 auto 6px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#b06fe8,#7633b2 60%,#5b2491);box-shadow:0 16px 34px -8px rgba(118,51,178,.55);animation:festaPop .6s cubic-bezier(.2,1.4,.4,1) both}
+.tela .festa-ic svg{width:42px;height:42px;fill:#fff;stroke:none;animation:festaBate 1.4s ease-in-out .6s infinite}
+@keyframes festaPop{from{transform:scale(.3);opacity:0}to{transform:none;opacity:1}}
+@keyframes festaBate{0%,100%{transform:scale(1)}15%{transform:scale(1.14)}30%{transform:scale(1)}45%{transform:scale(1.08)}}
+.tela b.festa-t{font-family:'Fraunces',Georgia,serif;font-size:36px;font-weight:600;letter-spacing:-.02em;margin:8px 0 4px;background:linear-gradient(135deg,#9d4fe0,#6a2bae);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tela p.festa-p{font-size:17px;line-height:1.4;color:var(--ink);margin:0 0 6px}
+.tela p.festa-p strong{display:block;margin-top:4px;font-size:18px;color:#7633b2}
+.tela p.festa-s{font-size:13.5px;margin:0 0 18px}
+html[data-tema="dark"] .tela b.festa-t{background:linear-gradient(135deg,#d6b3f5,#a865e6);-webkit-background-clip:text;background-clip:text}
+html[data-tema="dark"] .tela p.festa-p strong{color:#c49be6}
+@media (prefers-reduced-motion:reduce){.festa-conf{display:none}.tela .festa-ic,.tela .festa-ic svg,.db-corpo{animation:none}}
 /* animação de como tirar a foto */
 .tuto-cena{--dur:2.4s;--k:1;position:relative;height:232px;margin:4px 0 10px;border-radius:18px;overflow:hidden;background:radial-gradient(120% 90% at 50% 20%,#f8f3fc,#eadcf5)}
 .tuto-cena.peq{--k:.7;height:160px;margin:0 0 12px}
@@ -1397,7 +1471,7 @@ html[data-tema="dark"] .tuto-pts i.on{background:#c49be6}
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 109;
+  var APP_VERSAO = 110;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1720,28 +1794,68 @@ html[data-tema="dark"] .tuto-pts i.on{background:#c49be6}
     });
   }
   var filtroIni = lsGet('campo_ini_filtro') === 'maes' ? 'maes' : 'parc';
+  /* ---------- Início como painel: números, meta do mês, gráfico e atalhos (as listas ficam nas abas Mães e Parceiros) ---------- */
+  function mesAtualTxt(){ var x = new Date(); return x.getFullYear() + '-' + ('0' + (x.getMonth() + 1)).slice(-2); }
+  function noMes(d){ return String(d || '').slice(0, 7) === mesAtualTxt(); }
+  var MES_NOME = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+  // cadastros por semana (segunda a domingo), das últimas n semanas
+  function porSemana(datas, n){
+    var hj = new Date(); hj.setHours(12, 0, 0, 0); var seg = new Date(hj); seg.setDate(hj.getDate() - (hj.getDay() + 6) % 7);
+    var s = []; for (var i = n - 1; i >= 0; i--){ var a = new Date(seg); a.setDate(seg.getDate() - 7 * i); var b = new Date(a); b.setDate(a.getDate() + 7); s.push({ a: a, b: b, v: 0, rot: i === 0 ? 'esta' : ('0' + a.getDate()).slice(-2) + '/' + ('0' + (a.getMonth() + 1)).slice(-2) }); }
+    datas.forEach(function(d){ if (!d) return; var x = new Date(String(d).slice(0, 10) + 'T12:00:00'); s.forEach(function(w){ if (x >= w.a && x < w.b) w.v++; }); });
+    return s;
+  }
+  function dbGrafico(datas, titulo){
+    var s = porSemana(datas, 6), mx = Math.max(1, Math.max.apply(null, s.map(function(x){ return x.v; }))), tot = s.reduce(function(a, x){ return a + x.v; }, 0);
+    return '<div class="db-card db-graf"><div class="db-cab"><b>' + esc(titulo) + '</b><small>' + tot + ' em 6 semanas</small></div><div class="db-barras">' + s.map(function(x, i){
+      return '<div class="db-bar' + (i === s.length - 1 ? ' on' : '') + '"><span class="db-v">' + (x.v || '') + '</span><i style="height:' + Math.max(6, Math.round(x.v / mx * 100)) + '%"></i><small>' + x.rot + '</small></div>'; }).join('') + '</div></div>';
+  }
+  // meta do mês: quem usa o app escolhe (fica no celular); o anel enche conforme o mês anda
+  function dbMeta(tipo, feito, rot){
+    var meta = +lsGet('campo_meta_' + tipo) || 0, C = 2 * Math.PI * 15.5;
+    if (!meta) return '<button type="button" class="db-card db-meta vazia" data-meta="' + tipo + '"><span class="db-anel"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5"/></svg><b>+</b></span><span class="db-mt"><b>Defina sua meta de ' + MES_NOME[new Date().getMonth()] + '</b><small>' + feito + ' ' + rot + ' até agora</small></span></button>';
+    var p = Math.min(1, feito / meta), bateu = feito >= meta;
+    return '<button type="button" class="db-card db-meta' + (bateu ? ' bateu' : '') + '" data-meta="' + tipo + '"><span class="db-anel"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5"/><circle class="pr" cx="18" cy="18" r="15.5" stroke-dasharray="' + (C * p).toFixed(1) + ' ' + C.toFixed(1) + '"/></svg><b>' + Math.round(p * 100) + '%</b></span>' +
+      '<span class="db-mt"><b>' + (bateu ? 'Meta batida! Parabéns' : 'Meta de ' + MES_NOME[new Date().getMonth()]) + '</b><small>' + feito + ' de ' + meta + ' ' + rot + (bateu ? '' : ' · faltam ' + (meta - feito)) + '</small></span><u>editar</u></button>';
+  }
+  function editarMeta(tipo){
+    var atual = +lsGet('campo_meta_' + tipo) || 0;
+    var t = tela('<b>Meta de ' + MES_NOME[new Date().getMonth()] + '</b><p>' + (tipo === 'parc' ? 'Quantas mães você quer que seus parceiros indiquem neste mês?' : 'Quantas mães você quer cadastrar neste mês?') + '</p>' +
+      '<input id="meta-n" class="meta-in" type="number" inputmode="numeric" min="1" max="999" placeholder="Ex.: 10" value="' + (atual || '') + '"><button id="meta-ok">Salvar a meta</button>' + (atual ? '<button class="sec2" id="meta-tira">Tirar a meta</button>' : '') + '<button class="sec2" id="meta-x">Cancelar</button>');
+    var inp = t.querySelector('#meta-n'); setTimeout(function(){ inp.focus(); inp.select(); }, 60); inp.addEventListener('keydown', function(e){ if (e.key === 'Enter') t.querySelector('#meta-ok').click(); });
+    t.querySelector('#meta-ok').onclick = function(){ var n = Math.round(+inp.value); if (!(n > 0)) return inp.focus(); lsSet('campo_meta_' + tipo, String(Math.min(999, n))); t.remove(); telaInicial(); };
+    if (t.querySelector('#meta-tira')) t.querySelector('#meta-tira').onclick = function(){ lsSet('campo_meta_' + tipo, ''); t.remove(); telaInicial(); };
+    t.querySelector('#meta-x').onclick = function(){ t.remove(); };
+  }
+  function dbAtalho(n, rot, attrs, cls){ return '<button type="button" class="db-tile' + (cls ? ' ' + cls : '') + '" ' + attrs + '><b>' + n + '</b><small>' + rot + '</small><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button>'; }
+  function dbRanking(l){
+    var top = l.slice().sort(function(a, b){ return (+b.indicacoes || 0) - (+a.indicacoes || 0); }).slice(0, 3), mx = Math.max(1, +(top[0] || {}).indicacoes || 0);
+    return '<div class="db-card db-rank"><div class="db-cab"><b>Quem mais indicou</b><small>desde o começo</small></div>' + (top.length && +top[0].indicacoes ? top.map(function(x, i){
+      var n = +x.indicacoes || 0;
+      return '<button type="button" class="db-rl" data-parc="' + esc(x.id) + '"><span class="db-pos">' + (i + 1) + '</span><span class="db-rn"><b>' + esc(nomeParc(x)) + '</b><i><em style="width:' + Math.max(5, Math.round(n / mx * 100)) + '%"></em></i></span><span class="db-rv">' + n + '</span></button>';
+    }).join('') : '<p class="db-vazio">Quando seus parceiros indicarem mães, o ranking aparece aqui.</p>') + '</div>';
+  }
   function vistaProspPainel(){
-    var l = listaProsp(), t = somaProsp(l), r = resumoParceiro(clientesPainel()), primeiro = String((quem && quem.nome) || '').trim().split(/\s+/)[0];
-    var cl = clientesPainel().slice().sort(function(a, b){ return String(b.cadastro || '').localeCompare(String(a.cadastro || '')); });
+    var l = listaProsp(), t = somaProsp(l), cl = clientesPainel(), rede = maesDaRede().filter(function(m){ return !m.desqualificada; }), todas = cl.concat(rede), r = resumoParceiro(todas), maesV = filtroIni === 'maes';
     $('vista').classList.add('inicio');
-    $('vista').innerHTML =
-      '<div class="pm-ola"><h2>' + saudacao() + (nomeSaudacao() ? ', ' + esc(nomeSaudacao()) : '') + '</h2><span>' + hojeTxt() + '</span></div>' +
-      '<div class="pm-hero"><small>Parceiros que você trouxe</small><div class="pm-num">' + l.length + '</div><p>' + (l.length === 1 ? 'parceiro na sua rede' : 'parceiros na sua rede') + '</p>' +
-        '<div class="pm-trio"><span><b>' + t.ind + '</b>indicações</span><span><b>' + t.con + '</b>contratos</span><span><b>' + t.cnc + '</b>concedidos</span></div></div>' +
-      (false ? '<button type="button" class="pm-alerta" data-ir="maes"><span class="n">' + r.pend + '</span><span><b>' + (r.pend === 1 ? 'mãe sua com documento faltando' : 'mães suas com documento faltando') + '</b><small>Toque para ver quais e completar</small></span></button>' : '') +
-      // filtro Parceiros | Mães e, embaixo, a lista escolhida (cadastrar fica no botão Novo)
-      '<div class="seg-ini" role="group" aria-label="Mostrar"><button type="button" data-ini="parc" aria-pressed="' + (filtroIni !== 'maes') + '">Parceiros<b>' + l.length + '</b></button><button type="button" data-ini="maes" aria-pressed="' + (filtroIni === 'maes') + '">Mães<b>' + cl.length + '</b></button></div>' +
-      (filtroIni !== 'maes'
-        ? (l.length ? '<div class="pm-lista" data-mais-ir="clientes" data-mais-txt="Ver todos os ' + l.length + ' parceiros">' + l.slice(0, 8).map(linhaParc).join('') + '</div>' + (l.length > 8 ? '<button type="button" class="pm-mais" data-ir="clientes">Ver todos os ' + l.length + ' parceiros</button>' : '')
-                    : '<div class="pm-vazio"><b>Sua rede começa aqui</b>Toque no <b style="display:inline;font-size:inherit">+</b> para cadastrar o primeiro parceiro.</div>')
-        : (cl.length ? '<div class="pm-lista" data-mais-ir="maes" data-mais-txt="Ver todas as ' + cl.length + ' mães">' + cl.slice(0, 8).map(linhaMae).join('') + '</div>' + (cl.length > 8 ? '<button type="button" class="pm-mais" data-ir="maes">Ver todas as ' + cl.length + ' mães</button>' : '')
-                     : '<div class="pm-vazio"><b>Nenhuma mãe ainda</b>Toque no <b style="display:inline;font-size:inherit">+</b> para cadastrar uma mãe.</div>') +
-          (maesDaRede().length ? '<button type="button" class="pm-mais" data-maes-rede>Mães dos seus parceiros · ' + maesDaRede().length + '</button>' : ''));
+    var seg = '<div class="seg-ini" role="group" aria-label="Mostrar"><button type="button" data-ini="parc" aria-pressed="' + !maesV + '">Parceiros<b>' + l.length + '</b></button><button type="button" data-ini="maes" aria-pressed="' + maesV + '">Mães<b>' + todas.length + '</b></button></div>';
+    var corpo = !maesV
+      ? '<div class="pm-hero"><small>Sua rede</small><div class="pm-num">' + l.length + '</div><p>' + (l.length === 1 ? 'parceiro cadastrado' : 'parceiros cadastrados') + '</p>' +
+          '<div class="pm-trio"><span><b>' + t.ind + '</b>indicações</span><span><b>' + t.con + '</b>contratos</span><span><b>' + t.cnc + '</b>concedidos</span></div></div>' +
+        dbMeta('parc', rede.filter(function(m){ return noMes(m.cadastro); }).length, 'indicações no mês') +
+        dbRanking(l) +
+        '<div class="db-tiles db-opc">' + dbAtalho(l.filter(function(x){ return noMes(x.criadoEm); }).length, 'parceiros novos no mês', 'data-ir="clientes"') + dbAtalho(l.filter(function(x){ return !(+x.indicacoes); }).length, 'ainda sem indicação', 'data-ir="clientes"', 'aviso') + '</div>'
+      : '<div class="pm-hero"><small>Mães</small><div class="pm-num">' + todas.length + '</div><p>' + cl.length + (cl.length === 1 ? ' sua' : ' suas') + ' · ' + rede.length + ' dos seus parceiros</p>' +
+          '<div class="pm-trio"><span><b>' + r.and + '</b>em andamento</span><span><b>' + r.pend + '</b>com pendência</span><span><b>' + r.ok + '</b>deram certo</span></div></div>' +
+        dbMeta('maes', todas.filter(function(m){ return noMes(m.cadastro); }).length, 'mães no mês') +
+        dbGrafico(todas.map(function(m){ return m.cadastro; }), 'Cadastros por semana') +
+        '<div class="db-tiles db-opc">' + dbAtalho(cl.filter(function(c){ return faltas(c).length; }).length, 'suas com pendência', 'data-ir="maes" data-filtro="faltam"', 'aviso') + dbAtalho(rede.length, 'mães dos parceiros', 'data-maes-rede') + '</div>';
+    $('vista').innerHTML = '<div class="pm-ola"><h2>' + saudacao() + (nomeSaudacao() ? ', ' + esc(nomeSaudacao()) : '') + '</h2><span>' + hojeTxt() + '</span></div>' + seg + '<div class="db-corpo">' + corpo + '</div>';
     $('vista').onclick = function(e){
-      var fi = e.target.closest('[data-ini]'); if (fi){ filtroIni = fi.dataset.ini; lsSet('campo_ini_filtro', filtroIni); return telaInicial(); }
-      var cm = e.target.closest('[data-cli]'); if (cm) return fichaCli(cm.dataset.cli);
+      var fi = e.target.closest('[data-ini]'); if (fi){ if (fi.dataset.ini === filtroIni) return; filtroIni = fi.dataset.ini; lsSet('campo_ini_filtro', filtroIni); return telaInicial(); }
+      var mt = e.target.closest('[data-meta]'); if (mt) return editarMeta(mt.dataset.meta);
       if (e.target.closest('[data-maes-rede]')) return telaMaesRede();
-      var ir = e.target.closest('[data-ir]'); if (ir) return irPara(ir.dataset.ir);
+      var ir = e.target.closest('[data-ir]'); if (ir){ if (ir.dataset.filtro){ filtroCli = ir.dataset.filtro; buscaCli = ''; } return irPara(ir.dataset.ir); }
       var p = e.target.closest('[data-parc]'); if (p) return fichaParceiro(p.dataset.parc);
     };
     avisoFila(); depoisDoInicio();
@@ -2764,7 +2878,7 @@ html[data-tema="dark"] .tuto-pts i.on{background:#c49be6}
     // 1) menos linhas na lista (fica pelo menos uma) e o botão "Ver todas"
     while (l && !cabe() && l.children.length > 1){ l.lastElementChild.remove(); mais(); }
     // 2) celular pequeno: sai o que é enfeite ou repetido (cadastrar e ver as mães também estão na barra de baixo)
-    ['.pm-ola span', '.pm-rot-cap', '.pm-acoes'].forEach(function(sel){ if (cabe()) return; var e = v.querySelector(sel); if (e) e.remove(); });
+    ['.pm-ola span', '.pm-rot-cap', '.pm-acoes', '.db-opc'].forEach(function(sel){ if (cabe()) return; var e = v.querySelector(sel); if (e) e.remove(); });
     // 3) ainda não coube: a lista sai e fica só o "Ver todas"
     if (l && !cabe()){ mais(); var t = l.previousElementSibling; if (t && t.classList.contains('pm-rot')) t.remove(); l.remove(); }
     // 4) celular muito pequeno: o Início diminui um pouco para caber inteiro (nunca rola)
@@ -2786,10 +2900,12 @@ html[data-tema="dark"] .tuto-pts i.on{background:#c49be6}
       '<div class="pm-hero"><small>Deram certo</small><div class="pm-num">' + r.ok + '</div><p>' + frase + '</p>' +
         '<div class="pm-trio"><span><b>' + r.total + '</b>enviadas</span><span><b>' + r.and + '</b>em andamento</span><span><b>' + r.pend + '</b>com pendência</span></div></div>' +
       (false ? '<button type="button" class="pm-alerta" data-ir="faltam"><span class="n">' + r.pend + '</span><span><b>' + (r.pend === 1 ? 'mãe com documento faltando' : 'mães com documento faltando') + '</b><small>Toque para ver quais e completar</small></span></button>' : '') +
-      (cl.length ? '<div class="pm-rot">Últimas enviadas</div><div class="pm-lista" data-mais-ir="todos" data-mais-txt="Ver todas as ' + cl.length + ' mães">' + cl.slice(0, 8).map(linhaMae).join('') + '</div>' + (cl.length > 8 ? '<button type="button" class="pm-mais" data-ir="todos">Ver todas as ' + cl.length + ' mães</button>' : '')
+      (cl.length ? '<div class="db-corpo">' + dbMeta('maes', cl.filter(function(c){ return noMes(c.cadastro); }).length, 'mães no mês') + dbGrafico(cl.map(function(c){ return c.cadastro; }), 'Seus cadastros por semana') +
+          '<div class="db-tiles db-opc">' + dbAtalho(r.pend, 'com pendência', 'data-ir="faltam"', 'aviso') + dbAtalho(cl.filter(function(c){ return noMes(c.cadastro); }).length, 'enviadas neste mês', 'data-ir="todos"') + '</div></div>'
         : '<div class="vazio" style="margin-top:14px">' + (navigator.onLine === false && !painel ? 'Sem internet: o painel aparece quando o celular tiver sinal.' : 'As mães que você cadastrar aparecem aqui. Toque em <b>Novo cadastro</b> para começar.') + '</div>') +
       '';
     $('vista').onclick = function(e){
+      var mt = e.target.closest('[data-meta]'); if (mt) return editarMeta(mt.dataset.meta);
       var k = e.target.closest('[data-ir]'); if (k){ filtroCli = k.dataset.ir; buscaCli = ''; return irPara('clientes'); }
       var c = e.target.closest('[data-cli]'); if (c) fichaCli(c.dataset.cli);
     };
@@ -3101,7 +3217,7 @@ html[data-tema="dark"] .tuto-pts i.on{background:#c49be6}
       var pc = {}; try { pc = JSON.parse(lsGet('campo_completar') || '{}') || {}; } catch(e){}
       if (Object.keys(pc).length && !confirm('Ainda há dados de um cadastro (endereço ou senha gov.br) esperando internet para chegar ao escritório. Se sair agora, eles serão apagados deste celular. Sair mesmo assim?')) return;
       fotos = {}; local = null; guardarRascunho();
-      ['campo_token', 'campo_quem', 'campo_painel', 'campo_receb', 'campo_aba', 'campo_completando', 'campo_completar', 'campo_pp', 'campo_apelido', 'campo_foto', 'campo_push', 'campo_ini_filtro'].concat(CAMPOS_CADASTRO).forEach(function(k){ lsSet(k, ''); });
+      ['campo_token', 'campo_quem', 'campo_painel', 'campo_receb', 'campo_aba', 'campo_completando', 'campo_completar', 'campo_pp', 'campo_apelido', 'campo_foto', 'campo_push', 'campo_ini_filtro', 'campo_meta_maes', 'campo_meta_parc'].concat(CAMPOS_CADASTRO).forEach(function(k){ lsSet(k, ''); });
       token = ''; quem = null; painel = null; receb = null; aba = 'painel';
       senhaGovRascunho = ''; passoNovo = null; completando = null; seqAtiva = false; pp = null; ppSig = ''; painelSig = '';
       pedirLink();
@@ -3247,8 +3363,8 @@ html[data-tema="dark"] .tuto-pts i.on{background:#c49be6}
         var par = parDe(dk.k), outro = par ? (dk.k === par.f ? par.v : par.f) : null, vaiOutro = !!(outro && !fotos[outro]);
         var pv = document.createElement('div'); pv.className = 'cam-prev';
         pv.innerHTML = '<div class="cp-tit">' + esc((par ? par.nome : dk.t) + (dk.lado ? ' · ' + dk.lado.toLowerCase() : '')) + '</div><img alt="" src="' + f.url + '">' +
-          '<p>Dá para ler tudo, sem sombra e sem borrão?</p><div class="cp-bts"><button type="button" class="cp-ok">' + (vaiOutro ? 'Ficou boa · tirar o ' + (outro === par.v ? 'verso' : 'frente') : 'Ficou boa') + '</button>' +
-          '<button type="button" class="cp-denovo">Tirar de novo</button></div>';
+          '<p>Dá para ler tudo, sem sombra e sem borrão?</p><div class="cp-bts"><button type="button" class="cp-ok"><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i><span>' + (vaiOutro ? 'Ficou boa · tirar o ' + (outro === par.v ? 'verso' : 'frente') : 'Ficou boa') + '</span></button>' +
+          '<button type="button" class="cp-denovo"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></svg><span>Tirar de novo</span></button></div>';
         c.appendChild(pv);
         falar('Confira se dá para ler tudo.');
         pv.querySelector('.cp-denovo').onclick = function(){ if (dk.multi && lista.length > 1) lista.pop(); else delete fotos[dk.k]; pv.remove(); retomar(); };
@@ -3772,6 +3888,16 @@ html[data-tema="dark"] .tuto-pts i.on{background:#c49be6}
     carregar(arq).then(function(im){ return usarFoto(d, im); }).catch(function(){ processando(false); alert('Não deu para usar esta foto. Tire de novo.'); });
   });
 
+  // fim do cadastro: parabéns, com confete
+  function festa(nome){
+    var cores = ['#a865e6', '#f472b6', '#facc15', '#4ade80', '#60a5fa', '#fb923c'], conf = '';
+    for (var i = 0; i < 40; i++) conf += '<i style="left:' + (Math.random() * 100).toFixed(1) + '%;background:' + cores[i % cores.length] + ';animation-delay:' + (Math.random() * 0.7).toFixed(2) + 's;animation-duration:' + (1.9 + Math.random() * 1.5).toFixed(2) + 's;--r:' + Math.round(Math.random() * 360) + 'deg' + (i % 3 ? '' : ';width:7px;height:7px;border-radius:50%') + '"></i>';
+    var t = tela('<div class="festa-conf" aria-hidden="true">' + conf + '</div><div class="festa-ic"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9.2-9A5 5 0 0 1 12 5.6 5 5 0 0 1 21.2 11C19 15.6 12 20 12 20z"/></svg></div>' +
+      '<b class="festa-t">Parabéns!</b><p class="festa-p">Mais uma mãezinha que será amparada' + (nome ? '<strong>' + esc(nome) + '</strong>' : '.') + '</p>' +
+      '<p class="festa-s">O cadastro já está indo para o escritório: acompanhe na barra embaixo.</p><button id="t-ok">Cadastrar a próxima</button>');
+    t.classList.add('festa'); falar('Parabéns! Mais uma mãezinha que será amparada.');
+    return t;
+  }
   function tela(html){ var t = document.createElement('div'); t.className = 'tela'; t.innerHTML = '<div>' + html + '</div>'; document.body.appendChild(t); return t; }
 
   function enviar(){
@@ -3889,7 +4015,7 @@ html[data-tema="dark"] .tuto-pts i.on{background:#c49be6}
        if (comp){ completando = null; lsSet('campo_completando', ''); if (painel) painel.clientes.forEach(function(c){ if (c.id === comp.id) c.faltaDocs = comp.faltaDocs.filter(function(k){ return envio.docs.indexOf(k) < 0; }); }); }
        else { CAMPOS_CADASTRO.forEach(function(k){ lsSet(k, ''); }); senhaGovRascunho = ''; passoNovo = null; seqAtiva = false; }
        t.remove(); aba = comp ? 'painel' : 'novo'; telaInicial(); window.scrollTo(0, 0); if ($('vista')) $('vista').scrollTop = 0;
-       var ok = tela('<svg viewBox="0 0 24 24" style="stroke:var(--ok)"><use href="#i-ok"/></svg><b>' + (comp ? 'Documentos guardados' : 'Cadastro guardado') + '</b><p>' + esc(envio.cliente || '') + '<br>' + (comp ? 'Vão para a pasta da cliente sozinhos quando tiver internet.' : 'Está sendo enviado agora: acompanhe na barra embaixo. Pode cadastrar a próxima cliente.') + '</p><button id="t-ok">' + (comp ? 'Entendi' : 'Cadastrar a próxima') + '</button>');
+       var ok = comp ? tela('<svg viewBox="0 0 24 24" style="stroke:var(--ok)"><use href="#i-ok"/></svg><b>Documentos guardados</b><p>' + esc(envio.cliente || '') + '<br>Vão para a pasta da cliente sozinhos quando tiver internet.</p><button id="t-ok">Entendi</button>') : festa(envio.cliente || '');
        ok.querySelector('#t-ok').onclick = function(){ ok.remove(); };
        proximo();
      })
