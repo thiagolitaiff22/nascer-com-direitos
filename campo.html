@@ -1278,47 +1278,55 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
 .tela .sq-perg{margin:2px 0 16px;font-size:17px;line-height:1.4;color:var(--ink)}
 .tela button.sq-parar{background:transparent;color:var(--ink2);border:0;height:44px;font-size:15px;text-decoration:underline;text-underline-offset:3px}
 /* animação de como tirar a foto */
-.tuto-cena{--dur:2.2s;--k:1;position:relative;height:200px;margin:4px 0 12px;border-radius:18px;overflow:hidden;background:radial-gradient(120% 90% at 50% 20%,#f8f3fc,#eadcf5)}
-.tuto-cena.peq{--k:.7;height:150px;margin:0 0 12px}
-.tuto-in{position:absolute;inset:0;transform:scale(var(--k));transform-origin:50% 50%}
-.tuto-cena.peq .tuto-in{inset:0}
-.tuto-doc{position:absolute;left:50%;top:50%;width:132px;height:84px;margin:-42px 0 0 -66px;border-radius:9px;background:#fff;box-shadow:0 8px 18px rgba(41,24,56,.16);transform:rotate(-4deg)}
-.tuto-doc::before{content:"";position:absolute;left:10px;top:12px;width:30px;height:38px;border-radius:5px;background:#e9dcf5}
-.tuto-doc::after{content:"";position:absolute;left:50px;right:12px;top:16px;height:44px;background:repeating-linear-gradient(180deg,#d9c8ea 0 6px,transparent 6px 13px)}
-.tuto-cel{position:absolute;left:50%;top:50%;width:118px;height:196px;margin:-98px 0 0 -59px;border:5px solid #2a1d38;border-radius:22px;box-shadow:0 14px 30px rgba(41,24,56,.28);animation:tutoCel var(--dur) ease-in-out infinite}
-.tuto-mold{position:absolute;left:50%;top:50%;width:96px;height:62px;margin:-31px 0 0 -48px;border:2.5px dashed rgba(255,255,255,.95);border-radius:7px;animation:tutoMold var(--dur) ease-in-out infinite}
-.tuto-flash{position:absolute;inset:0;border-radius:17px;background:#fff;opacity:0;animation:tutoFlash var(--dur) ease-in-out infinite}
-.tuto-ok{position:absolute;right:14px;top:14px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#16a34a;color:#fff;font-weight:800;font-size:20px;opacity:0;transform:scale(.6);animation:tutoOk var(--dur) ease-in-out infinite}
-.tuto-leg{display:block;margin:-4px 0 8px;text-align:center;font-size:15px;font-weight:800;color:#4c1c82}
+.tuto-cena{--dur:2.8s;--k:1;position:relative;height:232px;margin:4px 0 10px;border-radius:18px;overflow:hidden;background:radial-gradient(120% 90% at 50% 20%,#f8f3fc,#eadcf5)}
+.tuto-cena.peq{--k:.7;height:160px;margin:0 0 12px}
+.tuto-in{position:absolute;inset:0;transform:scale(var(--k));transform-origin:50% 50%;perspective:700px}
+.tuto-leg{display:block;margin:-2px 0 8px;text-align:center;font-size:15px;font-weight:800;color:#4c1c82}
 .tuto-pts{display:flex;justify-content:center;gap:6px;margin:4px 0 12px}
 .tuto-pts i{width:7px;height:7px;border-radius:50%;background:#e2d3f0}
 .tuto-pts i.on{background:#7633b2;width:18px;border-radius:4px}
-/* RG: verde-claro, com a foto */
-.tuto-cena[data-doc="rg"] .tuto-doc{background:linear-gradient(180deg,#d7ecdf 0 22%,#eef7f1 22%)}
-.tuto-cena[data-doc="rg"] .tuto-doc::before{top:24px;background:#b9d9c6}
-.tuto-cena[data-doc="rg"] .tuto-doc::after{top:28px;height:42px;background:repeating-linear-gradient(180deg,#b9d3c3 0 5px,transparent 5px 11px)}
-/* CPF: cartão azul, menor */
-.tuto-cena[data-doc="cpf"] .tuto-doc{width:120px;height:76px;margin:-38px 0 0 -60px;background:linear-gradient(135deg,#dbe7fb,#c6d8f6)}
-.tuto-cena[data-doc="cpf"] .tuto-doc::before{left:12px;top:12px;width:22px;height:22px;border-radius:50%;background:#9db8e6}
-.tuto-cena[data-doc="cpf"] .tuto-doc::after{left:12px;right:12px;top:42px;height:24px;background:repeating-linear-gradient(180deg,#a9c0e8 0 5px,transparent 5px 11px)}
-/* título de eleitor: papel claro com faixa verde */
-.tuto-cena[data-doc="titulo"] .tuto-doc{background:linear-gradient(180deg,#cfe6c4 0 18%,#f6f4e8 18%)}
-.tuto-cena[data-doc="titulo"] .tuto-doc::before{display:none}
-.tuto-cena[data-doc="titulo"] .tuto-doc::after{left:12px;top:24px;height:48px;background:repeating-linear-gradient(180deg,#d8d2b6 0 5px,transparent 5px 11px)}
-/* comprovante de residência e provas: folha em pé (conta de luz, água…), moldura em pé */
-.tuto-cena[data-doc="folha"] .tuto-doc{width:92px;height:126px;margin:-63px 0 0 -46px;border-radius:5px;background:linear-gradient(180deg,#e9dcf5 0 16%,#fff 16%)}
-.tuto-cena[data-doc="folha"] .tuto-doc::before{left:auto;right:10px;top:26px;width:28px;height:14px;border-radius:3px;background:#f3c4c4}
-.tuto-cena[data-doc="folha"] .tuto-doc::after{left:10px;right:10px;top:48px;height:68px;background:repeating-linear-gradient(180deg,#e2d6ee 0 5px,transparent 5px 11px)}
-.tuto-cena[data-doc="folha"] .tuto-mold{width:80px;height:112px;margin:-56px 0 0 -40px}
-@keyframes tutoCel{0%,8%{transform:translate(64px,70px) rotate(20deg);background:rgba(42,29,56,.06)}42%,100%{transform:translate(0,0) rotate(-4deg);background:rgba(42,29,56,.10)}}
-@keyframes tutoMold{0%,48%{border-color:rgba(255,255,255,.95);border-style:dashed;transform:rotate(0)}56%,100%{border-color:#22c55e;border-style:solid;box-shadow:0 0 0 3px rgba(34,197,94,.25)}}
-@keyframes tutoFlash{0%,62%{opacity:0}66%{opacity:.85}74%,100%{opacity:0}}
-@keyframes tutoOk{0%,70%{opacity:0;transform:scale(.6)}78%,94%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1)}}
-@keyframes tutoDoc{0%,100%{transform:rotate(-4deg)}}
+/* o documento é um cartão com frente e verso, um pouco torto na mesa */
+.tuto-doc{position:absolute;left:50%;top:50%;width:104px;height:68px;margin:-34px 0 0 -52px;transform:rotate(-4deg);transform-style:preserve-3d}
+.tuto-doc i{position:absolute;inset:0;border-radius:8px;-webkit-backface-visibility:hidden;backface-visibility:hidden;box-shadow:0 8px 16px rgba(41,24,56,.16);overflow:hidden}
+.tuto-doc i::before,.tuto-doc i::after{content:"";position:absolute}
+/* RG: frente com a foto e os dados; verso com a digital */
+.tuto-doc i.fr{background:linear-gradient(180deg,#cfe7d8 0 22%,#eef7f1 22%)}
+.tuto-doc i.fr::before{left:8px;top:20px;width:24px;height:32px;border-radius:4px;background:#b3d6c1}
+.tuto-doc i.fr::after{left:40px;right:9px;top:22px;height:36px;background:repeating-linear-gradient(180deg,#b6d1c1 0 4px,transparent 4px 9px)}
+.tuto-doc i.vs{transform:rotateY(180deg);background:linear-gradient(180deg,#eef7f1 0 78%,#cfe7d8 78%)}
+.tuto-doc i.vs::before{right:10px;top:12px;width:20px;height:26px;border-radius:50% 50% 46% 46%;background:repeating-radial-gradient(circle at 50% 75%,#9fc8b0 0 1.4px,transparent 1.4px 3.4px)}
+.tuto-doc i.vs::after{left:9px;right:38px;top:12px;height:34px;background:repeating-linear-gradient(180deg,#b6d1c1 0 4px,transparent 4px 9px)}
+/* CPF: cartão azul, um pouco menor */
+[data-doc="cpf"] .tuto-doc{width:96px;height:62px;margin:-31px 0 0 -48px}
+[data-doc="cpf"] .tuto-doc i.fr{background:linear-gradient(135deg,#dbe7fb,#c6d8f6)}
+[data-doc="cpf"] .tuto-doc i.fr::before{left:9px;top:9px;width:18px;height:18px;border-radius:50%;background:#9db8e6}
+[data-doc="cpf"] .tuto-doc i.fr::after{left:9px;right:9px;top:34px;height:20px;background:repeating-linear-gradient(180deg,#a9c0e8 0 4px,transparent 4px 9px)}
+/* o celular chega por cima e o quadro (do tamanho do documento) encaixa exatamente na borda dele */
+.tuto-cel{position:absolute;left:50%;top:50%;width:132px;height:220px;margin:-110px 0 0 -66px;border:5px solid #2a1d38;border-radius:24px;background:rgba(42,29,56,.07);box-shadow:0 14px 30px rgba(41,24,56,.28);animation:tutoCel var(--dur) ease-in-out infinite}
+.tuto-mold{position:absolute;left:50%;top:50%;width:112px;height:76px;margin:-38px 0 0 -56px;border:2.5px dashed rgba(255,255,255,.95);border-radius:11px;animation:tutoMold var(--dur) ease-in-out infinite}
+[data-doc="cpf"] .tuto-mold{width:104px;height:70px;margin:-35px 0 0 -52px}
+.tuto-flash{position:absolute;inset:0;border-radius:19px;background:#fff;opacity:0;animation:tutoFlash var(--dur) ease-in-out infinite}
+.tuto-ok{position:absolute;right:14px;top:14px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#16a34a;color:#fff;font-weight:800;font-size:20px;opacity:0;transform:scale(.6);animation:tutoOk var(--dur) ease-in-out infinite}
+@keyframes tutoCel{0%,6%{transform:translate(72px,84px) rotate(22deg)}46%,100%{transform:translate(0,0) rotate(-4deg)}}
+@keyframes tutoMold{0%,52%{border-color:rgba(255,255,255,.95);border-style:dashed;box-shadow:none}58%,100%{border-color:#22c55e;border-style:solid;box-shadow:0 0 0 3px rgba(34,197,94,.25)}}
+@keyframes tutoFlash{0%,64%{opacity:0}68%{opacity:.85}76%,100%{opacity:0}}
+@keyframes tutoOk{0%,72%{opacity:0;transform:scale(.6)}80%,96%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1)}}
+/* RG verso: o RG vira, depois o celular chega, encaixa e tira a foto */
+[data-doc="rgv"]{--dur:3.6s}
+[data-doc="rgv"] .tuto-doc{animation:tutoVira var(--dur) ease-in-out infinite}
+[data-doc="rgv"] .tuto-cel{animation-name:tutoCelV}
+[data-doc="rgv"] .tuto-mold{animation-name:tutoMoldV}
+[data-doc="rgv"] .tuto-flash{animation-name:tutoFlashV}
+[data-doc="rgv"] .tuto-ok{animation-name:tutoOkV}
+@keyframes tutoVira{0%,8%{transform:rotate(-4deg) rotateY(0)}30%,100%{transform:rotate(-4deg) rotateY(180deg)}}
+@keyframes tutoCelV{0%,32%{transform:translate(72px,84px) rotate(22deg);opacity:0}38%{opacity:1}64%,100%{transform:translate(0,0) rotate(-4deg);opacity:1}}
+@keyframes tutoMoldV{0%,68%{border-color:rgba(255,255,255,.95);border-style:dashed;box-shadow:none}73%,100%{border-color:#22c55e;border-style:solid;box-shadow:0 0 0 3px rgba(34,197,94,.25)}}
+@keyframes tutoFlashV{0%,77%{opacity:0}81%{opacity:.85}87%,100%{opacity:0}}
+@keyframes tutoOkV{0%,84%{opacity:0;transform:scale(.6)}90%,98%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1)}}
 .tuto-passos{margin:0 0 14px;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;text-align:left}
 .tuto-passos li{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.4;color:var(--ink)}
 .tuto-passos li b{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#efe4f8;color:#7633b2;font-size:13px;margin:0}
-@media (prefers-reduced-motion:reduce){.tuto-cel,.tuto-mold,.tuto-flash,.tuto-ok{animation:none}.tuto-cel{transform:rotate(-4deg)}.tuto-mold{border-color:#22c55e;border-style:solid}}
+@media (prefers-reduced-motion:reduce){.tuto-cel,.tuto-mold,.tuto-flash,.tuto-ok,.tuto-doc{animation:none!important}.tuto-cel{transform:rotate(-4deg)}.tuto-mold{border-color:#22c55e;border-style:solid}[data-doc="rgv"] .tuto-doc{transform:rotate(-4deg) rotateY(180deg)}}
 .tela .tuto-leg{display:block;margin:0}
 </style>
 <link rel="preload" as="image" href="img/marca-suave.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
@@ -1364,7 +1372,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 104;
+  var APP_VERSAO = 105;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -3586,11 +3594,12 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   }
   function seqDepois(){ if (seqAtiva) setTimeout(seqContinuar, 120); }
   // desenho animado de um documento: o celular chega por cima, a moldura fica verde e a foto é tirada
-  var TUTO_DOCS = [['rg', 'RG · frente e verso'], ['cpf', 'CPF']];
+  // cenas do vídeo: RG frente, RG verso (ele vira) e CPF; o tempo de cada uma acompanha a animação dela
+  var TUTO_DOCS = [['rg', 'RG · frente', 2800], ['rgv', 'RG · verso', 3600], ['cpf', 'CPF', 2800]];
   function tutoDocs(){ return TUTO_DOCS; }
   var TUTO_DE = { rg: 'rg', cpf: 'cpf', titulo: 'titulo', residencia: 'folha', rural: 'folha' };
   function tutoCena(tipo, legenda, peq){
-    return '<div class="tuto-cena' + (peq ? ' peq' : '') + '" data-doc="' + tipo + '" aria-hidden="true"><div class="tuto-in"><div class="tuto-doc"></div><div class="tuto-cel"><span class="tuto-mold"></span><span class="tuto-flash"></span></div></div><span class="tuto-ok">✓</span></div>' +
+    return '<div class="tuto-cena' + (peq ? ' peq' : '') + '" data-doc="' + tipo + '" aria-hidden="true"><div class="tuto-in"><div class="tuto-doc"><i class="fr"></i><i class="vs"></i></div><div class="tuto-cel"><span class="tuto-mold"></span><span class="tuto-flash"></span></div></div><span class="tuto-ok">✓</span></div>' +
       (legenda ? '<span class="tuto-leg">' + esc(legenda) + '</span>' : '');   // o nome fica embaixo do desenho, fora da animação
   }
   // animação curtinha de como tirar a foto, passando por todos os documentos (aparece sozinha na primeira foto; depois, no "Como tirar a foto")
@@ -3599,14 +3608,19 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     var t = tela('<div id="tuto-palco">' + tutoCena(TD[0][0], TD[0][1]) + '</div><div class="tuto-pts">' + TD.map(function(x, i){ return '<i' + (i ? '' : ' class="on"') + '></i>'; }).join('') + '</div>' +
       '<b>Como tirar a foto</b><ol class="tuto-passos"><li><b>1</b>Documento em cima de uma mesa, com luz e sem reflexo</li><li><b>2</b>Celular reto, por cima do documento</li><li><b>3</b>Encaixe no quadro: quando a linha ficar verde, toque no botão</li></ol>' +
       '<button id="tuto-ok">' + (depois ? 'Entendi, abrir a câmera' : 'Entendi') + '</button>');
-    // troca de documento a cada volta da animação (recria o desenho para a animação recomeçar)
-    var n = 0, troca = setInterval(function(){
-      if (!t.isConnected || n >= TD.length - 1){ clearInterval(troca); return; }
-      n++;
-      t.querySelector('#tuto-palco').innerHTML = tutoCena(TD[n][0], TD[n][1]);
-      Array.prototype.forEach.call(t.querySelectorAll('.tuto-pts i'), function(p, i){ p.className = i === n ? 'on' : ''; });
-    }, 2200);
-    t.querySelector('#tuto-ok').onclick = function(){ clearInterval(troca); lsSet('campo_tuto_foto', '1'); t.remove(); if (depois) depois(); };
+    // passa uma vez por cada cena (recria o desenho para a animação recomeçar) e para na última
+    var n = 0, troca = null;
+    var proxima = function(){
+      troca = setTimeout(function(){
+        if (!t.isConnected || n >= TD.length - 1) return;
+        n++;
+        t.querySelector('#tuto-palco').innerHTML = tutoCena(TD[n][0], TD[n][1]);
+        Array.prototype.forEach.call(t.querySelectorAll('.tuto-pts i'), function(p, i){ p.className = i === n ? 'on' : ''; });
+        proxima();
+      }, TD[n][2] || 2800);
+    };
+    proxima();
+    t.querySelector('#tuto-ok').onclick = function(){ clearTimeout(troca); lsSet('campo_tuto_foto', '1'); t.remove(); if (depois) depois(); };
   }
   // o bloco dos documentos no fim do cadastro: um botão (antes de começar) ou a lista do que já foi feito e das pendências
   function seqPainel(){
