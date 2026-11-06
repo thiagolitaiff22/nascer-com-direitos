@@ -1278,7 +1278,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
 .tela .sq-perg{margin:2px 0 16px;font-size:17px;line-height:1.4;color:var(--ink)}
 .tela button.sq-parar{background:transparent;color:var(--ink2);border:0;height:44px;font-size:15px;text-decoration:underline;text-underline-offset:3px}
 /* animação de como tirar a foto */
-.tuto-cena{--dur:2.8s;--k:1;position:relative;height:232px;margin:4px 0 10px;border-radius:18px;overflow:hidden;background:radial-gradient(120% 90% at 50% 20%,#f8f3fc,#eadcf5)}
+.tuto-cena{--dur:2.4s;--k:1;position:relative;height:232px;margin:4px 0 10px;border-radius:18px;overflow:hidden;background:radial-gradient(120% 90% at 50% 20%,#f8f3fc,#eadcf5)}
 .tuto-cena.peq{--k:.7;height:160px;margin:0 0 12px}
 .tuto-in{position:absolute;inset:0;transform:scale(var(--k));transform-origin:50% 50%;perspective:700px}
 .tuto-leg{display:block;margin:-2px 0 8px;text-align:center;font-size:15px;font-weight:800;color:#4c1c82}
@@ -1297,14 +1297,17 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
 .tuto-doc i.vs::before{right:10px;top:12px;width:20px;height:26px;border-radius:50% 50% 46% 46%;background:repeating-radial-gradient(circle at 50% 75%,#9fc8b0 0 1.4px,transparent 1.4px 3.4px)}
 .tuto-doc i.vs::after{left:9px;right:38px;top:12px;height:34px;background:repeating-linear-gradient(180deg,#b6d1c1 0 4px,transparent 4px 9px)}
 /* CPF: cartão azul, um pouco menor */
-[data-doc="cpf"] .tuto-doc{width:96px;height:62px;margin:-31px 0 0 -48px}
-[data-doc="cpf"] .tuto-doc i.fr{background:linear-gradient(135deg,#dbe7fb,#c6d8f6)}
-[data-doc="cpf"] .tuto-doc i.fr::before{left:9px;top:9px;width:18px;height:18px;border-radius:50%;background:#9db8e6}
-[data-doc="cpf"] .tuto-doc i.fr::after{left:9px;right:9px;top:34px;height:20px;background:repeating-linear-gradient(180deg,#a9c0e8 0 4px,transparent 4px 9px)}
+[data-doc="cpf"] .tuto-doc,[data-doc="cpfv"] .tuto-doc{width:96px;height:62px;margin:-31px 0 0 -48px}
+[data-doc="cpf"] .tuto-doc i.fr,[data-doc="cpfv"] .tuto-doc i.fr{background:linear-gradient(135deg,#dbe7fb,#c6d8f6)}
+[data-doc="cpf"] .tuto-doc i.fr::before,[data-doc="cpfv"] .tuto-doc i.fr::before{left:9px;top:9px;width:18px;height:18px;border-radius:50%;background:#9db8e6}
+[data-doc="cpf"] .tuto-doc i.fr::after,[data-doc="cpfv"] .tuto-doc i.fr::after{left:9px;right:9px;top:34px;height:20px;background:repeating-linear-gradient(180deg,#a9c0e8 0 4px,transparent 4px 9px)}
+[data-doc="cpfv"] .tuto-doc i.vs{background:linear-gradient(135deg,#c9daf7,#dde8fb)}
+[data-doc="cpfv"] .tuto-doc i.vs::before{right:auto;left:9px;top:10px;width:44px;height:8px;border-radius:3px;background:#a9c0e8}
+[data-doc="cpfv"] .tuto-doc i.vs::after{left:9px;right:9px;top:26px;height:26px;background:repeating-linear-gradient(180deg,#b3c8ec 0 4px,transparent 4px 9px)}
 /* o celular chega por cima e o quadro (do tamanho do documento) encaixa exatamente na borda dele */
 .tuto-cel{position:absolute;left:50%;top:50%;width:132px;height:220px;margin:-110px 0 0 -66px;border:5px solid #2a1d38;border-radius:24px;background:rgba(42,29,56,.07);box-shadow:0 14px 30px rgba(41,24,56,.28);animation:tutoCel var(--dur) ease-in-out infinite}
 .tuto-mold{position:absolute;left:50%;top:50%;width:112px;height:76px;margin:-38px 0 0 -56px;border:2.5px dashed rgba(255,255,255,.95);border-radius:11px;animation:tutoMold var(--dur) ease-in-out infinite}
-[data-doc="cpf"] .tuto-mold{width:104px;height:70px;margin:-35px 0 0 -52px}
+[data-doc="cpf"] .tuto-mold,[data-doc="cpfv"] .tuto-mold{width:104px;height:70px;margin:-35px 0 0 -52px}
 .tuto-flash{position:absolute;inset:0;border-radius:19px;background:#fff;opacity:0;animation:tutoFlash var(--dur) ease-in-out infinite}
 .tuto-ok{position:absolute;right:14px;top:14px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#16a34a;color:#fff;font-weight:800;font-size:20px;opacity:0;transform:scale(.6);animation:tutoOk var(--dur) ease-in-out infinite}
 @keyframes tutoCel{0%,6%{transform:translate(72px,84px) rotate(22deg)}46%,100%{transform:translate(0,0) rotate(-4deg)}}
@@ -1312,12 +1315,12 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
 @keyframes tutoFlash{0%,64%{opacity:0}68%{opacity:.85}76%,100%{opacity:0}}
 @keyframes tutoOk{0%,72%{opacity:0;transform:scale(.6)}80%,96%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1)}}
 /* RG verso: o RG vira, depois o celular chega, encaixa e tira a foto */
-[data-doc="rgv"]{--dur:3.6s}
-[data-doc="rgv"] .tuto-doc{animation:tutoVira var(--dur) ease-in-out infinite}
-[data-doc="rgv"] .tuto-cel{animation-name:tutoCelV}
-[data-doc="rgv"] .tuto-mold{animation-name:tutoMoldV}
-[data-doc="rgv"] .tuto-flash{animation-name:tutoFlashV}
-[data-doc="rgv"] .tuto-ok{animation-name:tutoOkV}
+[data-doc="rgv"],[data-doc="cpfv"]{--dur:3.2s}
+[data-doc="rgv"] .tuto-doc,[data-doc="cpfv"] .tuto-doc{animation:tutoVira var(--dur) ease-in-out infinite}
+[data-doc="rgv"] .tuto-cel,[data-doc="cpfv"] .tuto-cel{animation-name:tutoCelV}
+[data-doc="rgv"] .tuto-mold,[data-doc="cpfv"] .tuto-mold{animation-name:tutoMoldV}
+[data-doc="rgv"] .tuto-flash,[data-doc="cpfv"] .tuto-flash{animation-name:tutoFlashV}
+[data-doc="rgv"] .tuto-ok,[data-doc="cpfv"] .tuto-ok{animation-name:tutoOkV}
 @keyframes tutoVira{0%,8%{transform:rotate(-4deg) rotateY(0)}30%,100%{transform:rotate(-4deg) rotateY(180deg)}}
 @keyframes tutoCelV{0%,32%{transform:translate(72px,84px) rotate(22deg);opacity:0}38%{opacity:1}64%,100%{transform:translate(0,0) rotate(-4deg);opacity:1}}
 @keyframes tutoMoldV{0%,68%{border-color:rgba(255,255,255,.95);border-style:dashed;box-shadow:none}73%,100%{border-color:#22c55e;border-style:solid;box-shadow:0 0 0 3px rgba(34,197,94,.25)}}
@@ -1326,7 +1329,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
 .tuto-passos{margin:0 0 14px;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;text-align:left}
 .tuto-passos li{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.4;color:var(--ink)}
 .tuto-passos li b{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#efe4f8;color:#7633b2;font-size:13px;margin:0}
-@media (prefers-reduced-motion:reduce){.tuto-cel,.tuto-mold,.tuto-flash,.tuto-ok,.tuto-doc{animation:none!important}.tuto-cel{transform:rotate(-4deg)}.tuto-mold{border-color:#22c55e;border-style:solid}[data-doc="rgv"] .tuto-doc{transform:rotate(-4deg) rotateY(180deg)}}
+@media (prefers-reduced-motion:reduce){.tuto-cel,.tuto-mold,.tuto-flash,.tuto-ok,.tuto-doc{animation:none!important}.tuto-cel{transform:rotate(-4deg)}.tuto-mold{border-color:#22c55e;border-style:solid}[data-doc="rgv"] .tuto-doc,[data-doc="cpfv"] .tuto-doc{transform:rotate(-4deg) rotateY(180deg)}}
 .tela .tuto-leg{display:block;margin:0}
 </style>
 <link rel="preload" as="image" href="img/marca-suave.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><script>try{var t=localStorage.getItem("nascer_tema");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-tema",t);}catch(e){document.documentElement.setAttribute("data-tema","light");}</script>
@@ -1372,7 +1375,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 105;
+  var APP_VERSAO = 106;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1382,7 +1385,8 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   var DOCS = [
     { k: 'rg_frente', arq: 'RG - frente', t: 'RG', s: 'da mãe, frente e verso', lado: 'Frente', ic: 'i-id', req: true, fala: 'Tire a foto da frente do RG, o lado com a foto.' },
     { k: 'rg_verso', arq: 'RG - verso', t: 'RG', s: 'verso', lado: 'Verso', oculto: true, ic: 'i-idv', fala: 'Agora o verso do RG.' },
-    { k: 'cpf', arq: 'CPF', t: 'CPF', s: 'da mãe', ic: 'i-id', req: true, fala: 'Tire a foto do CPF da cliente.' },
+    { k: 'cpf', arq: 'CPF - frente', t: 'CPF', s: 'da mãe, frente e verso', lado: 'Frente', ic: 'i-id', req: true, fala: 'Tire a foto da frente do CPF da cliente.' },
+    { k: 'cpf_verso', arq: 'CPF - verso', t: 'CPF', s: 'verso', lado: 'Verso', oculto: true, ic: 'i-idv', fala: 'Agora o verso do CPF.' },
     { k: 'titulo', arq: 'Título de eleitor - frente', t: 'Título de eleitor', s: 'frente e verso, se tiver', lado: 'Frente', ic: 'i-id', req: false, oculto: true, fala: 'Tire a foto da frente do título de eleitor.' },
     { k: 'titulo_verso', arq: 'Título de eleitor - verso', t: 'Título de eleitor', s: 'verso', lado: 'Verso', oculto: true, ic: 'i-idv', fala: 'Agora o verso do título de eleitor, se tiver.' },
     { k: 'residencia', arq: 'Comprovante de residência', t: 'Comprovante de residência', s: 'da mãe', ic: 'i-casa', req: false, oculto: true, fala: 'Tire a foto do comprovante de residência.' },
@@ -1393,9 +1397,9 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   ];
   // formato do enquadramento: cartão (RG/CPF, deitado), folha (A4, em pé) ou rosto (oval)
   // documentos com frente e verso: um cartão só na tela, duas fotos
-  var PARES = { rg_frente: { f: 'rg_frente', v: 'rg_verso', nome: 'RG' }, titulo: { f: 'titulo', v: 'titulo_verso', nome: 'Título de eleitor' } };
-  function parDe(k){ return k === 'rg_verso' ? PARES.rg_frente : k === 'titulo_verso' ? PARES.titulo : PARES[k] || null; }
-  var MOLDURA = { outro: 'folha', procuracao: 'folha', rg_frente: 'cartao', rg_verso: 'cartao', cpf: 'cartao', titulo: 'cartao', titulo_verso: 'cartao', residencia: 'folha' };
+  var PARES = { rg_frente: { f: 'rg_frente', v: 'rg_verso', nome: 'RG' }, cpf: { f: 'cpf', v: 'cpf_verso', nome: 'CPF' }, titulo: { f: 'titulo', v: 'titulo_verso', nome: 'Título de eleitor' } };
+  function parDe(k){ return k === 'rg_verso' ? PARES.rg_frente : k === 'cpf_verso' ? PARES.cpf : k === 'titulo_verso' ? PARES.titulo : PARES[k] || null; }
+  var MOLDURA = { outro: 'folha', procuracao: 'folha', rg_frente: 'cartao', rg_verso: 'cartao', cpf: 'cartao', cpf_verso: 'cartao', titulo: 'cartao', titulo_verso: 'cartao', residencia: 'folha' };
   var DICA = { cartao: 'Coloque o documento dentro do quadro e segure firme', folha: 'Coloque a folha inteira dentro do quadro e segure firme', livre: 'Rosto da cliente dentro do círculo' };
   // dados do cadastro em andamento (ficam no celular até o envio)
   // cadastro antigo, sem o tipo guardado: conta como segurada especial
@@ -3537,7 +3541,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   var seqAtiva = false;
   var SEQ = {
     rg: { doc: 'rg_frente', nome: 'RG', ver: 'frente e verso' },
-    cpf: { doc: 'cpf', nome: 'CPF', perg: 'O número do CPF aparece no RG dela?' },
+    cpf: { doc: 'cpf', nome: 'CPF', ver: 'frente e verso', perg: 'O número do CPF aparece no RG dela?' },
     titulo: { doc: 'titulo', nome: 'Título de eleitor', perg: 'Ela está com o título de eleitor aí?', ver: 'frente e verso' },
     residencia: { doc: 'residencia', nome: 'Comprovante de residência', perg: 'Ela está com o comprovante de residência aí? (conta de luz, água ou telefone)' },
     rural: { doc: 'rural', nome: 'Provas da atividade', perg: 'Ela tem provas de que é pescadora, agricultora ou indígena? (carteira de pescadora, declaração do sindicato, documento da terra…)' }
@@ -3548,7 +3552,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   // só RG e CPF, para todas (06/11/2026: sem título de eleitor, sem comprovante de residência e sem provas da atividade rural)
   function seqPassos(){ return ['rg', 'cpf']; }
   function seqPend(k){ return (seqEstado().pend || []).indexOf(SEQ[k].doc) >= 0; }
-  function seqTemFoto(k){ return k === 'rg' ? !!(fotos.rg_frente && fotos.rg_verso) : !!(fotos[SEQ[k].doc] && fotos[SEQ[k].doc].length); }
+  function seqTemFoto(k){ return k === 'rg' ? !!(fotos.rg_frente && fotos.rg_verso) : k === 'cpf' ? !!(fotos.cpf && fotos.cpf_verso) : !!(fotos[SEQ[k].doc] && fotos[SEQ[k].doc].length); }
   function seqFeito(k){ return seqTemFoto(k) || seqPend(k) || (k === 'cpf' && !!seqEstado().cpfNoRg); }
   function seqTudo(){ return seqPassos().every(seqFeito); }
   function seqMarcar(k, como){   // como: 'pend' | 'norg' | '' (tirar a marca)
@@ -3557,7 +3561,8 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     if (como === 'pend') s.pend.push(d);
     seqGuardar(s);
   }
-  function seqComecar(){ seqAtiva = true; seqContinuar(); }
+  // toda vez que toca para tirar as fotos, passa primeiro o vídeo de como tirar (RG e CPF, frente e verso)
+  function seqComecar(){ seqAtiva = true; tutoFoto(seqContinuar); }
   function seqParar(){ seqAtiva = false; telaInicial(); }
   function seqContinuar(){
     if (!seqAtiva) return;
@@ -3579,8 +3584,8 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   function seqFoto(k){
     var d = docK(SEQ[k].doc);
     if (k === 'rg' && fotos.rg_frente && !fotos.rg_verso) d = docK('rg_verso');
+    if (k === 'cpf' && fotos.cpf && !fotos.cpf_verso) d = docK('cpf_verso');
     if (k === 'titulo' && fotos.titulo && !fotos.titulo_verso) d = docK('titulo_verso');
-    if (lsGet('campo_tuto_foto') !== '1') return tutoFoto(function(){ fotografar(d); });
     fotografar(d);
   }
   // fechou a câmera no meio da sequência: tentar de novo, deixar pendente ou parar
@@ -3595,7 +3600,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   function seqDepois(){ if (seqAtiva) setTimeout(seqContinuar, 120); }
   // desenho animado de um documento: o celular chega por cima, a moldura fica verde e a foto é tirada
   // cenas do vídeo: RG frente, RG verso (ele vira) e CPF; o tempo de cada uma acompanha a animação dela
-  var TUTO_DOCS = [['rg', 'RG · frente', 2800], ['rgv', 'RG · verso', 3600], ['cpf', 'CPF', 2800]];
+  var TUTO_DOCS = [['rg', 'RG · frente', 2400], ['rgv', 'RG · verso', 3200], ['cpf', 'CPF · frente', 2400], ['cpfv', 'CPF · verso', 3200]];
   function tutoDocs(){ return TUTO_DOCS; }
   var TUTO_DE = { rg: 'rg', cpf: 'cpf', titulo: 'titulo', residencia: 'folha', rural: 'folha' };
   function tutoCena(tipo, legenda, peq){
@@ -3628,7 +3633,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     var box = document.createElement('div'); box.className = 'sq';
     if (!algum){
       box.innerHTML = '<div class="sq-ini"><span class="sq-ic">' + cam + '</span><p>A câmera vai pedindo um de cada vez: ' + passos.map(function(k){ return SEQ[k].nome; }).join(', ').replace(/, ([^,]*)$/, ' e $1') + '. O que ela não tiver agora fica como pendência.</p>' +
-        '<button type="button" class="sq-go" id="sq-go">' + cam + 'Começar as fotos</button><button type="button" class="sq-tuto" id="sq-tuto">Como tirar a foto</button></div>';
+        '<button type="button" class="sq-go" id="sq-go">' + cam + 'Começar as fotos</button></div>';
     } else {
       var linha = function(k){
         var ok = seqTemFoto(k) || (k === 'cpf' && s.cpfNoRg), pend = !ok && seqPend(k);
@@ -3639,11 +3644,10 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
       box.innerHTML = '<div class="sq-lista">' + passos.map(linha).join('') + '</div>' +
         (seqTudo() ? '' : '<button type="button" class="sq-go" id="sq-go">' + cam + 'Continuar as fotos</button>') +
         (pends.length ? '<p class="sq-pend"><b>Pendências:</b> ' + pends.map(function(k){ return SEQ[k].nome; }).join(', ') + '. O cadastro vai assim mesmo e o escritório cobra a mãe depois.</p>' : '') +
-        '<p class="sq-mais">Opcional: <button type="button" data-sq-opc="outro">outro documento</button> · <button type="button" data-sq-opc="video">vídeo de concordância</button> · <button type="button" id="sq-tuto">como tirar a foto</button></p>';
+        '<p class="sq-mais">Opcional: <button type="button" data-sq-opc="outro">outro documento</button> · <button type="button" data-sq-opc="video">vídeo de concordância</button></p>';
     }
     box.addEventListener('click', function(e){
       if (e.target.closest('#sq-go')) return seqComecar();
-      if (e.target.closest('#sq-tuto')) return tutoFoto(null);
       var o = e.target.closest('[data-sq-opc]');
       if (o){ var dO = docK(o.dataset.sqOpc); if (dO.video) return fotos[dO.k] && fotos[dO.k].length ? verVideo(dO) : escolherVideo(dO); return fotos[dO.k] && fotos[dO.k].length ? conferir(dO) : escolher(dO); }
       var b = e.target.closest('[data-sq]'); if (!b) return;
@@ -3754,7 +3758,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
     var GRUPOS_ARQ = [
       { nome: 'CONTRATO E PROCURAÇÃO', ks: ['procuracao'] },
       { nome: 'RG', ks: ['rg_frente', 'rg_verso'] },
-      { nome: 'CPF', ks: ['cpf'] },
+      { nome: 'CPF', ks: ['cpf', 'cpf_verso'] },
       { nome: 'TÍTULO DE ELEITOR', ks: ['titulo', 'titulo_verso'] },
       { nome: 'COMPROVANTE DE RESIDÊNCIA', ks: ['residencia'] },
       { nome: 'PROVAS DE ATIVIDADE RURAL', ks: ['rural'] },
