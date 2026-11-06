@@ -7653,8 +7653,17 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     var u = cpUrl || $('cp-url').value.trim(); if (!u){ $('zs-status').textContent = 'Ligue primeiro o Cadastro pelo celular (endereço do script).'; return; }
     $('zs-status').textContent = 'Testando…';
     try {
-      var d = await fetch(u).then(function(r){ return r.json(); }); igScript = d; pintarInteg();
-      var z = d && d.zapsign;
+      var d = await fetch(u + (u.indexOf('?') < 0 ? '?' : '&') + 'zs=1').then(function(r){ return r.json(); }); igScript = d; pintarInteg();
+      var z = d && d.zapsign, zt = d && d.zsTeste;
+      // o script perguntou ao ZapSign: token, modelos e campos
+      if (zt && (z === 'ok' || z === 'teste')){
+        var NOMES_ZS = { contrato: 'Contrato', procuracao: 'Procuração' };
+        var linha = function(k){ var m = zt[k] || {}; return NOMES_ZS[k] + ': ' + (m.falta ? 'falta colar o ID do modelo' : m.erro ? 'o ZapSign não achou este modelo (' + m.erro.replace(/^ZapSign: /, '') + ')' : m.faltam && m.faltam.length ? 'faltam no modelo os campos ' + m.faltam.map(function(c){ return '{{' + c + '}}'; }).join(', ') : m.faltam ? 'modelo certo, com todos os campos' : 'modelo encontrado' + (m.nome ? ' (' + m.nome + ')' : '')); };
+        $('zs-status').textContent = zt.erro ? 'O ZapSign respondeu: ' + zt.erro
+          : zt.token === false ? 'O ZapSign não aceitou o token. Copie de novo em ZapSign › Configurações › Integração › API, cole aqui e salve.' + (z === 'teste' ? ' (Está marcada a conta de teste: o token da conta oficial não vale lá.)' : '')
+          : (z === 'teste' ? 'Conta de teste (os contratos não valem). ' : 'Token aceito. ') + linha('contrato') + ' · ' + linha('procuracao') + '.';
+        return;
+      }
       $('zs-status').textContent = z === undefined ? 'O script do Google ainda é a versão antiga: cole o google/campo.gs novo no projeto do script e implante uma nova versão.'
         : z === 'ok' ? 'Tudo pronto: o aplicativo já gera o contrato pelo ZapSign.'
         : z === 'teste' ? 'Pronto, na conta de teste do ZapSign (os contratos não valem).'

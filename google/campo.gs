@@ -41,12 +41,35 @@ var NOMES = {
 };
 
 // o sistema usa esta resposta para mostrar Drive e Claude como ativados em Configurações
-function doGet(){
+function doGet(e){
+  var conferir = !!(e && e.parameter && e.parameter.zs === '1');   // botão Testar do BI: lê a configuração de novo e pergunta ao ZapSign
+  if (conferir) try { CacheService.getScriptCache().remove('zapsign'); } catch (x){}
   var g = 'ok'; try { gatilho(); } catch (x){ g = String(x && x.message || x); }
   var c = ''; try { c = chaveClaude(); } catch (x){}
   var ac = []; try { ac = ScriptApp.getProjectTriggers().map(function(t){ return t.getHandlerFunction(); }); } catch (x){ ac = ['erro: ' + x]; }
   var zs = ''; try { var z = zapsign_(); zs = z.token && z.modelo ? (z.teste ? 'teste' : 'ok') : 'sem chave'; } catch (x){ zs = 'erro: ' + (x && x.message || x); }
-  return saida({ ok: true, servico: 'cadastro pelo celular', claude: !!c, ia: c ? (/^sk-ant-/.test(c) ? 'Claude' : 'ChatGPT') : '', zapsign: zs, acionadores: ac, gatilho: g });
+  var o = { ok: true, servico: 'cadastro pelo celular', claude: !!c, ia: c ? (/^sk-ant-/.test(c) ? 'Claude' : 'ChatGPT') : '', zapsign: zs, acionadores: ac, gatilho: g };
+  if (conferir) try { o.zsTeste = zsConferir_(); } catch (x){ o.zsTeste = { erro: String(x && x.message || x) }; }
+  return saida(o);
+}
+// campos que o script preenche em cada modelo do ZapSign (escritos no Word como {{NOME}}, {{CPF}}...)
+var ZS_CAMPOS_ = ['NOME', 'CPF', 'ENDERECO', 'TELEFONE', 'CIDADE', 'UF', 'DATA'];
+// confere no ZapSign: o token vale? os dois modelos existem e têm os campos?
+function zsConferir_(){
+  var cfg = zapsign_(); if (!cfg.token) return { erro: 'Falta o token da API.' };
+  var r = { token: true, conta: cfg.teste ? 'teste' : 'oficial' };
+  [['contrato', cfg.modelo], ['procuracao', cfg.modeloProc]].forEach(function(p){
+    if (!p[1]){ r[p[0]] = { falta: true }; return; }
+    try {
+      var t = zsApi_(cfg, 'get', '/api/v1/templates/' + encodeURIComponent(p[1]) + '/');
+      var achou = (JSON.stringify(t.inputs || t.template_inputs || t.variables || []).match(/\{\{\s*[A-Za-z_]+\s*\}\}/g) || []).map(function(v){ return v.replace(/[{}\s]/g, '').toUpperCase(); });
+      r[p[0]] = { nome: String(t.name || '').slice(0, 80), campos: achou, faltam: achou.length ? ZS_CAMPOS_.filter(function(k){ return achou.indexOf(k) < 0; }) : null };
+    } catch (x){
+      var m = String(x && x.message || x); r[p[0]] = { erro: m };
+      if (/\b(401|403)\b|token|credenc|autentica|unauthor|forbidden/i.test(m)) r.token = false;
+    }
+  });
+  return r;
 }
 
 /* chave do Claude: a do sistema (Configurações › Integrações › Claude); a das propriedades do script vale como reserva */
