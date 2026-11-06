@@ -1237,7 +1237,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 88;
+  var APP_VERSAO = 89;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1948,7 +1948,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
      Exceção: sem internet, o parceiro segue; o contrato é gerado no envio e o link vai para a mãe no WhatsApp, junto com as boas-vindas. */
   function ctEstado(){ try { var c = JSON.parse(lsGet('campo_contrato') || '{}'); return c && typeof c === 'object' ? c : {}; } catch(e){ return {}; } }
   function ctGuardar(c){ lsSet('campo_contrato', JSON.stringify(c || {})); }
-  function ctMarca(){ return ['campo_nome', 'campo_cpf', 'campo_fone', 'campo_cep', 'campo_rua', 'campo_num', 'campo_compl', 'campo_bairro', 'campo_cidade', 'campo_uf_cep'].map(function(k){ return String(lsGet(k) || '').trim().toLowerCase(); }).join('|'); }
+  function ctMarca(){ return ['campo_nome', 'campo_q_trab', 'campo_cpf', 'campo_fone', 'campo_cep', 'campo_rua', 'campo_num', 'campo_compl', 'campo_bairro', 'campo_cidade', 'campo_uf_cep'].map(function(k){ return String(lsGet(k) || '').trim().toLowerCase(); }).join('|'); }
   // gerar · assinar (gerado, falta a assinatura) · assinado · semrede (sem internet agora) · depois (vai pelo WhatsApp) · sem (ZapSign não ligado no sistema)
   function ctFase(){
     var c = ctEstado();
@@ -1961,7 +1961,7 @@ html[data-tema="dark"] .wz-nao-ic{background:rgba(158,89,216,.2)}html[data-tema=
   function ctOk(){ var f = ctFase(); return f === 'assinado' || f === 'depois' || f === 'sem'; }
   function ctResumo(){ var f = ctFase(); return f === 'assinado' ? 'assinado' : f === 'depois' ? 'vai pelo WhatsApp (sem internet)' : f === 'sem' ? 'o escritório faz depois' : 'falta assinar'; }
   function ctEnvio(){ var f = ctFase(), c = ctEstado(); return f === 'assinado' ? { doc: c.doc } : f === 'depois' ? { depois: true } : null; }
-  function ctDados(){ return { nome: lsGet('campo_nome'), cpf: lsGet('campo_cpf'), fone: lsGet('campo_fone'), endereco: { cep: lsGet('campo_cep'), rua: lsGet('campo_rua'), numero: lsGet('campo_num'), complemento: lsGet('campo_compl'), bairro: lsGet('campo_bairro'), cidade: lsGet('campo_cidade'), uf: lsGet('campo_uf_cep') } }; }
+  function ctDados(){ return { nome: lsGet('campo_nome'), trabalho: lsGet('campo_q_trab'), cpf: lsGet('campo_cpf'), fone: lsGet('campo_fone'), endereco: { cep: lsGet('campo_cep'), rua: lsGet('campo_rua'), numero: lsGet('campo_num'), complemento: lsGet('campo_compl'), bairro: lsGet('campo_bairro'), cidade: lsGet('campo_cidade'), uf: lsGet('campo_uf_cep') } }; }
   function semRede(e){ return !navigator.onLine || /sem conexão|demorou demais|Failed to fetch|Load failed|NetworkError|network/i.test(String(e && e.message || e)); }
   function ctErro(t){ var er = $('wz-erro'); if (er){ er.textContent = t; er.hidden = false; } }
   function ctGerar(btn){

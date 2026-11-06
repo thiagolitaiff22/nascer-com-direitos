@@ -188,7 +188,7 @@ function fechar(p, quem){
  * (exceção), o parceiro segue e o contrato é gerado aqui, no envio: o link vai para a mãe junto com as boas-vindas.
  * Token da API, ID do modelo e conta de teste: colados no sistema (Configurações › Integrações › Contrato ZapSign).
  * Campos que o modelo (Word) pode usar: {{NOME}} {{CPF}} {{ENDERECO}} {{RUA}} {{NUMERO}} {{COMPLEMENTO}} {{BAIRRO}}
- * {{CIDADE}} {{UF}} {{CEP}} {{TELEFONE}} {{DATA}}.
+ * {{CIDADE}} {{UF}} {{CEP}} {{TELEFONE}} {{DATA}} {{MODALIDADE}} (RURAL ou URBANO); e o texto branco <<assinatura>> onde a mãe assina.
  * O documento leva external_id "parceiro|cadastro": só quem gerou consegue conferir e anexar. */
 function zapsign_(){
   var cache = CacheService.getScriptCache(), c = cache.get('zapsign');
@@ -219,6 +219,8 @@ function camposContrato_(d){
     ENDERECO: [limpa(e.rua), limpa(e.numero), limpa(e.complemento), limpa(e.bairro), [cidade, uf].filter(String).join('/'), cepF ? 'CEP ' + cepF : ''].filter(String).join(', '),
     RUA: limpa(e.rua), NUMERO: limpa(e.numero), COMPLEMENTO: limpa(e.complemento), BAIRRO: limpa(e.bairro), CIDADE: cidade, UF: uf, CEP: cepF,
     TELEFONE: foneContrato_(d.fone),
+    // pescadora, agricultora ou indígena = rural; as outras respostas = urbano
+    MODALIDADE: d.trabalho === 'rural' || d.tipoSegurada === 'especial' ? 'RURAL' : 'URBANO',
     DATA: Utilities.formatDate(hoje, tz, 'd') + ' de ' + MESES_[Number(Utilities.formatDate(hoje, tz, 'M')) - 1] + ' de ' + Utilities.formatDate(hoje, tz, 'yyyy')
   };
 }
@@ -231,6 +233,9 @@ function gerarContrato_(cfg, quem, ref, d, c){
     template_id: cfg.modelo, signer_name: c.NOME, lang: 'pt-br',
     send_automatic_email: false, send_automatic_whatsapp: false, disable_signer_emails: true,
     brand_primary_color: '#7633b2', external_id: quem.prospId + '|' + ref, folder_path: '/Nascer com Direitos/',
+    // o modelo (contrato/Contrato e procuração - modelo ZapSign.docx) tem o texto branco <<assinatura>> onde a mãe assina:
+    // no fim do contrato e no fim da procuração; ela assina uma vez e a assinatura vai para os dois lugares
+    signature_placement: '<<assinatura>>',
     data: Object.keys(c).map(function(k){ return { de: '{{' + k + '}}', para: c[k] }; })
   };
   if (fone.length >= 10){ corpo.signer_phone_country = '55'; corpo.signer_phone_number = fone; }
@@ -282,7 +287,7 @@ function contratoNoEnvio_(p, quem, pasta, dados, nota){
       // envio repetido (a internet caiu no meio): usa o mesmo contrato, não gera outro
       var cc = CacheService.getScriptCache(), ck = 'zs_env_' + p.envio, g = cc.get(ck);
       if (g) g = JSON.parse(g);
-      else { g = gerarContrato_(cfg, quem, p.envio, { nome: dados.nome, cpf: p.cpf, fone: p.contato, endereco: p.endereco || {} }); cc.put(ck, JSON.stringify(g), 21600); }
+      else { g = gerarContrato_(cfg, quem, p.envio, { nome: dados.nome, cpf: p.cpf, fone: p.contato, endereco: p.endereco || {}, tipoSegurada: p.tipoSegurada }); cc.put(ck, JSON.stringify(g), 21600); }
       zsPendente_(g.doc, pasta);
       nota.push('Contrato gerado no envio (o parceiro estava sem internet): o link vai para a mãe no WhatsApp.');
       return { doc: g.doc, url: g.url, status: 'pendente' };
