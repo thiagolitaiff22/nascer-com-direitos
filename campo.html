@@ -1395,6 +1395,13 @@ html[data-tema="dark"] .tela p.festa-p strong{color:#c49be6}
 html[data-tema="dark"] #perm-tela .perm-i{background:#2c2236;color:#c49be6}
 html[data-tema="dark"] #perm-tela .perm-lin.granted .perm-i{background:#16351f;color:#6fd59a}
 html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a2226;color:#f5c2c2}
+/* gestor no aplicativo (11/11) */
+.abas.gs{grid-template-columns:repeat(4,1fr)}
+.pm-m.eq-filho{margin-left:22px;width:calc(100% - 22px);position:relative}
+.pm-m.eq-filho::before{content:'';position:absolute;left:-13px;top:-8px;bottom:50%;width:10px;border-left:2px solid var(--line);border-bottom:2px solid var(--line);border-bottom-left-radius:8px}
+.tela button.mr-lin{display:flex!important;align-items:center;justify-content:space-between;gap:10px;width:100%;height:auto!important;min-height:0!important;margin:0!important;padding:10px 12px!important;border:1px solid var(--line2,var(--line))!important;border-radius:12px!important;background:var(--card)!important;color:var(--ink)!important;font:inherit!important;font-size:inherit!important;font-weight:400!important;text-align:left!important;box-shadow:none!important;cursor:pointer}
+.tela button.mr-lin .mr-n b{font-weight:700}
+.tela button.mr-lin:active{transform:scale(.99)}
 /* animação de como tirar a foto */
 .tuto-cena{--dur:2.4s;--k:1;position:relative;height:232px;margin:4px 0 10px;border-radius:18px;overflow:hidden;background:radial-gradient(120% 90% at 50% 20%,#f8f3fc,#eadcf5)}
 .tuto-cena.peq{--k:.7;height:160px;margin:0 0 12px}
@@ -1493,7 +1500,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 112;
+  var APP_VERSAO = 113;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1725,6 +1732,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
   function navBotoes(){
     var b = function(a, ic, t, extra){ var p = String(t).split('|'); return '<button type="button" data-aba="' + a + '"><svg><use href="#' + ic + '"/></svg>' + (p[1] ? '<span class="l-lg">' + p[0] + '</span><span class="l-sm">' + p[1] + '</span>' : p[0]) + (extra || '') + '</button>'; };
     var bolha = '<span class="bolha" id="bolha" hidden></span>';
+    if (ehGestor()) return b('painel', 'i-painel', 'Início') + b('clientes', 'i-grupo', 'Equipe') + b('maes', 'i-bebe', 'Mães') + b('conta', 'i-pessoa', 'Conta');
     return ehProspectador()
       ? b('painel', 'i-painel', 'Início') + b('clientes', 'i-grupo', 'Parceiros') + b('novo', 'i-novo', 'Novo', bolha) + b('maes', 'i-bebe', 'Mães') + b('recebimentos', 'i-moeda', 'Meus ganhos|Ganhos')
       : b('painel', 'i-painel', 'Início') + b('clientes', 'i-grupo', 'Mães') + b('novo', 'i-novo', 'Novo cadastro|Novo', bolha) + b('recebimentos', 'i-moeda', 'Meus ganhos|Ganhos') + b('conta', 'i-pessoa', 'Conta');
@@ -1740,7 +1748,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
     f.addEventListener('click', function(e){ var b = e.target.closest('[data-ir]'); if (b){ f.remove(); return irPara(b.dataset.ir); } if (e.target === f || e.target.closest('[data-fecha]')) f.remove(); });
   }
   function montarCasca(){
-    var perfilCasca = (ehProspectador() ? 'p' : 'c') + (semGanho() ? 's' : '');
+    var perfilCasca = (ehGestor() ? 'g' : ehProspectador() ? 'p' : 'c') + (semGanho() ? 's' : '');
     if ($('vista') && $('app').dataset.perfil === perfilCasca) return;
     $('app').dataset.perfil = perfilCasca;
     $('app').innerHTML =
@@ -1751,7 +1759,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
         '<button type="button" class="av" id="topo-av" aria-label="Sua conta"></button></div>' +
       '<div class="tit-tela"><b id="topo-nome"></b><span id="topo-sub"></span></div>' +
       '<main class="vista" id="vista"></main>' +
-      '<nav class="abas' + (semGanho() ? ' sg' : '') + '" id="abas">' +
+      '<nav class="abas' + (ehGestor() ? ' gs' : semGanho() ? ' sg' : '') + '" id="abas">' +
         navBotoes() +
       '</nav>';
     $('abas').addEventListener('click', function(e){ var b = e.target.closest('[data-aba]'); if (!b) return; if (ehProspectador() && b.dataset.aba === 'novo') return escolherNovo(); irPara(b.dataset.aba); });
@@ -1785,7 +1793,14 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
   // prospectador que também é parceiro (configuração no sistema) pode alternar entre os dois modos
   // parceiro marcado como "sem ganhos": não vê Meus ganhos nem os marcos de pagamento
   function semGanho(){ return !!(quem && quem.temGanho === false && quem.perfil !== 'prospectador'); }
-  function ehProspectador(){ return !!(quem && quem.perfil === 'prospectador'); }
+  // o gestor (equipe do BI) usa o aplicativo como o prospectador, vendo a equipe dele: prospectadores, parceiros e mães
+  function ehGestor(){ return !!(quem && quem.perfil === 'gestor'); }
+  function ehProspectador(){ return !!(quem && (quem.perfil === 'prospectador' || quem.perfil === 'gestor')); }
+  // o acesso do gestor no aplicativo é "gestor:<e-mail>" (SQL 59); o resto dos dados vem do painel dele
+  function ajustarGestor(d){
+    if (d && /^gestor:/.test(String(d.prospId || ''))){ d.perfil = 'gestor'; d.temGanho = false; d.tambemParceiro = false; d.tipo = 'pessoa'; d.nome = lsGet('campo_gestor_nome') || d.nome || 'Gestor'; }
+    return d;
+  }
   function chamar(nome, corpo){
     return fetch(CFG.url + '/rest/v1/rpc/' + nome, { method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) })
       .then(function(r){ return r.json(); });
@@ -1793,6 +1808,15 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
   var ppSig = '';
   function carregarProsp(){
     if (!CFG_OK || !token || navigator.onLine === false) return Promise.resolve();
+    if (ehGestor()) return chamar('gestor_painel', { p_token: token }).then(function(d){
+      if (!d || !d.parceiros) return;
+      if (d.nome && quem && quem.nome !== d.nome){ quem.nome = d.nome; lsSet('campo_gestor_nome', d.nome); lsSet('campo_quem', JSON.stringify(quem)); }
+      var cli = (d.clientes || []).filter(function(c){ return !c.desqualificada; });
+      var sig = JSON.stringify([d.parceiros, cli]), mudou = sig !== ppSig; ppSig = sig;
+      pp = { parceiros: d.parceiros, atualizado: d.atualizado }; lsSet('campo_pp', JSON.stringify(pp));
+      painel = maiusculas({ clientes: cli, atualizado: d.atualizado }); painelSig = JSON.stringify(cli); lsSet('campo_painel', JSON.stringify({ clientes: cli, atualizado: d.atualizado }));
+      if (mudou && $('vista') && !document.querySelector('.tela, .folha')){ semAnimarTroca(); telaInicial(); }
+    }).catch(function(){});
     return chamar('prosp_painel', { p_token: token }).then(function(d){
       if (d && d.parceiros){ var sig = JSON.stringify(d.parceiros), mudou = sig !== ppSig; ppSig = sig; pp = d; lsSet('campo_pp', JSON.stringify(d)); if (mudou && aba !== 'novo' && $('vista') && !document.querySelector('.tela')) telaInicial(); }
     }).catch(function(){});
@@ -1858,20 +1882,21 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
     }).join('') : '<p class="db-vazio">Quando seus parceiros indicarem mães, o ranking aparece aqui.</p>') + '</div>';
   }
   function vistaProspPainel(){
-    var l = listaProsp(), t = somaProsp(l), cl = clientesPainel(), rede = maesDaRede().filter(function(m){ return !m.desqualificada; }), todas = cl.concat(rede), r = resumoParceiro(todas), maesV = filtroIni === 'maes';
+    var G = ehGestor(), l = listaProsp(), t = somaProsp(l), cl = clientesPainel(), rede = G ? [] : maesDaRede().filter(function(m){ return !m.desqualificada; }), todas = G ? cl : cl.concat(rede), r = resumoParceiro(todas), maesV = filtroIni === 'maes';
+    var nRede = G ? l.reduce(function(s, x){ return s + (+x.parceirosQtd || 0); }, 0) : 0;
     $('vista').classList.add('inicio');
-    var seg = '<div class="seg-ini" role="group" aria-label="Mostrar"><button type="button" data-ini="parc" aria-pressed="' + !maesV + '">Parceiros<b>' + l.length + '</b></button><button type="button" data-ini="maes" aria-pressed="' + maesV + '">Mães<b>' + todas.length + '</b></button></div>';
+    var seg = '<div class="seg-ini" role="group" aria-label="Mostrar"><button type="button" data-ini="parc" aria-pressed="' + !maesV + '">' + (G ? 'Equipe' : 'Parceiros') + '<b>' + l.length + '</b></button><button type="button" data-ini="maes" aria-pressed="' + maesV + '">Mães<b>' + todas.length + '</b></button></div>';
     var corpo = !maesV
-      ? '<div class="pm-hero"><small>Sua rede</small><div class="pm-num">' + l.length + '</div><p>' + (l.length === 1 ? 'parceiro cadastrado' : 'parceiros cadastrados') + '</p>' +
+      ? '<div class="pm-hero"><small>' + (G ? 'Sua equipe' : 'Sua rede') + '</small><div class="pm-num">' + l.length + '</div><p>' + (G ? (l.length === 1 ? 'prospectador' : 'prospectadores') + ' · ' + nRede + (nRede === 1 ? ' parceiro' : ' parceiros') + ' na rede' : (l.length === 1 ? 'parceiro cadastrado' : 'parceiros cadastrados')) + '</p>' +
           '<div class="pm-trio"><span><b>' + t.ind + '</b>indicações</span><span><b>' + t.con + '</b>contratos</span><span><b>' + t.cnc + '</b>concedidos</span></div></div>' +
-        dbMeta('parc', rede.filter(function(m){ return noMes(m.cadastro); }).length, 'indicações no mês') +
+        dbMeta('parc', (G ? todas : rede).filter(function(m){ return noMes(m.cadastro); }).length, 'indicações no mês') +
         dbRanking(l) +
-        '<div class="db-tiles db-opc">' + dbAtalho(l.filter(function(x){ return noMes(x.criadoEm); }).length, 'parceiros novos no mês', 'data-ir="clientes"') + dbAtalho(l.filter(function(x){ return !(+x.indicacoes); }).length, 'ainda sem indicação', 'data-ir="clientes"', 'aviso') + '</div>'
-      : '<div class="pm-hero"><small>Mães</small><div class="pm-num">' + todas.length + '</div><p>' + cl.length + (cl.length === 1 ? ' sua' : ' suas') + ' · ' + rede.length + ' dos seus parceiros</p>' +
+        '<div class="db-tiles db-opc">' + dbAtalho(l.filter(function(x){ return noMes(x.criadoEm); }).length, G ? 'novos na equipe no mês' : 'parceiros novos no mês', 'data-ir="clientes"') + dbAtalho(l.filter(function(x){ return !(+x.indicacoes); }).length, 'ainda sem indicação', 'data-ir="clientes"', 'aviso') + '</div>'
+      : '<div class="pm-hero"><small>Mães</small><div class="pm-num">' + todas.length + '</div><p>' + (G ? 'indicadas pela sua equipe' : cl.length + (cl.length === 1 ? ' sua' : ' suas') + ' · ' + rede.length + ' dos seus parceiros') + '</p>' +
           '<div class="pm-trio"><span><b>' + r.and + '</b>em andamento</span><span><b>' + r.pend + '</b>com pendência</span><span><b>' + r.ok + '</b>deram certo</span></div></div>' +
         dbMeta('maes', todas.filter(function(m){ return noMes(m.cadastro); }).length, 'mães no mês') +
         dbGrafico(todas.map(function(m){ return m.cadastro; }), 'Cadastros por semana') +
-        '<div class="db-tiles db-opc">' + dbAtalho(cl.filter(function(c){ return faltas(c).length; }).length, 'suas com pendência', 'data-ir="maes" data-filtro="faltam"', 'aviso') + dbAtalho(rede.length, 'mães dos parceiros', 'data-maes-rede') + '</div>';
+        '<div class="db-tiles db-opc">' + dbAtalho(cl.filter(function(c){ return faltas(c).length; }).length, G ? 'com pendência' : 'suas com pendência', 'data-ir="maes" data-filtro="faltam"', 'aviso') + (G ? dbAtalho(nRede, 'parceiros na rede', 'data-ir="clientes"') : dbAtalho(rede.length, 'mães dos parceiros', 'data-maes-rede')) + '</div>';
     // o balão em cima, o filtro Parceiros | Mães logo abaixo dele e, embaixo, a meta e o resto do painel
     var mh = corpo.match(/^<div class="pm-hero">[\s\S]*?<div class="pm-trio">[\s\S]*?<\/div><\/div>/), hero = mh ? mh[0] : '', resto = corpo.slice(hero.length);
     $('vista').innerHTML = '<div class="pm-ola"><h2>' + saudacao() + (nomeSaudacao() ? ', ' + esc(nomeSaudacao()) : '') + '</h2><span>' + hojeTxt() + '</span></div><div class="db-hero">' + hero + '</div>' + seg + '<div class="db-corpo">' + resto + '</div>';
@@ -1886,7 +1911,36 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
   }
   var buscaParc = '';
   (function(){ var s = document.createElement('style'); s.textContent = '.mr-rot{margin:14px 0 6px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}.mr-lista{max-height:42vh;overflow-y:auto;display:flex;flex-direction:column;gap:6px;text-align:left}.mr-lin{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;background:var(--card);border:1px solid var(--line2)}.mr-n{display:flex;flex-direction:column;min-width:0}.mr-n b{font-size:14.5px}.mr-n small{font-size:12px;color:var(--ink2)}.mr-s{flex:none;font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:999px;background:var(--line2);color:var(--ink2)}.mr-s.ok{background:rgba(34,139,84,.16);color:#1f8a54}.mr-s.an{background:rgba(158,89,216,.22);color:#66279d}.mr-s.no{background:rgba(160,160,160,.2)}.mr-busca{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--line2);background:var(--card);color:var(--ink);font:inherit;margin:8px 0 10px}.mr-vazio{text-align:center;color:var(--ink2)}'; document.head.appendChild(s); })();
+  // linha da equipe do gestor: prospectador (com quantos parceiros tem) ou parceiro dele
+  function linhaEquipe(x, pai){
+    var inds = +x.indicacoes || 0, con = +x.contratos || 0, sem = x.ativo === false, np = +x.parceirosQtd || 0;
+    return '<button type="button" class="pm-m' + (pai ? ' eq-filho' : '') + '" data-parc="' + esc(x.id) + '"><span class="pm-av">' + esc(iniciais(nomeParc(x))) + '</span><span class="pm-n"><b>' + esc(nomeParc(x)) + '</b>' +
+      '<span class="pm-l2"><span class="pm-s' + (sem ? ' fa' : '') + '">' + (sem ? (x.usuario ? 'acesso bloqueado' : 'sem acesso ao app') : con + (con === 1 ? ' contrato' : ' contratos')) + '</span>' +
+      '<small>' + (pai ? 'parceiro de ' + esc(primeiroNome(nomeParc(pai))) + ' · ' : (x.perfil === 'prospectador' ? 'prospectador · ' : 'parceiro · ')) + inds + (inds === 1 ? ' indicação' : ' indicações') + '</small></span></span>' +
+      (!pai && np ? '<span class="pm-ganho">' + np + (np === 1 ? ' parceiro' : ' parceiros') + '</span>' : '') + '</button>';
+  }
+  function vistaEquipeGestor(){
+    var l = listaProsp(), nRede = l.reduce(function(s, x){ return s + (x.rede || []).length; }, 0);
+    $('vista').innerHTML =
+      '<div class="pm-ola"><h2>Sua equipe</h2><span>' + (l.length ? l.length + (l.length === 1 ? ' prospectador' : ' prospectadores') + ' · ' + nRede + (nRede === 1 ? ' parceiro' : ' parceiros') : 'Ninguém na sua equipe ainda') + '</span></div>' +
+      '<label class="pm-busca"><svg><use href="#i-busca"/></svg><input id="busca-parc" placeholder="Buscar prospectador ou parceiro" value="' + esc(buscaParc) + '" autocomplete="off"></label>' +
+      '<div id="lista-parc" style="margin-top:14px"></div>';
+    function pintar(){
+      var q = semAcento(buscaParc), bate = function(x){ return !q || semAcento(nomeParc(x) + ' ' + (x.nome || '') + ' ' + (x.cidade || '')).indexOf(q) >= 0; };
+      var html = l.map(function(x){
+        var filhos = (x.rede || []).filter(bate);
+        if (!bate(x) && !filhos.length) return '';
+        return linhaEquipe(x, null) + (q ? filhos : (x.rede || [])).map(function(s){ return linhaEquipe(s, x); }).join('');
+      }).join('');
+      $('lista-parc').innerHTML = html ? '<div class="pm-lista">' + html + '</div>'
+        : '<div class="pm-vazio"><b>' + (l.length ? 'Nada por aqui' : 'Sua equipe aparece aqui') + '</b>' + (l.length ? 'Ninguém com esse nome.' : 'Os prospectadores que você cadastrar (e os parceiros deles) aparecem aqui, com as indicações de cada um.') + '</div>';
+    }
+    pintar();
+    $('busca-parc').addEventListener('input', function(){ buscaParc = this.value; pintar(); });
+    $('vista').onclick = function(e){ var p = e.target.closest('[data-parc]'); if (p) fichaParceiro(p.dataset.parc); };
+  }
   function vistaProspLista(){
+    if (ehGestor()) return vistaEquipeGestor();
     var l = listaProsp();
     $('vista').innerHTML =
       '<div class="pm-ola"><h2>Seus parceiros</h2><span>' + (l.length ? l.length + (l.length === 1 ? ' parceiro na sua rede' : ' parceiros na sua rede') : 'Nenhum parceiro cadastrado ainda') + '</span></div>' +
@@ -2151,7 +2205,34 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
     pintar(); q.addEventListener('input', pintar);
     t.querySelector('#t-fecha').onclick = function(){ t.remove(); };
   }
+  function achaEquipe(id){
+    var a = null;
+    listaProsp().forEach(function(p){ if (p.id === id) a = { x: p, pai: null }; (p.rede || []).forEach(function(s){ if (s.id === id) a = { x: s, pai: p }; }); });
+    return a;
+  }
+  function fichaEquipe(id){
+    var a = achaEquipe(id); if (!a) return;
+    var x = a.x, pai = a.pai, rede = pai ? [] : (x.rede || []);
+    var maes = clientesPainel().filter(function(c){ return pai ? c.resp === x.id : c.dono === x.id; });
+    var linhaM = function(m){ return linhaMaeRede(m, !pai).replace('<div class="mr-lin">', '<button type="button" class="mr-lin eq-lin" data-mae="' + esc(m.id) + '">').replace(/<\/div>$/, '</button>'); };
+    var t = tela('<b>' + esc(nomeParc(x)) + '</b><p>' + (pai ? 'Parceiro de ' + esc(nomeParc(pai)) : x.perfil === 'prospectador' ? 'Prospectador da sua equipe' : 'Parceiro da sua equipe') + (x.cidade ? ' · ' + esc(bonito(x.cidade)) : '') + '</p>' +
+      '<div class="acesso-caixa"><span>Acesso ao app</span><b>' + (x.ativo === false ? (x.usuario ? 'Bloqueado' : 'Ainda sem acesso') : 'Ativo') + '</b>' +
+        (x.criadoEm ? '<span>Na equipe desde</span><b>' + esc(dataBR(x.criadoEm)) + '</b>' : '') +
+        '<span>Indicações</span><b>' + (+x.indicacoes || 0) + '</b><span>Contratos</span><b>' + (+x.contratos || 0) + '</b><span>Concedidos</span><b>' + (+x.concedidos || 0) + '</b>' +
+        (pai ? '' : '<span>Parceiros</span><b>' + rede.length + '</b>') + '</div>' +
+      (rede.length ? '<div class="mr-rot">Parceiros dele</div><div class="mr-lista">' + rede.map(function(s){ return '<button type="button" class="mr-lin eq-lin" data-eq="' + esc(s.id) + '"><div class="mr-n"><b>' + esc(nomeParc(s)) + '</b><small>' + (+s.indicacoes || 0) + ((+s.indicacoes || 0) === 1 ? ' indicação' : ' indicações') + ' · ' + (+s.contratos || 0) + ((+s.contratos || 0) === 1 ? ' contrato' : ' contratos') + '</small></div><span class="mr-s an">ver</span></button>'; }).join('') + '</div>' : '') +
+      '<div class="mr-rot">Mães indicadas · ' + maes.length + '</div>' + (maes.length ? '<div class="mr-lista">' + maes.map(linhaM).join('') + '</div>' : '<p class="mr-vazio">Nenhuma mãe indicada ainda.</p>') +
+      (x.telefone ? '<button id="t-zap">Mandar mensagem no WhatsApp</button><button class="sec2" id="t-ligar">Ligar</button>' : '') + '<button class="sec2" id="t-fecha">Fechar</button>');
+    t.querySelector('#t-fecha').onclick = function(){ t.remove(); };
+    if (t.querySelector('#t-zap')) t.querySelector('#t-zap').onclick = function(){ enviarZap(x.telefone, 'Olá, ' + primeiroNome(nomeParc(x)) + '! '); };
+    if (t.querySelector('#t-ligar')) t.querySelector('#t-ligar').onclick = function(){ location.href = 'tel:' + String(x.telefone).replace(/\D/g, ''); };
+    t.addEventListener('click', function(e){
+      var s = e.target.closest('[data-eq]'); if (s){ t.remove(); return fichaEquipe(s.dataset.eq); }
+      var m = e.target.closest('[data-mae]'); if (m){ t.remove(); return fichaCli(m.dataset.mae); }
+    });
+  }
   function fichaParceiro(id){
+    if (ehGestor()) return fichaEquipe(id);
     var x = listaProsp().filter(function(p){ return p.id === id; })[0]; if (!x) return;
     var t = tela('<b>' + esc(nomeParc(x)) + '</b><p>' + esc(x.tipo === 'clinica' ? 'Clínica · ' + bonito(x.nome) : 'Parceiro') + (x.cidade ? ' · <img class="cid-flag mini" data-cid="' + esc(bonito(x.cidade)) + '" alt="" hidden> ' + esc(bonito(x.cidade)) : '') + '</p>' +
       '<div class="acesso-caixa"><span>Usuário</span><b>' + esc(x.usuario || '—') + '</b><span>Situação</span><b>' + (x.ativo === false ? 'Acesso bloqueado' : 'Ativo') + '</b>' +
@@ -2184,7 +2265,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
     $('vista').style.zoom = '';
     var clin = quem && quem.tipo === 'clinica' && quem.clinica;
     var quemTxt = clin ? bonito(quem.clinica) : bonito((quem && quem.nome) || '') || 'Parceiro';
-    var papelTxt = ehProspectador() ? 'Prospectador' : clin ? 'Clínica parceira' : (quem && quem.perfil === 'prospectador' ? 'Parceiro' : 'Parceira');
+    var papelTxt = ehGestor() ? 'Gestor' : ehProspectador() ? 'Prospectador' : clin ? 'Clínica parceira' : (quem && quem.perfil === 'prospectador' ? 'Parceiro' : 'Parceira');
     $('topo-nome').textContent = 'Nascer com Direitos';
     $('topo-sub').innerHTML = '<span class="t-nome">' + esc(quemTxt) + '</span><span class="t-papel"> · ' + esc(papelTxt) + '</span>';
     var bm = $('modo');
@@ -2202,6 +2283,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
     if (semGanho() && aba === 'recebimentos') aba = 'painel';
     if (aba === 'recebimentos'){ carregarReceb(); return vistaRecebimentos(); }
     if (aba === 'conta') return vistaConta();
+    if (ehGestor() && (aba === 'novo' || aba === 'novop' || aba === 'recebimentos')) aba = 'painel';
     if (ehProspectador()) return aba === 'novop' ? vistaProspNovo() : aba === 'novo' ? vistaNovo() : aba === 'maes' ? vistaClientesParceira() : aba === 'clientes' ? vistaProspLista() : vistaProspPainel();
     if (aba === 'painel') return vistaPainel();
     if (aba === 'clientes') return vistaClientes();
@@ -2666,6 +2748,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
     });
   }
   function carregarPainel(){
+    if (ehGestor()) return carregarProsp();   // o painel do gestor já traz as mães da equipe
     if (ehProspectador()) carregarProsp();   // e segue: ele também tem as próprias mães
     if (!CFG_OK || buscandoPainel || !token || navigator.onLine === false) return Promise.resolve();
     buscandoPainel = true;
@@ -2696,7 +2779,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
   }
   function linhaMae(c){
     var s = situacaoSimples(c);
-    return '<button type="button" class="pm-m" data-cli="' + esc(c.id) + '"><span class="pm-av">' + esc(iniciais(c.nome)) + '</span><span class="pm-n"><b>' + esc(bonito(c.nome) || 'Sem nome') + '</b><span class="pm-l2"><span class="pm-s ' + s[0] + '">' + esc(s[1]) + '</span><small>' + (c.cadastro ? esc(quando(c.cadastro)) : '') + '</small></span>' + (semGanho() ? '' : '<span class="pm-pts"><span class="' + (marcos(c).conf ? 'on' : '') + '"><i></i>Confirmada</span><span class="' + (marcos(c).lib ? 'on' : '') + '"><i></i>Benefício liberado</span></span>') + '</span><span class="pm-seta">›</span></button>';
+    return '<button type="button" class="pm-m" data-cli="' + esc(c.id) + '"><span class="pm-av">' + esc(iniciais(c.nome)) + '</span><span class="pm-n"><b>' + esc(bonito(c.nome) || 'Sem nome') + '</b><span class="pm-l2"><span class="pm-s ' + s[0] + '">' + esc(s[1]) + '</span><small>' + (ehGestor() && c.parceiro ? esc(bonito(c.parceiro)) + ' · ' : '') + (c.cadastro ? esc(quando(c.cadastro)) : '') + '</small></span>' + (semGanho() ? '' : '<span class="pm-pts"><span class="' + (marcos(c).conf ? 'on' : '') + '"><i></i>Confirmada</span><span class="' + (marcos(c).lib ? 'on' : '') + '"><i></i>Benefício liberado</span></span>') + '</span><span class="pm-seta">›</span></button>';
   }
   function depoisDoInicio(){ caberInicio(); setTimeout(function(){ conviteAvisos(); caberInicio(); reativarAvisos(); }, 600); }
   // Início sem rolagem: tira do fim da lista as linhas que não cabem na tela (as outras ficam na aba Mães ou Parceiros)
@@ -3044,7 +3127,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
   }
   /* ---------- conta ---------- */
   function vistaConta(){
-    var p = perfilLocal(), oficial = nomeOficial(), papel = ehProspectador() ? 'Prospectador' : (quem && quem.tipo === 'clinica' && quem.clinica ? 'Clínica parceira' : 'Parceira');
+    var p = perfilLocal(), oficial = nomeOficial(), papel = ehGestor() ? 'Gestor' : ehProspectador() ? 'Prospectador' : (quem && quem.tipo === 'clinica' && quem.clinica ? 'Clínica parceira' : 'Parceira');
     var escuro = document.documentElement.getAttribute('data-tema') === 'dark';
     $('vista').innerHTML =
       '<div class="pm-ola"><h2>Sua conta</h2><span>' + esc(oficial) + ' · ' + papel + '</span></div>' +
@@ -3055,12 +3138,12 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
         '<div class="ct-linha"><input id="ct-apelido" maxlength="40" autocomplete="off" placeholder="' + esc(primeiroNome(oficial)) + '" value="' + esc(p.apelido) + '"><button type="button" id="ct-apelido-ok">Salvar</button></div>' +
         '<small class="ct-dica">Aparece no Início e no seu perfil. O nome oficial no escritório não muda.</small></div>' +
       '<div class="ct-bloco"><div class="ct-rot">Aparência</div><div class="seg-ini ct-tema"><button type="button" data-tema-set="light" aria-pressed="' + !escuro + '">Claro</button><button type="button" data-tema-set="dark" aria-pressed="' + escuro + '">Escuro</button></div></div>' +
-      '<div class="ct-bloco"><div class="ct-rot">Trocar a senha</div>' +
+      (ehGestor() ? '<div class="ct-bloco"><div class="ct-rot">Senha</div><small class="ct-dica">Você entra com o mesmo CPF e a mesma senha do BI. Para trocar a senha, use o BI (menu do seu nome ou Esqueci a senha).</small></div>' : '<div class="ct-bloco"><div class="ct-rot">Trocar a senha</div>' +
         '<div class="ct-linha"><input id="ct-s1" type="password" inputmode="numeric" autocomplete="new-password" placeholder="Nova senha (só números, mínimo 6)"></div>' +
         '<div class="ct-linha"><input id="ct-s2" type="password" inputmode="numeric" autocomplete="new-password" placeholder="Repita a nova senha"></div>' +
-        '<button type="button" class="ct-btn" id="ct-senha-ok">Salvar a nova senha</button></div>' +
+        '<button type="button" class="ct-btn" id="ct-senha-ok">Salvar a nova senha</button></div>') +
       '<div class="ct-rot" style="margin-top:18px">Aplicativo</div>' +
-      '<div class="pm-conta">' + (podeInstalar() ? '<button type="button" id="inst-btn"><b>Instalar o aplicativo</b><small>' + (android() ? 'Baixe o aplicativo para Android. Atualiza sozinho.' : 'Sem baixar arquivo e sem alertas. Atualiza sozinho.') + '</small></button>' : '') + (pushSuporte() ? '<button type="button" id="avisos-btn"><b>Avisos no celular</b><small id="avisos-sub">' + (avisosAtivos() ? 'Ativados · toque para desativar' : 'Desativados · toque para ativar') + '</small></button>' : '') + '<button type="button" id="verif-perm"><b>Permissões do celular</b><small>Câmera, localização e avisos</small></button><button type="button" id="verif-atu"><b>Verificar atualização</b><small>Veja se há uma versão nova do aplicativo</small></button>' +
+      '<div class="pm-conta">' + (podeInstalar() ? '<button type="button" id="inst-btn"><b>Instalar o aplicativo</b><small>' + (android() ? 'Baixe o aplicativo para Android. Atualiza sozinho.' : 'Sem baixar arquivo e sem alertas. Atualiza sozinho.') + '</small></button>' : '') + (pushSuporte() ? '<button type="button" id="avisos-btn"><b>Avisos no celular</b><small id="avisos-sub">' + (avisosAtivos() ? 'Ativados · toque para desativar' : 'Desativados · toque para ativar') + '</small></button>' : '') + (ehGestor() ? '<button type="button" id="ir-gestor"><b>Painel completo do gestor</b><small>Todos os parceiros e documentos do escritório</small></button>' : '') + '<button type="button" id="verif-perm"><b>Permissões do celular</b><small>Câmera, localização e avisos</small></button><button type="button" id="verif-atu"><b>Verificar atualização</b><small>Veja se há uma versão nova do aplicativo</small></button>' +
       '<button type="button" class="sair" id="sair"><svg><use href="#i-sair"/></svg>Sair desta conta</button></div>' +
       '<div class="versao">Nascer com Direitos · versão ' + APP_VERSAO + '</div>';
     $('sair').onclick = sair;
@@ -3072,6 +3155,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
       ativarAvisos().then(function(r){ if (r.ok) sub.textContent = 'Ativados · toque para desativar'; else { sub.textContent = 'Desativados · toque para ativar'; alert(r.msg); } pintarSino(); });
     };
     $('verif-perm').onclick = function(){ pedirPermissoes(true); };
+    if ($('ir-gestor')) $('ir-gestor').onclick = function(){ location.href = SITE + 'gestor.html'; };
     $('verif-atu').onclick = function(){ var b = this; b.querySelector('small').textContent = 'Verificando…'; ultimaChecagem = 0; verificarAtualizacao(); setTimeout(function(){ if (document.body.contains(b)) b.querySelector('small').textContent = document.querySelector('.atu') ? 'Há uma versão nova: use o aviso no topo' : 'Seu aplicativo está atualizado'; }, 1800); };
     // foto: escolhe da galeria ou tira na hora; o app recorta quadrada e diminui (192 x 192)
     var escolher = function(){ $('ct-arq').value = ''; $('ct-arq').click(); };
@@ -3093,7 +3177,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
       var t = b.dataset.temaSet; document.documentElement.setAttribute('data-tema', t); try { localStorage.setItem('nascer_tema', t); } catch(e){} corTopo();
       Array.prototype.forEach.call(document.querySelectorAll('[data-tema-set]'), function(x){ x.setAttribute('aria-pressed', String(x === b)); });
     }; });
-    $('ct-senha-ok').onclick = function(){
+    if ($('ct-senha-ok')) $('ct-senha-ok').onclick = function(){
       var a = $('ct-s1').value, c = $('ct-s2').value, bt = this;
       var pe = senhaNumerica(a); if (pe) return alert(pe);
       if (a !== c) return alert('As duas senhas não são iguais.');
@@ -3112,7 +3196,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
     var cl = clientesPainel().slice().sort(function(a, b){ return String(b.cadastro || '').localeCompare(String(a.cadastro || '')); });
     if (!GRUPOS_P.some(function(g){ return g[0] === filtroCli; })) filtroCli = 'todos';
     $('vista').innerHTML =
-      '<div class="pm-ola"><h2>Suas mães</h2><span>' + (cl.length ? cl.length + (cl.length === 1 ? ' mãe enviada por você' : ' mães enviadas por você') : 'Nenhuma mãe enviada ainda') + '</span></div>' +
+      '<div class="pm-ola"><h2>' + (ehGestor() ? 'Mães da equipe' : 'Suas mães') + '</h2><span>' + (cl.length ? cl.length + (ehGestor() ? (cl.length === 1 ? ' mãe indicada pela sua equipe' : ' mães indicadas pela sua equipe') : (cl.length === 1 ? ' mãe enviada por você' : ' mães enviadas por você')) : (ehGestor() ? 'Nenhuma mãe indicada pela equipe ainda' : 'Nenhuma mãe enviada ainda')) + '</span></div>' +
       '<label class="pm-busca"><svg><use href="#i-busca"/></svg><input id="busca-cli" placeholder="Buscar pelo nome" value="' + esc(buscaCli) + '" autocomplete="off"></label>' +
       '<div class="pm-filtro" id="chips">' + GRUPOS_P.map(function(g){ var n = cl.filter(function(c){ return noGrupoP(c, g[0]); }).length; return '<button type="button" class="' + (g[0] === 'faltam' ? 'fa' : g[0] === 'ganharam' ? 'ok' : '') + '" data-g="' + g[0] + '" aria-pressed="' + (filtroCli === g[0]) + '"><b>' + n + '</b><span>' + g[1] + '</span></button>'; }).join('') + '</div>' +
       '<div id="lista-cli"></div><div id="fila"></div>';
@@ -3221,8 +3305,8 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
     var atual = passos.findIndex(function(p){ return !p.ok && !p.ruim; });
     var info = [TIPOS[c.tipoSegurada] || '', c.crianca ? 'Criança: ' + String(c.crianca) : '', c.criancaNasc ? 'nasceu em ' + dataBR(c.criancaNasc) : ''].filter(Boolean).join(' · ');
     var f = document.createElement('div'); f.className = 'folha';
-    f.innerHTML = '<div><div class="puxa"></div><h3>' + esc(bonito(c.nome)) + '</h3><div class="sub">' + esc(situacaoSimples(c)[1]) + (c.cadastro ? ' · enviada ' + esc(quando(c.cadastro)) : '') + '</div>' +
-      (faltas(c).length ? '<div class="falta-box"><b>Faltam documentos</b><span>' + esc(nomesFaltas(faltas(c))) + '</span>' + (c.temPasta !== false ? '<button type="button" class="enviar" data-completar style="height:50px;font-size:16px;margin-top:10px">Completar documentos</button>' : '<span>O escritório ainda está criando a pasta desta cliente.</span>') + '</div>' : '') +
+    f.innerHTML = '<div><div class="puxa"></div><h3>' + esc(bonito(c.nome)) + '</h3><div class="sub">' + esc(situacaoSimples(c)[1]) + (c.cadastro ? ' · enviada ' + esc(quando(c.cadastro)) : '') + (ehGestor() && c.parceiro ? ' · indicada por ' + esc(bonito(c.parceiro)) + (c.prospectador && c.prospectador !== c.parceiro ? ' (equipe de ' + esc(primeiroNome(c.prospectador)) + ')' : '') : '') + '</div>' +
+      (faltas(c).length ? '<div class="falta-box"><b>Faltam documentos</b><span>' + esc(nomesFaltas(faltas(c))) + '</span>' + (ehGestor() ? '' : c.temPasta !== false ? '<button type="button" class="enviar" data-completar style="height:50px;font-size:16px;margin-top:10px">Completar documentos</button>' : '<span>O escritório ainda está criando a pasta desta cliente.</span>') + '</div>' : '') +
       (faltas(c).length ? '' : '<div class="ini-ok">Tudo certo com os documentos desta mãe. Agora é com a nossa equipe.</div>') +
       '<button type="button" class="sair" style="margin-top:6px" data-fecha>Fechar</button></div>';
     document.body.appendChild(f);
@@ -3242,7 +3326,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
       var pc = {}; try { pc = JSON.parse(lsGet('campo_completar') || '{}') || {}; } catch(e){}
       if (Object.keys(pc).length && !confirm('Ainda há dados de um cadastro (endereço ou senha gov.br) esperando internet para chegar ao escritório. Se sair agora, eles serão apagados deste celular. Sair mesmo assim?')) return;
       fotos = {}; local = null; guardarRascunho();
-      ['campo_token', 'campo_quem', 'campo_painel', 'campo_receb', 'campo_aba', 'campo_completando', 'campo_completar', 'campo_pp', 'campo_apelido', 'campo_foto', 'campo_push', 'campo_ini_filtro', 'campo_meta_maes', 'campo_meta_parc'].concat(CAMPOS_CADASTRO).forEach(function(k){ lsSet(k, ''); });
+      ['campo_token', 'campo_quem', 'campo_painel', 'campo_receb', 'campo_aba', 'campo_completando', 'campo_completar', 'campo_pp', 'campo_apelido', 'campo_foto', 'campo_push', 'campo_ini_filtro', 'campo_meta_maes', 'campo_meta_parc', 'campo_gestor_nome'].concat(CAMPOS_CADASTRO).forEach(function(k){ lsSet(k, ''); });
       token = ''; quem = null; painel = null; receb = null; aba = 'painel';
       senhaGovRascunho = ''; passoNovo = null; completando = null; seqAtiva = false; pp = null; ppSig = ''; painelSig = '';
       pedirLink();
@@ -4263,7 +4347,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
   function atualizarQuem(){
     if (!token || !CFG_OK) return Promise.resolve(quem);
     return fetch(CFG.url + '/rest/v1/rpc/campo_quem', { method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_token: token }) })
-      .then(function(r){ return r.json(); }).then(function(d){ if (d && d.prospId){ quem = d; lsSet('campo_quem', JSON.stringify(d)); } else if (d === null){ quem = null; lsSet('campo_quem', ''); } return quem; })
+      .then(function(r){ return r.json(); }).then(function(d){ if (d && d.prospId){ quem = ajustarGestor(d); lsSet('campo_quem', JSON.stringify(quem)); } else if (d === null){ quem = null; lsSet('campo_quem', ''); } return quem; })
       .catch(function(){ return quem; });
   }
 
@@ -4328,6 +4412,21 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
         return fetch(CFG.url + '/rest/v1/rpc/minha_funcao', { method: 'POST', headers: { apikey: CFG.key, Authorization: 'Bearer ' + s.access_token, 'Content-Type': 'application/json' }, body: '{}' })
           .then(function(r){ return r.json(); })
           .then(function(f){
+            if (f !== 'admin') return irPainelGestor(s, f);
+            // gestor: troca a sessão do BI pelo acesso do aplicativo e entra no formato do prospectador (SQL 59)
+            return fetch(CFG.url + '/rest/v1/rpc/gestor_app_entrar', { method: 'POST', headers: { apikey: CFG.key, Authorization: 'Bearer ' + s.access_token, 'Content-Type': 'application/json' }, body: '{}' })
+              .then(function(r){ return r.json(); })
+              .then(function(g){
+                if (!g || !g.token) return irPainelGestor(s, f);
+                token = g.token; lsSet('campo_token', token); lsSet('campo_gestor_nome', g.nome || ''); lsSet('campo_aba', 'painel'); aba = 'painel';
+                quem = null; iniciar(); return true;
+              }, function(){ return irPainelGestor(s, f); });
+          });
+      })
+      .catch(function(){ return false; });
+  }
+  // painel antigo do gestor (se o acesso do aplicativo não sair) ou o BI, para quem não é gestor
+  function irPainelGestor(s, f){
             var GESTOR = 'https://www.nascercomdireitos.com.br/' + (f === 'admin' ? 'gestor.html' : 'index.html');
             var DEST = f === 'admin' ? 'gestor.html' : 'index.html';
             if (!APP){
@@ -4335,9 +4434,6 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
               location.href = DEST;
             } else { location.href = GESTOR; }
             return true;
-          });
-      })
-      .catch(function(){ return false; });
   }
   function pedirLink(msg){
     tirarEsqueleto(true); corTopo('#6a2bae');   // mesmo roxo da borda de cima da tela de entrar
@@ -4372,7 +4468,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
             if (d.trocar && SENHA_TROCA_OBRIGATORIA) return telaNovaSenha(d.token);   // desligado: vale a senha padrão 123456
             return iniciar();
           }
-          // não é parceiro: pode ser um gestor do escritório (usuário e senha do sistema) → vai para o painel do gestor
+          // não é parceiro: pode ser um gestor do escritório (CPF e senha do BI) → entra no aplicativo como gestor (SQL 59)
           return tentarGestor(uCru, p).then(function(foi){
             if (!foi){ tirarEsqueleto(true); alert((d && (d.erro || d.message)) || 'Não foi possível entrar.'); }
           });
@@ -4426,6 +4522,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
   function pedirPermissoes(forcar){
     if (!token || $('perm-tela') || (!forcar && document.querySelector('.tela, .cam, .folha, .ver, .rec, .ct-tela'))) return;
     if (!forcar && lsGet('campo_perm_adiada') === new Date().toDateString()) return;
+    if (!forcar && ehGestor()) return;
     permsAgora().then(function(st){
       var falta = PERM_ITENS.filter(function(x){ return st[x[0]] !== 'granted'; });
       // ao abrir: só insiste se a câmera não está liberada ou se algo nunca foi perguntado (aviso e localização recusados não são cobrados todo dia)
@@ -4473,7 +4570,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
     var semRede = false;
     abrirRascunho().then(function(){
       return fetch(CFG.url + '/rest/v1/rpc/campo_quem', { method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_token: token }) })
-        .then(function(r){ return r.json(); }).then(function(d){ if (d && d.prospId){ quem = d; lsSet('campo_quem', JSON.stringify(d)); return quem; } if (d === null){ lsSet('campo_quem', ''); return null; } return quem; })
+        .then(function(r){ return r.json(); }).then(function(d){ if (d && d.prospId){ quem = ajustarGestor(d); lsSet('campo_quem', JSON.stringify(quem)); return quem; } if (d === null){ lsSet('campo_quem', ''); return null; } return quem; })
         .catch(function(){ semRede = true; return quem; });
     }).then(function(q){
       if (!q && !semRede){ lsSet('campo_token', ''); token = ''; return pedirLink('Seu acesso mudou. Entre de novo com o usuário e a senha.'); }

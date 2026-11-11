@@ -6411,11 +6411,17 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
       '<div class="field full"><label class="chk"><input id="pp-tambem" type="checkbox"' + (p && p.tambemParceiro ? ' checked' : '') + '> Também indica mães direto</label><span class="hint">No aplicativo ele passa a poder alternar entre cadastrar parceiros e cadastrar mães.</span></div>' +
       '<div class="field full"><label class="chk"><input id="pp-ativo" type="checkbox"' + (!p || p.ativo !== false ? ' checked' : '') + '> Prospectador ativo</label></div>' +
       '<p class="parcn-nota">Quanto ele ganha é definido em cada parceiro que ele fechar (campo <b>Quem fechou a parceria</b>).</p>';
+    // gestor responsável: quem acompanha este prospectador (e os parceiros e as mães dele) pelo aplicativo
+    var gestores = (state.equipe || []).filter(function(u){ return u.funcao === 'admin' && u.ativo !== false && u.email; });
+    var gAtual = p ? String(p.gestorEmail != null ? p.gestorEmail : (/^gestor:/.test(p.criadoPor || '') ? p.criadoPor.slice(7) : '')).toLowerCase() : (isAdmin() && state.me && state.me.email ? String(state.me.email).toLowerCase() : '');
+    corpo += '<div class="field full"><label for="pp-gestor">Gestor responsável</label><select id="pp-gestor"><option value="">Nenhum (escritório)</option>' +
+      gestores.map(function(u){ var em = String(u.email).toLowerCase(); return '<option value="' + esc(em) + '"' + (em === gAtual ? ' selected' : '') + '>' + esc(u.nome || em) + '</option>'; }).join('') +
+      '</select><span class="hint">O gestor acompanha pelo aplicativo este prospectador, os parceiros dele e as mães que vierem por eles.</span></div>';
     parcDialogo(p ? 'Editar prospectador' : 'Novo prospectador', corpo, p ? 'Salvar' : 'Cadastrar prospectador', async function(q){
       var nome = nomeProprio(q('#pp-nome').value.trim()), uf = q('#pp-uf').value, cid = nomeProprio(q('#pp-cid').value.trim());
       if (nome.length < 3){ toast('Informe o nome do prospectador.'); q('#pp-nome').focus(); return false; }
       await parcGravar(p, { perfil: 'prospectador', tipo: 'pessoa', clinica: '', nome: nome, documento: q('#pp-doc').value.trim(), telefone: q('#pp-tel').value.trim(), ufParc: uf, cidadeParc: cid,
-        regiaoId: p ? p.regiaoId || '' : '', regiao: cid, pix: q('#pp-pix').value.trim(), tambemParceiro: q('#pp-tambem').checked, ativo: q('#pp-ativo').checked });
+        regiaoId: p ? p.regiaoId || '' : '', regiao: cid, pix: q('#pp-pix').value.trim(), tambemParceiro: q('#pp-tambem').checked, ativo: q('#pp-ativo').checked, gestorEmail: q('#pp-gestor') ? q('#pp-gestor').value : '' });
       toast((p ? 'Prospectador atualizado: ' : 'Prospectador cadastrado: ') + nome + (p ? '' : '. Agora clique em Aplicativo para criar o login dele.'));
     });
   }
@@ -9041,6 +9047,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     if (pPerfil === 'prospectador'){ data.perfil = 'prospectador'; data.tipo = 'pessoa'; data.clinica = ''; data.tambemParceiro = $('fp-tambem').checked; }
     else { var pr = $('fp-prospectador').value || ''; if (pr) data.prospectadorId = pr; }
     if (prev.criadoPor) data.criadoPor = prev.criadoPor;
+    if (prev.gestorEmail != null) data.gestorEmail = prev.gestorEmail;
     $('fp-save').disabled = true;
     try {
       if (state.db){ await (pEditing ? pcol().doc(pEditing) : pcol().doc()).set(data); }
