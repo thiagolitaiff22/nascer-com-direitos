@@ -1804,30 +1804,23 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
 .kb-lista .cad-acoes{justify-content:flex-end}
 .kb-lista .kb-btn{height:26px;padding:0 10px;font-size:11px}
 /* Pós-venda do fluxo novo em planilha */
-.pv-plan{min-width:1080px}
-.pv-plan .pv-w-cli{width:27%}.pv-plan .pv-w-doc{width:7.4%}.pv-plan .pv-w-rel{width:12.5%}.pv-plan .pv-w-resp{width:8.5%}.pv-plan .pv-w-ed{width:44px}
-.pv-plan thead th{vertical-align:bottom}
-.pv-plan tr.pv-grupo th{padding-bottom:4px;color:hsl(var(--c-pri))!important;font-weight:600!important;text-align:center}
-.pv-plan tr.pv-grupo th[rowspan]{text-align:left;color:var(--ink-3)!important;font-weight:500!important;vertical-align:bottom;padding-bottom:9.4px}
-.pv-plan tr.pv-grupo th[colspan]{box-shadow:inset 0 -2px 0 hsl(var(--c-pri)/.22)}
-.pv-plan tr.pv-sub th{padding-top:7px;font-size:10.5px!important}
+.pv-plan{min-width:1000px}
+.pv-plan .pv-w-cli{width:30%}.pv-plan .pv-w-doc{width:8%}.pv-plan .pv-w-rel{width:12%}.pv-plan .pv-w-resp{width:9%}.pv-plan .pv-w-ed{width:44px}
 .pv-plan th.pv-c,.pv-plan td.pv-c{text-align:center}
-.pv-plan .pv-ini{box-shadow:inset 1px 0 0 hsl(var(--c-line)/.55)}
-.pv-plan tr.pv-grupo th[colspan].pv-ini{box-shadow:inset 1px 0 0 hsl(var(--c-line)/.55),inset 0 -2px 0 hsl(var(--c-pri)/.22)}
-.pv-plan td{padding-top:10px;padding-bottom:10px}
-.pv-plan td.pv-doc{background:hsl(var(--c-sec)/.22)}
-.pv-sel{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:54px;height:22px;padding:0 8px;border-radius:999px;font:inherit;font-size:11px;font-weight:600;border:0}
-.pv-sel .i{width:12px;height:12px}
-.pv-ok{background:hsl(var(--c-green)/.13);color:hsl(var(--c-green))}
-.pv-falta{background:hsl(var(--c-red)/.13);color:hsl(var(--c-red));cursor:pointer}
-.pv-falta:hover{background:hsl(var(--c-red)/.24)}
+.pv-plan td{padding-top:11px;padding-bottom:11px}
+.pv-plan td.nome .nome-abrir{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.pv-plan td.nome small{margin-top:2px}
+.pv-box{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;padding:0;border-radius:4px;border:1.5px solid hsl(var(--c-fg)/.25);background:none;vertical-align:middle;cursor:pointer}
+.pv-box:hover{border-color:hsl(var(--c-pri)/.7)}
+.pv-box.ok{background:hsl(var(--c-green));border-color:hsl(var(--c-green));cursor:default}
+.pv-box svg{width:11px;height:11px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .pv-na{color:var(--ink-3)}
-.pv-data{color:var(--ink-2);font-size:12px}
-.pv-plan td.pv-rel .kb-cron{font-size:12px;line-height:22px;padding:0 8px}
-.pv-plan td.pv-rel small{margin-top:4px}
-.pv-plan .pv-conta{font-weight:600;color:hsl(var(--c-red))}
-.pv-plan .pv-conta.ok{color:hsl(var(--c-green))}
-.pv-plan td .kb-resp{color:var(--ink-2)}
+.pv-plan td.pv-rel .kb-cron{background:none;padding:0;font-size:12.5px;font-weight:600;line-height:18px;color:var(--ink)}
+.pv-plan td.pv-rel .kb-cron.verm{color:hsl(var(--c-red))}
+.pv-plan td.pv-rel small{margin-top:1px}
+.pv-data{font-size:12.5px;font-weight:600;color:var(--ink)}
+.pv-data.pv-paga{color:hsl(var(--c-green))}
+.pv-plan td.pv-resp{color:var(--ink-2);font-size:12px}
 /* senha gov.br na janela do card */
 .fc-senha{flex-wrap:wrap}
 .fc-senha-v{word-break:break-all;user-select:all}
@@ -5959,41 +5952,40 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     if (!it) return ['na', 'Não precisa'];
     return it.ok ? ['ok', it.n + ': ok'] : ['falta', it.n + ' faltando: abrir a ficha'];
   }
+  // caixinha como a do checklist de documentos do BI de Vendas: verde marcada = ok; vazia = falta (abre a ficha)
   function pvCel(r, k){
     var e = pvEstado(r, k);
-    if (e[0] === 'ok') return '<span class="pv-sel pv-ok" title="' + esc(e[1]) + '">' + svgI('i-check') + 'ok</span>';
+    if (e[0] === 'ok') return '<span class="pv-box ok" title="' + esc(e[1]) + '" aria-label="' + esc(e[1]) + '"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2l2.3 2.3 4.7-4.9"/></svg></span>';
     if (e[0] === 'na') return '<span class="pv-na" title="' + esc(e[1]) + '">—</span>';
-    return '<button type="button" class="pv-sel pv-falta" data-act="abrir" data-id="' + esc(r.id) + '" title="' + esc(e[1]) + '">Falta</button>';
+    return '<button type="button" class="pv-box" data-act="abrir" data-id="' + esc(r.id) + '" title="' + esc(e[1]) + '" aria-label="' + esc(e[1]) + '"></button>';
   }
   function pvNasc(r){
-    if (nascido(r)) return '<span class="pv-data">Nasceu' + (r.criancaNasc ? ' ' + fmtDate(String(r.criancaNasc).slice(0, 10)) : '') + '</span>';
+    if (nascido(r)) return '<span class="pv-data">Nasceu</span><small>' + (r.criancaNasc ? fmtDate(String(r.criancaNasc).slice(0, 10)) : '') + '</small>';
     if (!r.dpp) return '<button type="button" class="kb-inline" data-act="edit" data-id="' + esc(r.id) + '">Informar o parto</button>';
-    return relogio(r.dpp, 'azul') + '<small>Parto ' + fmtDate(String(r.dpp).slice(0, 10)) + '</small>';
+    return relogio(r.dpp) + '<small>' + fmtDate(String(r.dpp).slice(0, 10)) + '</small>';
   }
   function pvGps(r){
     if (!r.tipoSegurada) return '<span class="pv-na">—</span>';
     if (rural(r) || semGps(r)) return '<span class="pv-na">Sem GPS</span>';
-    if (gpsPaga(r)) return '<span class="kb-cron verde">' + svgI('i-ok') + '<span>paga</span></span>';
+    if (gpsPaga(r)) return '<span class="pv-data pv-paga">Paga</span>';
     var v = prazoGps(r); if (!v) return '<span class="pv-na">—</span>';
-    return relogio(v, 'ouro') + '<small>Pagar até ' + fmtDate(v) + '</small>';
+    return relogio(v) + '<small>até ' + fmtDate(v) + '</small>';
   }
   function tabelaPosNovo(box, lista){
-    var nd = PV_COLS.length, nc = nd + 5;
-    // planilha: Cliente | Documentos (um check por item) | Cronômetros (parto e GPS) | Responsável
+    var nc = PV_COLS.length + 5;
+    // planilha limpa: Cliente | uma caixinha por item | relógio do parto | relógio da GPS | Responsável
     var cols = '<col class="pv-w-cli">' + PV_COLS.map(function(){ return '<col class="pv-w-doc">'; }).join('') + '<col class="pv-w-rel"><col class="pv-w-rel"><col class="pv-w-resp"><col class="pv-w-ed">';
-    var cab = '<thead><tr class="pv-grupo"><th rowspan="2" class="pv-cli">Cliente</th><th colspan="' + nd + '" class="pv-ini">Documentos</th><th colspan="2" class="pv-ini">Cronômetros</th><th rowspan="2" class="pv-ini">Responsável</th><th rowspan="2"></th></tr>' +
-      '<tr class="pv-sub">' + PV_COLS.map(function(c, i){ return '<th class="pv-c' + (i === 0 ? ' pv-ini' : '') + '">' + esc(c[1]) + '</th>'; }).join('') + '<th class="pv-ini">Nascimento</th><th>Pagamento da GPS</th></tr></thead>';
+    var cab = '<thead><tr><th>Cliente</th>' + PV_COLS.map(function(c){ return '<th class="pv-c">' + esc(c[1]) + '</th>'; }).join('') + '<th>Nascimento</th><th>Pagamento da GPS</th><th>Responsável</th><th></th></tr></thead>';
     pintarLista(box, '<table class="kb-tab kb-lista pv-plan"><colgroup>' + cols + '</colgroup>' + cab + '<tbody>' +
       (lista.slice(0, 300).map(function(r){
-        var id = esc(r.id), falta = PV_COLS.filter(function(c){ return pvEstado(r, c[0])[0] === 'falta'; }).length;
+        var id = esc(r.id);
         var sub = !r.tipoSegurada ? '<small class="verm">Pescadora, agricultora ou indígena? Informar na ficha</small>'
-          : !zapUrl(foneDe(r)) ? '<small class="verm">Sem telefone: a Ana não consegue falar com ela</small>'
-          : '<small>' + esc(cidadeCli(r) || '') + (falta ? '<b class="pv-conta"> · ' + (falta === 1 ? 'falta 1 item' : 'faltam ' + falta + ' itens') + '</b>' : '<b class="pv-conta ok"> · tudo ok</b>') + '</small>';
-        var resp = primeiroNome(r.posResp);
-        return '<tr data-linha="' + id + '"><td class="nome"><div class="nome-l"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + id + '">' + esc(r.nome || 'Sem nome') + '</button>' + tipoPill(r) + '</div>' + sub + '</td>' +
-          PV_COLS.map(function(c, i){ return '<td class="pv-c pv-doc' + (i === 0 ? ' pv-ini' : '') + '">' + pvCel(r, c[0]) + '</td>'; }).join('') +
-          '<td class="tnum pv-rel pv-ini">' + pvNasc(r) + '</td><td class="tnum pv-rel">' + pvGps(r) + '</td>' +
-          '<td class="pv-ini">' + (resp ? '<span class="kb-resp"><span class="kb-av">' + esc(iniciais(r.posResp)) + '</span><span>' + esc(resp) + '</span></span>' : '<span class="kb-resp"><span class="kb-av sem">?</span><span>Sem responsável</span></span>') + '</td>' +
+          : !zapUrl(foneDe(r)) ? '<small class="verm">Sem telefone</small>'
+          : '<small>' + esc(cidadeCli(r) || '') + '</small>';
+        return '<tr data-linha="' + id + '"><td class="nome"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + id + '">' + esc(r.nome || 'Sem nome') + '</button>' + sub + '</td>' +
+          PV_COLS.map(function(c){ return '<td class="pv-c">' + pvCel(r, c[0]) + '</td>'; }).join('') +
+          '<td class="tnum pv-rel">' + pvNasc(r) + '</td><td class="tnum pv-rel">' + pvGps(r) + '</td>' +
+          '<td class="pv-resp">' + esc(primeiroNome(r.posResp) || '—') + '</td>' +
           '<td><div class="cad-acoes">' + editBtn(r) + '</div></td></tr>';
       }).join('') || '<tr><td colspan="' + nc + '" class="empty">Nenhuma cliente neste filtro.</td></tr>') + '</tbody></table>');
   }
