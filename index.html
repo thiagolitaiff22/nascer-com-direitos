@@ -1803,6 +1803,14 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
 .kb-lista select{max-width:190px}
 .kb-lista .cad-acoes{justify-content:flex-end}
 .kb-lista .kb-btn{height:26px;padding:0 10px;font-size:11px}
+.pv-plan th.pv-c,.pv-plan td.pv-c{text-align:center}
+.pv-ok{display:inline-flex;align-items:center;gap:3px;color:hsl(var(--c-green));font-weight:600;font-size:11.25px}
+.pv-ok .i{width:12px;height:12px}
+.pv-falta{border:0;border-radius:4px;padding:0 8px;line-height:20px;font:inherit;font-size:11px;font-weight:600;background:hsl(var(--c-red)/.12);color:hsl(var(--c-red));cursor:pointer}
+.pv-falta:hover{background:hsl(var(--c-red)/.22)}
+.pv-na{color:var(--ink-3)}
+.pv-data{color:var(--ink-2)}
+.pv-plan td.pv-rel small{margin-top:3px}
 /* senha gov.br na janela do card */
 .fc-senha{flex-wrap:wrap}
 .fc-senha-v{word-break:break-all;user-select:all}
@@ -5023,7 +5031,8 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
       pintarQuadro(box, 'pos', POS_COLS.map(function(c){ return { col: c[0] === 'ok' ? [c[0], c[1], 'ok'] : c, cartoes: lista.filter(function(r){ return posEtapaDe(r) === c[0]; }).map(posCard), vazio: 'Solte uma cliente aqui' }; }));
       return;
     }
-    tabelaFase(box, lista, posInfo, 'Parto', 'Nenhuma cliente neste filtro.');
+    if (fluxoVista === 'novo') tabelaPosNovo(box, lista);
+    else tabelaFase(box, lista, posInfo, 'Parto', 'Nenhuma cliente neste filtro.');
   }
   /* ---------- fluxo novo: GPS (urbana), Aguardando nascimento e Requerimento ---------- */
   var gpnQ = '', nanQ = '', rqnQ = '';
@@ -5923,6 +5932,40 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   }
   function metaDocs(r){ var l = docsApp(r), ok = l.filter(function(x){ return x.ok; }).length; return ok === l.length ? '' : 'Documentos ' + ok + '/' + l.length; }
   // lista igual em todas as fases: cliente (com o aviso principal), etapa, data da fase, responsável, dias na etapa e o botão
+  /* Pós-venda do fluxo novo em planilha (pedido de 11/11/2026): no lugar da etapa, uma coluna por item com o check "ok",
+     e na linha o relógio do nascimento e o do pagamento da GPS */
+  var PV_COLS = [['senha', 'Senha gov.br'], ['nit', 'NIT'], ['rg_frente', 'RG'], ['cpf', 'CPF'], ['procuracao', 'Contrato']];
+  function pvOk(tit){ return '<span class="pv-ok"' + (tit ? ' title="' + esc(tit) + '"' : '') + '>' + svgI('i-check') + 'ok</span>'; }
+  function pvCel(r, k){
+    var it = docsApp(r).filter(function(x){ return x.k === k; })[0];
+    if (k === 'procuracao' && !it) return r.contratoEm ? pvOk('Contrato fechado em ' + fmtDate(String(r.contratoEm).slice(0, 10))) : '<span class="pv-na">—</span>';
+    if (!it) return '<span class="pv-na" title="Não precisa">—</span>';
+    if (it.ok) return pvOk('');
+    return '<button type="button" class="pv-falta" data-act="abrir" data-id="' + esc(r.id) + '" title="' + esc(it.n) + ' faltando: abrir a ficha">Falta</button>';
+  }
+  function pvNasc(r){
+    if (nascido(r)) return '<span class="pv-data">Nasceu' + (r.criancaNasc ? ' ' + fmtDate(String(r.criancaNasc).slice(0, 10)) : '') + '</span>';
+    if (!r.dpp) return '<button type="button" class="kb-inline" data-act="edit" data-id="' + esc(r.id) + '">Informar o parto</button>';
+    return relogio(r.dpp, 'azul') + '<small>Parto ' + fmtDate(String(r.dpp).slice(0, 10)) + '</small>';
+  }
+  function pvGps(r){
+    if (!r.tipoSegurada) return '<span class="pv-na">—</span>';
+    if (rural(r) || semGps(r)) return '<span class="pv-na">Sem GPS</span>';
+    if (gpsPaga(r)) return '<span class="kb-cron verde">' + svgI('i-ok') + '<span>paga</span></span>';
+    var v = prazoGps(r); if (!v) return '<span class="pv-na">—</span>';
+    return relogio(v, 'ouro') + '<small>Pagar até ' + fmtDate(v) + '</small>';
+  }
+  function tabelaPosNovo(box, lista){
+    var nc = PV_COLS.length + 5;
+    pintarLista(box, '<table class="kb-tab kb-lista pv-plan"><colgroup><col>' + PV_COLS.map(function(){ return '<col style="width:84px">'; }).join('') + '<col style="width:150px"><col style="width:150px"><col style="width:96px"><col style="width:44px"></colgroup>' +
+      '<thead><tr><th>Cliente</th>' + PV_COLS.map(function(c){ return '<th class="pv-c">' + esc(c[1]) + '</th>'; }).join('') + '<th>Nascimento</th><th>Pagamento da GPS</th><th>Responsável</th><th></th></tr></thead><tbody>' +
+      (lista.slice(0, 300).map(function(r){
+        var id = esc(r.id), sub = !r.tipoSegurada ? '<small class="verm">Pescadora, agricultora ou indígena? Informar na ficha</small>' : !zapUrl(foneDe(r)) ? '<small class="verm">Sem telefone: a Ana não consegue falar com ela</small>' : '<small>' + esc(cidadeCli(r) || '') + '</small>';
+        return '<tr data-linha="' + id + '"><td class="nome"><div class="nome-l"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + id + '">' + esc(r.nome || 'Sem nome') + '</button>' + tipoPill(r) + '</div>' + sub + '</td>' +
+          PV_COLS.map(function(c){ return '<td class="pv-c">' + pvCel(r, c[0]) + '</td>'; }).join('') +
+          '<td class="tnum pv-rel">' + pvNasc(r) + '</td><td class="tnum pv-rel">' + pvGps(r) + '</td><td>' + esc(primeiroNome(r.posResp) || '—') + '</td><td><div class="cad-acoes">' + editBtn(r) + '</div></td></tr>';
+      }).join('') || '<tr><td colspan="' + nc + '" class="empty">Nenhuma cliente neste filtro.</td></tr>') + '</tbody></table>');
+  }
   function tabelaFase(box, lista, info, dataRot, vazio){
     pintarLista(box, '<table class="kb-tab kb-lista"><colgroup><col><col style="width:200px"><col style="width:140px"><col style="width:120px"><col style="width:84px"><col style="width:230px"></colgroup>' +
       '<thead><tr><th>Cliente</th><th>Etapa</th><th>' + esc(dataRot) + '</th><th>Responsável</th><th>Na etapa</th><th></th></tr></thead><tbody>' +
