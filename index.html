@@ -1805,14 +1805,22 @@ dialog::backdrop{background:rgba(8,5,10,.5)}
 .kb-lista .kb-btn{height:26px;padding:0 10px;font-size:11px}
 /* Pós-venda do fluxo novo em planilha */
 .pv-plan{min-width:1000px}
-.pv-plan .pv-w-cli{width:30%}.pv-plan .pv-w-doc{width:8%}.pv-plan .pv-w-rel{width:12%}.pv-plan .pv-w-resp{width:9%}.pv-plan .pv-w-ed{width:44px}
+.pv-plan .pv-w-cli{width:32%}.pv-plan .pv-w-doc{width:8.5%}.pv-plan .pv-w-rel{width:12%}.pv-plan .pv-w-resp{width:9%}.pv-plan .pv-w-ed{width:44px}
 .pv-plan th.pv-c,.pv-plan td.pv-c{text-align:center}
 .pv-plan td{padding-top:11px;padding-bottom:11px}
 .pv-plan td.nome .nome-abrir{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
 .pv-plan td.nome small{margin-top:2px}
 .pv-box{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;padding:0;border-radius:4px;border:1.5px solid hsl(var(--c-fg)/.25);background:none;vertical-align:middle;cursor:pointer}
 .pv-box:hover{border-color:hsl(var(--c-pri)/.7)}
-.pv-box.ok{background:hsl(var(--c-green));border-color:hsl(var(--c-green));cursor:default}
+.pv-box.ok{background:hsl(var(--c-green));border-color:hsl(var(--c-green))}
+.pv-box.ok.fixo{cursor:default}
+.pv-pop{position:absolute;z-index:9999;width:260px;background:var(--panel);border:1px solid hsl(var(--c-line));border-radius:12px;box-shadow:0 12px 32px rgba(40,20,70,.18);padding:14px;display:flex;flex-direction:column;gap:8px;font-size:12.5px}
+.pv-pop b{font-size:13.5px;font-weight:600;color:var(--ink)}
+.pv-pop .pv-pop-q{color:var(--ink-3);font-size:11.5px;margin-top:-6px}
+.pv-pop input{height:34px;border:1px solid var(--line-2);border-radius:8px;padding:0 10px;font:inherit;font-size:13px;background:var(--bg);color:var(--ink)}
+.pv-pop .pv-pop-e{color:hsl(var(--c-red));font-size:11.5px}
+.pv-pop-b{display:flex;justify-content:flex-end;gap:8px}
+.pv-pop-b .btn{height:30px;padding:0 12px;font-size:12px}
 .pv-box svg{width:11px;height:11px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .pv-na{color:var(--ink-3)}
 .pv-plan td.pv-rel .kb-cron{background:none;padding:0;font-size:12.5px;font-weight:600;line-height:18px;color:var(--ink)}
@@ -5944,7 +5952,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   // lista igual em todas as fases: cliente (com o aviso principal), etapa, data da fase, responsável, dias na etapa e o botão
   /* Pós-venda do fluxo novo em planilha (pedido de 11/11/2026): no lugar da etapa, uma coluna por item com o check "ok",
      e na linha o relógio do nascimento e o do pagamento da GPS */
-  var PV_COLS = [['senha', 'Senha gov.br'], ['nit', 'NIT'], ['rg_frente', 'RG'], ['cpf', 'CPF'], ['procuracao', 'Contrato']];
+  var PV_COLS = [['senha', 'Senha gov.br'], ['nit', 'NIT'], ['rg_frente', 'RG'], ['cpf', 'CPF']];
   // situação de um item: ok, falta ou na (não precisa), com a dica do mouse
   function pvEstado(r, k){
     var it = docsApp(r).filter(function(x){ return x.k === k; })[0];
@@ -5952,13 +5960,78 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     if (!it) return ['na', 'Não precisa'];
     return it.ok ? ['ok', it.n + ': ok'] : ['falta', it.n + ' faltando: abrir a ficha'];
   }
-  // caixinha como a do checklist de documentos do BI de Vendas: verde marcada = ok; vazia = falta (abre a ficha)
+  // caixinha como a do checklist de documentos do BI de Vendas: verde marcada = ok; vazia = falta.
+  // Clicar resolve ali mesmo: senha gov.br e NIT abrem um campo para adicionar; RG e CPF marcam e desmarcam (pedido de 11/11/2026)
+  var PV_CHECK = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2l2.3 2.3 4.7-4.9"/></svg>';
   function pvCel(r, k){
-    var e = pvEstado(r, k);
-    if (e[0] === 'ok') return '<span class="pv-box ok" title="' + esc(e[1]) + '" aria-label="' + esc(e[1]) + '"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2l2.3 2.3 4.7-4.9"/></svg></span>';
+    var e = pvEstado(r, k), id = esc(r.id), nome = (PV_COLS.filter(function(c){ return c[0] === k; })[0] || [0, ''])[1], doc = k === 'rg_frente' || k === 'cpf';
     if (e[0] === 'na') return '<span class="pv-na" title="' + esc(e[1]) + '">—</span>';
-    return '<button type="button" class="pv-box" data-act="abrir" data-id="' + esc(r.id) + '" title="' + esc(e[1]) + '" aria-label="' + esc(e[1]) + '"></button>';
+    if (e[0] === 'ok') return doc ? '<button type="button" class="pv-box ok" data-pv="desmarcar" data-doc="' + k + '" data-id="' + id + '" title="' + esc(nome) + ' recebido · clique para desmarcar" aria-label="' + esc(nome) + ' recebido">' + PV_CHECK + '</button>'
+      : '<span class="pv-box ok fixo" title="' + esc(nome) + ' ok" aria-label="' + esc(nome) + ' ok">' + PV_CHECK + '</span>';
+    var tit = k === 'senha' ? 'Adicionar senha gov.br' : k === 'nit' ? 'Adicionar NIT' : 'Marcar ' + nome + ' como recebido';
+    return '<button type="button" class="pv-box" data-pv="' + (doc ? 'doc' : k) + '" data-doc="' + k + '" data-id="' + id + '" title="' + esc(tit) + '" aria-label="' + esc(tit) + '"></button>';
   }
+  function mascNit(v){ var x = digits(v).slice(0, 11), o = x.slice(0, 3); if (x.length > 3) o += '.' + x.slice(3, 8); if (x.length > 8) o += '.' + x.slice(8, 10); if (x.length > 10) o += '-' + x.slice(10); return o; }
+  var pvPopEl = null;
+  function pvFechar(){ if (pvPopEl){ pvPopEl.remove(); pvPopEl = null; } }
+  function pvAbrir(b, r, tipo){
+    pvFechar();
+    var senha = tipo === 'senha', d = document.createElement('div');
+    d.className = 'pv-pop'; d.setAttribute('role', 'dialog'); d.dataset.id = r.id; d.dataset.tipo = tipo;
+    d.innerHTML = '<b>' + (senha ? 'Adicionar senha gov.br' : 'Adicionar NIT') + '</b><span class="pv-pop-q">' + esc(r.nome || '') + '</span>' +
+      '<input ' + (senha ? 'type="text" placeholder="Senha do gov.br"' : 'inputmode="numeric" placeholder="000.00000.00-0" maxlength="14"') + ' autocomplete="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore aria-label="' + (senha ? 'Senha do gov.br' : 'NIT') + '">' +
+      '<small class="pv-pop-e" hidden></small><div class="pv-pop-b"><button type="button" class="btn" data-pvp="x">Cancelar</button><button type="button" class="btn primary" data-pvp="ok">Salvar</button></div>';
+    document.body.appendChild(d); pvPopEl = d;
+    var q = b.getBoundingClientRect(), w = d.offsetWidth, h = d.offsetHeight, left = Math.max(8, Math.min(window.innerWidth - w - 8, q.left + q.width / 2 - w / 2)), top = q.bottom + 8;
+    if (top + h > window.innerHeight - 8) top = Math.max(8, q.top - h - 8);
+    d.style.left = (left + window.scrollX) + 'px'; d.style.top = (top + window.scrollY) + 'px';
+    var inp = d.querySelector('input'); inp.focus({ preventScroll: true });
+    if (!senha) inp.addEventListener('input', function(){ inp.value = mascNit(inp.value); });
+  }
+  async function pvSalvar(){
+    var d = pvPopEl; if (!d) return;
+    var r = acharRow(d.dataset.id), inp = d.querySelector('input'), er = d.querySelector('.pv-pop-e'), bt = d.querySelector('[data-pvp="ok"]'), v = inp.value.trim(), senha = d.dataset.tipo === 'senha';
+    var erro = function(t){ er.textContent = t; er.hidden = false; inp.focus(); };
+    if (!r){ pvFechar(); return; }
+    if (!v) return erro(senha ? 'Digite a senha.' : 'Digite o NIT.');
+    if (!senha && !nitOk(v)) return erro('NIT inválido: confira os 11 números.');
+    bt.disabled = true; bt.textContent = 'Salvando…';
+    try {
+      if (senha){
+        if (state.db){ var rs = await SB.rpc('senha_gov_gravar', { p_cliente: r.id, p_senha: v }); if (rs.error) throw rs.error; }
+        await patchRow(r.id, { senhaGovOk: true, atualizadoEm: new Date().toISOString() });
+        toast('Senha do gov.br salva · ' + r.nome);
+      } else {
+        await patchRow(r.id, { nit: mascNit(v), atualizadoEm: new Date().toISOString() });
+        toast('NIT salvo · ' + r.nome);
+      }
+      pvFechar();
+    } catch(err){ bt.disabled = false; bt.textContent = 'Salvar'; erro(errMsg(err)); }
+  }
+  async function pvDoc(r, k, marcar){
+    var lista = Array.isArray(r.campoDocs) ? r.campoDocs.slice() : docsApp(r).filter(function(x){ return x.ok && x.k !== 'senha' && x.k !== 'nit'; }).map(function(x){ return x.k; });
+    var falta = faltaDocs(r).filter(function(x){ return x !== k; });
+    if (marcar){ if (lista.indexOf(k) < 0) lista.push(k); }
+    else { lista = lista.filter(function(x){ return x !== k; }); falta.push(k); }
+    try { await patchRow(r.id, { campoDocs: lista, faltaDocs: falta, atualizadoEm: new Date().toISOString() }); toast((DOC_FALTA[k] || k) + (marcar ? ' marcado como recebido' : ' voltou a pendente') + ' · ' + r.nome); }
+    catch(err){ toast(errMsg(err)); }
+  }
+  window.addEventListener('click', function(e){
+    var t = e.target;
+    if (pvPopEl && !pvPopEl.contains(t)) pvFechar();
+    var p = t.closest && t.closest('.pv-pop [data-pvp]');
+    if (p){ e.stopImmediatePropagation(); if (p.dataset.pvp === 'ok') pvSalvar(); else pvFechar(); return; }
+    var b = t.closest && t.closest('.pv-plan [data-pv]'); if (!b) return;
+    e.stopImmediatePropagation(); e.preventDefault();
+    var r = acharRow(b.dataset.id); if (!r) return;
+    if (b.dataset.pv === 'senha' || b.dataset.pv === 'nit') pvAbrir(b, r, b.dataset.pv);
+    else pvDoc(r, b.dataset.doc, b.dataset.pv === 'doc');
+  }, true);
+  document.addEventListener('keydown', function(e){
+    if (!pvPopEl) return;
+    if (e.key === 'Escape') pvFechar();
+    else if (e.key === 'Enter' && pvPopEl.contains(e.target)){ e.preventDefault(); pvSalvar(); }
+  });
   function pvNasc(r){
     if (nascido(r)) return '<span class="pv-data">Nasceu</span><small>' + (r.criancaNasc ? fmtDate(String(r.criancaNasc).slice(0, 10)) : '') + '</small>';
     if (!r.dpp) return '<button type="button" class="kb-inline" data-act="edit" data-id="' + esc(r.id) + '">Informar o parto</button>';
@@ -5981,6 +6054,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
         var id = esc(r.id);
         var sub = !r.tipoSegurada ? '<small class="verm">Pescadora, agricultora ou indígena? Informar na ficha</small>'
           : !zapUrl(foneDe(r)) ? '<small class="verm">Sem telefone</small>'
+          : ctPend(r) ? '<small class="verm">Falta assinar o contrato (a Ana manda o link)</small>'
           : '<small>' + esc(cidadeCli(r) || '') + '</small>';
         return '<tr data-linha="' + id + '"><td class="nome"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + id + '">' + esc(r.nome || 'Sem nome') + '</button>' + sub + '</td>' +
           PV_COLS.map(function(c){ return '<td class="pv-c">' + pvCel(r, c[0]) + '</td>'; }).join('') +
