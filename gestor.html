@@ -283,6 +283,8 @@ function tentarParceiro(cpf, senha){
         msgLogin(f.error ? 'Não foi possível verificar o acesso.' : 'Este painel é só para gestores.');
         SB.auth.signOut(); return;
       }
+      // o acompanhamento do gestor agora é no aplicativo novo (formato do prospectador): entra lá com o acesso dele (SQL 59)
+      if (!/[?&]painel/.test(location.search)) return irAppGestor(session);
       S.eu = session.user.email;
       $('login').classList.add('hidden'); $('app').classList.remove('hidden');
       if (SENHA_TROCA_OBRIGATORIA) SB.rpc('equipe_precisa_trocar').then(function(q){ if (q.data === true) return novaSenhaObrigatoria(); });
@@ -292,6 +294,18 @@ function tentarParceiro(cpf, senha){
         carregar();
       }, function(){ S.estados = []; carregar(); });
     });
+  }
+  function irAppGestor(session){
+    msgLogin('Abrindo o aplicativo…');
+    SB.rpc('gestor_app_entrar').then(function(r){
+      var d = r && r.data;
+      if (!d || !d.token){ $('lg-go').disabled = false; msgLogin((d && d.erro) || 'Não foi possível abrir o seu acesso agora. Tente de novo.'); return; }
+      try {
+        localStorage.setItem('nascer_campo_token', d.token); localStorage.setItem('nascer_campo_gestor_nome', d.nome || ''); localStorage.setItem('nascer_campo_aba', 'painel');
+        ['nascer_campo_quem', 'nascer_campo_pp', 'nascer_campo_painel'].forEach(function(k){ localStorage.removeItem(k); });   // nada de outra conta neste aparelho
+      } catch(x){}
+      location.replace('campo.html');
+    }, function(){ $('lg-go').disabled = false; msgLogin('Sem internet. Tente de novo.'); });
   }
   $('b-sair').addEventListener('click', function(){ SB.auth.signOut().then(function(){ location.reload(); }); });
   SB.auth.getSession().then(function(r){ if (r.data && r.data.session) entrar(r.data.session); });

@@ -1500,7 +1500,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 113;
+  var APP_VERSAO = 114;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -3143,7 +3143,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
         '<div class="ct-linha"><input id="ct-s2" type="password" inputmode="numeric" autocomplete="new-password" placeholder="Repita a nova senha"></div>' +
         '<button type="button" class="ct-btn" id="ct-senha-ok">Salvar a nova senha</button></div>') +
       '<div class="ct-rot" style="margin-top:18px">Aplicativo</div>' +
-      '<div class="pm-conta">' + (podeInstalar() ? '<button type="button" id="inst-btn"><b>Instalar o aplicativo</b><small>' + (android() ? 'Baixe o aplicativo para Android. Atualiza sozinho.' : 'Sem baixar arquivo e sem alertas. Atualiza sozinho.') + '</small></button>' : '') + (pushSuporte() ? '<button type="button" id="avisos-btn"><b>Avisos no celular</b><small id="avisos-sub">' + (avisosAtivos() ? 'Ativados · toque para desativar' : 'Desativados · toque para ativar') + '</small></button>' : '') + (ehGestor() ? '<button type="button" id="ir-gestor"><b>Painel completo do gestor</b><small>Todos os parceiros e documentos do escritório</small></button>' : '') + '<button type="button" id="verif-perm"><b>Permissões do celular</b><small>Câmera, localização e avisos</small></button><button type="button" id="verif-atu"><b>Verificar atualização</b><small>Veja se há uma versão nova do aplicativo</small></button>' +
+      '<div class="pm-conta">' + (podeInstalar() ? '<button type="button" id="inst-btn"><b>Instalar o aplicativo</b><small>' + (android() ? 'Baixe o aplicativo para Android. Atualiza sozinho.' : 'Sem baixar arquivo e sem alertas. Atualiza sozinho.') + '</small></button>' : '') + (pushSuporte() ? '<button type="button" id="avisos-btn"><b>Avisos no celular</b><small id="avisos-sub">' + (avisosAtivos() ? 'Ativados · toque para desativar' : 'Desativados · toque para ativar') + '</small></button>' : '') + '<button type="button" id="verif-perm"><b>Permissões do celular</b><small>Câmera, localização e avisos</small></button><button type="button" id="verif-atu"><b>Verificar atualização</b><small>Veja se há uma versão nova do aplicativo</small></button>' +
       '<button type="button" class="sair" id="sair"><svg><use href="#i-sair"/></svg>Sair desta conta</button></div>' +
       '<div class="versao">Nascer com Direitos · versão ' + APP_VERSAO + '</div>';
     $('sair').onclick = sair;
@@ -3155,7 +3155,6 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
       ativarAvisos().then(function(r){ if (r.ok) sub.textContent = 'Ativados · toque para desativar'; else { sub.textContent = 'Desativados · toque para ativar'; alert(r.msg); } pintarSino(); });
     };
     $('verif-perm').onclick = function(){ pedirPermissoes(true); };
-    if ($('ir-gestor')) $('ir-gestor').onclick = function(){ location.href = SITE + 'gestor.html'; };
     $('verif-atu').onclick = function(){ var b = this; b.querySelector('small').textContent = 'Verificando…'; ultimaChecagem = 0; verificarAtualizacao(); setTimeout(function(){ if (document.body.contains(b)) b.querySelector('small').textContent = document.querySelector('.atu') ? 'Há uma versão nova: use o aviso no topo' : 'Seu aplicativo está atualizado'; }, 1800); };
     // foto: escolhe da galeria ou tira na hora; o app recorta quadrada e diminui (192 x 192)
     var escolher = function(){ $('ct-arq').value = ''; $('ct-arq').click(); };
@@ -4417,10 +4416,10 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
             return fetch(CFG.url + '/rest/v1/rpc/gestor_app_entrar', { method: 'POST', headers: { apikey: CFG.key, Authorization: 'Bearer ' + s.access_token, 'Content-Type': 'application/json' }, body: '{}' })
               .then(function(r){ return r.json(); })
               .then(function(g){
-                if (!g || !g.token) return irPainelGestor(s, f);
+                if (!g || !g.token){ tirarEsqueleto(true); alert((g && g.erro) || 'Não foi possível abrir o seu acesso de gestor agora. Tente de novo em instantes.'); return true; }
                 token = g.token; lsSet('campo_token', token); lsSet('campo_gestor_nome', g.nome || ''); lsSet('campo_aba', 'painel'); aba = 'painel';
                 quem = null; iniciar(); return true;
-              }, function(){ return irPainelGestor(s, f); });
+              }, function(){ tirarEsqueleto(true); alert('Sem conexão com o sistema agora. Tente de novo.'); return true; });
           });
       })
       .catch(function(){ return false; });
