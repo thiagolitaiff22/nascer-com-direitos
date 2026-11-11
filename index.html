@@ -5037,7 +5037,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     else if (v && v < iso(new Date())) st.push(kbSt('Prazo passou em ' + fmtDate(v) + ': pagamento automático não confirmado'));
     else if (gpsTarefa(r)) st.push(kbSt('Pagamento automático pelo Asaas até ' + fmtDate(v), 'lar'));
     else st.push(kbSt('Guia pronta · o Asaas paga' + (gat ? ' em ' + fmtDate(gat) : ' no prazo'), 'ok'));
-    if (pendG.length) st.push(kbSt('Pendência no Pós-venda: ' + pendG.join(', '), 'lar'));
+    if (pendG.length) st.push(kbSt('Ainda falta: ' + pendG.join(', '), 'lar'));
     return { etapa: gpsTarefa(r) ? 'Pagamento automático' : 'Aguardando o prazo', etapaSel: '', status: st, resp: r.posResp, dias: diasNoPos(r), parado: false,
       dataVal: v ? fmtDate(v) + ' · ' + emDias(v) : 'sem data do parto', acao: '' };
   }
@@ -6841,9 +6841,12 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   }
   function faseDe(r){ if (r.arquivado) return arquivadoPago(r) ? 'r' : 'q'; if (String(r.processo || '').trim()) return 'c'; if (requerido(r)) return 'i'; if (naFila(r)) return doFluxoNovo(r) ? 'rq' : 'h'; if (noContratos(r)) return doFluxoNovo(r) ? faseNovoPos(r) : 'k'; if (desqualificada(r) || perdidoAuto(r)) return 'q'; return 'd'; }
   // fluxo novo: senha/documentos ficam no Pós-venda; GPS, nascimento e certidão/requerimento ganham tela própria
+  // gestante que paga GPS, com NIT válido, guia ainda não paga e contrato sem pendência: a guia já pode sair
+  function aptaGps(r){ return !rural(r) && !semGps(r) && !nascido(r) && !gpsPaga(r) && !ctPend(r) && nitOk(r.nit) && ['senha', 'docs', 'prazo_gps', 'gps'].indexOf(posEtapaDe(r)) >= 0; }
   function faseNovoPos(r){
     if (!r.tipoSegurada) return 'k';            // o escritório decide rural ou urbano antes de qualquer guia
     if (gpsTarefa(r) && nitOk(r.nit)) return 'gp';   // prazo da GPS chegou e tem NIT: o pagamento automático segue mesmo com outra pendência (aparece na linha)
+    if (aptaGps(r)) return 'gp';                // já pode pagar a guia (tem NIT): fica na GPS mesmo faltando senha ou documento (pedido de 11/11/2026)
     if (faltamTxt(r)) return 'k';               // senha gov.br, documento, NIT ou prova rural faltando: Pós-venda resolve
     var e = posEtapaDe(r); return e === 'prazo_gps' || e === 'gps' ? 'gp' : e === 'nasc' ? 'an' : e === 'cert' || e === 'ok' ? 'rq' : 'k';
   }
