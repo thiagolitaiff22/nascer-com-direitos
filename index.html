@@ -2746,7 +2746,6 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
       <div class="brand"><div class="logo"><img src="img/logo-nascer-t.png" alt="Nascer com Direitos"></div><div class="brand-t"><b>Nascer com Direitos</b><span>Salário-maternidade</span></div></div>
       <button type="button" class="lat-rec" id="btn-side" title="Esconder o menu" aria-label="Esconder o menu" aria-expanded="true"><svg class="i"><use href="#i-panel"/></svg></button>
     </div>
-    <div class="fluxo-seg" role="group" aria-label="Qual fluxo ver"><button type="button" data-fluxo="novo" title="Mães que vêm do app novo, já qualificadas e com contrato: sem closer e sem Controladoria">Fluxo novo<b id="fx-n-novo" class="tnum"></b></button><button type="button" data-fluxo="antigo" title="Como funciona hoje: closer, Controladoria e Fila de protocolo">Fluxo antigo<b id="fx-n-antigo" class="tnum"></b></button></div>
     <nav class="nav" role="tablist" aria-orientation="vertical">
       <button class="tab" role="tab" id="tab-dash" aria-selected="false" type="button" title="Dashboard"><svg class="i"><use href="#i-grid"/></svg><span>Dashboard</span></button>
       <div class="nav-lbl" id="lbl-com" aria-hidden="true">Comercial</div>
@@ -2778,7 +2777,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
         <div class="tema-seg" role="group" aria-label="Tema"><button type="button" id="tema-claro" aria-label="Tema claro" title="Tema claro"><svg class="i"><use href="#i-sun"/></svg></button><button type="button" id="tema-escuro" aria-label="Tema escuro" title="Tema escuro"><svg class="i"><use href="#i-moon"/></svg></button></div>
         <button type="button" class="topo-sino" id="btn-avisos" title="Avisos: pontos que precisam de atenção" aria-label="Avisos"><svg class="i"><use href="#i-bell"/></svg><b id="avisos-n" class="av-n" hidden></b></button>
         <div class="pop-box"><button type="button" class="topo-add" id="btn-add" aria-haspopup="true" aria-expanded="false">Adicionar<svg class="i"><use href="#i-chev"/></svg></button>
-          <div class="pop" id="pop-add" hidden><button type="button" data-add="cad"><svg class="i"><use href="#i-phone"/></svg>Novo cadastro</button><button type="button" data-add="parc"><svg class="i"><use href="#i-users"/></svg>Novo parceiro</button><button type="button" class="admin-only" data-add="func"><svg class="i"><use href="#i-gear"/></svg>Novo funcionário</button></div></div>
+          <div class="pop" id="pop-add" hidden><button type="button" data-add="parc"><svg class="i"><use href="#i-users"/></svg>Novo parceiro</button><button type="button" class="admin-only" data-add="func"><svg class="i"><use href="#i-gear"/></svg>Novo funcionário</button></div></div>
         <div class="pop-box"><button type="button" class="topo-user" id="btn-user" aria-haspopup="true" aria-expanded="false"><span class="av" id="me-av">E</span><span class="ola">Olá, <b id="me-ola"></b></span><svg class="i"><use href="#i-chev"/></svg></button>
           <div class="pop" id="pop-user" hidden><p class="pop-nome" id="me"></p><small id="sync">Conectando à base…</small><button type="button" id="btn-senha"><svg class="i"><use href="#i-chave"/></svg>Alterar senha</button><button type="button" id="btn-recup" hidden><svg class="i"><use href="#i-mail"/></svg>E-mail de recuperação</button><button type="button" id="btn-sair"><svg class="i"><use href="#i-sair"/></svg>Sair</button></div></div>
       </div>
@@ -6899,8 +6898,8 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
            sem closer e sem Controladoria: entra direto no Pós-venda
      antigo: todas as outras; segue como era, com closer, Controladoria e Fila (cadastros antigos e app desatualizado, sem contrato) */
   function diaCadastro(r){ return r.criadoEm ? diaLocal(r.criadoEm) : String(r.dataCadastro || '').slice(0, 10); }
-  function doFluxoNovo(r){ return r.fluxo === 'novo'; }
-  var fluxoVista = lerGuardado('nascer-fluxo', 'antigo') === 'novo' ? 'novo' : 'antigo';
+  function doFluxoNovo(r){ return r.fluxo === 'novo' || !!r.contratoEm; }   // o Fluxo antigo acabou (18/11/2026): quem já tem contrato fica no novo; quem nunca fechou contrato sai do BI (continua guardada no banco)
+  var fluxoVista = 'novo';   // o Fluxo antigo saiu do BI em 18/11/2026 (a pedido: "acabe com o fluxo antigo e delete ele de todo o BI"): sem o botão Fluxo novo / Fluxo antigo
   function filtrarFluxo(){ var novo = fluxoVista === 'novo'; state.rows = (state.todas || state.rows || []).filter(function(r){ return doFluxoNovo(r) === novo; }); }
   function acharNaBase(id){ return (state.todas || state.rows).filter(function(x){ return x.id === id; })[0]; }
   function ativaNoFluxo(r){ return !r.arquivado && !perdaOuDesq(r); }
@@ -6912,7 +6911,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     document.documentElement.setAttribute('data-fx', fluxoVista);   // estilos do fluxo novo (filtros no padrão do BI de Vendas) só valem com data-fx="novo"
   }
   function trocarFluxo(f){
-    if (f === fluxoVista) return;
+    if (f === fluxoVista || f !== 'novo') return;
     fluxoVista = f; guardar('nascer-fluxo', f); filtrarFluxo();
     if (f === 'novo' && (telaAberta === 'd' || telaAberta === 'h' || telaAberta === 'q')) showTab(telaAberta === 'h' ? 'rq' : 'k');
     if (f !== 'novo' && (telaAberta === 'gp' || telaAberta === 'an' || telaAberta === 'rq')) showTab('k');
@@ -7017,7 +7016,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     var fluxo = telaDoFunil(t);
     $('vista-seg').hidden = true;
     Array.prototype.forEach.call($('vista-seg').querySelectorAll('button'), function(b){ b.setAttribute('aria-pressed', String(b.dataset.vista === vistaDe(t))); });
-    $('btn-novo').hidden = !(t === 'd' || t === 'k' || t === 'h' || t === 'i' || t === 'c');
+    $('btn-novo').hidden = true;   // cadastro novo só pelo aplicativo (pedido de 18/11/2026: "não libere novo cadastro diretamente do BI")
     $('mais-box').hidden = t !== 'k' || fluxoVista === 'novo';
     var c = $('conteudo');
     c.classList.remove('em-quadro', 'recolhido');
@@ -7151,7 +7150,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     var q = $('bg-q').value.trim(), box = $('bg-res');
     if (q.length < 2){ box.hidden = true; return; }
     var qd = digits(q);
-    bgItens = (state.todas || state.rows).filter(function(r){ return buscaCliente(r, q) || (qd.length >= 4 && digits(r.contato).indexOf(qd) >= 0); }).sort(function(a, b){ return String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); }).slice(0, 30);
+    bgItens = (state.rows || []).filter(function(r){ return buscaCliente(r, q) || (qd.length >= 4 && digits(r.contato).indexOf(qd) >= 0); }).sort(function(a, b){ return String(a.nome || '').localeCompare(String(b.nome || ''), 'pt'); }).slice(0, 30);
     if (bgMarcado >= bgItens.length) bgMarcado = 0;
     box.hidden = false;
     box.innerHTML = bgItens.length ? '<div class="bg-cab">' + plural(bgItens.length, 'cliente', 'clientes') + '</div>' + bgItens.map(function(r, i){
@@ -8741,6 +8740,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   // fluxo novo: a resposta da pergunta da atividade preenche os campos de tipo e atividade que o salvar já grava
   $('f-ativn').addEventListener('change', function(){ var p = ativPatch(this.value, state.editBase); $('f-tipo').value = p.tipoSegurada; $('f-ativ').value = p.atividade; });
   function openForm(r, embutido, compacto, comPasta){
+    if (!r){ if (!embutido) toast('Cadastro novo só pelo aplicativo.'); return; }   // o BI só edita: mãe nova entra pelo aplicativo (18/11/2026)
     var lugar = embutido ? $('cad-box') : dlg;
     if ($('form').parentElement !== lugar) lugar.appendChild($('form'));
     state.editing = r ? r.id : null;
@@ -8877,6 +8877,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   });
   $('form').addEventListener('submit', async function(e){
     e.preventDefault();
+    if (!state.editing){ toast('Cadastro novo só pelo aplicativo.'); return; }   // o BI não cria mãe nova (18/11/2026)
     var nome = $('f-nome').value.trim();
     nome = nomeProprio(nome);   // padrão do escritório: primeira letra maiúscula, o resto minúsculo
     if (!nome){ $('f-nome').focus(); toast('Informe o nome da cliente'); return; }
