@@ -2510,111 +2510,144 @@ html[data-fx="novo"] .kb-ana .i,html[data-fx="novo"] .fc-ana .i{width:14px;heigh
 html[data-fx="novo"]:root[data-theme="dark"] .kb-ana .i,html[data-fx="novo"]:root[data-theme="dark"] .fc-ana .i{color:#c9a3ea}
 html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:13px}
 
-/* ================= BI mais compacto (18/11/2026, a pedido: "reduza mais o tamanho dos elementos visuais, para ficar algo mais tranquilo e bonito") =================
-   Só no Fluxo novo. O mesmo estilo do aplicativo, em tamanho menor: menu e topo mais baixos, títulos, cartões e números menores,
-   sombras mais leves e listas mais justas (sobra espaço para o nome da mãe). */
-html[data-fx="novo"]:root:not([data-theme="dark"]){--shadow:0 1px 2px rgba(41,24,56,.05),0 2px 8px rgba(41,24,56,.04);--sombra:var(--shadow);--sombra-leve:0 1px 2px rgba(41,24,56,.04)}
-html[data-fx="novo"]{--r:14px;--r-sm:10px}
-html[data-fx="novo"] body{font-size:13px}
+/* ================= BI mais compacto (18/11/2026, a pedido: "reduza mais o tamanho dos elementos visuais, para ficar algo mais tranquilo e bonito" e depois "menor em tudo") =================
+   Só no Fluxo novo. O mesmo estilo do aplicativo, em tamanho pequeno: menu e topo baixos, títulos, cartões, números, gráfico e mapa menores,
+   sombras quase nenhuma e listas justas (sobra espaço para o nome da mãe). */
+html[data-fx="novo"]:root:not([data-theme="dark"]){--shadow:0 1px 2px rgba(41,24,56,.05);--sombra:var(--shadow);--sombra-leve:0 1px 2px rgba(41,24,56,.04)}
+html[data-fx="novo"]{--r:12px;--r-sm:8px}
+html[data-fx="novo"] body{font-size:12.5px}
 /* menu lateral */
-@media (min-width:1000px){html[data-fx="novo"] .app:not(.collapsed) .lateral{width:212px}}
+@media (min-width:1000px){html[data-fx="novo"] .app:not(.collapsed) .lateral{width:192px}}
 html[data-fx="novo"] .lateral{box-shadow:none}
-html[data-fx="novo"] .lat-topo{min-height:56px;padding:6px 6px 4px 12px}
-html[data-fx="novo"] .brand{gap:8px}
-html[data-fx="novo"] .brand img{height:34px;width:auto}
-html[data-fx="novo"] .brand b{font-size:13.5px}
-html[data-fx="novo"] .brand span{font-size:10.5px}
-html[data-fx="novo"] .fluxo-seg{margin:2px 10px 8px;padding:3px;border-radius:10px}
-html[data-fx="novo"] .fluxo-seg button{height:26px;border-radius:7px;font-size:11.5px}
-html[data-fx="novo"] .fluxo-seg button[aria-pressed="true"]{box-shadow:0 2px 6px rgba(102,46,153,.18)}
-html[data-fx="novo"] .nav{padding:2px 8px 10px}
-html[data-fx="novo"] .nav-lbl{margin-top:10px;padding:2px 10px;font-size:9.5px}
-html[data-fx="novo"] .nav .tab{height:31px;padding:0 10px;margin:1px 0;border-radius:8px;font-size:13px;gap:9px}
-html[data-fx="novo"] .nav .tab svg.i{width:16px;height:16px}
-html[data-fx="novo"] .nav-n{min-width:19px;height:17px;padding:0 5px;font-size:10px}
+html[data-fx="novo"] .lat-topo{min-height:48px;padding:5px 5px 3px 11px}
+html[data-fx="novo"] .lat-topo button{width:24px;height:24px}
+html[data-fx="novo"] .brand{gap:7px}
+html[data-fx="novo"] .brand img{height:28px;width:auto}
+html[data-fx="novo"] .brand b{font-size:12.5px}
+html[data-fx="novo"] .brand span{font-size:10px}
+html[data-fx="novo"] .fluxo-seg{margin:2px 9px 6px;padding:2px;border-radius:9px}
+html[data-fx="novo"] .fluxo-seg button{height:24px;border-radius:7px;font-size:11px}
+html[data-fx="novo"] .fluxo-seg button[aria-pressed="true"]{box-shadow:none}
+html[data-fx="novo"] .nav{padding:2px 7px 8px}
+html[data-fx="novo"] .nav-lbl{margin-top:8px;padding:2px 9px;font-size:9px}
+html[data-fx="novo"] .nav .tab{height:28px;padding:0 9px;margin:1px 0;border-radius:7px;font-size:12.5px;gap:8px}
+html[data-fx="novo"] .nav .tab svg.i{width:15px;height:15px}
+html[data-fx="novo"] .nav-n{min-width:18px;height:16px;padding:0 5px;font-size:9.5px}
 /* topo */
-html[data-fx="novo"] .topo{height:52px;padding:0 24px}
-html[data-fx="novo"] .busca-geral input:not([type=checkbox]):not([type=radio]){height:32px;font-size:12.5px;box-shadow:none}
-html[data-fx="novo"] .topo-add{height:32px;padding:0 11px 0 15px;font-size:12px;box-shadow:0 2px 8px rgba(102,46,153,.18)}
-html[data-fx="novo"] .topo-add .i{width:13px;height:13px}
-html[data-fx="novo"] .topo-user{height:32px;font-size:12.5px;gap:6px}
-html[data-fx="novo"] .topo-user .av{width:24px;height:24px;font-size:11px}
-html[data-fx="novo"] .topo-sino{width:32px;height:32px}
-html[data-fx="novo"] .topo-sino .i{width:16px;height:16px}
-html[data-fx="novo"] .tema-seg button{width:23px;height:23px}
-html[data-fx="novo"] .tema-seg .i{width:13px;height:13px}
-html[data-fx="novo"] .pop{border-radius:12px;padding:5px;box-shadow:0 10px 28px rgba(41,24,56,.14)}
-html[data-fx="novo"] .pop button,html[data-fx="novo"] .pop a{border-radius:8px;padding:7px 10px;font-size:12.5px}
-html[data-fx="novo"] .content{padding:20px 28px 40px;gap:16px}
+html[data-fx="novo"] .topo{height:46px;padding:0 20px}
+html[data-fx="novo"] .busca-geral input:not([type=checkbox]):not([type=radio]){height:30px;font-size:12px;box-shadow:none}
+html[data-fx="novo"] .topo-add{height:30px;padding:0 10px 0 13px;font-size:11.5px;box-shadow:none}
+html[data-fx="novo"] .topo-add .i{width:12px;height:12px}
+html[data-fx="novo"] .topo-user{height:30px;font-size:12px;gap:6px}
+html[data-fx="novo"] .topo-user .av{width:22px;height:22px;font-size:10.5px}
+html[data-fx="novo"] .topo-sino{width:30px;height:30px}
+html[data-fx="novo"] .topo-sino .i{width:15px;height:15px}
+html[data-fx="novo"] .tema-seg button{width:21px;height:21px}
+html[data-fx="novo"] .tema-seg .i{width:12px;height:12px}
+html[data-fx="novo"] .pop{border-radius:10px;padding:4px;box-shadow:0 8px 22px rgba(41,24,56,.13)}
+html[data-fx="novo"] .pop button,html[data-fx="novo"] .pop a{border-radius:7px;padding:6px 9px;font-size:12px}
+html[data-fx="novo"] .content{padding:16px 22px 32px;gap:12px}
 /* cabeçalho de cada tela */
-html[data-fx="novo"] .ph-ico,html[data-fx="novo"] .dn-h1-ico{width:30px;height:30px;border-radius:9px;box-shadow:none}
-html[data-fx="novo"] .ph-ico .i,html[data-fx="novo"] .dn-h1-ico .i{width:15px;height:15px}
-html[data-fx="novo"] .ph-esq{gap:10px}
-html[data-fx="novo"] .ph h1,html[data-fx="novo"] .dn-h1{font-size:20px}
-html[data-fx="novo"] .ph p{margin-top:2px;font-size:12px}
-html[data-fx="novo"] .dn-tit{font-size:15px}
-html[data-fx="novo"] .dn-sec{gap:8px}
+html[data-fx="novo"] .ph-ico,html[data-fx="novo"] .dn-h1-ico{width:26px;height:26px;border-radius:8px;box-shadow:none}
+html[data-fx="novo"] .ph-ico .i,html[data-fx="novo"] .dn-h1-ico .i{width:13px;height:13px}
+html[data-fx="novo"] .ph-esq{gap:9px}
+html[data-fx="novo"] .ph h1,html[data-fx="novo"] .dn-h1{font-size:17px}
+html[data-fx="novo"] .ph p{margin-top:1px;font-size:11.5px}
+html[data-fx="novo"] .dn-tit{font-size:13.5px}
+html[data-fx="novo"] .dn-sec{gap:6px}
 /* cartões */
 html[data-fx="novo"] .app .card,html[data-fx="novo"] .stats > .stat,html[data-fx="novo"] .stats > .card,html[data-fx="novo"] .fn-balao,
-html[data-fx="novo"] .reg-card,html[data-fx="novo"] .reg-det,html[data-fx="novo"] .eq-chip,html[data-fx="novo"] .eq-card,html[data-fx="novo"] .est-cfg-linha,html[data-fx="novo"] .ig-card,html[data-fx="novo"] .integ,html[data-fx="novo"] .prosp,html[data-fx="novo"] .eq-pedidos,html[data-fx="novo"] .ct-cart,html[data-fx="novo"] .list-sum{border-radius:14px!important}
-html[data-fx="novo"] .stats,html[data-fx="novo"] .dn-grade{gap:10px}
-html[data-fx="novo"] .stats > .stat,html[data-fx="novo"] .stats > .card,html[data-fx="novo"] .dn-card{padding:11px 14px 12px}
-html[data-fx="novo"] .stats > .stat::after,html[data-fx="novo"] .stats > .card::after,html[data-fx="novo"] .dn-card::after{left:14px;right:14px;height:2px}
+html[data-fx="novo"] .reg-card,html[data-fx="novo"] .reg-det,html[data-fx="novo"] .eq-chip,html[data-fx="novo"] .eq-card,html[data-fx="novo"] .est-cfg-linha,html[data-fx="novo"] .ig-card,html[data-fx="novo"] .integ,html[data-fx="novo"] .prosp,html[data-fx="novo"] .eq-pedidos,html[data-fx="novo"] .ct-cart,html[data-fx="novo"] .list-sum{border-radius:12px!important}
+html[data-fx="novo"] .stats,html[data-fx="novo"] .dn-grade{gap:8px}
+html[data-fx="novo"] .stats > .stat,html[data-fx="novo"] .stats > .card,html[data-fx="novo"] .dn-card{padding:9px 12px 10px}
+html[data-fx="novo"] .stats > .stat::after,html[data-fx="novo"] .stats > .card::after,html[data-fx="novo"] .dn-card::after{left:12px;right:12px;height:2px}
 html[data-fx="novo"] .dn-card{min-height:0}
-html[data-fx="novo"] .fn-t,html[data-fx="novo"] .stat-h,html[data-fx="novo"] .dn-rot{font-size:11.5px;line-height:15px}
-html[data-fx="novo"] .fn-t .i,html[data-fx="novo"] .stat-h svg.i,html[data-fx="novo"] .dn-rot .i{width:13px;height:13px}
-html[data-fx="novo"] .stats .stat-h{min-height:15px}
-html[data-fx="novo"] .fn-v,html[data-fx="novo"] .stat-v{font-size:20px!important}
-html[data-fx="novo"] .fn-v,html[data-fx="novo"] .stat-v,html[data-fx="novo"] .dn-v{margin-top:5px;font-size:20px;line-height:1.2}
-html[data-fx="novo"] .fn-s,html[data-fx="novo"] .stat-c,html[data-fx="novo"] .dn-sub{font-size:11.5px;line-height:1.4}
-html[data-fx="novo"] #dash-box > section.dn-sec:first-of-type .dn-grade > .dn-card:first-child{box-shadow:0 4px 14px rgba(102,46,153,.18)!important}
-html[data-fx="novo"] #dash-box > section.dn-sec:first-of-type .dn-grade > .dn-card:first-child .dn-v{font-size:24px}
-html[data-fx="novo"] .dn-rosca-c b{font-size:20px}
-html[data-fx="novo"] .dn-origem{padding:13px 15px}
+html[data-fx="novo"] .fn-t,html[data-fx="novo"] .stat-h,html[data-fx="novo"] .dn-rot{font-size:11px;line-height:14px}
+html[data-fx="novo"] .fn-t .i,html[data-fx="novo"] .stat-h svg.i,html[data-fx="novo"] .dn-rot .i{width:12px;height:12px}
+html[data-fx="novo"] .stats .stat-h{min-height:14px}
+html[data-fx="novo"] .fn-v,html[data-fx="novo"] .stat-v{font-size:17px!important}
+html[data-fx="novo"] .fn-v,html[data-fx="novo"] .stat-v,html[data-fx="novo"] .dn-v{margin-top:4px;font-size:17px;line-height:1.2}
+html[data-fx="novo"] .fn-s,html[data-fx="novo"] .stat-c,html[data-fx="novo"] .dn-sub{font-size:11px;line-height:1.4}
+html[data-fx="novo"] #dash-box > section.dn-sec:first-of-type .dn-grade > .dn-card:first-child{box-shadow:0 3px 10px rgba(102,46,153,.16)!important}
+html[data-fx="novo"] #dash-box > section.dn-sec:first-of-type .dn-grade > .dn-card:first-child .dn-v{font-size:20px}
+/* gráfico, rosca e mapa do Dashboard (e o mapa de Parceiros) */
+html[data-fx="novo"] .dash-graf-card{padding:10px 12px 6px}
+html[data-fx="novo"] .dash-graf-cab{margin-bottom:6px;gap:8px 18px}
+html[data-fx="novo"] .dash-graf-t{font-size:12.5px}
+html[data-fx="novo"] .dash-graf-s{font-size:11px}
+html[data-fx="novo"] .dash-leg>div p{font-size:10.5px}
+html[data-fx="novo"] .dash-leg>div b{font-size:15px}
+html[data-fx="novo"] .dn-origem{padding:10px 12px}
+html[data-fx="novo"] .dn-rosca{width:104px;height:104px;margin-top:10px}
+html[data-fx="novo"] .dn-rosca svg{width:100%;height:100%;display:block}
+html[data-fx="novo"] .dn-rosca-c b{font-size:17px}
+html[data-fx="novo"] .dn-rosca-c span{font-size:10px}
+html[data-fx="novo"] .dn-leg{margin-top:10px;gap:6px}
+html[data-fx="novo"] .dn-leg p{font-size:11.5px}
+html[data-fx="novo"] .dn-mapa{padding:12px;gap:16px}
+html[data-fx="novo"] .dn-mapa-svg{max-height:300px}
+html[data-fx="novo"] .dn-mapa-vazio{max-height:290px}
+html[data-fx="novo"] .dn-mapa-dir{max-height:310px;gap:8px}
 /* botões, campos e filtros */
-html[data-fx="novo"] .btn{min-height:32px;padding:0 12px;border-radius:9px;font-size:12.5px}
-html[data-fx="novo"] .btn.primary,html[data-fx="novo"] .btn-primary{box-shadow:0 2px 8px rgba(102,46,153,.18)}
-html[data-fx="novo"] .kb-btn{height:28px;padding:0 10px;border-radius:8px;font-size:12px;box-shadow:none}
-html[data-fx="novo"] .vista-seg{border-radius:10px}
-html[data-fx="novo"] .vista-seg button{height:26px;border-radius:7px}
+html[data-fx="novo"] .btn{min-height:28px;padding:0 10px;border-radius:8px;font-size:12px}
+html[data-fx="novo"] .btn.primary,html[data-fx="novo"] .btn-primary{box-shadow:none}
+html[data-fx="novo"] .kb-btn{height:26px;padding:0 9px;border-radius:7px;font-size:11.5px;box-shadow:none}
+html[data-fx="novo"] .vista-seg{border-radius:9px}
+html[data-fx="novo"] .vista-seg button{height:24px;border-radius:6px}
 html[data-fx="novo"] .app input:not([type=checkbox]):not([type=radio]):not([type=range]),html[data-fx="novo"] .app select,html[data-fx="novo"] .app textarea,
 html[data-fx="novo"] dialog input:not([type=checkbox]):not([type=radio]):not([type=range]),html[data-fx="novo"] dialog select,html[data-fx="novo"] dialog textarea,
-html[data-fx="novo"] .ficha-card input:not([type=checkbox]):not([type=radio]),html[data-fx="novo"] .ficha-card select,html[data-fx="novo"] .ficha-card textarea{border-radius:9px!important}
-html[data-fx="novo"] .field input,html[data-fx="novo"] .field select,html[data-fx="novo"] .field textarea,html[data-fx="novo"] .fc-c input,html[data-fx="novo"] .fc-c select,html[data-fx="novo"] .fc-c textarea{min-height:34px;font-size:13px}
-html[data-fx="novo"] .field label{font-size:11.5px}
-html[data-fx="novo"] .fbar{gap:8px;font-size:12.5px}
-html[data-fx="novo"] .fbar .search input,html[data-fx="novo"] .fbar .tb-sel,html[data-fx="novo"] .fbar .fb-lnk{height:32px;font-size:12.5px;box-shadow:none}
-html[data-fx="novo"] .fbar .fb-al,html[data-fx="novo"] .fbar .fb-limpar{height:28px;padding:0 11px;font-size:11.5px}
-html[data-fx="novo"] .pop-filtro{border-radius:14px}
-html[data-fx="novo"] .dn-alterna button,html[data-fx="novo"] .per-btn,html[data-fx="novo"] .dn-topo .tb-sel{height:32px;border-radius:9px;box-shadow:none;font-size:12.5px}
+html[data-fx="novo"] .ficha-card input:not([type=checkbox]):not([type=radio]),html[data-fx="novo"] .ficha-card select,html[data-fx="novo"] .ficha-card textarea{border-radius:8px!important}
+html[data-fx="novo"] .field input,html[data-fx="novo"] .field select,html[data-fx="novo"] .field textarea,html[data-fx="novo"] .fc-c input,html[data-fx="novo"] .fc-c select,html[data-fx="novo"] .fc-c textarea{min-height:31px;font-size:12.5px;padding:0 10px}
+html[data-fx="novo"] .field textarea,html[data-fx="novo"] .fc-c textarea{padding:8px 10px}
+html[data-fx="novo"] .field label{font-size:11px}
+html[data-fx="novo"] .fbar{gap:7px;font-size:12px}
+html[data-fx="novo"] .fbar .search input,html[data-fx="novo"] .fbar .tb-sel,html[data-fx="novo"] .fbar .fb-lnk{height:30px;font-size:12px;box-shadow:none}
+html[data-fx="novo"] .fbar .search svg{left:11px}
+html[data-fx="novo"] .fbar .search input{padding-left:32px}
+html[data-fx="novo"] .fbar .fb-al,html[data-fx="novo"] .fbar .fb-limpar{height:26px;padding:0 10px;font-size:11px}
+html[data-fx="novo"] .pop-filtro{border-radius:12px}
+html[data-fx="novo"] .dn-alterna button,html[data-fx="novo"] .per-btn,html[data-fx="novo"] .dn-topo .tb-sel{height:30px;border-radius:8px;box-shadow:none;font-size:12px}
 /* listas */
-html[data-fx="novo"] .kb-tab th,html[data-fx="novo"] .ct-tbl th,html[data-fx="novo"] .rel-tab th{padding:10px 12px 8px;font-size:10.5px!important}
-html[data-fx="novo"] .kb-tab td,html[data-fx="novo"] .ct-tbl td,html[data-fx="novo"] .rel-tab td{padding:8px 12px;font-size:12px}
-html[data-fx="novo"] .kb-tab td.nome,html[data-fx="novo"] .ct-tbl td.nome{font-size:13px}
-html[data-fx="novo"] .kb-tab td.nome small{font-size:11.5px}
-html[data-fx="novo"] .row{padding:8px 12px}
-html[data-fx="novo"] .kb-info{font-size:12.5px}
-html[data-fx="novo"] .kb-info b{font-size:14px}
-html[data-fx="novo"] .empty{border-radius:14px}
-html[data-fx="novo"] .pv-plan{min-width:860px}
+html[data-fx="novo"] .kb-tab th,html[data-fx="novo"] .ct-tbl th,html[data-fx="novo"] .rel-tab th{padding:8px 10px 6px;font-size:10px!important}
+html[data-fx="novo"] .kb-tab td,html[data-fx="novo"] .ct-tbl td,html[data-fx="novo"] .rel-tab td{padding:6px 10px;font-size:11.5px}
+html[data-fx="novo"] .kb-tab td.nome,html[data-fx="novo"] .ct-tbl td.nome{font-size:12.5px}
+html[data-fx="novo"] .kb-tab td.nome small{font-size:11px}
+html[data-fx="novo"] .row{padding:6px 10px}
+html[data-fx="novo"] .kb-info{font-size:12px}
+html[data-fx="novo"] .kb-info b{font-size:13px}
+html[data-fx="novo"] .empty{border-radius:12px}
+html[data-fx="novo"] .sm-tipo{font-size:10px}
+html[data-fx="novo"] .pv-plan{min-width:820px}
 html[data-fx="novo"] .pv-plan .pv-w-cli{width:27%}html[data-fx="novo"] .pv-plan .pv-w-doc{width:8%}html[data-fx="novo"] .pv-plan .pv-w-rel{width:14.5%}html[data-fx="novo"] .pv-plan .pv-w-resp{width:9%}
-html[data-fx="novo"] .pv-plan td{padding-top:8px;padding-bottom:8px}
-html[data-fx="novo"] .pv-plan td.pv-rel .kb-cron{font-size:12px}
-html[data-fx="novo"] .pv-box{width:16px;height:16px}
+html[data-fx="novo"] .pv-plan td{padding-top:6px;padding-bottom:6px}
+html[data-fx="novo"] .pv-plan td.nome .nome-abrir{font-size:12.5px}
+html[data-fx="novo"] .pv-plan td.pv-rel .kb-cron{font-size:11.5px;line-height:16px}
+html[data-fx="novo"] .pv-data{font-size:11.5px}
+html[data-fx="novo"] .pv-plan td.pv-resp{font-size:11.5px}
+html[data-fx="novo"] .pv-box{width:15px;height:15px}
+html[data-fx="novo"] .pv-box svg{width:10px;height:10px}
 html[data-fx="novo"] #gpn-list .sm-tipo.urb{display:none}   /* na aba GPS (urbana) toda mãe paga a GPS: a etiqueta "Com GPS" só repetia */
 /* abas de Financeiro e Configurações */
-html[data-fx="novo"] .fin-sub button,html[data-fx="novo"] .cfg-tab{font-size:13px!important}
-html[data-fx="novo"] .eq-sec h4{font-size:15px}
-html[data-fx="novo"] .eq-chip b{font-size:18px}
+html[data-fx="novo"] .fin-sub button,html[data-fx="novo"] .cfg-tab{font-size:12.5px!important}
+html[data-fx="novo"] .eq-sec h4{font-size:13.5px}
+html[data-fx="novo"] .eq-chip b{font-size:16px}
 /* janelas e cartão da cliente */
-html[data-fx="novo"] dialog{border-radius:18px!important;box-shadow:0 20px 50px rgba(41,24,56,.24)!important}
-html[data-fx="novo"] .ficha-card>div{border-radius:18px;box-shadow:0 20px 50px rgba(41,24,56,.26)}
-html[data-fx="novo"] .f-head h2{font-size:18px}
-html[data-fx="novo"] .fc-caixa{border-radius:14px}
-html[data-fx="novo"] .fc-cx-nome b,html[data-fx="novo"] .fc-cx-nome h3,html[data-fx="novo"] .fc-cx-nome > :first-child{font-size:17px}
-html[data-fx="novo"] .fc-sec{font-size:14px}
-html[data-fx="novo"] .fc-salvar .btn{min-height:36px;border-radius:10px;font-size:13px}
-html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:11px!important}
+html[data-fx="novo"] dialog{border-radius:16px!important;box-shadow:0 16px 40px rgba(41,24,56,.22)!important}
+html[data-fx="novo"] .ficha-card>div{border-radius:16px;box-shadow:0 16px 40px rgba(41,24,56,.24)}
+html[data-fx="novo"] .f-head h2{font-size:16px}
+html[data-fx="novo"] .fc-caixa{border-radius:12px}
+html[data-fx="novo"] .fc-caixa{padding:11px;margin-bottom:12px}
+html[data-fx="novo"] .fc-lin{min-height:26px;font-size:12px;gap:7px}
+html[data-fx="novo"] .fc-barra{padding:10px 11px 6px 13px}
+html[data-fx="novo"] .fc-abas{padding:3px}html[data-fx="novo"] .fc-abas button,html[data-fx="novo"] .fc-x{width:26px;height:26px}html[data-fx="novo"] .fc-abas .i,html[data-fx="novo"] .fc-x .i{width:14px;height:14px}
+html[data-fx="novo"] .fc-corpo{padding:0 16px}
+html[data-fx="novo"] .fc-corpo[data-aba="dados"] .p-dados,html[data-fx="novo"] .fc-corpo[data-aba="arq"] .p-arq,html[data-fx="novo"] .fc-corpo[data-aba="hist"] .p-hist{gap:10px}
+html[data-fx="novo"] .fc-rot{font-size:11.5px;margin-bottom:4px}
+html[data-fx="novo"] .fc-parte button{font-size:12.5px}
+html[data-fx="novo"] .fc-cx-nome b,html[data-fx="novo"] .fc-cx-nome h3,html[data-fx="novo"] .fc-cx-nome > :first-child{font-size:15px}
+html[data-fx="novo"] .fc-sec{font-size:13px}
+html[data-fx="novo"] .fc-salvar .btn{min-height:32px;border-radius:9px;font-size:12.5px}
+html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:10px!important}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -6337,7 +6370,7 @@ html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:11px!impor
     return d;
   }
   function dashGrafico(s, largura){
-    var W = Math.max(largura, 300), H = 230, ml = 30, mr = 12, mt = 14, mb = 26, pw = W - ml - mr, ph = H - mt - mb, n = s.rot.length;
+    var W = Math.max(largura, 300), H = fluxoVista === 'novo' ? 170 : 230, ml = 30, mr = 12, mt = 14, mb = 26, pw = W - ml - mr, ph = H - mt - mb, n = s.rot.length;
     var maxV = Math.max.apply(null, s.a.concat(s.b).concat([1])), passo = 1;
     [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000].some(function(p){ passo = p; return maxV / p <= 4; });
     var topo = Math.ceil(maxV / passo) * passo;
