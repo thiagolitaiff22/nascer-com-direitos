@@ -1396,7 +1396,7 @@ html[data-tema="dark"] #perm-tela .perm-i{background:#2c2236;color:#c49be6}
 html[data-tema="dark"] #perm-tela .perm-lin.granted .perm-i{background:#16351f;color:#6fd59a}
 html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a2226;color:#f5c2c2}
 /* gestor no aplicativo (11/11) */
-.abas.gs{grid-template-columns:repeat(4,1fr)}
+.abas.gs{grid-template-columns:repeat(4,1fr)}.abas.gs.gn{grid-template-columns:repeat(5,1fr)}
 .pm-m.eq-filho{margin-left:22px;width:calc(100% - 22px);position:relative}
 .pm-m.eq-filho::before{content:'';position:absolute;left:-13px;top:-8px;bottom:50%;width:10px;border-left:2px solid var(--line);border-bottom:2px solid var(--line);border-bottom-left-radius:8px}
 .tela button.mr-lin{display:flex!important;align-items:center;justify-content:space-between;gap:10px;width:100%;height:auto!important;min-height:0!important;margin:0!important;padding:10px 12px!important;border:1px solid var(--line2,var(--line))!important;border-radius:12px!important;background:var(--card)!important;color:var(--ink)!important;font:inherit!important;font-size:inherit!important;font-weight:400!important;text-align:left!important;box-shadow:none!important;cursor:pointer}
@@ -1500,7 +1500,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 114;
+  var APP_VERSAO = 115;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1732,7 +1732,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
   function navBotoes(){
     var b = function(a, ic, t, extra){ var p = String(t).split('|'); return '<button type="button" data-aba="' + a + '"><svg><use href="#' + ic + '"/></svg>' + (p[1] ? '<span class="l-lg">' + p[0] + '</span><span class="l-sm">' + p[1] + '</span>' : p[0]) + (extra || '') + '</button>'; };
     var bolha = '<span class="bolha" id="bolha" hidden></span>';
-    if (ehGestor()) return b('painel', 'i-painel', 'Início') + b('clientes', 'i-grupo', 'Equipe') + b('maes', 'i-bebe', 'Mães') + b('conta', 'i-pessoa', 'Conta');
+    if (ehGestor()) return b('painel', 'i-painel', 'Início') + b('clientes', 'i-grupo', 'Equipe') + (gestorCadastra() ? b('novo', 'i-novo', 'Novo', bolha) : '') + b('maes', 'i-bebe', 'Mães') + b('conta', 'i-pessoa', 'Conta');   // 23/11: gestor também cadastra mães e parceiros (SQL 61)
     return ehProspectador()
       ? b('painel', 'i-painel', 'Início') + b('clientes', 'i-grupo', 'Parceiros') + b('novo', 'i-novo', 'Novo', bolha) + b('maes', 'i-bebe', 'Mães') + b('recebimentos', 'i-moeda', 'Meus ganhos|Ganhos')
       : b('painel', 'i-painel', 'Início') + b('clientes', 'i-grupo', 'Mães') + b('novo', 'i-novo', 'Novo cadastro|Novo', bolha) + b('recebimentos', 'i-moeda', 'Meus ganhos|Ganhos') + b('conta', 'i-pessoa', 'Conta');
@@ -1748,7 +1748,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
     f.addEventListener('click', function(e){ var b = e.target.closest('[data-ir]'); if (b){ f.remove(); return irPara(b.dataset.ir); } if (e.target === f || e.target.closest('[data-fecha]')) f.remove(); });
   }
   function montarCasca(){
-    var perfilCasca = (ehGestor() ? 'g' : ehProspectador() ? 'p' : 'c') + (semGanho() ? 's' : '');
+    var perfilCasca = (ehGestor() ? (gestorCadastra() ? 'gn' : 'g') : ehProspectador() ? 'p' : 'c') + (semGanho() ? 's' : '');
     if ($('vista') && $('app').dataset.perfil === perfilCasca) return;
     $('app').dataset.perfil = perfilCasca;
     $('app').innerHTML =
@@ -1759,7 +1759,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
         '<button type="button" class="av" id="topo-av" aria-label="Sua conta"></button></div>' +
       '<div class="tit-tela"><b id="topo-nome"></b><span id="topo-sub"></span></div>' +
       '<main class="vista" id="vista"></main>' +
-      '<nav class="abas' + (ehGestor() ? ' gs' : semGanho() ? ' sg' : '') + '" id="abas">' +
+      '<nav class="abas' + (ehGestor() ? ' gs' + (gestorCadastra() ? ' gn' : '') : semGanho() ? ' sg' : '') + '" id="abas">' +
         navBotoes() +
       '</nav>';
     $('abas').addEventListener('click', function(e){ var b = e.target.closest('[data-aba]'); if (!b) return; if (ehProspectador() && b.dataset.aba === 'novo') return escolherNovo(); irPara(b.dataset.aba); });
@@ -1797,6 +1797,20 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
   function ehGestor(){ return !!(quem && quem.perfil === 'gestor'); }
   function ehProspectador(){ return !!(quem && (quem.perfil === 'prospectador' || quem.perfil === 'gestor')); }
   // o acesso do gestor no aplicativo é "gestor:<e-mail>" (SQL 59); o resto dos dados vem do painel dele
+  // 23/11: o gestor cadastra mães e parceiros (SQL 61). O + só aparece quando o banco já tem a função gestor_criar_parceiro
+  function gestorCadastra(){ return lsGet('campo_gestor_cad') === '1'; }
+  var gestorCadVisto = false;
+  function conferirGestorCadastra(){
+    if (gestorCadVisto || !ehGestor() || !token || navigator.onLine === false) return;
+    gestorCadVisto = true;
+    chamar('gestor_criar_parceiro', { p_token: token, p_nome: '', p_tipo: 'pessoa', p_clinica: '', p_cidade: '', p_telefone: '', p_usuario: '', p_senha: '', p_ganho: false, p_com_conf: 0, p_com_lib: 0 })
+      .then(function(d){
+        var pode = !!(d && !d.code && (d.erro || d.ok)), antes = gestorCadastra();   // com o SQL 61: "Informe o nome do parceiro." (nada é gravado)
+        if (!pode && !(d && d.code)) return;   // resposta estranha: deixa como está
+        lsSet('campo_gestor_cad', pode ? '1' : '');
+        if (pode !== antes && $('vista') && aba !== 'novo' && aba !== 'novop') telaInicial();   // mostra (ou tira) o + na hora
+      }, function(){ gestorCadVisto = false; });
+  }
   function ajustarGestor(d){
     if (d && /^gestor:/.test(String(d.prospId || ''))){ d.perfil = 'gestor'; d.temGanho = false; d.tambemParceiro = false; d.tipo = 'pessoa'; d.nome = lsGet('campo_gestor_nome') || d.nome || 'Gestor'; }
     return d;
@@ -1808,6 +1822,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
   var ppSig = '';
   function carregarProsp(){
     if (!CFG_OK || !token || navigator.onLine === false) return Promise.resolve();
+    if (ehGestor()) conferirGestorCadastra();
     if (ehGestor()) return chamar('gestor_painel', { p_token: token }).then(function(d){
       if (!d || !d.parceiros) return;
       if (d.nome && quem && quem.nome !== d.nome){ quem.nome = d.nome; lsSet('campo_gestor_nome', d.nome); lsSet('campo_quem', JSON.stringify(quem)); }
@@ -1883,11 +1898,12 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
   }
   function vistaProspPainel(){
     var G = ehGestor(), l = listaProsp(), t = somaProsp(l), cl = clientesPainel(), rede = G ? [] : maesDaRede().filter(function(m){ return !m.desqualificada; }), todas = G ? cl : cl.concat(rede), r = resumoParceiro(todas), maesV = filtroIni === 'maes';
-    var nRede = G ? l.reduce(function(s, x){ return s + (+x.parceirosQtd || 0); }, 0) : 0;
+    var nProsp = G ? l.filter(function(x){ return x.perfil === 'prospectador'; }).length : 0;
+    var nRede = G ? l.reduce(function(s, x){ return s + (+x.parceirosQtd || 0); }, 0) + (l.length - nProsp) : 0;   // parceiros dos prospectadores + os que o gestor cadastrou direto
     $('vista').classList.add('inicio');
-    var seg = '<div class="seg-ini" role="group" aria-label="Mostrar"><button type="button" data-ini="parc" aria-pressed="' + !maesV + '">' + (G ? 'Equipe' : 'Parceiros') + '<b>' + l.length + '</b></button><button type="button" data-ini="maes" aria-pressed="' + maesV + '">Mães<b>' + todas.length + '</b></button></div>';
+    var seg = '<div class="seg-ini" role="group" aria-label="Mostrar"><button type="button" data-ini="parc" aria-pressed="' + !maesV + '">' + (G ? 'Equipe' : 'Parceiros') + '<b>' + (G ? nProsp + nRede : l.length) + '</b></button><button type="button" data-ini="maes" aria-pressed="' + maesV + '">Mães<b>' + todas.length + '</b></button></div>';
     var corpo = !maesV
-      ? '<div class="pm-hero"><small>' + (G ? 'Sua equipe' : 'Sua rede') + '</small><div class="pm-num">' + l.length + '</div><p>' + (G ? (l.length === 1 ? 'prospectador' : 'prospectadores') + ' · ' + nRede + (nRede === 1 ? ' parceiro' : ' parceiros') + ' na rede' : (l.length === 1 ? 'parceiro cadastrado' : 'parceiros cadastrados')) + '</p>' +
+      ? '<div class="pm-hero"><small>' + (G ? 'Sua equipe' : 'Sua rede') + '</small><div class="pm-num">' + (G ? nProsp + nRede : l.length) + '</div><p>' + (G ? nProsp + (nProsp === 1 ? ' prospectador' : ' prospectadores') + ' · ' + nRede + (nRede === 1 ? ' parceiro' : ' parceiros') : (l.length === 1 ? 'parceiro cadastrado' : 'parceiros cadastrados')) + '</p>' +
           '<div class="pm-trio"><span><b>' + t.ind + '</b>indicações</span><span><b>' + t.con + '</b>contratos</span><span><b>' + t.cnc + '</b>concedidos</span></div></div>' +
         dbMeta('parc', (G ? todas : rede).filter(function(m){ return noMes(m.cadastro); }).length, 'indicações no mês') +
         dbRanking(l) +
@@ -1920,9 +1936,9 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
       (!pai && np ? '<span class="pm-ganho">' + np + (np === 1 ? ' parceiro' : ' parceiros') + '</span>' : '') + '</button>';
   }
   function vistaEquipeGestor(){
-    var l = listaProsp(), nRede = l.reduce(function(s, x){ return s + (x.rede || []).length; }, 0);
+    var l = listaProsp(), nProsp = l.filter(function(x){ return x.perfil === 'prospectador'; }).length, nRede = l.reduce(function(s, x){ return s + (x.rede || []).length; }, 0) + (l.length - nProsp);
     $('vista').innerHTML =
-      '<div class="pm-ola"><h2>Sua equipe</h2><span>' + (l.length ? l.length + (l.length === 1 ? ' prospectador' : ' prospectadores') + ' · ' + nRede + (nRede === 1 ? ' parceiro' : ' parceiros') : 'Ninguém na sua equipe ainda') + '</span></div>' +
+      '<div class="pm-ola"><h2>Sua equipe</h2><span>' + (l.length ? nProsp + (nProsp === 1 ? ' prospectador' : ' prospectadores') + ' · ' + nRede + (nRede === 1 ? ' parceiro' : ' parceiros') : 'Ninguém na sua equipe ainda') + '</span></div>' +
       '<label class="pm-busca"><svg><use href="#i-busca"/></svg><input id="busca-parc" placeholder="Buscar prospectador ou parceiro" value="' + esc(buscaParc) + '" autocomplete="off"></label>' +
       '<div id="lista-parc" style="margin-top:14px"></div>';
     function pintar(){
@@ -1933,7 +1949,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
         return linhaEquipe(x, null) + (q ? filhos : (x.rede || [])).map(function(s){ return linhaEquipe(s, x); }).join('');
       }).join('');
       $('lista-parc').innerHTML = html ? '<div class="pm-lista">' + html + '</div>'
-        : '<div class="pm-vazio"><b>' + (l.length ? 'Nada por aqui' : 'Sua equipe aparece aqui') + '</b>' + (l.length ? 'Ninguém com esse nome.' : 'Os prospectadores que você cadastrar (e os parceiros deles) aparecem aqui, com as indicações de cada um.') + '</div>';
+        : '<div class="pm-vazio"><b>' + (l.length ? 'Nada por aqui' : 'Sua equipe aparece aqui') + '</b>' + (l.length ? 'Ninguém com esse nome.' : 'Os parceiros que você cadastrar no + e os prospectadores da sua equipe aparecem aqui, com as indicações de cada um.') + '</div>';
     }
     pintar();
     $('busca-parc').addEventListener('input', function(){ buscaParc = this.value; pintar(); });
@@ -2158,7 +2174,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
       if (novoP.senha.length < 6){ alert('A senha precisa ter pelo menos 6 caracteres.'); $('np-senha').focus(); return; }
       if (navigator.onLine === false) return alert('Sem internet agora. Para cadastrar um parceiro é preciso estar conectado.');
       var b = this; b.disabled = true; b.lastChild.textContent = 'Criando…';
-      chamar('prosp_criar_parceiro', { p_token: token, p_nome: nome, p_tipo: novoP.tipo, p_clinica: novoP.tipo === 'clinica' ? clinica : '', p_cidade: cidade, p_telefone: novoP.fone, p_usuario: String(novoP.usuario || '').replace(/\D/g, ''), p_senha: novoP.senha, p_ganho: novoP.ganho !== false, p_com_conf: numReais(novoP.conf), p_com_lib: numReais(novoP.lib) })
+      chamar(ehGestor() ? 'gestor_criar_parceiro' : 'prosp_criar_parceiro', { p_token: token, p_nome: nome, p_tipo: novoP.tipo, p_clinica: novoP.tipo === 'clinica' ? clinica : '', p_cidade: cidade, p_telefone: novoP.fone, p_usuario: String(novoP.usuario || '').replace(/\D/g, ''), p_senha: novoP.senha, p_ganho: novoP.ganho !== false, p_com_conf: numReais(novoP.conf), p_com_lib: numReais(novoP.lib) })
         .then(function(d){
           if (d && d.ok){
             var rotulo = novoP.tipo === 'clinica' ? clinica : nome, tel = novoP.fone, usr = d.usuario, sen = novoP.senha;
@@ -2283,7 +2299,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
     if (semGanho() && aba === 'recebimentos') aba = 'painel';
     if (aba === 'recebimentos'){ carregarReceb(); return vistaRecebimentos(); }
     if (aba === 'conta') return vistaConta();
-    if (ehGestor() && (aba === 'novo' || aba === 'novop' || aba === 'recebimentos')) aba = 'painel';
+    if (ehGestor() && (aba === 'recebimentos' || (!gestorCadastra() && (aba === 'novo' || aba === 'novop')))) aba = 'painel';
     if (ehProspectador()) return aba === 'novop' ? vistaProspNovo() : aba === 'novo' ? vistaNovo() : aba === 'maes' ? vistaClientesParceira() : aba === 'clientes' ? vistaProspLista() : vistaProspPainel();
     if (aba === 'painel') return vistaPainel();
     if (aba === 'clientes') return vistaClientes();
@@ -3305,7 +3321,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
     var info = [TIPOS[c.tipoSegurada] || '', c.crianca ? 'Criança: ' + String(c.crianca) : '', c.criancaNasc ? 'nasceu em ' + dataBR(c.criancaNasc) : ''].filter(Boolean).join(' · ');
     var f = document.createElement('div'); f.className = 'folha';
     f.innerHTML = '<div><div class="puxa"></div><h3>' + esc(bonito(c.nome)) + '</h3><div class="sub">' + esc(situacaoSimples(c)[1]) + (c.cadastro ? ' · enviada ' + esc(quando(c.cadastro)) : '') + (ehGestor() && c.parceiro ? ' · indicada por ' + esc(bonito(c.parceiro)) + (c.prospectador && c.prospectador !== c.parceiro ? ' (equipe de ' + esc(primeiroNome(c.prospectador)) + ')' : '') : '') + '</div>' +
-      (faltas(c).length ? '<div class="falta-box"><b>Faltam documentos</b><span>' + esc(nomesFaltas(faltas(c))) + '</span>' + (ehGestor() ? '' : c.temPasta !== false ? '<button type="button" class="enviar" data-completar style="height:50px;font-size:16px;margin-top:10px">Completar documentos</button>' : '<span>O escritório ainda está criando a pasta desta cliente.</span>') + '</div>' : '') +
+      (faltas(c).length ? '<div class="falta-box"><b>Faltam documentos</b><span>' + esc(nomesFaltas(faltas(c))) + '</span>' + (ehGestor() && !(c.resp && quem && c.resp === quem.prospId) ? '' : c.temPasta !== false ? '<button type="button" class="enviar" data-completar style="height:50px;font-size:16px;margin-top:10px">Completar documentos</button>' : '<span>O escritório ainda está criando a pasta desta cliente.</span>') + '</div>' : '') +
       (faltas(c).length ? '' : '<div class="ini-ok">Tudo certo com os documentos desta mãe. Agora é com a nossa equipe.</div>') +
       '<button type="button" class="sair" style="margin-top:6px" data-fecha>Fechar</button></div>';
     document.body.appendChild(f);
