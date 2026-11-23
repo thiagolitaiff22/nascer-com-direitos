@@ -2844,145 +2844,202 @@ html[data-fx="novo"] .pn-hero-x{display:none}
 }
 /* fim do Dashboard completo */
 
-/* ================= Lista nova das mães e ficha em painel lateral (23/11/2026, a pedido: "formato lista, clicando no nome aparecem os dados das mães... bem bonito, que nem o dashboard") =================
-   Só no computador e no fluxo novo. Mesmo visual do Dashboard: cartão branco com respiro, avatar com as iniciais, uma etiqueta de situação por linha. */
+/* ================= Lista nova das mães, 2ª versão, e ficha ao lado (23/11/2026, proposta aprovada: "vamos testar essa proposta") =================
+   Só no computador e no fluxo novo. Calma como o Dashboard: linhas baixas numa linha só, vermelho só quando o prazo nosso passou,
+   filtros em lilás, e a ficha fixa à direita (sem escurecer a lista) a partir de 1200px. */
 @media (min-width:1000px){
-/* o que a lista nova substitui (os números e avisos de cima viraram os filtros com contagem) */
-html[data-fx="novo"] :is(#view-ctr,#view-gps,#view-nasc,#view-req,#view-inss,#view-clientes,#view-ret):has(> .ln-cab) > :is(.stats,.kb-info,.foot-note),
-html[data-fx="novo"] :is(#view-ctr,#view-gps,#view-nasc,#view-req,#view-inss,#view-clientes,#view-ret):has(> .ln-cab) .fbar :is(.fb-chips,.fb-div,#ctr-sit,#inss-sit,#jud-sit,#r-f,#r-count){display:none!important}
-html[data-fx="novo"] .ln-cab{display:flex;flex-direction:column;gap:4px;margin-bottom:-6px}
-html[data-fx="novo"] .ln-regra{margin:0;display:flex;align-items:baseline;gap:12px;font-size:12.5px;line-height:1.5;color:var(--ink-3);max-width:980px}
-html[data-fx="novo"] .ln-etapa{flex:none;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ap-g1)}
-html[data-fx="novo"]:root[data-theme="dark"] .ln-etapa{color:#c9a3ea}
-html[data-fx="novo"] .ln-chips{display:flex;flex-wrap:wrap;gap:8px;flex:1 1 auto;min-width:0}
-html[data-fx="novo"] :is(#view-ctr,#view-gps,#view-nasc,#view-req,#view-inss,#view-clientes,#view-ret):has(> .ln-cab) > .fbar{flex-wrap:wrap;justify-content:flex-start;row-gap:10px}
-html[data-fx="novo"] :is(#view-ctr,#view-gps,#view-nasc,#view-req,#view-inss,#view-clientes,#view-ret):has(> .ln-cab) > .fbar > .tb-busca{margin-left:auto}
-html[data-fx="novo"] .ln-chip{height:32px;padding:0 13px;border-radius:999px;border:1px solid var(--ap-linha);background:hsl(var(--c-card));font:inherit;font-size:12.5px;color:var(--ink-2);display:inline-flex;align-items:center;gap:9px;cursor:pointer;white-space:nowrap;transition:border-color .15s,background .15s}
+/* o que a lista nova substitui: os números e avisos de cima e o parágrafo da etapa (que virou o "?" do título) */
+html[data-fx="novo"] .vw-dash.ln-on > :is(.stats,.kb-info,.foot-note,.ln-cab),
+html[data-fx="novo"] .vw-dash.ln-on .fbar :is(.fb-chips,.fb-div,#ctr-sit,#inss-sit,#jud-sit,#r-f,#r-count){display:none!important}
+html[data-fx="novo"] .vw-dash.ln-on{gap:12px!important}
+/* subtítulo: "N mães · X atrasadas" e o "?" com a regra */
+html[data-fx="novo"] .ln-sub-at{color:var(--red);font-weight:600}
+html[data-fx="novo"] .ln-ajuda{position:relative;display:inline-grid;place-items:center;width:18px;height:18px;margin-left:8px;border-radius:50%;border:1px solid var(--ap-linha);font-size:10.5px;font-weight:600;color:var(--ink-3);cursor:help;vertical-align:1px;background:hsl(var(--c-card))}
+html[data-fx="novo"] .ln-ajuda:hover::after,html[data-fx="novo"] .ln-ajuda:focus::after{content:attr(data-dica);position:absolute;left:26px;top:-8px;z-index:60;width:380px;padding:10px 12px;border-radius:10px;background:var(--ink);color:hsl(var(--c-card));font-size:12px;font-weight:400;line-height:1.5;text-align:left;white-space:normal;box-shadow:0 8px 24px rgba(41,24,56,.2)}
+/* filtros na linha da busca; o ativo em lilás (como o menu) */
+html[data-fx="novo"] .vw-dash.ln-on > .fbar{flex-wrap:wrap;justify-content:flex-start;row-gap:8px}
+html[data-fx="novo"] .vw-dash.ln-on > .fbar > .tb-busca{margin-left:auto}
+html[data-fx="novo"] .ln-chips{display:flex;flex-wrap:wrap;gap:6px;flex:1 1 auto;min-width:0}
+html[data-fx="novo"] .ln-chip{height:30px;padding:0 12px;border-radius:999px;border:1px solid var(--ap-linha);background:hsl(var(--c-card));font:inherit;font-size:12.5px;color:var(--ink-2);display:inline-flex;align-items:center;gap:8px;cursor:pointer;white-space:nowrap;transition:border-color .15s,background .15s}
 html[data-fx="novo"] .ln-chip:hover{border-color:hsl(var(--c-pri)/.4)}
 html[data-fx="novo"] .ln-chip b{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
-html[data-fx="novo"] .ln-chip.verm b{color:var(--red)}
-html[data-fx="novo"] .ln-chip.on{background:var(--ink);border-color:var(--ink);color:hsl(var(--c-card))}
-html[data-fx="novo"] .ln-chip.on b{color:hsl(var(--c-card))}
-html[data-fx="novo"] .ln-chip.on.verm b{color:#ffb4ad}
-/* a tabela */
-html[data-fx="novo"] .list.ln-box{background:hsl(var(--c-card));border:1px solid var(--ap-linha);border-radius:16px;overflow:hidden;padding:0!important;box-shadow:0 1px 2px rgba(41,24,56,.04)}
-html[data-fx="novo"]:root[data-theme="dark"] .list.ln-box{box-shadow:none}
+html[data-fx="novo"] .ln-chip.on{background:hsl(var(--c-sec));border-color:hsl(var(--c-pri)/.28);color:var(--ap-g2);font-weight:600}
+html[data-fx="novo"] .ln-chip.on b{color:var(--ap-g2)}
+html[data-fx="novo"]:root[data-theme="dark"] .ln-chip.on,html[data-fx="novo"]:root[data-theme="dark"] .ln-chip.on b{color:#e3ccf6}
+html.fc-split[data-fx="novo"] .ln-chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+html.fc-split[data-fx="novo"] .ln-chips::-webkit-scrollbar{display:none}
+html[data-fx="novo"] .ln-ponto{width:6px;height:6px;border-radius:50%;background:var(--red)}
+/* a tabela: cartão igual ao do Dashboard, linhas de 44px numa linha só */
+html[data-fx="novo"] .list.ln-box{background:hsl(var(--c-card));border:1px solid var(--ap-linha);border-radius:16px;overflow:hidden;padding:0!important;box-shadow:none}
 html[data-fx="novo"] .ln-tab{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13px}
-html[data-fx="novo"] .ln-tab th{height:42px;padding:0 14px;text-align:left;font-size:11.5px;font-weight:500;color:var(--ink-3);background:hsl(var(--c-sec)/.35);border-bottom:1px solid var(--ap-linha);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-html[data-fx="novo"] .ln-tab th:first-child,html[data-fx="novo"] .ln-tab td:first-child{padding-left:20px}
-html[data-fx="novo"] .ln-tab th:last-child,html[data-fx="novo"] .ln-tab td:last-child{padding-right:16px}
-html[data-fx="novo"] .ln-tab td{padding:11px 14px;border-bottom:1px solid var(--ap-linha);vertical-align:middle;color:var(--ink-2);overflow:hidden}
-html[data-fx="novo"] .ln-tab tbody tr{cursor:pointer;transition:background .12s}
-html[data-fx="novo"] .ln-tab tbody tr:hover{background:var(--ap-lil)}
+html[data-fx="novo"] .ln-tab th{height:36px;padding:0 12px;text-align:left;font-size:12px;font-weight:500;color:var(--ink-3);background:hsl(var(--c-sec)/.3);border-bottom:1px solid var(--ap-linha);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .ln-tab td{height:44px;padding:0 12px;border-bottom:1px solid var(--ap-linha);vertical-align:middle;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .ln-tab th.c,html[data-fx="novo"] .ln-tab td.c{text-align:center}
+html[data-fx="novo"] .ln-tab th.r,html[data-fx="novo"] .ln-tab td.r{text-align:right}
+html[data-fx="novo"] .ln-tab th.ln-pri,html[data-fx="novo"] .ln-tab td.ln-pri{width:4px;padding:0;position:relative}
+html[data-fx="novo"] .ln-tab td.ln-pri i{position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:0 3px 3px 0}
+html[data-fx="novo"] .ln-tab td.ln-pri i.at{background:var(--red)}
+html[data-fx="novo"] .ln-tab td.ln-pri i.lg{background:hsl(var(--c-pri)/.45)}
+html[data-fx="novo"] .ln-tab tr.ln-aberta td.ln-pri i{background:var(--ap-g1)}
+html[data-fx="novo"] .ln-tab tbody tr{cursor:pointer}
+html[data-fx="novo"] .ln-tab tbody tr:hover td{background:var(--ap-lil)}
+html[data-fx="novo"] .ln-tab tbody tr.ln-aberta td{background:hsl(var(--c-sec)/.8)}
 html[data-fx="novo"] .ln-tab tbody tr:last-child td{border-bottom:0}
 html[data-fx="novo"] .ln-tab tr.ln-vazio-l{cursor:default}
-html[data-fx="novo"] .ln-tab tr.ln-vazio-l:hover{background:none}
-html[data-fx="novo"] .ln-tab .c{text-align:center}
-html[data-fx="novo"] .ln-mae{display:flex;align-items:center;gap:12px;min-width:0}
-html[data-fx="novo"] .ln-av{width:36px;height:36px;border-radius:50%;background:hsl(var(--c-sec));color:var(--ap-g2);display:grid;place-items:center;font-size:11.5px;font-weight:600;letter-spacing:.02em;flex:none}
-html[data-fx="novo"]:root[data-theme="dark"] .ln-av{color:#d9bdf2}
-html[data-fx="novo"] .ln-av-p{width:24px;height:24px;font-size:9.5px}
-html[data-fx="novo"] .ln-mae-t{min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:2px}
-html[data-fx="novo"] .ln-tab .ln-nome{max-width:100%;padding:0;border:0;background:none;font:inherit;font-size:13.5px;font-weight:600;color:var(--ink);text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;text-decoration:none}
-html[data-fx="novo"] .ln-tab .ln-nome:hover{color:var(--ap-g1);text-decoration:underline;text-underline-offset:3px}
-html[data-fx="novo"] .ln-mae-t small{max-width:100%;font-size:12px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-html[data-fx="novo"] .ln-mae-t small.verm{color:var(--red)}
-html[data-fx="novo"] .ln-mae-t small.lar{color:var(--ap-g1)}
-html[data-fx="novo"] .ln-mae-t small.ok{color:var(--green)}
-html[data-fx="novo"] .ln-dt b{display:block;font-size:12.5px;font-weight:500;color:var(--ink)}
-html[data-fx="novo"] .ln-dt small{display:block;font-size:11.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-html[data-fx="novo"] .ln-dt.verm b,html[data-fx="novo"] .ln-dt.verm small{color:var(--red)}
-html[data-fx="novo"] .ln-dt.ok small{color:var(--green)}
-html[data-fx="novo"] .ln-pill{display:inline-flex;align-items:center;gap:6px;height:26px;max-width:100%;padding:0 11px;border-radius:999px;font-size:12px;font-weight:500;background:hsl(var(--c-sec)/.75);color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
-html[data-fx="novo"] .ln-pill svg.i{width:13px;height:13px;flex:none}
+html[data-fx="novo"] .ln-tab tr.ln-vazio-l:hover td{background:none}
+html[data-fx="novo"] .ln-nome{font-size:13.5px;font-weight:600;color:var(--ink)}
+html[data-fx="novo"] .ln-ft{display:inline-flex;align-items:center;gap:6px;max-width:100%;color:var(--ink-2)}
+html[data-fx="novo"] .ln-ft > span{overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .ln-ft svg.i{width:14px;height:14px;flex:none;color:var(--ink-3)}
+html[data-fx="novo"] .ln-ft.verm,html[data-fx="novo"] .ln-ft.verm svg.i{color:var(--red)}
+html[data-fx="novo"] .ln-ft.lar,html[data-fx="novo"] .ln-ft.lar svg.i{color:var(--ap-g1)}
+html[data-fx="novo"]:root[data-theme="dark"] .ln-ft.lar,html[data-fx="novo"]:root[data-theme="dark"] .ln-ft.lar svg.i{color:#c9a3ea}
+html[data-fx="novo"] .ln-ft.ok,html[data-fx="novo"] .ln-ft.ok svg.i{color:var(--green)}
+html[data-fx="novo"] .ln-pz b{font-weight:500;color:var(--ink)}
+html[data-fx="novo"] .ln-pz span{color:var(--ink-3)}
+html[data-fx="novo"] .ln-pz.verm b,html[data-fx="novo"] .ln-pz.verm span{color:var(--red)}
+html[data-fx="novo"] .ln-pz.lg span{color:var(--ap-g1);font-weight:500}
+html[data-fx="novo"]:root[data-theme="dark"] .ln-pz.lg span{color:#c9a3ea}
+html[data-fx="novo"] .ln-pz.ok b{color:var(--green)}
+html[data-fx="novo"] .ln-pill{display:inline-flex;align-items:center;gap:5px;height:22px;max-width:100%;padding:0 9px;border-radius:999px;font-size:12px;font-weight:500;background:hsl(var(--c-sec)/.7);color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 html[data-fx="novo"] .ln-pill.verm{background:var(--red-soft);color:var(--red)}
 html[data-fx="novo"] .ln-pill.lar{background:hsl(var(--c-sec));color:var(--ap-g2)}
-html[data-fx="novo"]:root[data-theme="dark"] .ln-pill.lar{color:#d9bdf2}
 html[data-fx="novo"] .ln-pill.ok{background:var(--green-soft);color:var(--green)}
-html[data-fx="novo"] .ln-resp{display:inline-flex;align-items:center;gap:8px;max-width:100%;font-size:12.5px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .ln-resp{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2)}
+html[data-fx="novo"] .ln-resp .ln-av{width:20px;height:20px;border-radius:50%;background:hsl(var(--c-sec));color:var(--ap-g2);display:grid;place-items:center;font-size:9.5px;font-weight:600;flex:none}
 html[data-fx="novo"] .ln-dias{font-size:12.5px;color:var(--ink-3)}
-html[data-fx="novo"] .ln-dias.verm{color:var(--red);font-weight:600}
-html[data-fx="novo"] .ln-vz{color:var(--ink-3);font-size:12px}
-html[data-fx="novo"] .ln-mute{font-size:12px;color:var(--ink-3);white-space:nowrap}
-html[data-fx="novo"] .ln-forte{font-weight:600;color:var(--ink)}
-html[data-fx="novo"] .ln-tab .ln-link{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:0;border:0;background:none;font:inherit;font-size:12.5px;font-weight:500;color:var(--ap-g1);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-html[data-fx="novo"]:root[data-theme="dark"] .ln-tab .ln-link{color:#c9a3ea}
-html[data-fx="novo"] .ln-tab .ln-link:hover{text-decoration:underline}
-html[data-fx="novo"] .ln-tab .ln-link svg.i{width:13px;height:13px;flex:none}
-html[data-fx="novo"] .ln-acoes{display:flex;align-items:center;justify-content:flex-end;gap:6px}
-html[data-fx="novo"] .ln-acoes .kb-btn{white-space:nowrap}
-html[data-fx="novo"] .ln-seta{display:flex;color:var(--ink-3);opacity:.45;transition:opacity .15s,transform .15s}
-html[data-fx="novo"] .ln-seta svg.i{width:15px;height:15px}
-html[data-fx="novo"] .ln-tab tbody tr:hover .ln-seta{opacity:1;color:var(--ap-g1);transform:translateX(2px)}
-html[data-fx="novo"] .ln-c{display:flex;justify-content:center}
-html[data-fx="novo"] .ln-sel select{height:28px;max-width:100%;padding:0 26px 0 11px;border-radius:999px!important;border:1px solid var(--ap-linha);font-size:12px;font-weight:500;background-color:hsl(var(--c-sec)/.6);color:var(--ink)}
-html[data-fx="novo"] .ln-sel.exigencia select,html[data-fx="novo"] .ln-sel.indeferido select{background-color:var(--red-soft);color:var(--red);border-color:transparent}
-html[data-fx="novo"] .ln-sel.concedido select{background-color:var(--green-soft);color:var(--green);border-color:transparent}
-html[data-fx="novo"] .ln-rodape{display:flex;justify-content:space-between;gap:12px;padding:12px 20px;font-size:11.5px;color:var(--ink-3);border-top:1px solid var(--ap-linha);background:hsl(var(--c-sec)/.2)}
-html[data-fx="novo"] .ln-vazio{padding:44px 0;display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--ink-3);font-size:13px}
-html[data-fx="novo"] .ln-vazio svg.i{width:26px;height:26px;opacity:.5}
+html[data-fx="novo"] .ln-vz,html[data-fx="novo"] .ln-mute{color:var(--ink-3);font-size:12.5px}
+html[data-fx="novo"] .ln-cp{width:28px;height:28px;border-radius:8px;border:0;background:none;color:var(--ink-3);display:inline-grid;place-items:center;cursor:pointer;opacity:0;transition:opacity .12s}
+html[data-fx="novo"] .ln-cp svg.i{width:14px;height:14px}
+html[data-fx="novo"] .ln-tab tr:hover .ln-cp{opacity:1}
+html[data-fx="novo"] .ln-cp:hover{background:hsl(var(--c-sec));color:var(--ap-g2)}
+/* Pós-venda: o que falta chama o clique (quadrado tracejado roxo); o que já veio é um ✓ discreto */
+html[data-fx="novo"] .ln-tab .pv-box{width:18px;height:18px;border-radius:5px;border:1.5px dashed hsl(var(--c-pri)/.55);background:hsl(var(--c-card))}
+html[data-fx="novo"] .ln-tab .pv-box:hover{border-style:solid;border-color:var(--ap-g1);background:var(--ap-lil)}
+html[data-fx="novo"] .ln-tab .pv-box.ok{border:0;background:none}
+html[data-fx="novo"] .ln-tab .pv-box.ok svg{width:15px;height:15px;stroke:var(--green);stroke-width:2.3}
+html[data-fx="novo"] .ln-tab .pv-box.ok:not(.fixo):hover{background:hsl(var(--c-sec)/.6);border-radius:5px}
+html[data-fx="novo"] .ln-tab .pv-na{color:var(--ink-3)}
+html[data-fx="novo"] .ln-rodape{display:flex;justify-content:space-between;gap:12px;padding:9px 16px;font-size:11.5px;color:var(--ink-3);border-top:1px solid var(--ap-linha)}
+html[data-fx="novo"] .ln-rodape kbd{font:inherit;font-size:10.5px;border:1px solid var(--ap-linha);border-radius:4px;padding:0 4px;background:hsl(var(--c-card))}
+html[data-fx="novo"] .ln-vazio{padding:40px 0;display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--ink-3);font-size:13px}
+html[data-fx="novo"] .ln-vazio svg.i{width:24px;height:24px;opacity:.5}
 html[data-fx="novo"] .ln-vazio p{margin:0}
+/* lista ao lado da ficha: uma coluna, duas linhas por mãe (nome e prazo; embaixo o que falta) */
+html[data-fx="novo"] .ln-tab.ln-estreita td{height:54px}
+html[data-fx="novo"] .ln-dl{display:flex;flex-direction:column;gap:3px;min-width:0}
+html[data-fx="novo"] .ln-dl1{display:flex;align-items:baseline;gap:10px;min-width:0}
+html[data-fx="novo"] .ln-dl1 .ln-nome{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .ln-dl1 .ln-pz,html[data-fx="novo"] .ln-dl1 .ln-vz{flex:none;font-size:12px}
+html[data-fx="novo"] .ln-dl2{font-size:12px;overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .ln-dl2 .ln-pill{height:20px;font-size:11.5px}
 
-/* ---------- ficha da mãe: painel encostado à direita ---------- */
-html[data-fx="novo"] .ficha-card.fc-lado{justify-content:flex-end;align-items:stretch;padding:0;background:rgba(30,12,48,.26);-webkit-backdrop-filter:none;backdrop-filter:none}
-html[data-fx="novo"] .ficha-card.fc-lado>div{position:relative;width:min(620px,94vw);height:100vh;max-height:none;border-radius:22px 0 0 22px;border:0;box-shadow:-24px 0 60px rgba(41,24,56,.18);animation:fcLadoEntra .22s cubic-bezier(.2,.7,.2,1)}
-@keyframes fcLadoEntra{from{transform:translateX(48px);opacity:0}to{transform:none;opacity:1}}
-html[data-fx="novo"] .fc-lado .fct-host{flex:none;padding:26px 30px 0}
-html[data-fx="novo"] .fct-l1{display:flex;align-items:center;gap:14px;padding-right:40px}
-html[data-fx="novo"] .fct-av{width:50px;height:50px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:16px;font-weight:600;color:#fff;background:linear-gradient(135deg,var(--ap-g1),var(--ap-g2))}
-html[data-fx="novo"] .fct-t{min-width:0}
-html[data-fx="novo"] .fct-t h2{margin:0;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:22px;font-weight:600;letter-spacing:-.01em;line-height:1.2;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-html[data-fx="novo"] .fct-t p{margin:3px 0 0;font-size:12.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-html[data-fx="novo"] .fct-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
-html[data-fx="novo"] .fct-jor{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;margin-top:18px}
-html[data-fx="novo"] .fct-jor i{display:block;height:5px;border-radius:999px;background:hsl(var(--c-sec));margin-bottom:7px}
-html[data-fx="novo"] .fct-jor span{display:block;font-size:11px;color:var(--ink-3);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-html[data-fx="novo"] .fct-jor .feito i{background:hsl(var(--c-pri)/.45)}
+/* ---------- ficha ao lado ---------- */
+html[data-fx="novo"] .ficha-card.fc-lado{justify-content:flex-end;align-items:stretch;padding:0;background:rgba(30,12,48,.22);-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-fx="novo"] .ficha-card.fc-lado>div{position:relative;width:min(640px,94vw);height:100vh;max-height:none;border-radius:20px 0 0 20px;border:0;box-shadow:-20px 0 50px rgba(41,24,56,.16);animation:fcLadoEntra .2s cubic-bezier(.2,.7,.2,1)}
+@keyframes fcLadoEntra{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+/* tela larga: a ficha fica fixa à direita, sem escurecer; a lista encolhe e o menu vira ícones */
+html.fc-split[data-fx="novo"] .content{padding-right:676px!important}
+html[data-fx="novo"] .ficha-card.fc-lado.fc-fixa{position:fixed;inset:auto;top:58px;right:20px;bottom:16px;width:640px;display:block;background:none;z-index:45}
+html[data-fx="novo"] .ficha-card.fc-lado.fc-fixa>div{width:100%;height:100%;border-radius:16px;border:1px solid var(--ap-linha);box-shadow:0 10px 30px rgba(41,24,56,.10)}
+html[data-fx="novo"] .ficha-card.fc-lado.sem-anim>div{animation:none}
+html[data-fx="novo"] .fc-lado .fct-host{flex:none;padding:14px 20px 0}
+html[data-fx="novo"] .fct-l1{display:flex;align-items:center;gap:10px;min-height:36px}
+html[data-fx="novo"] .fct-l1 h2{margin:0;min-width:0;font-size:18px;font-weight:650;letter-spacing:-.01em;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .fct-meta{font-size:12.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+html[data-fx="novo"] .fct-nav{margin-left:auto;display:flex;align-items:center;gap:5px;flex:none;font-size:12px;color:var(--ink-3)}
+html[data-fx="novo"] .fct-nav > span{margin-right:3px}
+html[data-fx="novo"] .fct-b{width:30px;height:30px;border-radius:8px;border:1px solid var(--ap-linha);background:hsl(var(--c-card));color:var(--ink-2);display:grid;place-items:center;cursor:pointer;padding:0}
+html[data-fx="novo"] .fct-b:hover:not([disabled]){background:var(--ap-lil);color:var(--ink)}
+html[data-fx="novo"] .fct-b[disabled]{opacity:.4;cursor:default}
+html[data-fx="novo"] .fct-b svg.i{width:15px;height:15px}
+html[data-fx="novo"] .fct-b[data-fc-nav="-1"] svg.i{transform:rotate(90deg)}
+html[data-fx="novo"] .fct-b.fct-prox-b svg.i{transform:rotate(-90deg)}
+html[data-fx="novo"] .fct-jor{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;margin-top:12px}
+html[data-fx="novo"] .fct-jor i{display:block;height:4px;border-radius:999px;background:hsl(var(--c-sec))}
+html[data-fx="novo"] .fct-jor span{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:6px;font-size:11px;color:var(--ink-3);white-space:nowrap;overflow:hidden}
+html[data-fx="novo"] .fct-jor .feito i{background:hsl(var(--c-pri)/.4)}
 html[data-fx="novo"] .fct-jor .feito span{color:var(--ink-2)}
 html[data-fx="novo"] .fct-jor .agora i{background:var(--ap-g1)}
 html[data-fx="novo"] .fct-jor .agora span{color:var(--ap-g2);font-weight:600}
-html[data-fx="novo"]:root[data-theme="dark"] .fct-jor .agora span{color:#d9bdf2}
-html[data-fx="novo"] .fct-jor .agora.verm i{background:var(--red)}
-html[data-fx="novo"] .fct-jor .agora.verm span{color:var(--red)}
-html[data-fx="novo"] .fct-prox{display:flex;gap:12px;align-items:flex-start;margin-top:18px;padding:14px 16px;border-radius:14px;background:var(--ap-lil)}
-html[data-fx="novo"] .fct-prox > svg.i{width:18px;height:18px;flex:none;margin-top:1px;color:var(--ap-g1)}
-html[data-fx="novo"] .fct-prox b{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ap-g1);margin-bottom:3px}
-html[data-fx="novo"] .fct-prox p{margin:0;font-size:13px;line-height:1.5;color:var(--ink)}
+html[data-fx="novo"]:root[data-theme="dark"] .fct-jor .agora span{color:#e3ccf6}
+html[data-fx="novo"] .fct-ponto{width:6px;height:6px;border-radius:50%;background:var(--red);flex:none}
+html[data-fx="novo"] .fct-prox{display:flex;align-items:center;gap:12px;margin-top:12px;padding:11px 14px;border-radius:12px;background:var(--ap-lil)}
 html[data-fx="novo"] .fct-prox.verm{background:var(--red-soft)}
-html[data-fx="novo"] .fct-prox.verm > svg.i,html[data-fx="novo"] .fct-prox.verm b{color:var(--red)}
 html[data-fx="novo"] .fct-prox.ok{background:var(--green-soft)}
-html[data-fx="novo"] .fct-prox.ok > svg.i,html[data-fx="novo"] .fct-prox.ok b{color:var(--green)}
-/* abas com nome, sublinhadas; o X vai para o canto de cima */
-html[data-fx="novo"] .fc-lado .fc-barra{padding:18px 30px 0;border-bottom:1px solid var(--ap-linha);gap:0}
-html[data-fx="novo"] .fc-lado .fc-abas{gap:22px;padding:0;border-radius:0;background:none}
-html[data-fx="novo"] .fc-lado .fc-abas button{width:auto;height:38px;border-radius:0;display:inline-flex;align-items:center;gap:7px;padding:0 1px;margin-bottom:-1px;border-bottom:2px solid transparent;background:none!important;color:var(--ink-3);font:inherit;font-size:13px;font-weight:500}
+html[data-fx="novo"] .fct-q{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex:none;background:hsl(var(--c-card));color:var(--ap-g1)}
+html[data-fx="novo"] .fct-prox.verm .fct-q{color:var(--red)}
+html[data-fx="novo"] .fct-prox.ok .fct-q{color:var(--green)}
+html[data-fx="novo"] .fct-q svg.i{width:15px;height:15px}
+html[data-fx="novo"] .fct-prox p{flex:1;min-width:0;margin:0;font-size:13px;line-height:1.45;color:var(--ink)}
+html[data-fx="novo"] .fct-prox p small{display:block;font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ap-g2);margin-bottom:1px}
+html[data-fx="novo"]:root[data-theme="dark"] .fct-prox p small{color:#d9bdf2}
+html[data-fx="novo"] .fct-prox.verm p small{color:var(--red)}
+html[data-fx="novo"] .fct-prox.ok p small{color:var(--green)}
+html[data-fx="novo"] .fct-acao{flex:none;height:32px;padding:0 14px;border-radius:9px;border:0;background:var(--ap-g1);color:#fff;font:inherit;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:7px;cursor:pointer;white-space:nowrap}
+html[data-fx="novo"] .fct-acao:hover{background:var(--ap-g2)}
+html[data-fx="novo"] .fct-acao svg.i{width:14px;height:14px}
+html[data-fx="novo"] .fct-dados{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:22px;margin-top:12px;border-top:1px solid var(--ap-linha)}
+html[data-fx="novo"] .fct-d{display:flex;align-items:center;gap:10px;min-height:34px;border-bottom:1px solid var(--ap-linha);font-size:13px;min-width:0}
+html[data-fx="novo"] .fct-d small{width:96px;flex:none;font-size:12px;color:var(--ink-3)}
+html[data-fx="novo"] .fct-d b{font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .fct-d em{font-style:normal;color:var(--ink-3);font-size:12.5px}
+html[data-fx="novo"] .fct-cp{margin-left:auto;width:26px;height:26px;border-radius:7px;border:0;background:none;color:var(--ink-3);display:grid;place-items:center;cursor:pointer;flex:none}
+html[data-fx="novo"] .fct-cp:hover{background:hsl(var(--c-sec));color:var(--ap-g2)}
+html[data-fx="novo"] .fct-cp svg.i{width:13px;height:13px}
+html[data-fx="novo"] .fct-links{gap:14px}
+html[data-fx="novo"] .fct-links a{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:500;color:var(--ap-g1);text-decoration:none}
+html[data-fx="novo"]:root[data-theme="dark"] .fct-links a{color:#c9a3ea}
+html[data-fx="novo"] .fct-links a:hover{text-decoration:underline}
+html[data-fx="novo"] .fct-links svg.i{width:14px;height:14px}
+/* a senha do cofre ocupa a linha inteira (ler, copiar, trocar e o histórico continuam iguais) */
+html[data-fx="novo"] .fct-dados .fc-senha-box{grid-column:1/-1;border-bottom:1px solid var(--ap-linha);padding:2px 0}
+html[data-fx="novo"] .fct-dados .fc-senha-box .fc-lin{min-height:32px;margin:0;padding:0;border:0;background:none}
+/* abas com nome; o X antigo sai (o novo fica no topo, com ‹ ›) */
+html[data-fx="novo"] .fc-lado .fc-barra{padding:10px 20px 0;border-bottom:1px solid var(--ap-linha);gap:0}
+html[data-fx="novo"] .fc-lado .fc-barra .fc-x{display:none}
+html[data-fx="novo"] .fc-lado .fc-abas{gap:20px;padding:0;border-radius:0;background:none}
+html[data-fx="novo"] .fc-lado .fc-abas button{width:auto;height:36px;border-radius:0;display:inline-flex;align-items:center;gap:6px;padding:0 1px;margin-bottom:-1px;border-bottom:2px solid transparent;background:none!important;color:var(--ink-3);font:inherit;font-size:13px;font-weight:500}
+html[data-fx="novo"] .fc-lado .fc-abas button > svg.i{display:none}
 html[data-fx="novo"] .fc-lado .fc-abas button[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--ap-g1)}
-html[data-fx="novo"] .fc-lado .fc-abas .i{width:15px;height:15px}
-html[data-fx="novo"] .fc-lado .fc-abas .fc-ponto{position:static;margin-left:-2px}
-html[data-fx="novo"] .fc-lado .fc-x{position:absolute;top:18px;right:18px;width:34px;height:34px;border-radius:10px;border:1px solid var(--ap-linha);background:hsl(var(--c-card));z-index:2}
-html[data-fx="novo"] .fc-lado .fc-x:hover{background:var(--ap-lil);color:var(--ink)}
-html[data-fx="novo"] .fc-lado .fc-corpo{height:auto;flex:1;padding:18px 30px 0}
-html[data-fx="novo"] .fc-lado .fc-salvar{margin:0 -30px;padding:12px 30px 16px}
-html[data-fx="novo"] .fc-lado .fc-cx-nome{display:none}
-html[data-fx="novo"] .fc-lado .fc-cx-top{justify-content:flex-end}
-html[data-fx="novo"] .fc-lado .fc-corpo:not([data-aba="dados"]) .fc-caixa{display:none}
+html[data-fx="novo"] .fc-lado .fc-abas .fc-ponto{position:static;margin-left:-1px}
+html[data-fx="novo"] .fc-lado .fc-corpo{height:auto;flex:1;padding:14px 20px 0}
+html[data-fx="novo"] .fc-lado .fc-salvar{margin:0 -20px;padding:10px 20px 14px}
+/* o que já está no topo não se repete embaixo: "Partes envolvidas" e o relógio do parto com segundos */
+html[data-fx="novo"] .fc-lado .p-dados > .fc-c:has(> .fc-parte),html[data-fx="novo"] .fc-lado .p-dados > .fc-parto{display:none}
 html[data-fx="novo"] .fc-lado .fc-corpo .p-robos{display:none}
-html[data-fx="novo"] .fc-lado .fc-corpo[data-aba="robos"] .p-robos{display:flex;flex-direction:column;gap:10px;padding-bottom:24px}
-/* robôs da mãe */
-html[data-fx="novo"] .fcr{list-style:none;margin:0 0 8px;padding:0;border:1px solid var(--ap-linha);border-radius:14px;overflow:hidden}
-html[data-fx="novo"] .fcr li{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 14px;border-top:1px solid var(--ap-linha)}
+html[data-fx="novo"] .fc-lado .fc-corpo[data-aba="robos"] .p-robos{display:flex;flex-direction:column;gap:10px;padding-bottom:20px}
+/* pendências do Pós-venda */
+html[data-fx="novo"] .fcp ul{list-style:none;margin:0 0 6px;padding:0;border:1px solid var(--ap-linha);border-radius:12px;overflow:hidden}
+html[data-fx="novo"] .fcp li{display:flex;align-items:center;gap:12px;min-height:46px;padding:6px 14px;border-top:1px solid var(--ap-linha)}
+html[data-fx="novo"] .fcp li:first-child{border-top:0}
+html[data-fx="novo"] .fcp-q{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;flex:none}
+html[data-fx="novo"] .fcp li.ok .fcp-q{background:var(--green-soft);color:var(--green)}
+html[data-fx="novo"] .fcp li.f .fcp-q{border:1.5px dashed hsl(var(--c-pri)/.55)}
+html[data-fx="novo"] .fcp-q svg.i{width:13px;height:13px;stroke-width:2.4}
+html[data-fx="novo"] .fcp li > div{min-width:0}
+html[data-fx="novo"] .fcp li b{display:block;font-size:13px;font-weight:600;color:var(--ink)}
+html[data-fx="novo"] .fcp li small{display:block;font-size:12px;color:var(--ink-3)}
+html[data-fx="novo"] .fcp-b{margin-left:auto;flex:none;height:30px;padding:0 12px;border-radius:8px;border:1px solid hsl(var(--c-pri)/.3);background:var(--ap-lil);color:var(--ap-g2);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+html[data-fx="novo"] .fcp-b:hover{background:hsl(var(--c-sec))}
+html[data-fx="novo"] .fcp-b.sec{background:hsl(var(--c-card));border-color:var(--ap-linha);color:var(--ink-2);font-weight:500}
+html[data-fx="novo"] .fcp-ok{margin-left:auto;font-size:12px;font-weight:500;color:var(--green)}
+html[data-fx="novo"] .fcp-des{margin-left:auto;border:0;background:none;font:inherit;font-size:12px;color:var(--ink-3);cursor:pointer}
+html[data-fx="novo"] .fcp-des:hover{color:var(--ink);text-decoration:underline}
+/* automação desta mãe */
+html[data-fx="novo"] .fcr{list-style:none;margin:0 0 8px;padding:0;border:1px solid var(--ap-linha);border-radius:12px;overflow:hidden}
+html[data-fx="novo"] .fcr li{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 14px;border-top:1px solid var(--ap-linha)}
 html[data-fx="novo"] .fcr li:first-child{border-top:0}
-html[data-fx="novo"] .fcr-i{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:hsl(var(--c-sec));color:var(--ap-g1)}
-html[data-fx="novo"] .fcr-i svg.i{width:16px;height:16px}
+html[data-fx="novo"] .fcr-i{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:hsl(var(--c-sec));color:var(--ap-g1)}
+html[data-fx="novo"] .fcr-i svg.i{width:15px;height:15px}
 html[data-fx="novo"] .fcr li.off .fcr-i{background:hsl(var(--c-sec)/.5);color:var(--ink-3)}
 html[data-fx="novo"] .fcr b{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink)}
 html[data-fx="novo"] .fcr li.off b{color:var(--ink-2)}
 html[data-fx="novo"] .fcr small{display:block;margin-top:2px;font-size:12px;line-height:1.4;color:var(--ink-3)}
-html[data-fx="novo"] .fcr small.ok{color:var(--green)}
 html[data-fx="novo"] .fcr small.verm{color:var(--red)}
 html[data-fx="novo"] .fcr-aqui{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ap-g2);background:hsl(var(--c-sec));border-radius:6px;padding:1px 6px}
 html[data-fx="novo"] .fcr-st{font-size:11.5px;font-weight:500;white-space:nowrap;padding:3px 10px;border-radius:999px;border:1px dashed var(--ap-linha);color:var(--ink-3)}
-html[data-fx="novo"] .fcr-st.on{border:0;background:var(--green-soft);color:var(--green)}
+html[data-fx="novo"] .fcr-st.on{border:0;background:hsl(var(--c-sec)/.7);color:var(--ink-2)}
 }
 /* fim da lista nova */
 </style>
@@ -4434,7 +4491,7 @@ html[data-fx="novo"] .fcr-st.on{border:0;background:var(--green-soft);color:var(
   }
   /* ---------- card com os dados do cliente (abre ao clicar na linha) ---------- */
   var cardAberto = null;
-  function fecharCard(){ if (cardAberto){ cardAberto.el.remove(); cardAberto = null; } }
+  function fecharCard(){ if (cardAberto){ cardAberto.el.remove(); cardAberto = null; } fcDepoisFechar(); }
   function fcCopiar(v, titulo){ return '<button type="button" class="fc-cp" data-fc-copia="' + esc(v) + '" title="' + esc(titulo) + '" aria-label="' + esc(titulo) + '">' + svgI('i-copy') + '</button>'; }
   function fcLeitura(rot, val){ return val ? '<div class="fc-leit"><span>' + esc(rot) + '</span><b>' + esc(val) + '</b></div>' : ''; }
   // senha do gov.br: mora no cofre do banco e só fica na memória enquanto o card está aberto; o banco registra quem leu
@@ -4509,6 +4566,7 @@ html[data-fx="novo"] .fcr-st.on{border:0;background:var(--green-soft);color:var(
   function fcResp(r, t){ return t === 'd' ? [r.atendente, r.atendenteEmail] : t === 'h' ? [r.filaPor, ''] : [r.posResp, r.posRespEmail]; }
   function fcGuia(r){
     if (!noContratos(r)) return '';
+    if (cardAberto && cardAberto.el && cardAberto.el.classList.contains('fc-lado') && faseDe(r) === 'k') return '';   // ficha ao lado: no Pós-venda, as pendências ficam no lugar da guia
     var soNit = '<label class="fc-c"><span class="fc-rot">NIT / PIS da mãe</span><input id="fc-nit" class="tnum" inputmode="numeric" placeholder="000.00000.00-0" value="' + esc(r.nit ? nitFmt(r.nit) : '') + '"></label>';
     if (nascido(r)) return doFluxoNovo(r) && !rural(r) && !nitOk(r.nit) ? '<p class="fc-sec">NIT da mãe</p>' + soNit + '<p class="fc-nota">Pegue no Meu INSS com a senha gov.br e clique em Atualizar dados.</p>' : '';
     if (doFluxoNovo(r) && semGps(r) && !rural(r)) return '<p class="fc-sec">GPS</p><p class="fc-nota">Não paga GPS pelo escritório (' + (r.qualificacao.caminho === 'mei' ? 'é MEI' : 'pedido direto ao INSS') + ').</p>' + (nitOk(r.nit) ? '' : soNit);
@@ -4568,7 +4626,8 @@ html[data-fx="novo"] .fcr-st.on{border:0;background:var(--green-soft);color:var(
     if (el.classList.contains('fc-lado')) fcTopoPintar(el, r);
     if (cardAberto.sujo || (cardAberto.senha && cardAberto.senha.fase === 'editando')) return;   // tem alguém digitando: a atualização da base não apaga o texto
     var topo = corpo.scrollTop;
-    corpo.innerHTML = fcCaixa(r) + fcDados(r) + fcArquivos(r) + fcHistorico(r) + (el.classList.contains('fc-lado') ? fcRobos(r) : '');
+    corpo.innerHTML = el.classList.contains('fc-lado') ? fcCorpoLado(r) : fcCaixa(r) + fcDados(r) + fcArquivos(r) + fcHistorico(r);
+    if (el.classList.contains('fc-lado')) fcCorpoAjustar(el);
     corpo.scrollTop = topo;
   }
   async function salvarCard(){
@@ -4617,7 +4676,7 @@ html[data-fx="novo"] .fcr-st.on{border:0;background:var(--green-soft);color:var(
     var el = document.createElement('div'); el.className = 'ficha-card';
     el.innerHTML = '<div role="dialog" aria-modal="true" aria-label="Dados da cliente"><div class="fc-barra"><div class="fc-abas"><button type="button" data-aba="dados" title="Dados do processo" aria-label="Dados do processo">' + svgI('i-folder') + '</button><button type="button" data-aba="arq">' + svgI('i-nuvem') + '<span class="fc-ponto" hidden></span></button><button type="button" data-aba="hist" title="Histórico" aria-label="Histórico">' + svgI('i-historico') + '</button></div><button type="button" class="fc-x" data-fc-x aria-label="Fechar">' + svgI('i-x') + '</button></div><div class="fc-corpo"></div></div>';
     document.body.appendChild(el);
-    if (lnLigada()) fcLadoPreparar(el);   // computador, fluxo novo: a ficha abre encostada à direita (23/11/2026)
+    if (lnLigada()) fcLadoPreparar(el, id);   // computador, fluxo novo: a ficha abre encostada à direita (23/11/2026)
     cardAberto = { el: el, id: id, compacto: !!compacto, aba: 'dados', sujo: false, senha: { fase: 'lendo' } };
     pintarCard();
     lerSenhaCard();
@@ -7592,6 +7651,7 @@ html[data-fx="novo"] .fcr-st.on{border:0;background:var(--green-soft);color:var(
     c.classList.remove('em-quadro', 'recolhido');
     c.classList.toggle('dash-sem-cab', t === 'b' && fluxoVista === 'novo');   // Dashboard do fluxo novo sem o cabeçalho grande: começa na linha do período, como no BI de Vendas
     pintarFiltrar(); pintarLimpar();
+    lnPagina(t);   // lista nova: "N mães · X atrasadas" e o "?" da etapa
     Array.prototype.forEach.call(document.querySelectorAll('.kb-ord'), function(s){ s.value = kbOrdem; });
   }
   // o quadro vai até o pé da janela: a barra de rolagem lateral fica à vista e a página não ganha rolagem
@@ -10476,11 +10536,12 @@ html[data-fx="novo"] .fcr-st.on{border:0;background:var(--green-soft);color:var(
   $('tema-claro').addEventListener('click', function(){ trocarTema('light'); });
   $('tema-escuro').addEventListener('click', function(){ trocarTema('dark'); });
 
-  /* ---------- Lista nova das mães (23/11/2026, a pedido: "um novo layout para a estrutura de todas essas mães, formato lista, clicando no nome aparecem os dados
-     das mães, tudinho... bem bonito, bem top, que nem ficou o dashboard"). Só no computador e no fluxo novo: no celular continua a lista de antes.
-     Não muda nada do que a lista faz: recebe a mesma lista que a tela já filtrou (busca, Filtrar, Minhas clientes e ordem) e mantém as caixinhas do
-     Pós-venda (data-pv), os botões de cada fase (data-iact, data-act) e o clique no nome, que abre a ficha. ---------- */
+  /* ---------- Lista nova das mães, 2ª versão (23/11/2026). O usuário achou a 1ª "horrível"; a crítica de layout pediu menos vermelho, linhas baixas
+     numa linha só, cabeçalho de duas linhas e a ficha ao lado da lista. Proposta aprovada: "vamos testar essa proposta".
+     Só no computador e no fluxo novo; no celular continua a lista de antes. Recebe a mesma lista que a tela já filtrou (busca, Filtrar, ordem,
+     Minhas clientes) e mantém as caixinhas do Pós-venda (data-pv), copiar (data-copiar, data-gpn-copia) e o clique na linha, que abre a ficha. ---------- */
   function lnLigada(){ return fluxoVista === 'novo' && window.innerWidth >= 1000; }
+  function lnSplit(){ return document.documentElement.classList.contains('fc-split'); }
   var LN_BOX = { 'ctr-list': 'k', 'gpn-list': 'gp', 'nan-list': 'an', 'rqn-list': 'rq', 'inss-list': 'i', 'list': 'c', 'r-list': 'r' };
   var LN_ETAPA = {
     k:  [1, 'Pós-venda', 'Só as exceções: senha gov.br, NIT, RG e CPF, e a pergunta se é pescadora, agricultora ou indígena. Com tudo completo, a mãe segue sozinha. As caixinhas resolvem ali mesmo.'],
@@ -10491,101 +10552,83 @@ html[data-fx="novo"] .fcr-st.on{border:0;background:var(--green-soft);color:var(
     c:  [0, 'Judicial', 'Indeferidas no INSS que viraram ação na Justiça.'],
     r:  [6, 'Arquivados', 'Benefício pago e acerto feito. Mães que podem ter direito de novo com outro filho.']
   };
-  var lnSit = { gp: '', an: '', rq: '' };
+  var lnSit = { gp: '', an: '', rq: '' }, lnInfo = {};
   function lnIni(n){ var p = String(n || '?').trim().split(/\s+/); return ((p[0] || '?').charAt(0) + (p.length > 1 ? p[p.length - 1].charAt(0) : '')).toUpperCase(); }
   function lnRel(dia){ var n = daysUntil(dia); return n == null ? '' : n === 0 ? 'hoje' : n === 1 ? 'amanhã' : n === -1 ? 'ontem' : n > 0 ? 'em ' + n + ' d' : 'há ' + (-n) + ' d'; }
-  function lnData(dia, tom, sub){ if (!dia) return '<span class="ln-vz">—</span>'; dia = String(dia).slice(0, 10); return '<div class="ln-dt' + (tom ? ' ' + tom : '') + '"><b class="tnum">' + fmtDate(dia) + '</b><small>' + esc(sub != null ? sub : lnRel(dia)) + '</small></div>'; }
+  function lnDm(dia){ dia = String(dia || '').slice(0, 10); return dia ? dia.slice(8, 10) + '/' + dia.slice(5, 7) : ''; }
   function lnPill(txt, tom, ico){ return '<span class="ln-pill ' + (tom || '') + '">' + (ico ? svgI(ico) : '') + esc(txt) + '</span>'; }
-  function lnResp(n){ var p = primeiroNome(n); return p ? '<span class="ln-resp"><span class="ln-av ln-av-p">' + esc(lnIni(n)) + '</span>' + esc(p) + '</span>' : '<span class="ln-vz">—</span>'; }
-  function lnDias(n, parado){ return n == null ? '<span class="ln-vz">—</span>' : '<span class="ln-dias tnum' + (parado ? ' verm' : '') + '">' + n + ' d</span>'; }
-  function lnMae(r, sub, tom){
-    var id = esc(r.id);
-    return '<div class="ln-mae"><span class="ln-av">' + esc(lnIni(r.nome)) + '</span><div class="ln-mae-t"><button type="button" class="nome-abrir ln-nome" data-act="abrir" data-id="' + id + '" title="Abrir a ficha de ' + esc(r.nome || '') + '">' + esc(r.nome || 'Sem nome') + '</button>' +
-      '<small class="' + (tom || '') + '" title="' + esc(String(sub || '').replace(/<[^>]+>/g, '')) + '">' + (sub || esc(cidadeCli(r) || 'Cidade não informada')) + '</small></div></div>';
+  function lnResp(n){ var p = primeiroNome(n); return p ? '<span class="ln-resp"><span class="ln-av">' + esc(lnIni(n).charAt(0)) + '</span>' + esc(p) + '</span>' : '<span class="ln-vz">—</span>'; }
+  function lnDias(n){ return n == null ? '<span class="ln-vz">—</span>' : '<span class="ln-dias tnum">' + n + ' d</span>'; }
+  // "prazo" de uma linha: data curta e o relativo; vermelho só quando é prazo nosso e já passou
+  function lnPz(dia, tom, pre, rel){ if (!dia) return '<span class="ln-vz">—</span>'; return '<span class="ln-pz ' + (tom || '') + '"><b class="tnum">' + (pre || '') + lnDm(dia) + '</b>' + (rel === '' ? '' : ' <span>· ' + esc(rel != null ? rel : (daysUntil(dia) < 0 ? 'venceu ' : '') + lnRel(dia)) + '</span>') + '</span>'; }
+  function lnFt(txt, tom, ico){ return '<span class="ln-ft ' + (tom || '') + '">' + (ico ? svgI(ico) : '') + '<span>' + esc(txt) + '</span></span>'; }
+  // prioridade da linha: 'at' = prazo nosso passou (faixa vermelha); 'lg' = vence em até 7 dias (faixa lilás)
+  function lnTom(t, r){
+    var hoje = iso(new Date()), perto = function(d){ var n = daysUntil(d); return n != null && n >= 0 && n <= 7; };
+    if (t === 'k' || t === 'gp'){ if (!r.tipoSegurada && t === 'k') return ''; if (rural(r) || semGps(r) || gpsPaga(r)) return ''; var v = prazoGps(r); return v && v < hoje ? 'at' : v && perto(v) ? 'lg' : ''; }
+    if (t === 'an'){ var p = String(r.dpp || '').slice(0, 10); return p && p < hoje ? 'at' : p && perto(p) ? 'lg' : ''; }
+    if (t === 'i'){ var k = statusInss(r); if (k === 'exigencia'){ var e = String(r.exigenciaPrazo || '').slice(0, 10); return e && e < hoje ? 'at' : 'lg'; } return analiseAtrasada(r) ? 'lg' : ''; }
+    if (t === 'c') return r.audData && perto(r.audData) ? 'lg' : '';
+    return '';
   }
-  function lnAcoes(r, extra){ return '<div class="ln-acoes">' + (extra || '') + editBtn(r) + '<span class="ln-seta" aria-hidden="true">' + svgI('i-chev') + '</span></div>'; }
-  // a primeira situação que pede atenção (a mesma que a lista antiga mostrava embaixo do nome)
-  function lnAviso(r, i){ var s = (r.pvProblema && (noContratos(r) || naFila(r)) ? [kbSt('Problema: ' + r.pvProblema)] : []).concat((i && i.status) || []).filter(function(x){ return x && x.t; })[0]; return s; }
-  // colunas de cada etapa: [título, largura, célula]
-  function lnColunas(t, info){
+  // o que falta (ou a situação) de cada mãe, numa frase curta
+  function lnFalta(t, r){
     var hoje = iso(new Date());
-    if (t === 'k') return [
-      ['Mãe', '', function(r){ var sub = !r.tipoSegurada ? ['Pescadora, agricultora ou indígena? Informar na ficha', 'verm'] : !zapUrl(foneDe(r)) ? ['Sem telefone', 'verm'] : ctPend(r) ? ['Falta assinar o contrato (cadastro sem internet)', 'verm'] : r.pvProblema ? ['Problema: ' + r.pvProblema, 'verm'] : null; return lnMae(r, sub ? esc(sub[0]) : '', sub ? sub[1] : ''); }],
-      ['Senha gov.br', 106, function(r){ return '<div class="ln-c">' + pvCel(r, 'senha') + '</div>'; }, 'c'],
-      ['NIT', 64, function(r){ return '<div class="ln-c">' + pvCel(r, 'nit') + '</div>'; }, 'c'],
-      ['RG', 56, function(r){ return '<div class="ln-c">' + pvCel(r, 'rg_frente') + '</div>'; }, 'c'],
-      ['CPF', 56, function(r){ return '<div class="ln-c">' + pvCel(r, 'cpf') + '</div>'; }, 'c'],
-      ['Parto', 118, function(r){ if (nascido(r)) return lnData(r.criancaNasc, 'ok', 'nasceu'); if (!r.dpp) return '<button type="button" class="ln-link" data-act="edit" data-id="' + esc(r.id) + '">Informar o parto</button>'; var d = String(r.dpp).slice(0, 10); return lnData(d, d < hoje ? 'verm' : ''); }],
-      ['GPS', 118, function(r){ if (!r.tipoSegurada) return '<span class="ln-vz">—</span>'; if (rural(r) || semGps(r)) return lnPill('Sem GPS', ''); if (gpsPaga(r)) return lnPill('Paga', 'ok', 'i-check'); var v = prazoGps(r); return v ? lnData(v, v < hoje ? 'verm' : '', lnRel(v)) : '<span class="ln-vz">—</span>'; }],
-      ['Responsável', 128, function(r){ return lnResp(r.posResp); }],
-      ['Na etapa', 86, function(r){ var d = diasNoPos(r); return lnDias(d, atrasada(r)); }],
-      ['', 72, function(r){ return lnAcoes(r); }]
-    ];
-    if (t === 'gp') return [
-      ['Mãe', '', function(r){ return lnMae(r, r.pvProblema ? esc('Problema: ' + r.pvProblema) : '', r.pvProblema ? 'verm' : ''); }],
-      ['Situação', 176, function(r){ var v = prazoGps(r); return !nitOk(r.nit) ? lnPill('Sem NIT', 'verm', 'i-alert') : v && v < hoje ? lnPill('Prazo vencido', 'verm', 'i-alert') : gpsTarefa(r) ? lnPill('Prazo chegou', 'lar', 'i-clock') : lnPill('Aguardando o prazo', '', 'i-clock'); }],
-      ['Competência', 108, function(r){ return '<span class="tnum">' + esc(compTxt(gpsCompetencia(r))) + '</span>'; }],
-      ['Prazo da GPS', 120, function(r){ var v = prazoGps(r); return lnData(v, v && v < hoje ? 'verm' : ''); }],
-      ['Guia', 132, function(r){ var g = gpsGerar(r); return g ? '<button type="button" class="ln-link" data-gpn-copia="' + esc(g.digitos) + '" title="Copiar o código de barras da guia">' + svgI('i-copy') + 'Copiar código</button>' : '<span class="ln-vz">' + (nitOk(r.nit) && gpsSemSalario(r) ? 'sem salário do ano' : 'falta o NIT') + '</span>'; }],
-      ['Responsável', 128, function(r){ return lnResp(r.posResp); }],
-      ['Na etapa', 86, function(r){ return lnDias(diasNoPos(r)); }],
-      ['', 72, function(r){ return lnAcoes(r); }]
-    ];
-    if (t === 'an') return [
-      ['Mãe', '', function(r){ return lnMae(r, r.pvProblema ? esc('Problema: ' + r.pvProblema) : '', r.pvProblema ? 'verm' : ''); }],
-      ['Situação', 190, function(r){ return rural(r) ? lnPill(ativNovoTxt(r) + ' · sem GPS', '') : semGps(r) ? lnPill('Sem GPS', '') : gpsPaga(r) ? lnPill('GPS paga', 'ok', 'i-check') : lnPill('GPS a conferir', 'lar', 'i-alert'); }],
-      ['Parto previsto', 128, function(r){ var d = String(r.dpp || '').slice(0, 10); return lnData(d, d && d < hoje ? 'verm' : ''); }],
-      ['Semana do parto', 150, function(r){ var n = daysUntil(r.dpp); if (n == null) return '<span class="ln-vz">—</span>'; if (n <= 7) return lnPill(n < 0 ? 'Já passou da data' : 'É esta semana', n < 0 ? 'verm' : 'lar', 'i-baby'); var d = new Date(String(r.dpp).slice(0, 10) + 'T12:00:00'); d.setDate(d.getDate() - 7); return '<span class="ln-mute">a partir de ' + fmtDate(iso(d)).slice(0, 5) + '</span>'; }],
-      ['Responsável', 128, function(r){ return lnResp(r.posResp); }],
-      ['Na etapa', 86, function(r){ return lnDias(diasNoPos(r)); }],
-      ['', 72, function(r){ return lnAcoes(r); }]
-    ];
-    if (t === 'rq') return [
-      ['Mãe', '', function(r){ return lnMae(r, r.pvProblema ? esc('Problema: ' + r.pvProblema) : '', r.pvProblema ? 'verm' : ''); }],
-      ['Situação', 170, function(r){ var ce = noContratos(r) && posEtapaDe(r) === 'cert'; return ce ? lnPill('Esperando a certidão', '', 'i-clock') : lnPill('Pronta para requerer', 'lar', 'i-file'); }],
-      ['Nascimento', 120, function(r){ return r.criancaNasc ? lnData(r.criancaNasc, '') : r.dpp ? lnData(r.dpp, '', 'previsto') : '<span class="ln-vz">—</span>'; }],
-      ['Certidão', 120, function(r){ return r.certidaoRecebida ? lnData(r.certidaoEm, 'ok', 'recebida') : '<span class="ln-vz">ainda não</span>'; }],
-      ['Responsável', 128, function(r){ return lnResp(r.posResp); }],
-      ['Na etapa', 86, function(r){ var i = info ? info(r) : {}; return lnDias(i.dias); }],
-      ['', 72, function(r){ return lnAcoes(r); }]
-    ];
-    // INSS, Judicial e Arquivados: o que cada linha mostra e os botões de cada uma vêm da própria fase (inssInfo, judInfo, arqInfo)
-    if (t === 'i') return [
-      ['Mãe', '', function(r, i){ var s = lnAviso(r, i); return lnMae(r, s ? esc(s.t) : '', s ? (s.tom === 'ok' ? 'ok' : s.tom) : ''); }],
-      ['Situação', 150, function(r, i){ return '<div class="ln-sel ' + statusInss(r) + '">' + (i.etapaSel || esc(i.etapa || '')) + '</div>'; }],
-      ['Requerimento', 112, function(r){ return lnData(r.der, analiseAtrasada(r) ? 'verm' : '', r.der ? lnRel(r.der) : ''); }],
-      ['Protocolo', 128, function(r){ return r.protocoloInss ? '<button type="button" class="ln-link copia" data-copiar="' + esc(r.protocoloInss) + '" title="Copiar o protocolo">' + esc(r.protocoloInss) + svgI('i-copy') + '</button>' : '<span class="ln-vz">sem número</span>'; }],
-      ['Responsável', 112, function(r, i){ return lnResp(i.resp); }],
-      ['Na etapa', 86, function(r, i){ return lnDias(i.dias, analiseAtrasada(r)); }],
-      ['', 200, function(r, i){ return lnAcoes(r, i.acao); }]
-    ];
-    if (t === 'c') return [
-      ['Mãe', '', function(r, i){ var s = lnAviso(r, i); return lnMae(r, s ? esc(s.t) : '', s ? s.tom : ''); }],
-      ['Situação', 170, function(r, i){ return lnPill(i.etapa || '', ganhou(r) ? 'ok' : r.embargos === 'opostos' ? 'verm' : 'lar'); }],
-      ['Audiência', 120, function(r){ return r.audData ? lnData(r.audData, '', (r.audHora ? r.audHora + ' · ' : '') + lnRel(r.audData)) : '<span class="ln-vz">sem data</span>'; }],
-      ['Processo', 200, function(r){ return r.processo ? '<button type="button" class="ln-link copia" data-copiar="' + esc(r.processo) + '" title="Copiar o número do processo">' + esc(r.processo) + svgI('i-copy') + '</button>' : '<span class="ln-vz">—</span>'; }],
-      ['Responsável', 120, function(r, i){ return lnResp(i.resp); }],
-      ['', 150, function(r, i){ return lnAcoes(r, i.acao); }]
-    ];
-    if (t === 'r') return [
-      ['Mãe', '', function(r){ return lnMae(r, ''); }],
-      ['Situação', 190, function(r){ return r.contatadoRetorno ? lnPill('Contatada para novo benefício', '', 'i-phone') : lnPill('Paga e arquivada', 'ok', 'i-check'); }],
-      ['Benefício', 120, function(r){ return '<span class="tnum ln-forte">' + brl(r.recebimento && r.recebimento.valor ? r.recebimento.valor : valorBenef(r)) + '</span>'; }],
-      ['Encerrado em', 120, function(r){ return lnData(r.arquivadoEm, ''); }],
-      ['Responsável', 120, function(r, i){ return lnResp(i.resp); }],
-      ['', 210, function(r, i){ return lnAcoes(r, i.acao); }]
-    ];
+    if (t === 'k'){
+      if (ctPend(r)) return lnFt('Falta assinar o contrato', 'verm', 'i-alert');
+      if (!r.tipoSegurada) return lnFt('Pescadora, agricultora ou indígena?', 'lar', 'i-help');
+      var f = docsApp(r).filter(function(x){ return !x.ok; }).map(function(x){ return x.k === 'rg_frente' ? 'RG' : x.k === 'senha' ? 'Senha gov.br' : x.k === 'nit' ? 'NIT' : x.k === 'cpf' ? 'CPF' : x.n; });
+      return f.length ? lnFt('Falta ' + f.join(', '), '', '') : lnFt('Tudo completo', 'ok', 'i-check');
+    }
+    if (t === 'gp'){ var v = prazoGps(r); return !nitOk(r.nit) ? lnFt('Falta o NIT', 'verm', 'i-alert') : v && v < hoje ? lnFt('Pagamento não confirmado', 'verm', 'i-alert') : gpsTarefa(r) ? lnFt('Prazo chegou: pagar a guia', 'lar', 'i-clock') : gpsGerar(r) ? lnFt('Guia pronta', 'ok', 'i-check') : lnFt('Aguardando o prazo', '', 'i-clock'); }
+    if (t === 'an') return rural(r) ? lnFt(ativNovoTxt(r) + ' · sem GPS', '', '') : semGps(r) ? lnFt('Sem GPS', '', '') : gpsPaga(r) ? lnFt('GPS paga', 'ok', 'i-check') : lnFt('GPS a conferir', 'lar', 'i-alert');
+    if (t === 'rq') return noContratos(r) && posEtapaDe(r) === 'cert' ? lnFt('Esperando a certidão', '', 'i-clock') : lnFt('Pronta para requerer', 'lar', 'i-file');
+    if (t === 'i'){ var k = statusInss(r); return k === 'exigencia' ? lnPill('Em exigência', 'verm') : k === 'indeferido' ? lnPill('Indeferido', 'verm') : k === 'concedido' ? lnPill('Concedido', 'ok') : k === 'redigir' ? lnPill('Registrar requerimento', 'lar') : lnPill('Em análise', ''); }
+    if (t === 'c') return lnFt(nomeEtapa(etapa(r)) + (r.embargos === 'opostos' ? ' · INSS recorreu' : ''), r.embargos === 'opostos' ? 'verm' : '', '');
+    if (t === 'r') return r.contatadoRetorno ? lnFt('Contatada para novo benefício', '', 'i-phone') : lnFt('Paga e arquivada', 'ok', 'i-check');
+    return '';
+  }
+  // o prazo que importa em cada etapa
+  function lnPrazo(t, r){
+    var tm = lnTom(t, r), tom = tm === 'at' ? 'verm' : tm === 'lg' ? 'lg' : '';
+    if (t === 'k'){ if (!r.tipoSegurada) return '<span class="ln-vz">—</span>'; if (rural(r) || semGps(r)) return '<span class="ln-vz">sem GPS</span>'; if (gpsPaga(r)) return '<span class="ln-pz ok"><b>GPS paga</b></span>'; return lnPz(prazoGps(r), tom); }
+    if (t === 'gp') return lnPz(prazoGps(r), tom);
+    if (t === 'an') return lnPz(r.dpp, tom, '', daysUntil(r.dpp) < 0 ? 'passou ' + lnRel(r.dpp) : lnRel(r.dpp));
+    if (t === 'rq') return r.criancaNasc ? lnPz(r.criancaNasc, '', 'nasceu ', lnRel(r.criancaNasc)) : lnPz(r.dpp, '', 'previsto ', lnRel(r.dpp));
+    if (t === 'i'){ var k = statusInss(r); if (k === 'exigencia') return r.exigenciaPrazo ? lnPz(r.exigenciaPrazo, tom) : '<span class="ln-pz verm"><b>sem prazo</b></span>'; if ((k === 'concedido' || k === 'indeferido') && r.inssDecisaoEm) return lnPz(r.inssDecisaoEm, '', 'decisão ', lnRel(r.inssDecisaoEm)); return r.der ? lnPz(r.der, analiseAtrasada(r) ? 'lg' : '', 'DER ', lnRel(r.der)) : '<span class="ln-vz">sem DER</span>'; }
+    if (t === 'c') return r.audData ? lnPz(r.audData, tom, 'audiência ', lnRel(r.audData)) : '<span class="ln-vz">sem audiência</span>';
+    if (t === 'r') return lnPz(r.arquivadoEm, '', 'encerrado ', '');
+    return '';
+  }
+  function lnCp(attr, val, tit){ return val ? '<button type="button" class="ln-cp" ' + attr + '="' + esc(val) + '" title="' + esc(tit) + '">' + svgI('i-copy') + '</button>' : ''; }
+  // colunas da lista larga (sem ficha aberta): [título, largura, célula, alinhamento]
+  function lnColunas(t, info){
+    var M = ['Mãe', '', function(r){ return '<span class="ln-nome">' + esc(r.nome || 'Sem nome') + '</span>'; }];
+    var R = ['Responsável', 128, function(r, i){ return lnResp(t === 'i' || t === 'c' || t === 'r' ? i.resp : r.posResp); }];
+    var N = ['Na etapa', 80, function(r, i){ return lnDias(t === 'k' || t === 'gp' || t === 'an' ? diasNoPos(r) : i.dias); }, 'r'];
+    if (t === 'k') return [M,
+      ['Senha gov.br', 100, function(r){ return pvCel(r, 'senha'); }, 'c'], ['NIT', 58, function(r){ return pvCel(r, 'nit'); }, 'c'], ['RG', 52, function(r){ return pvCel(r, 'rg_frente'); }, 'c'], ['CPF', 52, function(r){ return pvCel(r, 'cpf'); }, 'c'],
+      ['Prazo da GPS', 178, function(r){ return lnPrazo('k', r); }], R, N];
+    if (t === 'gp') return [M, ['O que falta', 236, function(r){ return lnFalta('gp', r); }], ['Prazo da GPS', 178, function(r){ return lnPrazo('gp', r); }], R, N,
+      ['', 56, function(r){ var g = gpsGerar(r); return g ? lnCp('data-gpn-copia', g.digitos, 'Copiar o código de barras da guia') : ''; }, 'c']];
+    if (t === 'an') return [M, ['Situação', 236, function(r){ return lnFalta('an', r); }], ['Parto previsto', 178, function(r){ return lnPrazo('an', r); }], R, N];
+    if (t === 'rq') return [M, ['Situação', 236, function(r){ return lnFalta('rq', r); }], ['Nascimento', 178, function(r){ return lnPrazo('rq', r); }], R, N];
+    if (t === 'i') return [M, ['Situação', 168, function(r){ return lnFalta('i', r); }], ['Prazo', 190, function(r){ return lnPrazo('i', r); }], ['Protocolo', 128, function(r){ return r.protocoloInss ? '<span class="tnum ln-mute">' + esc(r.protocoloInss) + '</span>' : '<span class="ln-vz">—</span>'; }], R, N,
+      ['', 56, function(r){ return lnCp('data-copiar', r.protocoloInss, 'Copiar o protocolo'); }, 'c']];
+    if (t === 'c') return [M, ['Situação', 230, function(r){ return lnFalta('c', r); }], ['Audiência', 190, function(r){ return lnPrazo('c', r); }], ['Processo', 230, function(r){ return r.processo ? '<span class="tnum ln-mute">' + esc(r.processo) + '</span>' : '<span class="ln-vz">—</span>'; }], R,
+      ['', 56, function(r){ return lnCp('data-copiar', r.processo, 'Copiar o número do processo'); }, 'c']];
+    if (t === 'r') return [M, ['Situação', 250, function(r){ return lnFalta('r', r); }], ['Encerrado', 150, function(r){ return lnPrazo('r', r); }], ['Benefício', 120, function(r){ return '<span class="tnum ln-mute">' + brl(r.recebimento && r.recebimento.valor ? r.recebimento.valor : valorBenef(r)) + '</span>'; }, 'r'], R];
     return null;
   }
   // filtros de cima (com a contagem): mexem nos mesmos filtros que a tela já tinha (Pós-venda, INSS, Judicial e Arquivados) ou num filtro próprio (GPS, Parto e Requerimento)
   function lnFiltros(t, lista){
-    var hoje = iso(new Date()), F;
+    var F;
     if (t === 'k'){
       var emPos = state.rows.filter(posDaTela).filter(function(r){ return buscaOk(r, ctrQ2) && (!soMinhas || minha(r)) && passaFiltro(r); });
-      F = { atual: ctrSit, itens: [['', 'Todas', emPos.length]].concat([['semsenha', 'Sem senha gov.br'], ['docs', 'Documentos faltando'], ['rprova', 'Sem prova da atividade'], ['atr', 'GPS vencida', 'verm']].map(function(x){ return [x[0], x[1], emPos.filter(function(r){ return passaCtr(r, x[0]); }).length, x[2]]; })) };
+      F = { atual: ctrSit, itens: [['', 'Todas', emPos.length]].concat([['atr', 'GPS vencida', 'verm'], ['semsenha', 'Sem senha gov.br'], ['docs', 'Documentos faltando'], ['rprova', 'Sem prova da atividade']].map(function(x){ return [x[0], x[1], emPos.filter(function(r){ return passaCtr(r, x[0]); }).length, x[2]]; })) };
     } else if (t === 'i'){
       var todos = state.rows.filter(noInss).filter(function(r){ return (!soMinhas || minha(r)) && passaFiltro(r) && buscaCliente(r, inssQ); });
-      F = { atual: inssSit, itens: [['', 'Todos', todos.length]].concat([['analise', 'Em análise'], ['exigencia', 'Em exigência', 'verm'], ['atrasada', 'Análise atrasada', 'verm'], ['concedido', 'Concedidos'], ['indeferido', 'Indeferidos']].map(function(x){ return [x[0], x[1], todos.filter(function(r){ return passaInss(r, x[0]); }).length, x[2]]; })) };
+      F = { atual: inssSit, itens: [['', 'Todos', todos.length]].concat([['exigencia', 'Em exigência', 'verm'], ['analise', 'Em análise'], ['atrasada', 'Análise atrasada'], ['concedido', 'Concedidos'], ['indeferido', 'Indeferidos']].map(function(x){ return [x[0], x[1], todos.filter(function(r){ return passaInss(r, x[0]); }).length, x[2]]; })) };
     } else if (t === 'c'){
       var jt = state.rows.filter(noControle).filter(passaFiltro);
       F = { atual: judSit, itens: [['', 'Todas', jt.length]].concat(JUD_COLS.map(function(c){ return [c[0], c[1], jt.filter(function(r){ return etapa(r) === c[0]; }).length]; })) };
@@ -10594,7 +10637,7 @@ html[data-fx="novo"] .fcr-st.on{border:0;background:var(--green-soft);color:var(
       F = { atual: state.r.f === 'arquivado' ? '' : state.r.f, itens: [['', 'Todas', arq.length], ['novo', 'Para contatar de novo', arq.filter(function(r){ return !r.contatadoRetorno; }).length], ['contatado', 'Já contatadas', arq.filter(function(r){ return r.contatadoRetorno; }).length]] };
     } else {
       var P = {
-        gp: [['venc', 'Prazo vencido', function(r){ var v = prazoGps(r); return !!v && v < hoje; }, 'verm'], ['agora', 'Prazo chegou', gpsTarefa], ['espera', 'Aguardando o prazo', function(r){ var v = prazoGps(r); return !gpsTarefa(r) && !(v && v < hoje); }], ['semnit', 'Sem NIT', function(r){ return !nitOk(r.nit); }, 'verm']],
+        gp: [['venc', 'Prazo vencido', function(r){ return lnTom('gp', r) === 'at'; }, 'verm'], ['semnit', 'Sem NIT', function(r){ return !nitOk(r.nit); }], ['agora', 'Prazo chegou', gpsTarefa], ['espera', 'Aguardando o prazo', function(r){ return !gpsTarefa(r) && lnTom('gp', r) !== 'at'; }]],
         an: [['sem', 'Parto em até 7 dias', function(r){ var n = daysUntil(r.dpp); return n != null && n <= 7; }], ['mes', 'Parto em até 30 dias', function(r){ var n = daysUntil(r.dpp); return n != null && n <= 30; }], ['esp', 'Pescadora, agricultora ou indígena', rural]],
         rq: [['cert', 'Esperando a certidão', function(r){ return noContratos(r) && posEtapaDe(r) === 'cert'; }], ['pronta', 'Pronta para requerer', function(r){ return !(noContratos(r) && posEtapaDe(r) === 'cert'); }]]
       }[t] || [];
@@ -10602,16 +10645,14 @@ html[data-fx="novo"] .fcr-st.on{border:0;background:var(--green-soft);color:var(
     }
     return F;
   }
-  function lnCab(t, F){
+  function lnChips(t, F){
     var v = VIEWS[t] && $(VIEWS[t][1]); if (!v) return;
-    var cab = v.querySelector(':scope > .ln-cab');
-    if (!cab){ cab = document.createElement('div'); cab.className = 'ln-cab'; v.insertBefore(cab, v.firstChild); }
-    var e = LN_ETAPA[t];
+    v.classList.add('ln-on');
     var fb = v.querySelector(':scope > .fbar'), ch = fb && fb.querySelector(':scope > .ln-chips');
     if (fb && !ch){ ch = document.createElement('div'); ch.className = 'ln-chips'; ch.setAttribute('role', 'group'); fb.insertBefore(ch, fb.firstChild); }
-    if (ch) ch.setAttribute('aria-label', 'Filtrar ' + e[1]);
-    cab.innerHTML = '<p class="ln-regra">' + (e[0] ? '<span class="ln-etapa">Etapa ' + e[0] + ' de 6</span>' : '<span class="ln-etapa">Fora do caminho</span>') + '<span>' + esc(e[2]) + '</span></p>';
-    if (ch) ch.innerHTML = F.itens.map(function(x){ if (x[0] && !x[2] && F.atual !== x[0]) return ''; return '<button type="button" class="ln-chip' + (F.atual === x[0] ? ' on' : '') + (x[3] ? ' ' + x[3] : '') + '" data-ln-chip="' + t + '|' + x[0] + '" aria-pressed="' + (F.atual === x[0]) + '">' + esc(x[1]) + '<b class="tnum">' + x[2] + '</b></button>'; }).join('');
+    if (!ch) return;
+    ch.setAttribute('aria-label', 'Filtrar ' + LN_ETAPA[t][1]);
+    ch.innerHTML = F.itens.map(function(x){ if (x[0] && !x[2] && F.atual !== x[0]) return ''; return '<button type="button" class="ln-chip' + (F.atual === x[0] ? ' on' : '') + '" data-ln-chip="' + t + '|' + x[0] + '" aria-pressed="' + (F.atual === x[0]) + '">' + (x[3] === 'verm' ? '<i class="ln-ponto"></i>' : '') + esc(x[1]) + '<b class="tnum">' + x[2] + '</b></button>'; }).join('');
   }
   document.addEventListener('click', function(e){
     var c = e.target.closest && e.target.closest('[data-ln-chip]'); if (!c) return;
@@ -10623,83 +10664,202 @@ html[data-fx="novo"] .fcr-st.on{border:0;background:var(--green-soft);color:var(
     else lnSit[t] = lnSit[t] === v ? '' : v;
     render();
   });
+  // subtítulo da tela: "N mães · X atrasadas" e o "?" com a regra da etapa (no lugar do parágrafo)
+  function lnPagina(t){
+    if (!LN_ETAPA || !lnInfo) return;   // o BI ainda está carregando (a primeira tela é desenhada antes desta parte do código)
+    if (!lnLigada() || !LN_ETAPA[t] || !lnInfo[t] || !$('pg-sub')) return;
+    var i = lnInfo[t], e = LN_ETAPA[t];
+    $('pg-sub').innerHTML = plural(i.n, t === 'i' ? 'requerimento' : 'mãe', t === 'i' ? 'requerimentos' : 'mães') + (i.at ? ' · <b class="ln-sub-at">' + plural(i.at, 'atrasada', 'atrasadas') + '</b>' : '') +
+      '<span class="ln-ajuda" tabindex="0" aria-label="' + esc(e[2]) + '" data-dica="' + esc((e[0] ? 'Etapa ' + e[0] + ' de 6 · ' : '') + e[2]) + '">?</span>';
+  }
   // desenha a lista nova no lugar da tabela antiga; devolve false quando não é o caso (celular, fluxo antigo ou outra tela)
   function lnTabela(box, lista, info, vazio){
-    if (!lnLigada() || !box) return false;
+    if (!LN_BOX || !lnLigada() || !box) return false;   // sem LN_BOX: o BI ainda está carregando
     var t = LN_BOX[box.id]; if (!t) return false;
     var cols = lnColunas(t, info); if (!cols) return false;
-    var F = lnFiltros(t, lista); lnCab(t, F);
+    var F = lnFiltros(t, lista); lnChips(t, F);
     if (F.local && lnSit[t]){ var f = F.local.filter(function(x){ return x[0] === lnSit[t]; })[0]; if (f) lista = lista.filter(f[2]); }
+    // atrasadas primeiro (na ordem padrão da tela); com outra ordem escolhida em Ordenar, vale a escolhida
+    if (!kbOrdem){ var at = lista.filter(function(r){ return lnTom(t, r) === 'at'; }); lista = at.concat(lista.filter(function(r){ return lnTom(t, r) !== 'at'; })); }
+    lnInfo[t] = { n: lista.length, at: lista.filter(function(r){ return lnTom(t, r) === 'at'; }).length };
+    var split = lnSplit(), aberta = cardAberto && cardAberto.id;
+    if (split) cols = [['Mãe', '', function(r){ return '<div class="ln-dl"><div class="ln-dl1"><span class="ln-nome">' + esc(r.nome || 'Sem nome') + '</span>' + lnPrazo(t, r) + '</div><div class="ln-dl2">' + lnFalta(t, r) + '</div></div>'; }]];
     var lis = lista.slice(0, limiteDe(box));
-    var html = '<table class="ln-tab' + (t === 'k' ? ' pv-plan' : '') + '"><colgroup>' + cols.map(function(c){ return '<col' + (c[1] ? ' style="width:' + c[1] + 'px"' : '') + '>'; }).join('') + '</colgroup>' +
-      '<thead><tr>' + cols.map(function(c){ return '<th' + (c[3] === 'c' ? ' class="c"' : '') + '>' + esc(c[0]) + '</th>'; }).join('') + '</tr></thead><tbody>' +
-      (lis.map(function(r){ var i = info ? info(r) || {} : {}; return '<tr data-linha="' + esc(r.id) + '">' + cols.map(function(c){ return '<td' + (c[3] === 'c' ? ' class="c"' : '') + '>' + c[2](r, i) + '</td>'; }).join('') + '</tr>'; }).join('') ||
-        '<tr class="ln-vazio-l"><td colspan="' + cols.length + '"><div class="ln-vazio">' + svgI('i-users') + '<p>' + esc(lnSit[t] || (t === 'k' && ctrSit) || (t === 'i' && inssSit) || (t === 'c' && judSit) || (t === 'r' && state.r.f) ? 'Nenhuma mãe neste filtro.' : vazio || 'Nenhuma mãe nesta etapa.') + '</p></div></td></tr>') +
-      linhaMais(box, lista.length, cols.length) + '</tbody></table>' +
-      (lista.length ? '<div class="ln-rodape"><span>' + plural(Math.min(lis.length, lista.length), 'mãe', 'mães') + (lista.length > lis.length ? ' de ' + lista.length : '') + '</span><span>Clique no nome ou na linha para abrir a ficha</span></div>' : '');
+    var html = '<table class="ln-tab' + (split ? ' ln-estreita' : '') + (t === 'k' ? ' pv-plan' : '') + '"><colgroup><col style="width:4px">' + cols.map(function(c){ return '<col' + (c[1] ? ' style="width:' + c[1] + 'px"' : '') + '>'; }).join('') + '</colgroup>' +
+      '<thead><tr><th class="ln-pri"></th>' + cols.map(function(c){ return '<th' + (c[3] ? ' class="' + c[3] + '"' : '') + '>' + esc(c[0]) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      (lis.map(function(r){ var i = info ? info(r) || {} : {}, tom = lnTom(t, r); return '<tr data-linha="' + esc(r.id) + '"' + (aberta === r.id ? ' class="ln-aberta"' : '') + '><td class="ln-pri"><i class="' + tom + '"></i></td>' + cols.map(function(c){ return '<td' + (c[3] ? ' class="' + c[3] + '"' : '') + '>' + c[2](r, i) + '</td>'; }).join('') + '</tr>'; }).join('') ||
+        '<tr class="ln-vazio-l"><td colspan="' + (cols.length + 1) + '"><div class="ln-vazio">' + svgI('i-users') + '<p>' + esc(lnSit[t] || (t === 'k' && ctrSit) || (t === 'i' && inssSit) || (t === 'c' && judSit) || (t === 'r' && state.r.f) ? 'Nenhuma mãe neste filtro.' : vazio || 'Nenhuma mãe nesta etapa.') + '</p></div></td></tr>') +
+      linhaMais(box, lista.length, cols.length + 1) + '</tbody></table>' +
+      (lista.length ? '<div class="ln-rodape"><span>' + plural(lista.length, 'mãe', 'mães') + (kbOrdem ? '' : ' · atrasadas primeiro') + '</span>' + (split ? '' : '<span>Clique numa mãe para abrir a ficha ao lado · <kbd>↑</kbd> <kbd>↓</kbd> passam de uma para outra</span>') + '</div>' : '');
     pintarLista(box, html);
     box.classList.add('ln-box');
     return true;
   }
+  // marca a mãe aberta na lista (sem redesenhar) e a deixa à vista
+  function lnMarcar(id){
+    Array.prototype.forEach.call(document.querySelectorAll('.ln-tab tr.ln-aberta'), function(x){ x.classList.remove('ln-aberta'); });
+    var tr = id && document.querySelector('.vw-dash:not([hidden]) .ln-tab tr[data-linha="' + (window.CSS && CSS.escape ? CSS.escape(id) : id) + '"]');
+    if (tr){ tr.classList.add('ln-aberta'); tr.scrollIntoView({ block: 'nearest' }); }
+  }
   // ao passar de computador para tela pequena (ou o contrário), a lista se redesenha no formato certo
   var lnEra = null;
-  window.addEventListener('resize', function(){ var a = lnLigada(); if (lnEra !== null && a !== lnEra){ lnEra = a; render(); } else lnEra = a; });
-  /* ---------- Ficha da mãe em painel lateral (23/11/2026, junto da lista nova): só no computador e no fluxo novo.
-     É a mesma janela de antes (senha do cofre, NIT e GPS, anotações, Atualizar dados, documentos e histórico), agora encostada à direita,
-     com o resumo da mãe em cima (jornada e próximo passo) e a aba Robôs. ---------- */
-  function fcLadoPreparar(el){
+  window.addEventListener('resize', function(){ var a = lnLigada(); if (lnEra !== null && a !== lnEra){ lnEra = a; if (!a && cardAberto) fecharCard(); render(); } else lnEra = a; });
+  /* ---------- Ficha da mãe ao lado da lista, 2ª versão (23/11/2026, proposta aprovada: "vamos testar essa proposta"). Só no computador e no fluxo novo.
+     É a mesma janela de antes (senha do cofre, NIT e GPS, anotações, Atualizar dados, documentos e histórico). Com tela larga (1200px ou mais)
+     ela fica fixa à direita, sem escurecer a lista, e o menu vira ícones; dá para passar de uma mãe para outra com ‹ › ou com as setas ↑ ↓.
+     Em cima: nome, a jornada, o Próximo passo com o botão que resolve e os dados de copiar. ---------- */
+  var fcColapsei = false;
+  function fcPodeLado(){ return lnLigada() && window.innerWidth >= 1200; }
+  function fcLadoPreparar(el, id){
     el.classList.add('fc-lado');
+    var html = document.documentElement, ja = html.classList.contains('fc-split');
+    if (fcPodeLado()){
+      el.classList.add('fc-fixa'); if (ja) el.classList.add('sem-anim');
+      if (!ja){
+        html.classList.add('fc-split');
+        var app = $('app'); if (app && !app.classList.contains('collapsed')){ app.classList.add('collapsed'); fcColapsei = true; }
+        setTimeout(function(){ render(); lnMarcar(id); }, 0);
+      } else setTimeout(function(){ lnMarcar(id); }, 0);
+    }
     var dlg = el.firstElementChild; if (!dlg) return;
     dlg.insertAdjacentHTML('afterbegin', '<div class="fct-host"></div>');
     var abas = dlg.querySelector('.fc-abas'); if (!abas) return;
-    abas.insertAdjacentHTML('beforeend', '<button type="button" data-aba="robos" title="Robôs desta mãe" aria-label="Robôs desta mãe">' + svgI('i-sync') + '</button>');
-    [['dados', 'Dados'], ['arq', 'Documentos'], ['hist', 'Histórico'], ['robos', 'Robôs']].forEach(function(x){ var b = abas.querySelector('[data-aba="' + x[0] + '"]'); if (b) b.insertAdjacentHTML('beforeend', '<span class="fc-aba-t">' + x[1] + '</span>'); });
+    abas.insertAdjacentHTML('beforeend', '<button type="button" data-aba="robos" title="Automação desta mãe" aria-label="Automação desta mãe">' + svgI('i-sync') + '</button>');
+    var r = acharRow(id) || {}, t = r.id ? faseDe(r) : '', etapaNome = (LN_ETAPA[t] && LN_ETAPA[t][1]) || 'Dados';
+    [['dados', etapaNome], ['arq', 'Documentos'], ['hist', 'Histórico'], ['robos', 'Automação']].forEach(function(x){ var b = abas.querySelector('[data-aba="' + x[0] + '"]'); if (b) b.insertAdjacentHTML('beforeend', '<span class="fc-aba-t">' + x[1] + '</span>'); });
   }
+  // a ficha fechou (e não abriu outra no lugar): a lista volta a ocupar a tela e o menu volta como estava
+  function fcDepoisFechar(){
+    setTimeout(function(){
+      if (cardAberto) return;
+      var html = document.documentElement; if (!html.classList.contains('fc-split')) return;
+      html.classList.remove('fc-split');
+      if (fcColapsei){ var app = $('app'); if (app) app.classList.remove('collapsed'); fcColapsei = false; }
+      render();
+    }, 0);
+  }
+  // as mães da lista que está na tela, na ordem em que aparecem
+  function fcIdsDaLista(){ return Array.prototype.map.call(document.querySelectorAll('.vw-dash:not([hidden]) .ln-tab tr[data-linha]'), function(x){ return x.dataset.linha; }); }
+  function fcNavegar(d){
+    if (!cardAberto) return;
+    var ids = fcIdsDaLista(), i = ids.indexOf(cardAberto.id), n = ids[i + d]; if (!n) return;
+    if (cardAberto.sujo && !window.confirm('Há alterações sem salvar. Ir para a próxima mãe assim mesmo?')) return;
+    cardAberto.sujo = false; abrirCard(n);
+  }
+  document.addEventListener('click', function(e){ var b = e.target.closest && e.target.closest('[data-fc-nav]'); if (b){ fcNavegar(+b.dataset.fcNav); } });
+  document.addEventListener('keydown', function(e){
+    if (!cardAberto || !cardAberto.el.classList.contains('fc-fixa') || (dlg && dlg.open) || pvPopEl) return;
+    if (e.target.closest && e.target.closest('input,textarea,select,[contenteditable]')) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp'){ e.preventDefault(); fcNavegar(e.key === 'ArrowDown' ? 1 : -1); }
+  });
   var FCT_POS = { k: 0, gp: 1, an: 2, rq: 3, i: 4, c: 4, r: 5 };
+  // o próximo passo: [tom, frase, ação] — a ação vira o botão ao lado da frase (as mesmas que existiam nas linhas e na ficha)
   function fcProximo(r, t){
-    var hoje = iso(new Date()), d10 = function(x){ return String(x || '').slice(0, 10); };
+    var hoje = iso(new Date()), d10 = function(x){ return String(x || '').slice(0, 10); }, atr = lnTom(t, r) === 'at';
     if (t === 'k'){
-      if (!r.tipoSegurada) return ['lar', 'Perguntar se ela é pescadora, agricultora ou indígena: a resposta decide se paga a GPS.'];
-      if (ctPend(r)) return ['verm', 'O contrato ainda não foi assinado (o cadastro foi feito sem internet). A Ana manda o link para a mãe.'];
-      var f = faltamTxt(r);
-      return f ? ['lar', 'Falta: ' + f + '. Com tudo completo, ela segue sozinha para ' + (rural(r) || semGps(r) ? 'Aguardando parto.' : 'a GPS.')] : ['ok', 'Tudo completo: ela segue sozinha.'];
+      if (ctPend(r)) return ['verm', 'O contrato ainda não foi assinado (o cadastro foi feito sem internet). A Ana manda o link para a mãe.', null];
+      if (!r.tipoSegurada) return ['lar', 'Perguntar se ela é pescadora, agricultora ou indígena: a resposta decide se paga a GPS.', ['atividade', 'Responder']];
+      var f = docsApp(r).filter(function(x){ return !x.ok; }), nomes = f.map(function(x){ return x.k === 'rg_frente' ? 'RG' : x.k === 'senha' ? 'senha gov.br' : x.n; });
+      if (!f.length) return ['ok', 'Tudo completo: ela segue sozinha.', null];
+      var k = f[0].k, ac = k === 'senha' ? ['senha', 'Adicionar senha gov.br'] : k === 'nit' ? ['nit', 'Adicionar NIT'] : k === 'rg_frente' ? ['doc:rg_frente', 'Marcar RG recebido'] : k === 'cpf' ? ['doc:cpf', 'Marcar CPF recebido'] : null;
+      return [atr ? 'verm' : 'lar', 'Falta ' + nomes.join(', ').replace(/, ([^,]*)$/, ' e $1') + '. Com tudo completo, ela segue sozinha para ' + (rural(r) || semGps(r) ? 'Aguardando parto.' : 'a GPS.') + (atr ? ' O prazo da GPS já passou.' : ''), ac];
     }
     if (t === 'gp'){
       var v = prazoGps(r), g = gpsGerar(r);
-      if (!nitOk(r.nit)) return ['verm', 'Falta o NIT para gerar a guia. Pegue no Meu INSS com a senha gov.br e salve em Dados.'];
-      if (v && v < hoje && !gpsPaga(r)) return ['verm', 'O prazo da GPS passou em ' + fmtDate(v) + ' e o pagamento não foi confirmado.' + (g ? ' A guia de ' + compTxt(g.competencia) + ' está pronta para copiar em Dados.' : '')];
-      return ['lar', (g ? 'Guia de ' + compTxt(g.competencia) + ' pronta (' + moedaTxt(g.valor) + ', vence ' + fmtDate(g.vencimento) + '). ' : '') + (v ? 'Prazo da GPS: ' + fmtDate(v) + ' (' + lnRel(v) + ').' : '')];
+      if (!nitOk(r.nit)) return [atr ? 'verm' : 'lar', 'Falta o NIT para gerar a guia. Pegue no Meu INSS com a senha gov.br.', ['nit', 'Adicionar NIT']];
+      if (v && v < hoje && !gpsPaga(r)) return ['verm', 'O prazo da GPS passou em ' + fmtDate(v) + ' e o pagamento não foi confirmado.', g ? ['copiar-guia', 'Copiar código da guia'] : null];
+      return ['lar', (g ? 'Guia de ' + compTxt(g.competencia) + ' pronta (' + moedaTxt(g.valor) + ', o boleto vence ' + fmtDate(g.vencimento) + '). ' : '') + (v ? 'Prazo da GPS: ' + fmtDate(v) + ' (' + lnRel(v) + ').' : ''), g ? ['copiar-guia', 'Copiar código da guia'] : null];
     }
     if (t === 'an'){
       var p = d10(r.dpp), n = daysUntil(p);
-      if (!p) return ['verm', 'Informe a data prevista do parto.'];
-      return n < 0 ? ['verm', 'A data prevista do parto (' + fmtDate(p) + ') já passou. O bebê nasceu? Informe a data no cadastro.'] : ['lar', 'Parto previsto para ' + fmtDate(p) + ' (' + lnRel(p) + '). Depois do parto, ela segue para o Requerimento.'];
+      if (!p) return ['verm', 'Informe a data prevista do parto.', ['editar', 'Editar cadastro']];
+      return n < 0 ? ['verm', 'A data prevista do parto (' + fmtDate(p) + ') já passou. O bebê nasceu? Informe a data no cadastro.', ['editar', 'Informar o nascimento']] : ['lar', 'Parto previsto para ' + fmtDate(p) + ' (' + lnRel(p) + '). Depois do parto, ela segue para o Requerimento.', null];
     }
-    if (t === 'rq') return noContratos(r) && posEtapaDe(r) === 'cert' ? ['lar', 'Esperando a certidão de nascimento' + (r.criancaNasc ? ' (o bebê nasceu em ' + fmtDate(d10(r.criancaNasc)) + ')' : '') + '.'] : ['lar', 'Certidão recebida: falta fazer o requerimento no INSS.'];
+    if (t === 'rq') return noContratos(r) && posEtapaDe(r) === 'cert' ? ['lar', 'Esperando a certidão de nascimento' + (r.criancaNasc ? ' (o bebê nasceu em ' + fmtDate(d10(r.criancaNasc)) + ')' : '') + '.', null] : ['lar', 'Certidão recebida: falta fazer o requerimento no INSS.', null];
     if (t === 'i'){
-      var k = statusInss(r);
-      if (k === 'exigencia') return ['verm', 'Exigência do INSS' + (r.exigenciaPrazo ? ': prazo ' + fmtDate(d10(r.exigenciaPrazo)) + ' (' + lnRel(r.exigenciaPrazo) + ')' : ', sem prazo informado') + (r.exigenciaObs ? '. ' + r.exigenciaObs : '') + '.'];
-      if (k === 'indeferido') return ['verm', 'Indeferido' + (r.motivoIndeferimento ? ': ' + r.motivoIndeferimento : '') + '. Use "Entrar no Judicial" na lista do INSS.'];
-      if (k === 'concedido') return ['ok', 'Benefício concedido' + (r.recebimento && r.recebimento.data ? ' e pago em ' + fmtDate(d10(r.recebimento.data)) : '; aguardando o pagamento') + '.'];
-      return ['lar', 'Em análise no INSS' + (r.der ? ' desde ' + fmtDate(d10(r.der)) + ' (' + (diasDesde(r.der) || 0) + ' dias)' : '') + '.'];
+      var s = statusInss(r);
+      if (s === 'exigencia') return [atr ? 'verm' : 'lar', 'Exigência do INSS' + (r.exigenciaPrazo ? ': prazo ' + fmtDate(d10(r.exigenciaPrazo)) + ' (' + lnRel(r.exigenciaPrazo) + ')' : ', sem prazo informado') + (r.exigenciaObs ? '. ' + r.exigenciaObs : '') + '.', ['cumprida', 'Exigência cumprida']];
+      if (s === 'indeferido') return ['verm', 'Indeferido' + (r.motivoIndeferimento ? ': ' + r.motivoIndeferimento : '') + '. Próximo passo: a ação na Justiça.', ['ajuizar', 'Entrar no Judicial']];
+      if (s === 'concedido') return ['ok', 'Benefício concedido' + (r.recebimento && r.recebimento.data ? ' e pago em ' + fmtDate(d10(r.recebimento.data)) : '; aguardando o pagamento') + '.', null];
+      if (s === 'redigir') return ['lar', 'Falta registrar o requerimento (protocolo e data).', ['requerer', 'Registrar requerimento']];
+      return [analiseAtrasada(r) ? 'lar' : '', 'Em análise no INSS' + (r.der ? ' desde ' + fmtDate(d10(r.der)) + ' (' + (diasDesde(r.der) || 0) + ' dias)' : '') + '.', null];
     }
-    if (t === 'c') return ['lar', 'Processo na Justiça' + (r.audData ? ': audiência em ' + fmtDate(d10(r.audData)) + (r.audHora ? ' às ' + r.audHora : '') : '') + '.'];
-    if (t === 'r') return ['ok', 'Benefício pago e acerto feito.' + (r.contatadoRetorno ? ' Já contatada para um novo benefício.' : ' Pode ter direito de novo com outro filho.')];
-    return ['', faseTexto(r)];
+    if (t === 'c') return ['lar', 'Processo na Justiça' + (r.audData ? ': audiência em ' + fmtDate(d10(r.audData)) + (r.audHora ? ' às ' + r.audHora : '') : '') + '.', null];
+    if (t === 'r') return ['ok', 'Benefício pago e acerto feito.' + (r.contatadoRetorno ? ' Já contatada para um novo benefício.' : ' Pode ter direito de novo com outro filho.'), ['contato', r.contatadoRetorno ? 'Desmarcar contato' : 'Marcar contatada']];
+    return ['', faseTexto(r), null];
   }
+  function fcCopia(v, tit){ return v ? '<button type="button" class="fct-cp" data-fc-copia="' + esc(v) + '" title="' + esc(tit) + '" aria-label="' + esc(tit) + '">' + svgI('i-copy') + '</button>' : ''; }
   function fcTopo(r){
-    var t = faseDe(r), pos = FCT_POS[t], e = LN_ETAPA[t], prox = fcProximo(r, t), quem = prospName(r.responsavelId) || r.criadoPorNome || '', cad = dataCad(r);
-    var passos = ['Pós-venda', 'GPS', 'Parto', 'Requerimento', t === 'c' ? 'Judicial' : 'INSS', 'Concluída'];
-    var tipo = rural(r) ? ativNovoTxt(r) + ' · sem GPS' : semGps(r) ? 'Sem GPS' : r.tipoSegurada ? 'Paga a GPS' : 'Atividade não informada';
-    var ico = prox[0] === 'verm' ? 'i-alert' : prox[0] === 'ok' ? 'i-check' : 'i-clock';
-    return '<div class="fct"><div class="fct-l1"><span class="fct-av">' + esc(lnIni(r.nome)) + '</span><div class="fct-t"><h2 title="' + esc(r.nome || '') + '">' + esc(r.nome || 'Sem nome') + '</h2>' +
-        '<p>' + esc([cidadeCli(r), cad ? 'cadastrada em ' + fmtDate(cad) + (quem ? ' por ' + quem : '') : ''].filter(Boolean).join(' · ')) + '</p></div></div>' +
-      '<div class="fct-tags">' + lnPill((e && e[0] ? 'Etapa ' + e[0] + ' de 6 · ' : '') + (TITULOS[t] ? TITULOS[t][0] : faseTexto(r)), 'lar') + lnPill(tipo, rural(r) || semGps(r) ? '' : r.tipoSegurada ? '' : 'verm') + (r.posResp ? lnPill('Responsável: ' + primeiroNome(r.posResp), '') : '') + '</div>' +
-      (pos != null ? '<div class="fct-jor">' + passos.map(function(n, i){ return '<div class="' + (i < pos ? 'feito' : i === pos ? 'agora' + (prox[0] === 'verm' ? ' verm' : '') : '') + '"><i></i><span>' + esc(n) + '</span></div>'; }).join('') + '</div>' : '') +
-      '<div class="fct-prox ' + prox[0] + '">' + svgI(ico) + '<div><b>' + (prox[0] === 'ok' ? 'Situação' : 'Próximo passo') + '</b><p>' + esc(prox[1]) + '</p></div></div></div>';
+    var t = faseDe(r), pos = FCT_POS[t], prox = fcProximo(r, t), atr = lnTom(t, r) === 'at';
+    var nomes = ['Pós-venda', 'GPS', 'Aguardando parto', 'Requerimento', t === 'c' ? 'Judicial' : 'INSS', 'Arquivados'];
+    var ids = fcIdsDaLista(), i = ids.indexOf(r.id), fixa = cardAberto && cardAberto.el.classList.contains('fc-fixa');
+    var cpf = digits(r.cpf), tel = foneDe(r), ico = prox[0] === 'verm' ? 'i-alert' : prox[0] === 'ok' ? 'i-check' : 'i-clock';
+    var nasc = r.criancaNasc ? ['Nascimento', fmtDate(String(r.criancaNasc).slice(0, 10))] : ['Parto previsto', r.dpp ? fmtDate(String(r.dpp).slice(0, 10)) : ''];
+    var cel = function(rot, val, cp, falta){ return '<div class="fct-d"><small>' + esc(rot) + '</small>' + (val ? '<b class="tnum">' + esc(val) + '</b>' + (cp || '') : '<em>' + esc(falta || 'não cadastrado') + '</em>') + '</div>'; };
+    return '<div class="fct">' +
+      '<div class="fct-l1"><h2 title="' + esc(r.nome || '') + '">' + esc(r.nome || 'Sem nome') + '</h2><span class="fct-meta">' + esc([cidadeCli(r), r.posResp ? primeiroNome(r.posResp) : ''].filter(Boolean).join(' · ')) + '</span>' +
+        '<div class="fct-nav">' + (fixa && i >= 0 ? '<span class="tnum">' + (i + 1) + ' de ' + ids.length + '</span><button type="button" class="fct-b" data-fc-nav="-1" title="Mãe anterior (↑)" aria-label="Mãe anterior"' + (i <= 0 ? ' disabled' : '') + '>' + svgI('i-chev') + '</button><button type="button" class="fct-b fct-prox-b" data-fc-nav="1" title="Próxima mãe (↓)" aria-label="Próxima mãe"' + (i >= ids.length - 1 ? ' disabled' : '') + '>' + svgI('i-chev') + '</button>' : '') +
+        '<button type="button" class="fct-b" data-act="edit" title="Editar o cadastro" aria-label="Editar o cadastro">' + svgI('i-pencil') + '</button><button type="button" class="fct-b" data-fc-x title="Fechar (Esc)" aria-label="Fechar">' + svgI('i-x') + '</button></div></div>' +
+      (pos != null ? '<div class="fct-jor">' + nomes.map(function(n, k){ return '<div class="' + (k < pos ? 'feito' : k === pos ? 'agora' : '') + '"><i></i><span>' + (k === pos && atr ? '<b class="fct-ponto"></b>' : '') + esc(n) + '</span></div>'; }).join('') + '</div>' : '') +
+      '<div class="fct-prox ' + prox[0] + '"><span class="fct-q">' + svgI(ico) + '</span><p><small>' + (prox[0] === 'ok' ? 'Situação' : 'Próximo passo') + '</small>' + esc(prox[1]) + '</p>' + (prox[2] ? '<button type="button" class="fct-acao" data-fc-acao="' + prox[2][0] + '">' + (/copiar/.test(prox[2][0]) ? svgI('i-copy') : '') + esc(prox[2][1]) + '</button>' : '') + '</div>' +
+      '<div class="fct-dados">' +
+        cel('CPF', cpf.length >= 11 ? r.cpf : '', fcCopia(cpf, 'Copiar o CPF')) +
+        (rural(r) && !r.nit ? cel('Atividade', ativNovoTxt(r) + ' · sem GPS') : cel('NIT', nitOk(r.nit) ? nitFmt(r.nit) : '', fcCopia(digits(r.nit), 'Copiar o NIT'), r.nit ? 'inválido: ' + r.nit : 'não cadastrado')) +
+        cel('WhatsApp', tel ? fmtTel(tel) : '', fcCopia(digits(tel), 'Copiar o WhatsApp')) +
+        cel(nasc[0], nasc[1], '', 'não informado') +
+        (r.protocoloInss ? cel('Protocolo', r.protocoloInss, fcCopia(r.protocoloInss, 'Copiar o protocolo')) : cel('Responsável', r.posResp || '', '', 'ninguém ainda')) +
+        '<div class="fct-d fct-links">' + (r.pastaUrl ? '<a href="' + esc(urlSegura(r.pastaUrl)) + '" target="_blank" rel="noopener">' + svgI('i-folder') + 'Pasta no Drive</a>' : '<em>pasta ainda não criada</em>') + '<a href="https://meu.inss.gov.br/" target="_blank" rel="noopener">' + svgI('i-inss') + 'Meu INSS</a></div>' +
+        fcSenhaHtml() +
+      '</div></div>';
   }
-  function fcTopoPintar(el, r){ var h = el.querySelector('.fct-host'); if (h) h.innerHTML = fcTopo(r); }
-  // robôs da mãe: o que já roda sozinho (com o que fez com ela) e o que vem depois
+  function fcTopoPintar(el, r){
+    var h = el.querySelector('.fct-host'); if (!h) return;
+    if (cardAberto && cardAberto.senha && cardAberto.senha.fase === 'editando') return;   // alguém digitando a senha: não apaga o campo
+    h.innerHTML = fcTopo(r);
+  }
+  // Pós-venda: as pendências, cada uma com o botão que resolve ali mesmo
+  function fcPendencias(r){
+    if (faseDe(r) !== 'k') return '';
+    var itens = docsApp(r).filter(function(x){ return ['senha', 'nit', 'rg_frente', 'cpf', 'procuracao'].indexOf(x.k) >= 0; });
+    var dica = { senha: 'vai para o cofre; só a equipe vê', nit: 'o robô procura nos documentos a cada 10 minutos', rg_frente: 'foto da frente e do verso', cpf: 'pode estar no próprio RG', procuracao: 'assinados no cadastro, pelo aplicativo' };
+    var acao = { senha: ['senha', 'Adicionar senha'], nit: ['nit', 'Adicionar NIT'], rg_frente: ['doc:rg_frente', 'Marcar recebido'], cpf: ['doc:cpf', 'Marcar recebido'] };
+    var nome = function(x){ return x.k === 'rg_frente' ? 'RG' : x.n; };
+    return '<div class="fcp"><p class="fc-sec0">Pendências do Pós-venda</p><ul>' + itens.map(function(x){
+      return x.ok ? '<li class="ok"><span class="fcp-q">' + svgI('i-check') + '</span><div><b>' + esc(nome(x)) + '</b><small>' + (x.k === 'procuracao' ? esc(dica.procuracao) : 'recebido') + '</small></div>' + (x.k === 'rg_frente' || x.k === 'cpf' ? '<button type="button" class="fcp-des" data-fc-acao="desdoc:' + x.k + '">Desmarcar</button>' : '<span class="fcp-ok">Ok</span>') + '</li>'
+        : '<li class="f"><span class="fcp-q"></span><div><b>' + esc(nome(x)) + '</b><small>' + esc(dica[x.k] || '') + '</small></div>' + (acao[x.k] ? '<button type="button" class="fcp-b" data-fc-acao="' + acao[x.k][0] + '">' + esc(acao[x.k][1]) + '</button>' : '') + '</li>';
+    }).join('') +
+      '<li class="' + (r.tipoSegurada ? 'ok' : 'f') + '"><span class="fcp-q">' + (r.tipoSegurada ? svgI('i-check') : '') + '</span><div><b>Pescadora, agricultora ou indígena?</b><small>' + esc(r.tipoSegurada ? (rural(r) ? ativNovoTxt(r) + ' · sem GPS' : 'Nenhuma das três · paga a GPS') : 'a resposta decide se ela paga a GPS') + '</small></div><button type="button" class="fcp-b' + (r.tipoSegurada ? ' sec' : '') + '" data-fc-acao="atividade">' + (r.tipoSegurada ? 'Mudar' : 'Responder') + '</button></li>' +
+      '</ul></div>';
+  }
+  // corpo da ficha ao lado: as pendências (no Pós-venda) no começo da aba da etapa; depois a mesma janela de antes
+  function fcCorpoLado(r){ return fcDados(r).replace('<div class="fc-p p-dados">', '<div class="fc-p p-dados">' + fcPendencias(r)) + fcArquivos(r) + fcHistorico(r) + fcRobos(r); }
+  function fcCorpoAjustar(el){ var b = el.querySelector('[data-fc-salvar]'); if (b) b.textContent = 'Salvar alterações'; }
+  // os botões do Próximo passo e das pendências: fazem o mesmo que os botões que já existiam na lista e na ficha
+  document.addEventListener('click', async function(e){
+    var b = e.target.closest && e.target.closest('[data-fc-acao]'); if (!b || !cardAberto) return;
+    var r = acharRow(cardAberto.id); if (!r) return;
+    var a = b.dataset.fcAcao, ag = new Date().toISOString();
+    if (a === 'senha' || a === 'nit'){ pvAbrir(b, r, a); return; }
+    if (a.indexOf('doc:') === 0){ pvDoc(r, a.slice(4), true); return; }
+    if (a.indexOf('desdoc:') === 0){ pvDoc(r, a.slice(7), false); return; }
+    if (a === 'copiar-guia'){ var g = gpsGerar(r); if (!g) return; try { await copiarTexto(g.digitos); toast('Código de barras da GPS copiado'); } catch(err){ toast('Não foi possível copiar.'); } return; }
+    if (a === 'atividade'){ cardAberto.aba = 'dados'; pintarCard(); setTimeout(function(){ var s = cardAberto && cardAberto.el.querySelector('#fc-ativn'); if (s){ s.scrollIntoView({ block: 'center' }); s.focus(); } }, 40); return; }
+    if (a === 'editar'){ var id = cardAberto.id; fecharCard(); openForm(r); return; }
+    if (a === 'requerer'){ abrirRequerimento(r); return; }
+    if (a === 'ajuizar'){ fecharCard(); openForm(r); setTimeout(function(){ if ($('f-proc')){ $('f-proc').scrollIntoView({ block: 'center' }); $('f-proc').focus(); } }, 60); toast('Preencha o número do processo e a data do ajuizamento'); return; }
+    if (a === 'cumprida'){
+      var antes = { inssStatus: r.inssStatus || '', exigenciaPrazo: r.exigenciaPrazo || '' };
+      try { await patchRow(r.id, { inssStatus: 'analise', exigenciaPrazo: '', exigenciaCumpridaEm: iso(new Date()), atualizadoEm: ag }); toast('Exigência cumprida: ' + r.nome + ' voltou para análise', 'Desfazer', function(){ desfazer(r.id, antes); }); }
+      catch(err){ toast(errMsg(err)); }
+      return;
+    }
+    if (a === 'contato'){
+      var c2 = !r.contatadoRetorno;
+      try { await patchRow(r.id, { contatadoRetorno: c2 ? iso(new Date()) : null, atualizadoEm: ag }); toast(c2 ? 'Marcada como contatada: ' + r.nome : 'Contato desmarcado: ' + r.nome); }
+      catch(err){ toast(errMsg(err)); }
+    }
+  });
+  // automação desta mãe: o que já roda sozinho (com o que fez com ela) e o que vem depois
   function fcRobos(r){
     var t = faseDe(r), g = gpsGerar(r);
     var lig = [
