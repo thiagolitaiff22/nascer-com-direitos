@@ -2659,6 +2659,200 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
 .bi-novo button.sec{background:transparent;color:rgba(255,255,255,.7);padding:8px 6px}
 
 
+
+/* ================= Dashboard completo (23/11/2026, a pedido: "mais completo, bonito, com respiro... quantas entram, quantas foram aprovadas") =================
+   Só no computador. Cartões brancos com respiro, um número grande por tela, gráficos de traço fino e uma cor por série. */
+@media (min-width:1000px){
+html[data-fx="novo"]{--pn-cinza:hsl(274 14% 80%)}
+html[data-fx="novo"]:root[data-theme="dark"]{--pn-cinza:hsl(274 10% 34%)}
+html[data-fx="novo"] .pn-topo{margin-bottom:18px}
+html[data-fx="novo"] .pn{container:painel / inline-size;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:clamp(14px,1.35vw,22px);margin-bottom:24px}
+html[data-fx="novo"] .pn-c{background:hsl(var(--c-card));border:1px solid var(--ap-linha);border-radius:16px;padding:20px 22px;min-width:0;box-shadow:0 1px 2px rgba(41,24,56,.04)}
+html[data-fx="novo"]:root[data-theme="dark"] .pn-c{box-shadow:none}
+/* tela larga (a área do Dashboard com 1150px ou mais): número grande + 4 números numa linha; os cartões lado a lado */
+html[data-fx="novo"] .pn-hero{grid-column:span 4}html[data-fx="novo"] .pn-tile{grid-column:span 2}
+html[data-fx="novo"] .pn-cf{grid-column:span 7}html[data-fx="novo"] .pn-ci{grid-column:span 5}
+html[data-fx="novo"] .pn-ce{grid-column:span 8}html[data-fx="novo"] .pn-ct{grid-column:span 4}
+html[data-fx="novo"] .pn-cp{grid-column:span 7}html[data-fx="novo"] .pn-cc{grid-column:span 5}
+html[data-fx="novo"] .pn-cpf,html[data-fx="novo"] .pn-fin{grid-column:span 12}
+html[data-fx="novo"] .pn-c.clic{cursor:pointer;transition:border-color .15s,background .15s}
+html[data-fx="novo"] .pn-c.clic:hover{border-color:hsl(var(--c-pri)/.35);background:var(--ap-lil)}
+html[data-fx="novo"] .pn-h{display:flex;align-items:center;gap:12px;margin:0 0 3px;min-height:22px}
+html[data-fx="novo"] .pn-t{margin:0;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:16px;font-weight:600;letter-spacing:-.005em;color:var(--ink)}
+html[data-fx="novo"] .pn-sub{margin:0 0 18px;font-size:12px;color:var(--ink-3);line-height:1.45}
+html[data-fx="novo"] .pn-lk{margin-left:auto;font-size:12px;font-weight:500;color:var(--ap-g1);padding:2px 0;background:none;border:0;cursor:pointer}
+html[data-fx="novo"]:root[data-theme="dark"] .pn-lk{color:#c9a3ea}
+html[data-fx="novo"] .pn-lk:hover{text-decoration:underline}
+html[data-fx="novo"] .pn-nota{margin:14px 0 0;font-size:11.5px;color:var(--ink-3);line-height:1.5}
+html[data-fx="novo"] .pn-vazio{padding:28px 0;text-align:center;color:var(--ink-3);font-size:12.5px}
+/* números do topo */
+html[data-fx="novo"] .pn-tile{display:flex;flex-direction:column;padding:18px 18px 16px}
+html[data-fx="novo"] .pn-tile-r{margin:0;font-size:12px;color:var(--ink-3);font-weight:500}
+html[data-fx="novo"] .pn-tile-v{margin:8px 0 6px;font-size:28px;font-weight:600;letter-spacing:-.02em;line-height:1;color:var(--ink)}
+html[data-fx="novo"] .pn-tile-c{margin:6px 0 0;font-size:11.5px;color:var(--ink-3);line-height:1.4}
+html[data-fx="novo"] .pn-tile .pn-tile-c{margin-top:auto;padding-top:6px}
+html[data-fx="novo"] .pn-var{display:block;font-size:11.5px;color:var(--ink-3)}
+html[data-fx="novo"] .pn-var b{font-weight:600;color:var(--ink-2)}
+html[data-fx="novo"] .pn-var b.sobe{color:var(--green)}
+html[data-fx="novo"] .pn-var b.desce{color:var(--red)}
+html[data-fx="novo"] .pn-hero{padding:20px 22px 18px;background:linear-gradient(135deg,var(--ap-g1),var(--ap-g2));border:0;color:#fff}
+html[data-fx="novo"] .pn-hero .pn-tile-r,html[data-fx="novo"] .pn-hero .pn-tile-c,html[data-fx="novo"] .pn-hero .pn-var{color:rgba(255,255,255,.78)}
+html[data-fx="novo"] .pn-hero .pn-var b,html[data-fx="novo"] .pn-hero .pn-var b.sobe,html[data-fx="novo"] .pn-hero .pn-var b.desce{color:#fff}
+html[data-fx="novo"] .pn-hero-l{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:8px 0 6px}
+html[data-fx="novo"] .pn-hero-v{margin:0;font-size:52px;font-weight:600;letter-spacing:-.03em;line-height:.95;color:#fff}
+html[data-fx="novo"] .pn-spark rect{fill:rgba(255,255,255,.32)}
+html[data-fx="novo"] .pn-spark rect.ag{fill:#fff}
+/* barras horizontais: funil, tempos e cidades */
+html[data-fx="novo"] .pn-funil,html[data-fx="novo"] .pn-tempos,html[data-fx="novo"] .pn-cid{display:grid;gap:9px}
+html[data-fx="novo"] .pn-bl{display:grid;grid-template-columns:148px minmax(0,1fr) 78px;align-items:center;gap:14px;min-height:22px;border-radius:8px}
+html[data-fx="novo"] .pn-tempos .pn-bl{grid-template-columns:154px minmax(0,1fr) 46px;gap:12px}
+/* cidades: nome e número numa linha, barrinha embaixo (o nome inteiro cabe) */
+html[data-fx="novo"] .pn-ml{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+html[data-fx="novo"] .pn-ml p{display:flex;align-items:baseline;gap:10px;margin:0 0 5px;font-size:12.5px;color:var(--ink-2)}
+html[data-fx="novo"] .pn-ml p span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .pn-ml p b{margin-left:auto;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+html[data-fx="novo"] .pn-ml i{display:block;height:6px;border-radius:999px;background:var(--ap-lil)}
+html[data-fx="novo"] .pn-ml em{display:block;height:100%;border-radius:999px;background:hsl(var(--c-pri)/.6)}
+html[data-fx="novo"] .pn-bl-r{font-size:12.5px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .pn-bl-t{display:block;height:16px;border-radius:0 5px 5px 0;background:var(--ap-lil)}
+html[data-fx="novo"] .pn-bl-t i{display:block;height:100%;border-radius:0 4px 4px 0;background:var(--ser-1)}
+html[data-fx="novo"] .pn-bl.leve .pn-bl-t{height:10px;background:transparent}
+html[data-fx="novo"] .pn-bl.leve .pn-bl-t i{background:hsl(var(--c-pri)/.55)}
+html[data-fx="novo"] .pn-bl.forte .pn-bl-r{color:var(--ink);font-weight:600}
+html[data-fx="novo"] .pn-bl-v{font-size:12.5px;color:var(--ink-3);white-space:nowrap;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:6px}
+html[data-fx="novo"] .pn-bl-v b{font-weight:600;color:var(--ink)}
+html[data-fx="novo"] .pn-bl-v small{font-size:11.5px;color:var(--ink-3)}
+html[data-fx="novo"] .pn-funil .pn-bl-v{justify-content:flex-start}
+html[data-fx="novo"] .pn-total{margin-top:20px;padding:14px 16px;border-radius:12px;background:var(--ap-lil)}
+html[data-fx="novo"] .pn-total p{margin:0;font-size:12px;color:var(--ink-3)}
+html[data-fx="novo"] .pn-total b{display:block;margin:4px 0 2px;font-size:18px;font-weight:600;letter-spacing:-.02em;color:var(--ink)}
+html[data-fx="novo"] .pn-total small{font-size:11.5px;color:var(--ink-3)}
+/* resultado no INSS */
+html[data-fx="novo"] .pn-taxa{display:flex;align-items:center;gap:14px;margin:2px 0 12px}
+html[data-fx="novo"] .pn-taxa-v{margin:0;font-size:40px;font-weight:600;letter-spacing:-.03em;line-height:1;color:var(--ink)}
+html[data-fx="novo"] .pn-taxa-r{margin:0;font-size:13px;font-weight:600;color:var(--ink)}
+html[data-fx="novo"] .pn-taxa .pn-tile-c{margin-top:2px}
+html[data-fx="novo"] .pn-meter{height:8px;border-radius:999px;background:var(--green-soft);overflow:hidden;margin-bottom:16px}
+html[data-fx="novo"] .pn-meter i{display:block;height:100%;border-radius:999px;background:var(--green)}
+html[data-fx="novo"] .pn-st{list-style:none;margin:0;padding:0}
+html[data-fx="novo"] .pn-st li{display:flex;align-items:center;gap:10px;padding:9px 6px;margin:0 -6px;border-top:1px solid var(--ap-linha);font-size:12.5px;color:var(--ink-2);cursor:pointer;border-radius:8px}
+html[data-fx="novo"] .pn-st li:first-child{border-top:0}
+html[data-fx="novo"] .pn-st li:hover{background:var(--ap-lil)}
+html[data-fx="novo"] .pn-st li small{font-size:11.5px;color:var(--ink-3)}
+html[data-fx="novo"] .pn-st li b{margin-left:auto;font-size:14px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+html[data-fx="novo"] .pn-st-i{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;background:hsl(var(--c-sec));color:var(--ap-g1);flex:none}
+html[data-fx="novo"] .pn-st-i svg.i{width:13px;height:13px}
+html[data-fx="novo"] .pn-st-i.ok{background:var(--green-soft);color:var(--green)}
+html[data-fx="novo"] .pn-st-i.ruim{background:var(--red-soft);color:var(--red)}
+/* mês a mês */
+html[data-fx="novo"] .pn-leg{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+html[data-fx="novo"] .pn-leg li{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-2)}
+html[data-fx="novo"] .pn-leg li i{width:10px;height:10px;border-radius:3px;flex:none}
+html[data-fx="novo"] .pn-leg li b{margin-left:auto;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+html[data-fx="novo"] .pn-leg-top{display:flex;gap:16px;margin-left:14px}
+html[data-fx="novo"] .pn-leg-top li i{width:14px;height:3px;border-radius:2px}
+html[data-fx="novo"] .pn-graf{position:relative}
+html[data-fx="novo"] .pn-graf svg{display:block;overflow:visible}
+html[data-fx="novo"] .pn-g{stroke:var(--ap-linha);stroke-width:1}
+html[data-fx="novo"] .pn-ax{font-size:11px;fill:var(--ink-3);font-variant-numeric:tabular-nums}
+html[data-fx="novo"] .pn-fim{font-size:12px;font-weight:600;fill:var(--ink)}
+html[data-fx="novo"] .pn-fim-v{font-size:11px;fill:var(--ink-3)}
+html[data-fx="novo"] .pn-cruz{stroke:var(--ink-3);stroke-width:1;opacity:.45}
+html[data-fx="novo"] .pn-dica{position:absolute;min-width:180px;background:hsl(var(--c-card));border:1px solid var(--ap-linha);border-radius:12px;padding:10px 12px;box-shadow:0 8px 24px rgba(41,24,56,.12);pointer-events:none;font-size:12px;z-index:3}
+html[data-fx="novo"] .pn-dica b{display:block;font-weight:600;color:var(--ink);margin-bottom:6px}
+html[data-fx="novo"] .pn-dica p{display:flex;align-items:center;gap:8px;margin:3px 0;color:var(--ink-2)}
+html[data-fx="novo"] .pn-dica p i{width:10px;height:3px;border-radius:2px}
+html[data-fx="novo"] .pn-dica p span{margin-left:auto;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+html[data-fx="novo"] .pn-dica .pn-dica-x{padding-left:18px;color:var(--ink-3)}
+html[data-fx="novo"] .pn-tab{width:100%;font-size:12.5px}
+html[data-fx="novo"] .pn-tab td,html[data-fx="novo"] .pn-tab th{padding:7px 10px}
+html[data-fx="novo"] .pn-tab .dir{text-align:right}
+/* consultores e parceiros */
+html[data-fx="novo"] .pn-rk{width:100%;border-collapse:collapse;font-size:12.5px}
+html[data-fx="novo"] .pn-rk th{font-size:11px;font-weight:500;color:var(--ink-3);text-align:left;padding:0 8px 8px;border-bottom:1px solid var(--ap-linha)}
+html[data-fx="novo"] .pn-rk td{padding:9px 8px;border-bottom:1px solid var(--ap-linha);color:var(--ink-2);vertical-align:middle}
+html[data-fx="novo"] .pn-rk tr:last-child td{border-bottom:0}
+html[data-fx="novo"] .pn-rk .dir{text-align:right;width:74px}
+html[data-fx="novo"] .pn-rk th:first-child,html[data-fx="novo"] .pn-rk td:first-child{padding-left:0}
+html[data-fx="novo"] .pn-rk th:last-child,html[data-fx="novo"] .pn-rk td:last-child{padding-right:0}
+html[data-fx="novo"] .pn-rk td b{font-weight:600;color:var(--ink)}
+html[data-fx="novo"] .pn-rk-n{display:block;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink);font-weight:500}
+html[data-fx="novo"] .pn-rk-b{display:block;height:4px;margin-top:5px;max-width:220px}
+html[data-fx="novo"] .pn-rk-b i{display:block;height:100%;border-radius:999px;background:hsl(var(--c-pri)/.5)}
+html[data-fx="novo"] .pn-rk tr.org .pn-rk-n{color:var(--ink-3);font-weight:400}
+html[data-fx="novo"] .pn-rk tr.org .pn-rk-b i{background:var(--pn-cinza)}
+/* perfil: barra dividida em partes */
+html[data-fx="novo"] .pn-mini-t{margin:0 0 8px;font-size:12px;font-weight:600;color:var(--ink-2)}
+html[data-fx="novo"] .pn-mini-t ~ .pn-mini-t{margin-top:18px}
+html[data-fx="novo"] .pn-seg{display:flex;gap:2px;height:28px;margin-bottom:10px}
+html[data-fx="novo"] .pn-seg span{display:flex;align-items:center;padding:0 8px;border-radius:4px;min-width:0;font-size:11.5px;font-weight:600;color:#fff;white-space:nowrap;overflow:visible}
+html[data-fx="novo"] .pn-seg span[style*="--pn-cinza"]{color:var(--ink)}
+/* financeiro */
+html[data-fx="novo"] .pn-fin-g{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
+html[data-fx="novo"] .pn-fin-g > div{padding:2px 20px;border-left:1px solid var(--ap-linha)}
+html[data-fx="novo"] .pn-fin-g > div:first-child{padding-left:0;border-left:0}
+html[data-fx="novo"] .pn-fin-v{margin:8px 0 2px;font-size:22px;font-weight:600;letter-spacing:-.02em;color:var(--ink)}
+/* menos texto nos blocos (23/11/2026, a pedido: "evite balões com muitas letras e frases"): só o nome e o número; a comparação aparece só quando muda */
+html[data-fx="novo"] .pn :is(.pn-sub,.pn-nota,.pn-tile-c,.pn-total small,.pn-st li small){display:none}
+html[data-fx="novo"] .pn-h{margin-bottom:16px}
+html[data-fx="novo"] .pn-tile{justify-content:flex-start}
+html[data-fx="novo"] .pn-st li.pn-st-sem{cursor:default}
+html[data-fx="novo"] .pn-st li.pn-st-sem:hover{background:none}
+/* o mapa continua igual, só com o mesmo respiro */
+html[data-fx="novo"] #dash-box .pn ~ .dn-sec{margin-top:0}
+/* ---------- cabe em qualquer tela de computador (23/11/2026, a pedido: "adaptável a qualquer tela de PC"; o "GPS" estava quebrando em duas linhas) ----------
+   letras e espaços acompanham a largura do Dashboard (cqi = 1% da largura), e nenhum rótulo quebra de linha: o que não couber termina em "…" e aparece inteiro ao passar o mouse */
+html[data-fx="novo"] .pn-c{padding:clamp(16px,1.9cqi,24px) clamp(16px,2.1cqi,26px)}
+html[data-fx="novo"] .pn-tile{padding:clamp(14px,1.6cqi,20px)}
+html[data-fx="novo"] .pn-t{font-size:clamp(14.5px,1.45cqi,17px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .pn-hero-v{font-size:clamp(30px,2.9cqi,38px);letter-spacing:-.02em}
+html[data-fx="novo"] .pn-tile-v{font-size:clamp(20px,1.85cqi,24px)}
+html[data-fx="novo"] .pn-taxa-v{font-size:clamp(24px,2.3cqi,30px)}
+html[data-fx="novo"] .pn-fin-v{font-size:clamp(17px,1.6cqi,20px)}
+html[data-fx="novo"] .pn-tile-r,html[data-fx="novo"] .pn-tile-c,html[data-fx="novo"] .pn-var,html[data-fx="novo"] .pn-mini-t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .pn-rk th{white-space:nowrap}
+html[data-fx="novo"] .pn-rk .dir{width:clamp(56px,6.2cqi,78px)}
+html[data-fx="novo"] .pn-rk-n,html[data-fx="novo"] .pn-rk-b{max-width:none}
+html[data-fx="novo"] .pn-st li{white-space:nowrap;min-width:0}
+html[data-fx="novo"] .pn-st li small{overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .pn-leg li span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .pn-h .pn-leg-top li{white-space:nowrap}
+/* perfil das mães: as duas barras lado a lado, com a legenda numa linha */
+html[data-fx="novo"] .pn-perfil{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px clamp(24px,4cqi,56px)}
+html[data-fx="novo"] .pn-perfil .pn-mini-t{margin-top:0}
+html[data-fx="novo"] .pn-perfil .pn-seg{margin-bottom:12px}
+html[data-fx="novo"] .pn-perfil .pn-leg{display:flex;flex-wrap:wrap;gap:6px 22px}
+html[data-fx="novo"] .pn-perfil .pn-leg li b{margin-left:6px}
+html[data-fx="novo"] .pn-hero{position:relative}
+html[data-fx="novo"] .pn-hero-x{display:none}
+/* tela média (a área do Dashboard entre 860 e 1149px, como num notebook): o número grande vira uma faixa e os 4 números ficam lado a lado embaixo */
+@container painel (max-width:1149px){
+  html[data-fx="novo"] .pn-hero{grid-column:span 12}
+  html[data-fx="novo"] .pn-hero-x{display:flex;gap:clamp(24px,4.5cqi,56px);position:absolute;right:clamp(18px,3cqi,40px);top:50%;transform:translateY(-50%)}
+  html[data-fx="novo"] .pn-hero-x div{padding-left:clamp(14px,2cqi,22px);border-left:1px solid rgba(255,255,255,.22)}
+  html[data-fx="novo"] .pn-hero-x p{margin:0 0 6px;font-size:11.5px;color:rgba(255,255,255,.75);white-space:nowrap}
+  html[data-fx="novo"] .pn-hero-x b{font-size:clamp(16px,1.7cqi,20px);font-weight:600;letter-spacing:-.02em;color:#fff;white-space:nowrap}
+  html[data-fx="novo"] .pn-hero-x b small{font-size:11.5px;font-weight:500;color:rgba(255,255,255,.75);margin-left:6px;letter-spacing:0}
+  html[data-fx="novo"] .pn-hero-l{justify-content:flex-start;gap:clamp(28px,6cqi,72px);align-items:center}
+  html[data-fx="novo"] .pn-hero .pn-spark{width:180px;height:46px}
+  html[data-fx="novo"] .pn-tile{grid-column:span 3}
+  html[data-fx="novo"] .pn-ce{grid-column:span 7}html[data-fx="novo"] .pn-ct{grid-column:span 5}
+}
+/* tela estreita (abaixo de 860px de área): um cartão por linha e os números de 2 em 2 */
+@container painel (max-width:859px){
+  html[data-fx="novo"] .pn-tile{grid-column:span 6}
+  html[data-fx="novo"] .pn-hero .pn-spark{width:150px;height:46px}
+  html[data-fx="novo"] .pn-hero-l{gap:24px}
+  html[data-fx="novo"] .pn-cf,html[data-fx="novo"] .pn-ci,html[data-fx="novo"] .pn-ce,html[data-fx="novo"] .pn-ct,html[data-fx="novo"] .pn-cp,html[data-fx="novo"] .pn-cc{grid-column:span 12}
+  html[data-fx="novo"] .pn-fin-g{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:18px}
+  html[data-fx="novo"] .pn-fin-g > div:nth-child(3){padding-left:0;border-left:0}
+}
+@container painel (max-width:640px){
+  html[data-fx="novo"] .pn-perfil{grid-template-columns:1fr}
+}
+}
+/* fim do Dashboard completo */
+
 /* ================= Lista nova das mães, 2ª versão, e ficha ao lado (23/11/2026, proposta aprovada: "vamos testar essa proposta") =================
    Só no computador e no fluxo novo. Calma como o Dashboard: linhas baixas numa linha só, vermelho só quando o prazo nosso passou,
    filtros em lilás, e a ficha fixa à direita (sem escurecer a lista) a partir de 1200px. */
@@ -2856,200 +3050,13 @@ html[data-fx="novo"] .fcr-aqui{font-size:10px;font-weight:700;letter-spacing:.05
 html[data-fx="novo"] .fcr-st{font-size:11.5px;font-weight:500;white-space:nowrap;padding:3px 10px;border-radius:999px;border:1px dashed var(--ap-linha);color:var(--ink-3)}
 html[data-fx="novo"] .fcr-st.on{border:0;background:hsl(var(--c-sec)/.7);color:var(--ink-2)}
 }
+/* telas grandes (23/11/2026, a pedido: "em telas grandes o layout do Nascer ficou pequeno"): o BI inteiro cresce junto, na mesma proporção.
+   Até 1499px nada muda (o notebook do usuário e o celular ficam como estão). */
+@media (min-width:1500px){html[data-fx="novo"]{zoom:1.1}}
+@media (min-width:1750px){html[data-fx="novo"]{zoom:1.2}}
+@media (min-width:2100px){html[data-fx="novo"]{zoom:1.35}}
+@media (min-width:2500px){html[data-fx="novo"]{zoom:1.5}}
 /* fim da lista nova */
-/* ================= Dashboard completo (23/11/2026, a pedido: "mais completo, bonito, com respiro... quantas entram, quantas foram aprovadas") =================
-   Só no computador. Cartões brancos com respiro, um número grande por tela, gráficos de traço fino e uma cor por série. */
-@media (min-width:1000px){
-html[data-fx="novo"]{--pn-cinza:hsl(274 14% 80%)}
-html[data-fx="novo"]:root[data-theme="dark"]{--pn-cinza:hsl(274 10% 34%)}
-html[data-fx="novo"] .pn-topo{margin-bottom:18px}
-html[data-fx="novo"] .pn{container:painel / inline-size;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:clamp(14px,1.35vw,22px);margin-bottom:24px}
-html[data-fx="novo"] .pn-c{background:hsl(var(--c-card));border:1px solid var(--ap-linha);border-radius:16px;padding:20px 22px;min-width:0;box-shadow:0 1px 2px rgba(41,24,56,.04)}
-html[data-fx="novo"]:root[data-theme="dark"] .pn-c{box-shadow:none}
-/* tela larga (a área do Dashboard com 1150px ou mais): número grande + 4 números numa linha; os cartões lado a lado */
-html[data-fx="novo"] .pn-hero{grid-column:span 4}html[data-fx="novo"] .pn-tile{grid-column:span 2}
-html[data-fx="novo"] .pn-cf{grid-column:span 7}html[data-fx="novo"] .pn-ci{grid-column:span 5}
-html[data-fx="novo"] .pn-ce{grid-column:span 8}html[data-fx="novo"] .pn-ct{grid-column:span 4}
-html[data-fx="novo"] .pn-cp{grid-column:span 7}html[data-fx="novo"] .pn-cc{grid-column:span 5}
-html[data-fx="novo"] .pn-cpf,html[data-fx="novo"] .pn-fin{grid-column:span 12}
-html[data-fx="novo"] .pn-c.clic{cursor:pointer;transition:border-color .15s,background .15s}
-html[data-fx="novo"] .pn-c.clic:hover{border-color:hsl(var(--c-pri)/.35);background:var(--ap-lil)}
-html[data-fx="novo"] .pn-h{display:flex;align-items:center;gap:12px;margin:0 0 3px;min-height:22px}
-html[data-fx="novo"] .pn-t{margin:0;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:16px;font-weight:600;letter-spacing:-.005em;color:var(--ink)}
-html[data-fx="novo"] .pn-sub{margin:0 0 18px;font-size:12px;color:var(--ink-3);line-height:1.45}
-html[data-fx="novo"] .pn-lk{margin-left:auto;font-size:12px;font-weight:500;color:var(--ap-g1);padding:2px 0;background:none;border:0;cursor:pointer}
-html[data-fx="novo"]:root[data-theme="dark"] .pn-lk{color:#c9a3ea}
-html[data-fx="novo"] .pn-lk:hover{text-decoration:underline}
-html[data-fx="novo"] .pn-nota{margin:14px 0 0;font-size:11.5px;color:var(--ink-3);line-height:1.5}
-html[data-fx="novo"] .pn-vazio{padding:28px 0;text-align:center;color:var(--ink-3);font-size:12.5px}
-/* números do topo */
-html[data-fx="novo"] .pn-tile{display:flex;flex-direction:column;padding:18px 18px 16px}
-html[data-fx="novo"] .pn-tile-r{margin:0;font-size:12px;color:var(--ink-3);font-weight:500}
-html[data-fx="novo"] .pn-tile-v{margin:8px 0 6px;font-size:28px;font-weight:600;letter-spacing:-.02em;line-height:1;color:var(--ink)}
-html[data-fx="novo"] .pn-tile-c{margin:6px 0 0;font-size:11.5px;color:var(--ink-3);line-height:1.4}
-html[data-fx="novo"] .pn-tile .pn-tile-c{margin-top:auto;padding-top:6px}
-html[data-fx="novo"] .pn-var{display:block;font-size:11.5px;color:var(--ink-3)}
-html[data-fx="novo"] .pn-var b{font-weight:600;color:var(--ink-2)}
-html[data-fx="novo"] .pn-var b.sobe{color:var(--green)}
-html[data-fx="novo"] .pn-var b.desce{color:var(--red)}
-html[data-fx="novo"] .pn-hero{padding:20px 22px 18px;background:linear-gradient(135deg,var(--ap-g1),var(--ap-g2));border:0;color:#fff}
-html[data-fx="novo"] .pn-hero .pn-tile-r,html[data-fx="novo"] .pn-hero .pn-tile-c,html[data-fx="novo"] .pn-hero .pn-var{color:rgba(255,255,255,.78)}
-html[data-fx="novo"] .pn-hero .pn-var b,html[data-fx="novo"] .pn-hero .pn-var b.sobe,html[data-fx="novo"] .pn-hero .pn-var b.desce{color:#fff}
-html[data-fx="novo"] .pn-hero-l{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:8px 0 6px}
-html[data-fx="novo"] .pn-hero-v{margin:0;font-size:52px;font-weight:600;letter-spacing:-.03em;line-height:.95;color:#fff}
-html[data-fx="novo"] .pn-spark rect{fill:rgba(255,255,255,.32)}
-html[data-fx="novo"] .pn-spark rect.ag{fill:#fff}
-/* barras horizontais: funil, tempos e cidades */
-html[data-fx="novo"] .pn-funil,html[data-fx="novo"] .pn-tempos,html[data-fx="novo"] .pn-cid{display:grid;gap:9px}
-html[data-fx="novo"] .pn-bl{display:grid;grid-template-columns:148px minmax(0,1fr) 78px;align-items:center;gap:14px;min-height:22px;border-radius:8px}
-html[data-fx="novo"] .pn-tempos .pn-bl{grid-template-columns:154px minmax(0,1fr) 46px;gap:12px}
-/* cidades: nome e número numa linha, barrinha embaixo (o nome inteiro cabe) */
-html[data-fx="novo"] .pn-ml{list-style:none;margin:0;padding:0;display:grid;gap:12px}
-html[data-fx="novo"] .pn-ml p{display:flex;align-items:baseline;gap:10px;margin:0 0 5px;font-size:12.5px;color:var(--ink-2)}
-html[data-fx="novo"] .pn-ml p span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-html[data-fx="novo"] .pn-ml p b{margin-left:auto;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
-html[data-fx="novo"] .pn-ml i{display:block;height:6px;border-radius:999px;background:var(--ap-lil)}
-html[data-fx="novo"] .pn-ml em{display:block;height:100%;border-radius:999px;background:hsl(var(--c-pri)/.6)}
-html[data-fx="novo"] .pn-bl-r{font-size:12.5px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-html[data-fx="novo"] .pn-bl-t{display:block;height:16px;border-radius:0 5px 5px 0;background:var(--ap-lil)}
-html[data-fx="novo"] .pn-bl-t i{display:block;height:100%;border-radius:0 4px 4px 0;background:var(--ser-1)}
-html[data-fx="novo"] .pn-bl.leve .pn-bl-t{height:10px;background:transparent}
-html[data-fx="novo"] .pn-bl.leve .pn-bl-t i{background:hsl(var(--c-pri)/.55)}
-html[data-fx="novo"] .pn-bl.forte .pn-bl-r{color:var(--ink);font-weight:600}
-html[data-fx="novo"] .pn-bl-v{font-size:12.5px;color:var(--ink-3);white-space:nowrap;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:6px}
-html[data-fx="novo"] .pn-bl-v b{font-weight:600;color:var(--ink)}
-html[data-fx="novo"] .pn-bl-v small{font-size:11.5px;color:var(--ink-3)}
-html[data-fx="novo"] .pn-funil .pn-bl-v{justify-content:flex-start}
-html[data-fx="novo"] .pn-total{margin-top:20px;padding:14px 16px;border-radius:12px;background:var(--ap-lil)}
-html[data-fx="novo"] .pn-total p{margin:0;font-size:12px;color:var(--ink-3)}
-html[data-fx="novo"] .pn-total b{display:block;margin:4px 0 2px;font-size:18px;font-weight:600;letter-spacing:-.02em;color:var(--ink)}
-html[data-fx="novo"] .pn-total small{font-size:11.5px;color:var(--ink-3)}
-/* resultado no INSS */
-html[data-fx="novo"] .pn-taxa{display:flex;align-items:center;gap:14px;margin:2px 0 12px}
-html[data-fx="novo"] .pn-taxa-v{margin:0;font-size:40px;font-weight:600;letter-spacing:-.03em;line-height:1;color:var(--ink)}
-html[data-fx="novo"] .pn-taxa-r{margin:0;font-size:13px;font-weight:600;color:var(--ink)}
-html[data-fx="novo"] .pn-taxa .pn-tile-c{margin-top:2px}
-html[data-fx="novo"] .pn-meter{height:8px;border-radius:999px;background:var(--green-soft);overflow:hidden;margin-bottom:16px}
-html[data-fx="novo"] .pn-meter i{display:block;height:100%;border-radius:999px;background:var(--green)}
-html[data-fx="novo"] .pn-st{list-style:none;margin:0;padding:0}
-html[data-fx="novo"] .pn-st li{display:flex;align-items:center;gap:10px;padding:9px 6px;margin:0 -6px;border-top:1px solid var(--ap-linha);font-size:12.5px;color:var(--ink-2);cursor:pointer;border-radius:8px}
-html[data-fx="novo"] .pn-st li:first-child{border-top:0}
-html[data-fx="novo"] .pn-st li:hover{background:var(--ap-lil)}
-html[data-fx="novo"] .pn-st li small{font-size:11.5px;color:var(--ink-3)}
-html[data-fx="novo"] .pn-st li b{margin-left:auto;font-size:14px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
-html[data-fx="novo"] .pn-st-i{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;background:hsl(var(--c-sec));color:var(--ap-g1);flex:none}
-html[data-fx="novo"] .pn-st-i svg.i{width:13px;height:13px}
-html[data-fx="novo"] .pn-st-i.ok{background:var(--green-soft);color:var(--green)}
-html[data-fx="novo"] .pn-st-i.ruim{background:var(--red-soft);color:var(--red)}
-/* mês a mês */
-html[data-fx="novo"] .pn-leg{list-style:none;margin:0;padding:0;display:grid;gap:7px}
-html[data-fx="novo"] .pn-leg li{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-2)}
-html[data-fx="novo"] .pn-leg li i{width:10px;height:10px;border-radius:3px;flex:none}
-html[data-fx="novo"] .pn-leg li b{margin-left:auto;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
-html[data-fx="novo"] .pn-leg-top{display:flex;gap:16px;margin-left:14px}
-html[data-fx="novo"] .pn-leg-top li i{width:14px;height:3px;border-radius:2px}
-html[data-fx="novo"] .pn-graf{position:relative}
-html[data-fx="novo"] .pn-graf svg{display:block;overflow:visible}
-html[data-fx="novo"] .pn-g{stroke:var(--ap-linha);stroke-width:1}
-html[data-fx="novo"] .pn-ax{font-size:11px;fill:var(--ink-3);font-variant-numeric:tabular-nums}
-html[data-fx="novo"] .pn-fim{font-size:12px;font-weight:600;fill:var(--ink)}
-html[data-fx="novo"] .pn-fim-v{font-size:11px;fill:var(--ink-3)}
-html[data-fx="novo"] .pn-cruz{stroke:var(--ink-3);stroke-width:1;opacity:.45}
-html[data-fx="novo"] .pn-dica{position:absolute;min-width:180px;background:hsl(var(--c-card));border:1px solid var(--ap-linha);border-radius:12px;padding:10px 12px;box-shadow:0 8px 24px rgba(41,24,56,.12);pointer-events:none;font-size:12px;z-index:3}
-html[data-fx="novo"] .pn-dica b{display:block;font-weight:600;color:var(--ink);margin-bottom:6px}
-html[data-fx="novo"] .pn-dica p{display:flex;align-items:center;gap:8px;margin:3px 0;color:var(--ink-2)}
-html[data-fx="novo"] .pn-dica p i{width:10px;height:3px;border-radius:2px}
-html[data-fx="novo"] .pn-dica p span{margin-left:auto;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
-html[data-fx="novo"] .pn-dica .pn-dica-x{padding-left:18px;color:var(--ink-3)}
-html[data-fx="novo"] .pn-tab{width:100%;font-size:12.5px}
-html[data-fx="novo"] .pn-tab td,html[data-fx="novo"] .pn-tab th{padding:7px 10px}
-html[data-fx="novo"] .pn-tab .dir{text-align:right}
-/* consultores e parceiros */
-html[data-fx="novo"] .pn-rk{width:100%;border-collapse:collapse;font-size:12.5px}
-html[data-fx="novo"] .pn-rk th{font-size:11px;font-weight:500;color:var(--ink-3);text-align:left;padding:0 8px 8px;border-bottom:1px solid var(--ap-linha)}
-html[data-fx="novo"] .pn-rk td{padding:9px 8px;border-bottom:1px solid var(--ap-linha);color:var(--ink-2);vertical-align:middle}
-html[data-fx="novo"] .pn-rk tr:last-child td{border-bottom:0}
-html[data-fx="novo"] .pn-rk .dir{text-align:right;width:74px}
-html[data-fx="novo"] .pn-rk th:first-child,html[data-fx="novo"] .pn-rk td:first-child{padding-left:0}
-html[data-fx="novo"] .pn-rk th:last-child,html[data-fx="novo"] .pn-rk td:last-child{padding-right:0}
-html[data-fx="novo"] .pn-rk td b{font-weight:600;color:var(--ink)}
-html[data-fx="novo"] .pn-rk-n{display:block;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink);font-weight:500}
-html[data-fx="novo"] .pn-rk-b{display:block;height:4px;margin-top:5px;max-width:220px}
-html[data-fx="novo"] .pn-rk-b i{display:block;height:100%;border-radius:999px;background:hsl(var(--c-pri)/.5)}
-html[data-fx="novo"] .pn-rk tr.org .pn-rk-n{color:var(--ink-3);font-weight:400}
-html[data-fx="novo"] .pn-rk tr.org .pn-rk-b i{background:var(--pn-cinza)}
-/* perfil: barra dividida em partes */
-html[data-fx="novo"] .pn-mini-t{margin:0 0 8px;font-size:12px;font-weight:600;color:var(--ink-2)}
-html[data-fx="novo"] .pn-mini-t ~ .pn-mini-t{margin-top:18px}
-html[data-fx="novo"] .pn-seg{display:flex;gap:2px;height:28px;margin-bottom:10px}
-html[data-fx="novo"] .pn-seg span{display:flex;align-items:center;padding:0 8px;border-radius:4px;min-width:0;font-size:11.5px;font-weight:600;color:#fff;white-space:nowrap;overflow:visible}
-html[data-fx="novo"] .pn-seg span[style*="--pn-cinza"]{color:var(--ink)}
-/* financeiro */
-html[data-fx="novo"] .pn-fin-g{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
-html[data-fx="novo"] .pn-fin-g > div{padding:2px 20px;border-left:1px solid var(--ap-linha)}
-html[data-fx="novo"] .pn-fin-g > div:first-child{padding-left:0;border-left:0}
-html[data-fx="novo"] .pn-fin-v{margin:8px 0 2px;font-size:22px;font-weight:600;letter-spacing:-.02em;color:var(--ink)}
-/* menos texto nos blocos (23/11/2026, a pedido: "evite balões com muitas letras e frases"): só o nome e o número; a comparação aparece só quando muda */
-html[data-fx="novo"] .pn :is(.pn-sub,.pn-nota,.pn-tile-c,.pn-total small,.pn-st li small){display:none}
-html[data-fx="novo"] .pn-h{margin-bottom:16px}
-html[data-fx="novo"] .pn-tile{justify-content:flex-start}
-html[data-fx="novo"] .pn-st li.pn-st-sem{cursor:default}
-html[data-fx="novo"] .pn-st li.pn-st-sem:hover{background:none}
-/* o mapa continua igual, só com o mesmo respiro */
-html[data-fx="novo"] #dash-box .pn ~ .dn-sec{margin-top:0}
-/* ---------- cabe em qualquer tela de computador (23/11/2026, a pedido: "adaptável a qualquer tela de PC"; o "GPS" estava quebrando em duas linhas) ----------
-   letras e espaços acompanham a largura do Dashboard (cqi = 1% da largura), e nenhum rótulo quebra de linha: o que não couber termina em "…" e aparece inteiro ao passar o mouse */
-html[data-fx="novo"] .pn-c{padding:clamp(16px,1.9cqi,24px) clamp(16px,2.1cqi,26px)}
-html[data-fx="novo"] .pn-tile{padding:clamp(14px,1.6cqi,20px)}
-html[data-fx="novo"] .pn-t{font-size:clamp(14.5px,1.45cqi,17px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-html[data-fx="novo"] .pn-hero-v{font-size:clamp(30px,2.9cqi,38px);letter-spacing:-.02em}
-html[data-fx="novo"] .pn-tile-v{font-size:clamp(20px,1.85cqi,24px)}
-html[data-fx="novo"] .pn-taxa-v{font-size:clamp(24px,2.3cqi,30px)}
-html[data-fx="novo"] .pn-fin-v{font-size:clamp(17px,1.6cqi,20px)}
-html[data-fx="novo"] .pn-tile-r,html[data-fx="novo"] .pn-tile-c,html[data-fx="novo"] .pn-var,html[data-fx="novo"] .pn-mini-t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-html[data-fx="novo"] .pn-rk th{white-space:nowrap}
-html[data-fx="novo"] .pn-rk .dir{width:clamp(56px,6.2cqi,78px)}
-html[data-fx="novo"] .pn-rk-n,html[data-fx="novo"] .pn-rk-b{max-width:none}
-html[data-fx="novo"] .pn-st li{white-space:nowrap;min-width:0}
-html[data-fx="novo"] .pn-st li small{overflow:hidden;text-overflow:ellipsis}
-html[data-fx="novo"] .pn-leg li span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-html[data-fx="novo"] .pn-h .pn-leg-top li{white-space:nowrap}
-/* perfil das mães: as duas barras lado a lado, com a legenda numa linha */
-html[data-fx="novo"] .pn-perfil{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px clamp(24px,4cqi,56px)}
-html[data-fx="novo"] .pn-perfil .pn-mini-t{margin-top:0}
-html[data-fx="novo"] .pn-perfil .pn-seg{margin-bottom:12px}
-html[data-fx="novo"] .pn-perfil .pn-leg{display:flex;flex-wrap:wrap;gap:6px 22px}
-html[data-fx="novo"] .pn-perfil .pn-leg li b{margin-left:6px}
-html[data-fx="novo"] .pn-hero{position:relative}
-html[data-fx="novo"] .pn-hero-x{display:none}
-/* tela média (a área do Dashboard entre 860 e 1149px, como num notebook): o número grande vira uma faixa e os 4 números ficam lado a lado embaixo */
-@container painel (max-width:1149px){
-  html[data-fx="novo"] .pn-hero{grid-column:span 12}
-  html[data-fx="novo"] .pn-hero-x{display:flex;gap:clamp(24px,4.5cqi,56px);position:absolute;right:clamp(18px,3cqi,40px);top:50%;transform:translateY(-50%)}
-  html[data-fx="novo"] .pn-hero-x div{padding-left:clamp(14px,2cqi,22px);border-left:1px solid rgba(255,255,255,.22)}
-  html[data-fx="novo"] .pn-hero-x p{margin:0 0 6px;font-size:11.5px;color:rgba(255,255,255,.75);white-space:nowrap}
-  html[data-fx="novo"] .pn-hero-x b{font-size:clamp(16px,1.7cqi,20px);font-weight:600;letter-spacing:-.02em;color:#fff;white-space:nowrap}
-  html[data-fx="novo"] .pn-hero-x b small{font-size:11.5px;font-weight:500;color:rgba(255,255,255,.75);margin-left:6px;letter-spacing:0}
-  html[data-fx="novo"] .pn-hero-l{justify-content:flex-start;gap:clamp(28px,6cqi,72px);align-items:center}
-  html[data-fx="novo"] .pn-hero .pn-spark{width:180px;height:46px}
-  html[data-fx="novo"] .pn-tile{grid-column:span 3}
-  html[data-fx="novo"] .pn-ce{grid-column:span 7}html[data-fx="novo"] .pn-ct{grid-column:span 5}
-}
-/* tela estreita (abaixo de 860px de área): um cartão por linha e os números de 2 em 2 */
-@container painel (max-width:859px){
-  html[data-fx="novo"] .pn-tile{grid-column:span 6}
-  html[data-fx="novo"] .pn-hero .pn-spark{width:150px;height:46px}
-  html[data-fx="novo"] .pn-hero-l{gap:24px}
-  html[data-fx="novo"] .pn-cf,html[data-fx="novo"] .pn-ci,html[data-fx="novo"] .pn-ce,html[data-fx="novo"] .pn-ct,html[data-fx="novo"] .pn-cp,html[data-fx="novo"] .pn-cc{grid-column:span 12}
-  html[data-fx="novo"] .pn-fin-g{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:18px}
-  html[data-fx="novo"] .pn-fin-g > div:nth-child(3){padding-left:0;border-left:0}
-}
-@container painel (max-width:640px){
-  html[data-fx="novo"] .pn-perfil{grid-template-columns:1fr}
-}
-}
-/* fim do Dashboard completo */
-
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -5261,9 +5268,9 @@ html[data-fx="novo"] .pn-hero-x{display:none}
     if (!alvo){ if (d) d.hidden = true; return; }
     if (!d){ d = document.createElement('div'); d.id = 'dica-docs'; document.body.appendChild(d); }
     d.textContent = alvo.querySelector('.docs-tip').textContent; d.hidden = false;
-    var r = alvo.getBoundingClientRect(), w = d.offsetWidth;
-    d.style.left = Math.max(8, Math.min(r.left, innerWidth - w - 8)) + 'px';
-    d.style.top = (r.bottom + 6 + d.offsetHeight > innerHeight ? r.top - d.offsetHeight - 6 : r.bottom + 6) + 'px';
+    var z = zoomBI(), r0 = alvo.getBoundingClientRect(), r = { left: r0.left / z, top: r0.top / z, bottom: r0.bottom / z }, w = d.offsetWidth;   // telas grandes: posição da tela dividida pelo zoom do BI
+    d.style.left = Math.max(8, Math.min(r.left, innerWidth / z - w - 8)) + 'px';
+    d.style.top = (r.bottom + 6 + d.offsetHeight > innerHeight / z ? r.top - d.offsetHeight - 6 : r.bottom + 6) + 'px';
   }
   $('cad-list').addEventListener('mouseover', function(e){ dicaDocs(e.target.closest('.docs-pend')); });
   $('cad-list').addEventListener('mouseleave', function(){ dicaDocs(null); });
@@ -6534,9 +6541,10 @@ html[data-fx="novo"] .pn-hero-x{display:none}
       '<input ' + (senha ? 'type="text" placeholder="Senha do gov.br"' : 'inputmode="numeric" placeholder="000.00000.00-0" maxlength="14"') + ' autocomplete="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore aria-label="' + (senha ? 'Senha do gov.br' : 'NIT') + '">' +
       '<small class="pv-pop-e" hidden></small><div class="pv-pop-b"><button type="button" class="btn" data-pvp="x">Cancelar</button><button type="button" class="btn primary" data-pvp="ok">Salvar</button></div>';
     document.body.appendChild(d); pvPopEl = d;
-    var q = b.getBoundingClientRect(), w = d.offsetWidth, h = d.offsetHeight, left = Math.max(8, Math.min(window.innerWidth - w - 8, q.left + q.width / 2 - w / 2)), top = q.bottom + 8;
-    if (top + h > window.innerHeight - 8) top = Math.max(8, q.top - h - 8);
-    d.style.left = (left + window.scrollX) + 'px'; d.style.top = (top + window.scrollY) + 'px';
+    var z = zoomBI(), q0 = b.getBoundingClientRect(), q = { left: q0.left / z, top: q0.top / z, bottom: q0.bottom / z, width: q0.width / z }, vw = window.innerWidth / z, vh = window.innerHeight / z;   // telas grandes: posição da tela dividida pelo zoom do BI
+    var w = d.offsetWidth, h = d.offsetHeight, left = Math.max(8, Math.min(vw - w - 8, q.left + q.width / 2 - w / 2)), top = q.bottom + 8;
+    if (top + h > vh - 8) top = Math.max(8, q.top - h - 8);
+    d.style.left = (left + window.scrollX / z) + 'px'; d.style.top = (top + window.scrollY / z) + 'px';
     var inp = d.querySelector('input'); inp.focus({ preventScroll: true });
     if (!senha) inp.addEventListener('input', function(){ inp.value = mascNit(inp.value); });
   }
@@ -7271,8 +7279,8 @@ html[data-fx="novo"] .pn-hero-x{display:none}
   }
   document.addEventListener('pointermove', function(e){
     var svg = e.target.closest && e.target.closest('.pn-graf svg'); if (!svg || !pnSerie) return;
-    var b = svg.getBoundingClientRect(), ml = +svg.dataset.ml, pw = +svg.dataset.pw, n = +svg.dataset.n, H = +svg.getAttribute('height');
-    var i = Math.max(0, Math.min(n - 1, Math.round((e.clientX - b.left - ml) / (n > 1 ? pw / (n - 1) : 1)))), xs = ml + (n > 1 ? pw * i / (n - 1) : pw / 2);
+    var z = zoomBI(), b = svg.getBoundingClientRect(), ml = +svg.dataset.ml, pw = +svg.dataset.pw, n = +svg.dataset.n, H = +svg.getAttribute('height');
+    var i = Math.max(0, Math.min(n - 1, Math.round(((e.clientX - b.left) / z - ml) / (n > 1 ? pw / (n - 1) : 1)))), xs = ml + (n > 1 ? pw * i / (n - 1) : pw / 2);
     var topo = Math.max.apply(null, pnSerie.series.reduce(function(a, x){ return a.concat(x.v); }, [1])), mt = 16, ph = H - 16 - 30, passo = 1;
     [1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 5000].some(function(p){ passo = p; return topo / p <= 4; }); topo = Math.ceil(topo / passo) * passo;
     var mira = svg.querySelector('.pn-mira'); mira.removeAttribute('hidden');
@@ -7280,7 +7288,7 @@ html[data-fx="novo"] .pn-hero-x{display:none}
     Array.prototype.forEach.call(mira.querySelectorAll('circle'), function(c){ var v = pnSerie.series[+c.dataset.k].v[i]; c.setAttribute('cx', xs); c.setAttribute('cy', mt + ph - ph * v / topo); });
     var tip = svg.parentNode.querySelector('.pn-dica');
     tip.innerHTML = '<b>' + esc(pnSerie.nomes[i]) + '</b>' + pnSerie.series.map(function(se){ return '<p><i style="background:var(' + se.cor + ')"></i>' + esc(se.nome) + '<span>' + pnNum(se.v[i]) + '</span></p>'; }).join('') + (pnSerie.extra ? '<p class="pn-dica-x">' + esc(pnSerie.extra.nome) + '<span>' + pnNum(pnSerie.extra.v[i]) + '</span></p>' : '');
-    tip.hidden = false; var lx = xs + 14; if (lx + 190 > b.width) lx = xs - 204; tip.style.left = lx + 'px'; tip.style.top = '18px';
+    tip.hidden = false; var lx = xs + 14; if (lx + 190 > b.width / z) lx = xs - 204; tip.style.left = lx + 'px'; tip.style.top = '18px';
   });
   document.addEventListener('pointerout', function(e){
     var svg = e.target.closest && e.target.closest('.pn-graf svg'); if (!svg || (e.relatedTarget && svg.contains(e.relatedTarget))) return;
@@ -7497,7 +7505,7 @@ html[data-fx="novo"] .pn-hero-x{display:none}
   });
   $('dash-box').addEventListener('pointermove', function(e){
     var svg = e.target.closest && e.target.closest('.dash-svg'); if (!svg || !dashSerie) return;
-    var ml = +svg.dataset.ml, pw = +svg.dataset.pw, n = +svg.dataset.n, cx = svg.getBoundingClientRect(), px = e.clientX - cx.left;
+    var ml = +svg.dataset.ml, pw = +svg.dataset.pw, n = +svg.dataset.n, cx = svg.getBoundingClientRect(), px = (e.clientX - cx.left) / zoomBI();
     var i = n > 1 ? Math.max(0, Math.min(n - 1, Math.round((px - ml) / pw * (n - 1)))) : 0, x = ml + (n > 1 ? pw * i / (n - 1) : pw / 2);
     var mira = svg.querySelector('.dash-mira'), H = +svg.getAttribute('height'), maxG = svg.querySelector('.dash-cruz');
     var y1 = +maxG.getAttribute('y1'), y2 = +maxG.getAttribute('y2'), topo = dashTopo(), y = function(v){ return y2 - (y2 - y1) * v / topo; };
@@ -9680,9 +9688,9 @@ html[data-fx="novo"] .pn-hero-x{display:none}
     if (el.dataset.pHelp) html += '<button type="button" class="btn" data-ir="' + esc(el.dataset.pHelp) + '">' + esc(el.dataset.pRot || 'Ver na lista') + '</button>';
     helpPop = document.createElement('div'); helpPop.className = 'help-pop'; helpPop.setAttribute('role', 'dialog'); helpPop.innerHTML = html;
     document.body.appendChild(helpPop);
-    var r = el.getBoundingClientRect(), w = helpPop.offsetWidth, h = helpPop.offsetHeight;
-    var x = Math.min(Math.max(8, r.left - 12), window.innerWidth - w - 8), y = r.bottom + 8;
-    if (y + h > window.innerHeight - 8) y = Math.max(8, r.top - h - 8);
+    var z = zoomBI(), r0 = el.getBoundingClientRect(), r = { left: r0.left / z, top: r0.top / z, bottom: r0.bottom / z }, w = helpPop.offsetWidth, h = helpPop.offsetHeight;   // telas grandes: posição da tela dividida pelo zoom do BI
+    var x = Math.min(Math.max(8, r.left - 12), window.innerWidth / z - w - 8), y = r.bottom + 8;
+    if (y + h > window.innerHeight / z - 8) y = Math.max(8, r.top - h - 8);
     helpPop.style.left = x + 'px'; helpPop.style.top = y + 'px';
     helpDe = el; el.setAttribute('aria-expanded', 'true');
     helpPop.addEventListener('click', function(e){
@@ -10549,6 +10557,8 @@ html[data-fx="novo"] .pn-hero-x{display:none}
      numa linha só, cabeçalho de duas linhas e a ficha ao lado da lista. Proposta aprovada: "vamos testar essa proposta".
      Só no computador e no fluxo novo; no celular continua a lista de antes. Recebe a mesma lista que a tela já filtrou (busca, Filtrar, ordem,
      Minhas clientes) e mantém as caixinhas do Pós-venda (data-pv), copiar (data-copiar, data-gpn-copia) e o clique na linha, que abre a ficha. ---------- */
+  // zoom do BI nas telas grandes (CSS: 1 até 1499px; 1.1 a 1.5 acima). Medidas da tela (getBoundingClientRect, clientX, innerWidth) divididas por ele viram medidas do BI
+  function zoomBI(){ var z = parseFloat(getComputedStyle(document.documentElement).zoom); return z > 0 ? z : 1; }
   function lnLigada(){ return fluxoVista === 'novo' && window.innerWidth >= 1000; }
   function lnSplit(){ return document.documentElement.classList.contains('fc-split'); }
   var LN_BOX = { 'ctr-list': 'k', 'gpn-list': 'gp', 'nan-list': 'an', 'rqn-list': 'rq', 'inss-list': 'i', 'list': 'c', 'r-list': 'r' };
