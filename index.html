@@ -3755,8 +3755,8 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   // Judicial: tem número de processo e ainda não foi arquivada (acompanha a ação até a sentença e o pagamento)
   function noControle(r){ return !!String(r.processo || '').trim() && !r.arquivado; }
   // Cadastro: ainda sem requerimento no INSS e sem número de processo
-  function noCadastro(r){ return !String(r.processo || '').trim() && !requerido(r) && !r.arquivado && !r.contratoEm && r.leadStatus !== 'desqualificado' && leadDe(r) !== 'perdido'; }
-  function perdidoAuto(r){ return !String(r.processo || '').trim() && !requerido(r) && !r.arquivado && !r.contratoEm && r.leadStatus !== 'desqualificado' && leadDe(r) === 'perdido'; }
+  function noCadastro(r){ return !String(r.processo || '').trim() && !requerido(r) && !r.arquivado && !r.contratoEm && !aguardaAssinatura(r) && r.leadStatus !== 'desqualificado' && leadDe(r) !== 'perdido'; }
+  function perdidoAuto(r){ return !String(r.processo || '').trim() && !requerido(r) && !r.arquivado && !r.contratoEm && !aguardaAssinatura(r) && r.leadStatus !== 'desqualificado' && leadDe(r) === 'perdido'; }
   function desqualificada(r){ return r.leadStatus === 'desqualificado' && !r.contratoEm && !r.arquivado; }
   // INSS: requerimento feito, ainda sem ação judicial
   // contrato fechado com a documentação toda ok: sai de Contratos fechados e vai para o INSS redigir o requerimento
@@ -3901,6 +3901,9 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   function faltaDocs(r){ return docsApp(r).filter(function(x){ return !x.ok; }).map(function(x){ return x.k; }); }
   // contrato do ZapSign gerado e ainda não assinado (sem internet na hora: o link foi para a mãe nas boas-vindas)
   function ctPend(r){ return !!(r && r.contrato && r.contrato.status !== 'assinado'); }
+  // fluxo novo: mãe que chegou do app com o contrato do ZapSign ainda sem assinatura. Fica no Pós-venda com a pendência "Contrato",
+  // mas não conta como contrato fechado (sem contratoEm) até assinar; a GPS não sai antes disso
+  function aguardaAssinatura(r){ return !!r && r.fluxo === 'novo' && !r.contratoEm && ctPend(r) && r.leadStatus !== 'desqualificado'; }
   function ctAssinadoEm(r){ var c = r && r.contrato; return c && c.status === 'assinado' && c.assinadoEm ? diaLocal(c.assinadoEm) : ''; }
   function ctSitNovo(r){
     var c = r && r.contrato; if (!c) return 'Sem contrato pelo app (cadastro feito no BI)';
@@ -3944,6 +3947,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
       var ses = await SB.auth.getSession(), jwt = ses && ses.data && ses.data.session ? ses.data.session.access_token : '';
       var d = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ acao: 'conferirDocs', jwt: jwt, pastaId: r.pastaId }) }).then(function(x){ return x.json(); });
       if (!d || !d.ok) throw new Error(d && d.erro || 'falhou');
+      r = await lerFresca(r.id) || r;   // a lista do que falta parte da versão do banco
       var falta = faltaPelaIA(r, d.tem || {});
       await patchRow(r.id, { faltaDocs: falta, docsCompletos: !falta.length, atualizadoEm: new Date().toISOString() });
       toast(!d.arquivos ? 'A pasta está vazia.' : falta.length ? 'Na pasta falta: ' + falta.map(function(k){ return DOC_FALTA[k]; }).join(', ') + '.' : 'Documentação completa: ' + docsExigidos(r).map(function(c){ return DOC_FALTA[c[1]]; }).join(', ') + '.' + (r.tipoSegurada ? '' : ' Informe o tipo de segurada para conferir também as provas.'));
@@ -4004,6 +4008,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   document.addEventListener('click', async function(e){
     var b = e.target.closest('[data-act="recebido"]'); if (!b) return;
     var r = state.rows.filter(function(x){ return x.id === b.dataset.id; })[0]; if (!r) return;
+    r = await lerFresca(r.id) || r;   // listas de documentos: parte da versão do banco
     var resta = faltaDocs(r).filter(function(k){ return k !== b.dataset.doc; });
     try { await patchRow(r.id, { faltaDocs: resta, campoDocs: (Array.isArray(r.campoDocs) ? r.campoDocs : docsApp(r).filter(function(x){ return x.ok && x.k !== 'senha' && x.k !== 'nit'; }).map(function(x){ return x.k; })).concat([b.dataset.doc]), atualizadoEm: new Date().toISOString() }); toast(DOC_FALTA[b.dataset.doc] + ' marcado como recebido'); }
     catch(err){ toast(errMsg(err)); }
@@ -4176,10 +4181,10 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     if (rural(r)){ var pr = docsApp(r).filter(function(x){ return x.k === 'rural'; })[0]; return doFluxoNovo(r) ? '<p class="fc-sec">' + esc(ativNovoTxt(r)) + ' · segurada especial</p><p class="fc-nota">Não paga GPS.</p>' : '<p class="fc-sec">Salário-maternidade rural</p><p class="fc-nota">Segurada especial: não paga GPS. O que garante o benefício é a prova da atividade rural' + (pr && pr.ok ? ' (já recebida).' : ' (ainda não chegou: cobrar da mãe).') + '</p>'; }
     var pago = gpsPaga(r), emitida = !!gpsGerar(r);
     return '<p class="fc-sec">Guia GPS (segurada facultativa)</p><div class="fc-guia">' +
-      fcLeitura('Código de pagamento', gpsCodigoDe(r) + (gpsCodigoDe(r) === '1163' ? ' · contribuinte individual, plano simplificado (11%)' : ' · facultativa, plano simplificado (11%)')) + fcLeitura('Valor', moedaTxt(gpsValor())) + fcLeitura('Prazo', prazoGps(r) ? fmtDate(prazoGps(r)) : 'informe a data do parto') + fcLeitura('Situação', pago ? 'Paga' + (r.guiaPagaEm ? ' em ' + fmtDate(r.guiaPagaEm) : '') : emitida ? 'Guia pronta, aguardando pagamento' : 'Falta o NIT para gerar a guia') + '</div>' +
+      fcLeitura('Código de pagamento', gpsCodigoDe(r) + (gpsCodigoDe(r) === '1163' ? ' · contribuinte individual, plano simplificado (11%)' : ' · facultativa, plano simplificado (11%)')) + fcLeitura('Valor', gpsValor(gpsCompetencia(r)) != null ? moedaTxt(gpsValor(gpsCompetencia(r))) : gpsSemSalario(r)) + fcLeitura('Prazo', prazoGps(r) ? fmtDate(prazoGps(r)) : 'informe a data do parto') + fcLeitura('Situação', pago ? 'Paga' + (r.guiaPagaEm ? ' em ' + fmtDate(r.guiaPagaEm) : '') : emitida ? 'Guia pronta, aguardando pagamento' : nitOk(r.nit) && gpsSemSalario(r) ? gpsSemSalario(r) : 'Falta o NIT para gerar a guia') + '</div>' +
       '<label class="fc-c"><span class="fc-rot">NIT / PIS da mãe</span><input id="fc-nit" class="tnum" inputmode="numeric" placeholder="000.00000.00-0" value="' + esc(r.nit ? nitFmt(r.nit) : '') + '"></label>' +
       '<label class="fc-c"><span class="fc-rot">Competência da guia</span><input id="fc-gps-comp" type="month" value="' + esc(gpsCompetencia(r)) + '"></label>' +
-      (function(){ var g = gpsGerar(r); return g ? '<div class="fc-gps-cod"><span class="fc-rot">Código de barras da GPS (gerado pelo sistema)</span><b class="tnum">' + esc(g.linha) + '</b><div class="fc-guia-acoes"><button type="button" class="btn" data-fc-copia="' + esc(g.digitos) + '">' + svgI('i-copy') + 'Copiar código de barras</button></div><p class="fc-nota">Competência ' + esc(compTxt(g.competencia)) + ' · vence ' + fmtDate(g.vencimento) + ' · ' + esc(moedaTxt(g.valor)) + '. Pague até o vencimento: depois dele o valor muda (juros).</p></div>' : '<p class="fc-nota">Informe o NIT da mãe e clique em Atualizar dados: o código de barras da GPS sai na hora.</p>'; })();
+      (function(){ var g = gpsGerar(r); return g ? '<div class="fc-gps-cod"><span class="fc-rot">Código de barras da GPS (gerado pelo sistema)</span><b class="tnum">' + esc(g.linha) + '</b><div class="fc-guia-acoes"><button type="button" class="btn" data-fc-copia="' + esc(g.digitos) + '">' + svgI('i-copy') + 'Copiar código de barras</button></div><p class="fc-nota">Competência ' + esc(compTxt(g.competencia)) + ' · vence ' + fmtDate(g.vencimento) + ' · ' + esc(moedaTxt(g.valor)) + '. Pague até o vencimento: depois dele o valor muda (juros).</p></div>' : nitOk(r.nit) && gpsSemSalario(r) ? '<p class="fc-nota">' + esc(gpsSemSalario(r)) + '. Avise o administrador para cadastrar o salário mínimo do ano.</p>' : '<p class="fc-nota">Informe o NIT da mãe e clique em Atualizar dados: o código de barras da GPS sai na hora.</p>'; })();
   }
   function fcDados(r){
     var t = faseDe(r), id = esc(r.id), resp = fcResp(r, t), etapaSel;
@@ -4248,6 +4253,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
       if (q('#fc-gps-comp') && q('#fc-gps-comp').value) p.gpsCompetencia = q('#fc-gps-comp').value;
       var gg = gpsGerar(Object.assign({}, r, { nit: p.nit, gpsCompetencia: p.gpsCompetencia || r.gpsCompetencia }));
       var lin = gg ? gg.digitos : '';
+      if (!gg && nitOk(p.nit)){ var semSal = gpsSemSalario(Object.assign({}, r, { gpsCompetencia: p.gpsCompetencia || r.gpsCompetencia })); if (semSal) toast(semSal + '. Avise o administrador.'); }
       if (lin !== digits(r.gpsLinha || '')){ p.gpsLinha = lin; p.gpsEmitidaEm = lin ? ag : ''; p.gpsValor = lin ? gg.valor : ''; p.gpsVencimento = lin ? gg.vencimento : ''; }
     }
     if (q('#fc-tipo') && q('#fc-tipo').value !== (r.tipoSegurada || '')) p.tipoSegurada = q('#fc-tipo').value;
@@ -4261,7 +4267,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     try {
       cardAberto.sujo = false;
       await patchRow(r.id, p); pintarCard();
-      toast('Dados atualizados: ' + r.nome, 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
+      toast('Dados atualizados: ' + r.nome, 'Desfazer', function(){ desfazer(r.id, antes); });
     } catch(err){ toast(errMsg(err)); }
   }
   function pedirFecharCard(){
@@ -4704,7 +4710,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     kbInfo('cad', 'd', lista.length, 'cliente', 'clientes');
     pintarLista(box, '<table class="kb-tab"><colgroup><col><col style="width:124px"><col style="width:140px"><col style="width:124px"><col style="width:112px"><col style="width:164px"><col style="width:92px"><col style="width:256px"></colgroup>' +
       '<thead><tr><th>Cliente</th><th>Telefone</th><th>Origem</th><th>Parto / bebê</th><th title="Urbano: paga a GPS · Rural: segurada especial, prova rural">Rural / urbano</th><th>Situação</th><th>Cadastro</th><th></th></tr></thead><tbody>' +
-      (lista.slice(0, 300).map(cadLinha).join('') || '<tr><td colspan="8" class="empty">' + (todos.length ? 'Nenhum cliente neste filtro.' : 'Nenhum cliente em cadastro. Clique em <b>Novo cadastro</b> para começar.') + '</td></tr>') + '</tbody></table>');
+      (lista.slice(0, limiteDe(box)).map(cadLinha).join('') || '<tr><td colspan="8" class="empty">' + (todos.length ? 'Nenhum cliente neste filtro.' : 'Nenhum cliente em cadastro. Clique em <b>Novo cadastro</b> para começar.') + '</td></tr>') + linhaMais(box, lista.length, 8) + '</tbody></table>');
   }
   function cadLinha(r){
     var id = esc(r.id), k = leadDe(r), par = prospById(r.responsavelId), parNome = par ? (par.tipo === 'clinica' && par.clinica ? par.clinica : par.nome) : (r.criadoPorNome ? 'Cadastro de ' + r.criadoPorNome : (r.origem === 'organico' ? 'Orgânico' : 'Sem parceiro'));
@@ -4822,7 +4828,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
       if (ia.dataset.iact === 'cumprida'){
         var antes = { inssStatus: r.inssStatus || '', exigenciaPrazo: r.exigenciaPrazo || '' };
         try { await patchRow(r.id, { inssStatus: 'analise', exigenciaPrazo: '', exigenciaCumpridaEm: iso(new Date()), atualizadoEm: new Date().toISOString() });
-          toast('Exigência cumprida: ' + r.nome + ' voltou para análise', 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); }); }
+          toast('Exigência cumprida: ' + r.nome + ' voltou para análise', 'Desfazer', function(){ desfazer(r.id, antes); }); }
         catch(err){ toast(errMsg(err)); }
       }
       return;
@@ -4838,7 +4844,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     var antes = { inssStatus: r.inssStatus || '', inssDecisaoEm: r.inssDecisaoEm || '' };
     var p = { inssStatus: k, atualizadoEm: new Date().toISOString() };
     if ((k === 'concedido' || k === 'indeferido') && !r.inssDecisaoEm) p.inssDecisaoEm = iso(new Date());
-    try { await patchRow(r.id, p); toast(INSS[k][0] + ': ' + r.nome + (k === 'exigencia' ? '. Abra o cadastro para lançar o prazo.' : k === 'indeferido' ? '. Use Entrar no Judicial quando tiver o processo.' : ''), 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); }); }
+    try { await patchRow(r.id, p); toast(INSS[k][0] + ': ' + r.nome + (k === 'exigencia' ? '. Abra o cadastro para lançar o prazo.' : k === 'indeferido' ? '. Use Entrar no Judicial quando tiver o processo.' : ''), 'Desfazer', function(){ desfazer(r.id, antes); }); }
     catch(err){ toast(errMsg(err)); render(); }
   }
   document.addEventListener('change', function(e){
@@ -4919,7 +4925,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
       Object.keys(LEAD).map(function(x){ return '<option value="' + x + '"' + (x === k ? ' selected' : '') + '>' + LEAD[x] + '</option>'; }).join('') + '</select>' + contadorContato(r);
   }
   var CTR_ETAPAS = { regularizar: ['Regularizar documentos', 'crit'] };
-  function fechado(r){ return !!r.contratoEm && !r.arquivado && !String(r.processo || '').trim() && !requerido(r); }
+  function fechado(r){ return (!!r.contratoEm || aguardaAssinatura(r)) && !r.arquivado && !String(r.processo || '').trim() && !requerido(r); }
   // fluxo do Salário Maternidade (o mesmo do BI de Vendas): Pós-venda → análise da Controladoria → Fila de protocolo → INSS
   function foiParaAnalise(r){ return r.pvAnalise === 'em_analise' || r.pvAnalise === 'aprovado'; }
   function naFila(r){ return fechado(r) && foiParaAnalise(r); }
@@ -4988,8 +4994,8 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   // qualificação do app (SQL 55): pedido direto ao INSS ou MEI (paga o próprio DAS) não passam pela GPS do escritório
   function semGps(r){ var q = r && r.qualificacao; return !!(q && (q.caminho === 'direto_inss' || q.caminho === 'mei')); }
   function gpsAPagar(r){ var g = gatilhoGps(r), hj = iso(new Date()); return !!g && !gpsPaga(r) && g <= hj && String(r.dpp).slice(0, 10) > hj; }
-  // a tarefa da GPS nasce quando o prazo chega, mesmo com o cartão em Senha ou Documentação, ou quando ele está em Emitir/Pagar GPS
-  function gpsTarefa(r){ return noContratos(r) && !nascido(r) && !rural(r) && !semGps(r) && !gpsPaga(r) && (gpsAPagar(r) || posEtapaDe(r) === 'gps') && (!doFluxoNovo(r) || !!r.tipoSegurada); }
+  // a tarefa da GPS nasce quando o prazo chega, mesmo com o cartão em Senha ou Documentação, ou quando ele está em Emitir/Pagar GPS (nunca com o contrato do ZapSign sem assinatura)
+  function gpsTarefa(r){ return noContratos(r) && !ctPend(r) && !nascido(r) && !rural(r) && !semGps(r) && !gpsPaga(r) && (gpsAPagar(r) || posEtapaDe(r) === 'gps') && (!doFluxoNovo(r) || !!r.tipoSegurada); }
   // o que o responsável precisa fazer agora: aparece no cartão, na janela e no sino até ser feito
   // gestante que fechou antes do prazo da GPS e não pagou: continua avisando depois do parto
   function gpsVencida(r){
@@ -5202,6 +5208,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     var pendG = docsApp(r).filter(function(x){ return !x.ok && x.k !== 'nit'; }).map(function(x){ return x.n; });
     var gat = gatilhoGps(r);
     if (!nitOk(r.nit)) st.push(kbSt('Falta o NIT da mãe: sem ele a guia não sai', 'lar'));
+    else if (!g && gpsSemSalario(r)) st.push(kbSt(gpsSemSalario(r)));
     else if (v && v < iso(new Date())) st.push(kbSt('Prazo passou em ' + fmtDate(v) + ': pagamento automático não confirmado'));
     else if (gpsTarefa(r)) st.push(kbSt('Pagamento automático pelo Asaas até ' + fmtDate(v), 'lar'));
     else st.push(kbSt('Guia pronta · o Asaas paga' + (gat ? ' em ' + fmtDate(gat) : ' no prazo'), 'ok'));
@@ -5289,7 +5296,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   function botoesCaso(r){ var id = esc(r.id); return '<button type="button" class="kb-lnk" data-pv-prob="' + id + '">' + (r.pvProblema ? 'Editar problema' : 'Registrar problema') + '</button><button type="button" class="kb-lnk verm" data-pv-perda="' + id + '">Marcar como perda</button>'; }
   document.addEventListener('click', async function(e){
     var bo = e.target.closest && e.target.closest('[data-pv-prob-ok]');
-    if (bo){ e.stopPropagation(); var ro = acharRow(bo.dataset.pvProbOk); if (!ro) return; var ao = { pvProblema: ro.pvProblema || '' }; try { await patchRow(ro.id, { pvProblema: '', atualizadoEm: new Date().toISOString() }); toast('Problema resolvido: ' + ro.nome, 'Desfazer', function(){ patchRow(ro.id, ao).catch(function(e2){ toast(errMsg(e2)); }); }); } catch(err){ toast(errMsg(err)); } return; }
+    if (bo){ e.stopPropagation(); var ro = acharRow(bo.dataset.pvProbOk); if (!ro) return; var ao = { pvProblema: ro.pvProblema || '' }; try { await patchRow(ro.id, { pvProblema: '', atualizadoEm: new Date().toISOString() }); toast('Problema resolvido: ' + ro.nome, 'Desfazer', function(){ desfazer(ro.id, ao); }); } catch(err){ toast(errMsg(err)); } return; }
     var bp = e.target.closest && e.target.closest('[data-pv-prob],[data-pv-perda],[data-pv-volta]'); if (!bp) return;
     e.stopPropagation();
     var r = acharRow(bp.dataset.pvProb || bp.dataset.pvPerda || bp.dataset.pvVolta); if (!r) return;
@@ -5306,7 +5313,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
       p = { arquivado: false, arquivadoEm: '', motivoArquivo: '', perdaEtapa: '', perdaPor: '', atualizadoEm: ag }; msg = r.nome + ' voltou para ' + (r.perdaEtapa === 'fila' ? 'a Fila de protocolo' : 'o Pós-venda');
     }
     var antes = antesDe(r, p);
-    try { await patchRow(r.id, p); toast(msg, 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); }); } catch(err){ toast(errMsg(err)); }
+    try { await patchRow(r.id, p); toast(msg, 'Desfazer', function(){ desfazer(r.id, antes); }); } catch(err){ toast(errMsg(err)); }
   }, true);
   function filaInfo(r){
     var et = filaEtapaDe(r), d = diasParado(r), st = [];
@@ -5356,7 +5363,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     else if (acao === 'redigir'){ p.filaEtapa = 'redigindo'; msg = 'Redigindo requerimento'; }
     else if (acao === 'enviar'){ p.filaPor = ''; p.filaEtapa = 'protocolar'; msg = 'Pronta para protocolar'; }
     else if (acao === 'voltar'){ p.filaEtapa = destino || FILA_ORDEM[Math.max(0, FILA_ORDEM.indexOf(et) - 1)]; if (p.filaEtapa === 'conferir') p.pvAnalise = 'em_analise'; msg = 'Voltou para a conferência'; }
-    try { await patchRow(id, p); toast(msg + ': ' + r.nome, 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); }); } catch(err){ toast(errMsg(err)); }
+    try { await patchRow(id, p); toast(msg + ': ' + r.nome, 'Desfazer', function(){ desfazer(id, antes); }); } catch(err){ toast(errMsg(err)); }
   }
   async function encaminharAnalise(id){
     var r = acharRow(id); if (!r) return;
@@ -5366,17 +5373,18 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     if (gpsVencida(r) && !window.confirm('A GPS de ' + (r.nome || 'a cliente') + ' venceu em ' + fmtDate(gpsVencida(r)) + ' e não está marcada como paga.\n\nEncaminhar mesmo assim?')) return;
     if (faltam.length){
       if (!window.confirm('A pasta está INCOMPLETA (faltam: ' + faltam.map(function(x){ return x.n; }).join(', ') + ').\n\nFechar a pasta incompleta gera penalidade de 50% para o Pós-venda (' + meuNome() + ').\n\nEncaminhar mesmo assim?')) return;
-      p.penalidades = (Array.isArray(r.penalidades) ? r.penalidades : []).concat([{ tipo: 'pasta_incompleta', percentual: 50, pos: meuNome(), email: meuEmail(), faltavam: faltam.map(function(x){ return x.n; }), em: ag }]);
+      var rf = await lerFresca(id) || r;   // a lista de penalidades parte da versão do banco
+      p.penalidades = (Array.isArray(rf.penalidades) ? rf.penalidades : []).concat([{ tipo: 'pasta_incompleta', percentual: 50, pos: meuNome(), email: meuEmail(), faltavam: faltam.map(function(x){ return x.n; }), em: ag }]);
     }
     var antes = antesDe(r, p);
-    try { await patchRow(id, p); toast(r.nome + (novo ? ' foi para a Fila de protocolo' : ' foi para a análise da Controladoria'), 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); }); } catch(err){ toast(errMsg(err)); }
+    try { await patchRow(id, p); toast(r.nome + (novo ? ' foi para a Fila de protocolo' : ' foi para a análise da Controladoria'), 'Desfazer', function(){ desfazer(id, antes); }); } catch(err){ toast(errMsg(err)); }
   }
   async function receberCertidao(id){
     var r = acharRow(id); if (!r) return;
     var ag = new Date().toISOString(), p = { certidaoRecebida: true, certidaoEm: iso(new Date()), posEtapa: 'ok', posMudouEm: ag, posResp: respMantido(r).posResp, posRespEmail: respMantido(r).posRespEmail, atualizadoEm: ag };
     var gravar = async function(){
       var antes = { certidaoRecebida: !!r.certidaoRecebida, certidaoEm: r.certidaoEm || '', posEtapa: r.posEtapa || '', posMudouEm: r.posMudouEm || '', criancaNasc: r.criancaNasc || '', fatoGerador: r.fatoGerador || '' };
-      await patchRow(id, p); toast('Certidão recebida: ' + r.nome + (doFluxoNovo(r) ? ' está pronta para o requerimento' : ' foi para Documentação OK'), 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
+      await patchRow(id, p); toast('Certidão recebida: ' + r.nome + (doFluxoNovo(r) ? ' está pronta para o requerimento' : ' foi para Documentação OK'), 'Desfazer', function(){ desfazer(id, antes); });
     };
     if (!r.criancaNasc && doFluxoNovo(r)){
       var hoje = iso(new Date()), prev = String(r.dpp || '').slice(0, 10);
@@ -5419,7 +5427,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
       var pv = { pvAnalise: '', filaEtapa: '', analiseMotivo: '', contratoEm: '', leadStatus: 'novo', posEtapa: '', posMudouEm: '', encaminhadoEm: '', filaMudouEm: '', filaPor: '', propostaAceita: false, propostaObs: '', contratoPor: '', contratoPorEmail: '', certidaoRecebida: false, contatoPrazoEm: '', tentativas: 0, leadMudouEm: ag, voltouAoCadastroEm: ag, atualizadoEm: ag };
       antes = antesDe(r, pv);
       await patchRow(id, pv);
-      toast((r.nome || 'Cliente') + ' voltou para o Cadastro', 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
+      toast((r.nome || 'Cliente') + ' voltou para o Cadastro', 'Desfazer', function(){ desfazer(id, antes); });
     } catch(err){ toast(errMsg(err)); render(); }
   }
   async function moverPos(id, etapa){
@@ -5432,7 +5440,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     try {
       await patchRow(id, mudanca);
       var nome = posNome(r, POS_COLS.filter(function(c){ return c[0] === etapa; })[0] || [0, etapa]);
-      toast(r.nome + ': ' + nome, 'Desfazer', function(){ patchRow(id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
+      toast(r.nome + ': ' + nome, 'Desfazer', function(){ desfazer(id, antes); });
     } catch(err){ toast(errMsg(err)); render(); }
   }
   document.addEventListener('change', function(e){ var s = e.target.closest && e.target.closest('select[data-pos]'); if (s) moverPos(s.dataset.pos, s.value); });
@@ -5460,7 +5468,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     $('desq-count').textContent = plural(lista.length, 'cliente', 'clientes');
     pintarLista(box, '<table class="kb-tab"><colgroup><col style="width:24%"><col style="width:132px"><col style="width:112px"><col style="width:92px"><col><col style="width:128px"></colgroup>' +
       '<thead><tr><th>Cliente</th><th>Telefone</th><th>Tipo</th><th>Data</th><th>Motivo</th><th></th></tr></thead><tbody>' +
-      (lista.slice(0, 300).map(function(r){
+      (lista.slice(0, limiteDe(box)).map(function(r){
         var id = esc(r.id), d = dataPerda(r), m = desqMotivo(r);
         return '<tr data-linha="' + id + '"><td class="nome"><button type="button" class="nome-abrir" data-act="abrir" data-id="' + id + '">' + esc(r.nome || 'Sem nome') + '</button>' + (r.cpf ? '<small>CPF ' + esc(r.cpf) + '</small>' : '') + '</td>' +
           '<td><div class="kb-tel">' + contatoCloser(r) + '</div></td>' +
@@ -5469,7 +5477,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
           '<td><div class="desq-motivo" title="' + esc(m) + '">' + (m ? esc(m) : '<small>Sem motivo registrado</small>') + '</div></td>' +
           '<td><div class="cad-acoes">' + (podeReativar(r) ? '<button type="button" class="btn" data-act="reativar" data-id="' + id + '" title="Volta para o Cadastro como novo lead">Reativar</button>' : r.perdaEtapa ? '<button type="button" class="btn" data-pv-volta="' + id + '" title="Desfaz a perda: volta para onde estava">Desfazer perda</button>' : '') +
           '<button type="button" class="ico-btn" data-act="edit" data-id="' + id + '" title="Editar cadastro" aria-label="Editar ' + esc(r.nome) + '"><svg class="i"><use href="#i-pencil"/></svg></button></div></td></tr>';
-      }).join('') || '<tr><td colspan="6" class="empty">' + (todos.length ? 'Nenhuma cliente neste filtro.' : 'Ninguém por aqui até agora. Quem for desqualificado ou perdido no Cadastro aparece nesta página.') + '</td></tr>') + '</tbody></table>');
+      }).join('') || '<tr><td colspan="6" class="empty">' + (todos.length ? 'Nenhuma cliente neste filtro.' : 'Ninguém por aqui até agora. Quem for desqualificado ou perdido no Cadastro aparece nesta página.') + '</td></tr>') + linhaMais(box, lista.length, 6) + '</tbody></table>');
   }
   $('desq-q').addEventListener('input', function(){ desqQ = this.value.trim(); renderDesq(); });
   filtroCards($('desq-stats'), 'data-desq-filtro', function(v){ desqTipo = desqTipo === v ? '' : v; }, renderDesq);
@@ -5489,7 +5497,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     try {
       var ag = new Date().toISOString();
       await patchRow(r.id, { leadStatus: 'novo', desqualMotivo: '', desqualEm: '', tentativas: 0, arquivado: false, arquivadoEm: '', leadMudouEm: ag, atualizadoEm: ag });
-      toast('Reativado: ' + r.nome + ' voltou ao Cadastro', 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
+      toast('Reativado: ' + r.nome + ' voltou ao Cadastro', 'Desfazer', function(){ desfazer(r.id, antes); });
     } catch(err){ toast(errMsg(err)); }
   });
   function pedeRequerer(r){ var d = parseDate(r.dpp); if (!d) return null; d.setDate(d.getDate() - 28); return iso(d); }
@@ -5525,7 +5533,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     var antes = { tipoSegurada: r.tipoSegurada || '', atividade: r.atividade || '' };
     s.disabled = true;
     patchRow(r.id, Object.assign(ativPatch(v, r), { atualizadoEm: new Date().toISOString() })).then(function(){
-      toast((v === 'nenhuma' ? 'Nenhuma das três (paga a GPS): ' : ativPatch(v).atividade + ' (sem GPS): ') + r.nome, 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
+      toast((v === 'nenhuma' ? 'Nenhuma das três (paga a GPS): ' : ativPatch(v).atividade + ' (sem GPS): ') + r.nome, 'Desfazer', function(){ desfazer(r.id, antes); });
     }, function(err){ s.disabled = false; s.value = ''; toast(errMsg(err)); });
   });
   // o closer marca na lista do Cadastro se o salário-maternidade é rural ou urbano
@@ -5536,7 +5544,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     var antes = { tipoSegurada: r.tipoSegurada || '' };
     Array.prototype.forEach.call(s.parentNode.querySelectorAll('[data-tipo-set]'), function(x){ x.setAttribute('aria-pressed', String(x === s)); }); s.parentNode.classList.remove('sem');
     patchRow(r.id, { tipoSegurada: v, atualizadoEm: new Date().toISOString() }).then(function(){
-      toast((v === 'especial' ? 'Rural (segurada especial, prova rural): ' : v ? 'Urbano (paga a GPS): ' : 'Sem rural/urbano: ') + r.nome, 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
+      toast((v === 'especial' ? 'Rural (segurada especial, prova rural): ' : v ? 'Urbano (paga a GPS): ' : 'Sem rural/urbano: ') + r.nome, 'Desfazer', function(){ desfazer(r.id, antes); });
     }, function(err){ toast(errMsg(err)); });
   });
   document.addEventListener('change', async function(e){
@@ -5547,13 +5555,13 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
         var antesG = { guiaStatus: r.guiaStatus || '', guiaPagaEm: r.guiaPagaEm || '' };
         var paga = sl.value === 'paga';
         await patchRow(r.id, { guiaStatus: sl.value, guiaPagaEm: paga ? iso(new Date()) : '', atualizadoEm: new Date().toISOString() });
-        toast((paga ? 'Guia paga: ' : 'Guia aguardando pagamento: ') + r.nome, 'Desfazer', function(){ patchRow(r.id, antesG).catch(function(e2){ toast(errMsg(e2)); }); });
+        toast((paga ? 'Guia paga: ' : 'Guia aguardando pagamento: ') + r.nome, 'Desfazer', function(){ desfazer(r.id, antesG); });
         return;
       }
       if (sl.dataset.ctr){
         var antesC = { ctrEtapa: r.ctrEtapa || '' };
         await patchRow(r.id, { ctrEtapa: sl.value, atualizadoEm: new Date().toISOString() });
-        toast(CTR_ETAPAS[sl.value][0] + ': ' + r.nome, 'Desfazer', function(){ patchRow(r.id, antesC).catch(function(e2){ toast(errMsg(e2)); }); });
+        toast(CTR_ETAPAS[sl.value][0] + ': ' + r.nome, 'Desfazer', function(){ desfazer(r.id, antesC); });
       } else {
         await mudarLead(r, sl.value);
       }
@@ -5580,7 +5588,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     if (valor === 'perdido'){ p.arquivado = true; p.arquivadoEm = iso(new Date()); }
     var antesL = Object.assign(antesL0, antesDe(r, p));
     await patchRow(r.id, p);
-    toast(LEAD[valor] + ': ' + r.nome + (valor === 'desqualificado' ? ' · ' + p.desqualMotivo : '') + (valor === 'perdido' ? ' (foi para Perdas e desqualificados)' : ''), 'Desfazer', function(){ patchRow(r.id, antesL).catch(function(e2){ toast(errMsg(e2)); }); });
+    toast(LEAD[valor] + ': ' + r.nome + (valor === 'desqualificado' ? ' · ' + p.desqualMotivo : '') + (valor === 'perdido' ? ' (foi para Perdas e desqualificados)' : ''), 'Desfazer', function(){ desfazer(r.id, antesL); });
   }
   $('cad-list').addEventListener('click', async function(e){
     var b = e.target.closest('[data-act="fechar"]'); if (!b) return;
@@ -5632,7 +5640,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
         antes = antesDe(r, pf);
         await patchRow(r.id, pf);
         f.remove();
-        toast('Contrato fechado por ' + atendente + ': ' + r.nome + ' · foi para o Pós-venda', 'Desfazer', function(){ patchRow(r.id, antes).catch(function(e2){ toast(errMsg(e2)); }); });
+        toast('Contrato fechado por ' + atendente + ': ' + r.nome + ' · foi para o Pós-venda', 'Desfazer', function(){ desfazer(r.id, antes); });
       } catch(err){ this.disabled = false; toast(errMsg(err)); }
     };
   }
@@ -6023,7 +6031,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   document.addEventListener('click', function(e){
     var p = e.target.closest && e.target.closest('#rel-per button[data-p]'); if (p){ relPer = p.dataset.p; renderRelatorio(); return; }
     var m = e.target.closest && e.target.closest('[data-minhas]'); if (m){ soMinhas = !soMinhas; Array.prototype.forEach.call(document.querySelectorAll('[data-minhas]'), function(b){ b.setAttribute('aria-pressed', String(soMinhas)); b.classList.toggle('primary', soMinhas); }); render(); return; }
-    var g = e.target.closest && e.target.closest('[data-guia-paga]'); if (g){ e.stopPropagation(); var rg = acharRow(g.dataset.guiaPaga); if (!rg) return; var ga = iso(new Date()), etg = posEtapaDe(rg), anda = POS_ORDEM.indexOf(etg) < POS_ORDEM.indexOf('nasc'), pg = { guiaStatus: 'paga', guiaPagaEm: ga, posResp: respMantido(rg).posResp, posRespEmail: respMantido(rg).posRespEmail, atualizadoEm: new Date().toISOString() }; if (anda){ pg.posEtapa = 'nasc'; pg.posMudouEm = new Date().toISOString(); } var antesG = antesDe(rg, pg); patchRow(rg.id, pg).then(function(){ toast('GPS paga: ' + rg.nome + (anda ? ' foi para Aguardando Nascimento' : ''), 'Desfazer', function(){ patchRow(rg.id, antesG).catch(function(e3){ toast(errMsg(e3)); }); }); }).catch(function(e2){ toast(errMsg(e2)); }); return; }
+    var g = e.target.closest && e.target.closest('[data-guia-paga]'); if (g){ e.stopPropagation(); var rg = acharRow(g.dataset.guiaPaga); if (!rg) return; var ga = iso(new Date()), etg = posEtapaDe(rg), anda = POS_ORDEM.indexOf(etg) < POS_ORDEM.indexOf('nasc'), pg = { guiaStatus: 'paga', guiaPagaEm: ga, posResp: respMantido(rg).posResp, posRespEmail: respMantido(rg).posRespEmail, atualizadoEm: new Date().toISOString() }; if (anda){ pg.posEtapa = 'nasc'; pg.posMudouEm = new Date().toISOString(); } var antesG = antesDe(rg, pg); patchRow(rg.id, pg).then(function(){ toast('GPS paga: ' + rg.nome + (anda ? ' foi para Aguardando Nascimento' : ''), 'Desfazer', function(){ desfazer(rg.id, antesG); }); }).catch(function(e2){ toast(errMsg(e2)); }); return; }
     if (e.target.closest && e.target.closest('#btn-avisos')) abrirAvisos();
   }, true);
   /* ---------- peças do quadro (as mesmas da aba Processos do BI de Vendas) ---------- */
@@ -6150,6 +6158,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     } catch(err){ bt.disabled = false; bt.textContent = 'Salvar'; erro(errMsg(err)); }
   }
   async function pvDoc(r, k, marcar){
+    r = await lerFresca(r.id) || r;   // parte da versão do banco: o que o app mandou nesse meio-tempo não se perde
     var lista = Array.isArray(r.campoDocs) ? r.campoDocs.slice() : docsApp(r).filter(function(x){ return x.ok && x.k !== 'senha' && x.k !== 'nit'; }).map(function(x){ return x.k; });
     var falta = faltaDocs(r).filter(function(x){ return x !== k; });
     if (marcar){ if (lista.indexOf(k) < 0) lista.push(k); }
@@ -6191,7 +6200,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     var cols = '<col class="pv-w-cli">' + PV_COLS.map(function(){ return '<col class="pv-w-doc">'; }).join('') + '<col class="pv-w-rel"><col class="pv-w-rel"><col class="pv-w-resp"><col class="pv-w-ed">';
     var cab = '<thead><tr><th>Cliente</th>' + PV_COLS.map(function(c){ return '<th class="pv-c">' + esc(c[1]) + '</th>'; }).join('') + '<th>Nascimento</th><th>Pagamento da GPS</th><th>Responsável</th><th></th></tr></thead>';
     pintarLista(box, '<table class="kb-tab kb-lista pv-plan"><colgroup>' + cols + '</colgroup>' + cab + '<tbody>' +
-      (lista.slice(0, 300).map(function(r){
+      (lista.slice(0, limiteDe(box)).map(function(r){
         var id = esc(r.id);
         var sub = !r.tipoSegurada ? '<small class="verm">Pescadora, agricultora ou indígena? Informar na ficha</small>'
           : !zapUrl(foneDe(r)) ? '<small class="verm">Sem telefone</small>'
@@ -6202,10 +6211,10 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
           '<td class="tnum pv-rel">' + pvNasc(r) + '</td><td class="tnum pv-rel">' + pvGps(r) + '</td>' +
           '<td class="pv-resp">' + esc(primeiroNome(r.posResp) || '—') + '</td>' +
           '<td><div class="cad-acoes">' + editBtn(r) + '</div></td></tr>';
-      }).join('') || '<tr><td colspan="' + nc + '" class="empty">Nenhuma cliente neste filtro.</td></tr>') + '</tbody></table>');
+      }).join('') || '<tr><td colspan="' + nc + '" class="empty">Nenhuma cliente neste filtro.</td></tr>') + linhaMais(box, lista.length, nc) + '</tbody></table>');
   }
   function tabelaFase(box, lista, info, dataRot, vazio){
-    var lis = lista.slice(0, 300), infos = lis.map(function(r){ return info(r); });
+    var lis = lista.slice(0, limiteDe(box)), infos = lis.map(function(r){ return info(r); });
     // fluxo novo: colunas mais justas; sem botão em nenhuma linha, a última coluna fica só com o lápis e o nome ganha o espaço
     var cols = fluxoVista === 'novo' ? [170, 160, 100, 70, infos.some(function(i){ return i && i.acao; }) ? 200 : 44] : [200, 140, 120, 84, 230];
     pintarLista(box, '<table class="kb-tab kb-lista"><colgroup><col>' + cols.map(function(w){ return '<col style="width:' + w + 'px">'; }).join('') + '</colgroup>' +
@@ -6217,7 +6226,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
           '<td>' + (i.etapaSel || esc(i.etapa || '')) + '</td><td class="tnum">' + (i.dataVal || '—') + '</td><td>' + esc(primeiroNome(i.resp) || '—') + '</td>' +
           '<td class="tnum' + (i.parado ? ' parado' : '') + '">' + (i.dias != null ? i.dias + ' d' : '—') + '</td>' +
           '<td><div class="cad-acoes">' + (i.acao || '') + editBtn(r) + '</div></td></tr>';
-      }).join('') || '<tr><td colspan="6" class="empty">' + vazio + '</td></tr>') + '</tbody></table>');
+      }).join('') || '<tr><td colspan="6" class="empty">' + vazio + '</td></tr>') + linhaMais(box, lista.length, 6) + '</tbody></table>');
   }
   function kbColuna(quadro, col, i, cartoes, vazio){
     var cor = col[2] === 'ok' ? 'hsl(var(--c-green)/.85)' : col[2] === 'prob' ? 'hsl(var(--c-red)/.85)' : 'hsl(var(--kb-' + ((i % 5) + 1) + ')/.85)';
@@ -6225,6 +6234,11 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
       '<div class="kb-corpo">' + (cartoes.slice(0, 120).join('') || '<p class="kb-vazio">' + esc(vazio || 'Nenhuma cliente') + '</p>') + (cartoes.length > 120 ? '<p class="kb-mais">+' + (cartoes.length - 120) + ' não mostradas</p>' : '') + '</div></section>';
   }
   function pintarQuadro(box, quadro, colunas){ box.classList.add('kb-quadro'); box.classList.remove('card'); box.innerHTML = '<div class="kb-colunas">' + colunas.map(function(c, i){ return kbColuna(quadro, c.col, i, c.cartoes, c.vazio); }).join('') + '</div>'; }
+  // listas longas: 300 linhas por vez e, no fim, Mostrar mais (antes as outras sumiam sem aviso)
+  var LISTA_PASSO = 300, listaLimite = {};
+  function limiteDe(box){ return listaLimite[box && box.id] || LISTA_PASSO; }
+  function linhaMais(box, total, colunas){ var n = limiteDe(box); return total > n ? '<tr><td colspan="' + colunas + '" class="empty"><button type="button" class="btn" data-lista-mais="' + esc(box.id) + '">Mostrar mais ' + Math.min(LISTA_PASSO, total - n) + '</button> <span class="small">' + n + ' de ' + total + ' na tela</span></td></tr>' : ''; }
+  document.addEventListener('click', function(e){ var b = e.target.closest && e.target.closest('[data-lista-mais]'); if (!b) return; e.stopPropagation(); listaLimite[b.dataset.listaMais] = limiteDe({ id: b.dataset.listaMais }) + LISTA_PASSO; render(); });
   function pintarLista(box, html){ box.classList.remove('kb-quadro'); box.classList.add('card'); box.style.height = ''; box.innerHTML = html; }
   function kbInfo(pref, tela, n, um, muitos){
     var el = $(pref + '-info'); if (!el) return;
@@ -6500,7 +6514,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     var valG = function(r){ return Number(r.gpsValor) > 0 ? Number(r.gpsValor) : gpsValor(); };
     var pagas = rows.filter(function(r){ return no(r.guiaPagaEm); }), G = pagas.reduce(function(a, r){ return a + valG(r); }, 0);
     var pagasA = rows.filter(function(r){ return noAnt(r.guiaPagaEm); }).reduce(function(a, r){ return a + valG(r); }, 0);
-    var agora = rows.filter(gpsTarefa), prox = rows.filter(function(r){ return noContratos(r) && !!r.tipoSegurada && !rural(r) && !nascido(r) && !gpsPaga(r) && !gpsTarefa(r) && prazoGps(r); });
+    var agora = rows.filter(gpsTarefa), prox = rows.filter(function(r){ return noContratos(r) && !ctPend(r) && !!r.tipoSegurada && !rural(r) && !nascido(r) && !gpsPaga(r) && !gpsTarefa(r) && prazoGps(r); });
     var com = comLinhas(), pagos = com.filter(function(x){ return x.pago && no(x.pago.pagoEm); }), R = pagos.reduce(function(a, x){ return a + (Number(x.pago.valor) || x.valor); }, 0);
     var RA = com.filter(function(x){ return x.pago && noAnt(x.pago.pagoEm); }).reduce(function(a, x){ return a + (Number(x.pago.valor) || x.valor); }, 0);
     var pend = com.filter(function(x){ return !x.pago; }), P = pend.reduce(function(a, x){ return a + x.valor; }, 0);
@@ -6928,15 +6942,20 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     var k = String(u.email).toLowerCase(); cargaPos[k] = (cargaPos[k] || 0) + 1;
     return u;
   }
-  function vaiProPos(r){ return doFluxoNovo(r) && !r.contratoEm && !r.arquivado && r.leadStatus !== 'desqualificado' && !String(r.processo || '').trim() && !requerido(r); }
+  // contrato ainda sem assinatura: só ganha o responsável (uma vez); contrato assinado (ou sem ZapSign): vira contrato fechado
+  function vaiProPos(r){ return doFluxoNovo(r) && !r.contratoEm && !r.arquivado && r.leadStatus !== 'desqualificado' && !String(r.processo || '').trim() && !requerido(r) && !(ctPend(r) && r.posRespEmail); }
   function levarFluxoNovo(){
     (state.todas || state.rows || []).forEach(function(r){
-      if (levadasPos[r.id] || !vaiProPos(r)) return;
-      levadasPos[r.id] = true;
-      filaLevar = filaLevar.then(function(){
-        var x = acharNaBase(r.id); if (!x || !vaiProPos(x)) return;
-        var u = respPosNovo();
-        return patchRow(x.id, { fluxo: 'novo', contratoEm: diaCadastro(x) || iso(new Date()), leadStatus: 'fechado', contratoPor: 'Aplicativo (fluxo novo)', contratoPorEmail: '', propostaAceita: true, posResp: u ? u.nome || u.email : '', posRespEmail: u ? u.email : '', posEtapa: '', posMudouEm: '', contatoPrazoEm: '', atualizadoEm: new Date().toISOString() });
+      var chave = r.id + (ctPend(r) ? ':pendente' : ':assinado');   // quando a mãe assina, ela volta a ser levada (agora para fechar o contrato)
+      if (levadasPos[chave] || !vaiProPos(r)) return;
+      levadasPos[chave] = true;
+      filaLevar = filaLevar.then(async function(){
+        // relê a mãe no banco logo antes de gravar: com vários BIs abertos, só o primeiro grava (os outros veem que já foi feito e não trocam o responsável)
+        var x = await lerFresca(r.id); if (!x || !vaiProPos(x)) return;
+        var ag = new Date().toISOString(), p = { atualizadoEm: ag };
+        if (!x.posRespEmail){ var u = respPosNovo(); p.posResp = u ? u.nome || u.email : ''; p.posRespEmail = u ? u.email : ''; p.posEtapa = ''; p.posMudouEm = ''; p.contatoPrazoEm = ''; }
+        if (!ctPend(x)) Object.assign(p, { fluxo: 'novo', contratoEm: ctAssinadoEm(x) || diaCadastro(x) || iso(new Date()), leadStatus: 'fechado', contratoPor: 'Aplicativo (fluxo novo)', contratoPorEmail: '', propostaAceita: true, contatoPrazoEm: '' });
+        return patchRow(x.id, p);
       }).catch(function(){});
     });
   }
@@ -7129,6 +7148,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   function aptaGps(r){ return !rural(r) && !semGps(r) && !nascido(r) && !gpsPaga(r) && !ctPend(r) && nitOk(r.nit) && ['senha', 'docs', 'prazo_gps', 'gps'].indexOf(posEtapaDe(r)) >= 0; }
   function faseNovoPos(r){
     if (!r.tipoSegurada) return 'k';            // o escritório decide rural ou urbano antes de qualquer guia
+    if (ctPend(r)) return 'k';                  // contrato do ZapSign sem assinatura: a guia não sai; fica no Pós-venda com a pendência Contrato (o prazo da GPS aparece na linha)
     if (gpsTarefa(r) && nitOk(r.nit)) return 'gp';   // prazo da GPS chegou e tem NIT: o pagamento automático segue mesmo com outra pendência (aparece na linha)
     if (aptaGps(r)) return 'gp';                // já pode pagar a guia (tem NIT): fica na GPS mesmo faltando senha ou documento (pedido de 11/11/2026)
     if (faltamTxt(r)) return 'k';               // senha gov.br, documento, NIT ou prova rural faltando: Pós-venda resolve
@@ -7436,17 +7456,24 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     var sel = e.target.closest && e.target.closest('select[data-pos]'); if (!sel) return;
     var r = state.rows.filter(function(x){ return x.id === sel.dataset.id; })[0]; if (!r) return;
     var campo = sel.dataset.pos, antes = r[campo] || '', novo = {}; novo[campo] = sel.value; novo.atualizadoEm = new Date().toISOString();
-    try { await patchRow(r.id, novo); toast((campo === 'embargos' ? (sel.value ? 'Recurso do INSS registrado: ' : 'Sem recurso: ') : 'Pagamento: ' + (PAG[sel.value] ? PAG[sel.value][0] : 'sem informação') + ' · ') + (r.nome || ''), 'Desfazer', function(){ var v = {}; v[campo] = antes; patchRow(r.id, v).catch(function(e3){ toast(errMsg(e3)); }); }); }
+    try { await patchRow(r.id, novo); toast((campo === 'embargos' ? (sel.value ? 'Recurso do INSS registrado: ' : 'Sem recurso: ') : 'Pagamento: ' + (PAG[sel.value] ? PAG[sel.value][0] : 'sem informação') + ' · ') + (r.nome || ''), 'Desfazer', function(){ var v = {}; v[campo] = antes; desfazer(r.id, v); }); }
     catch(err){ sel.value = antes; toast(errMsg(err)); }
   });
   document.addEventListener('click', function(e){ if (e.target.closest && e.target.closest('select[data-pos]')) e.stopPropagation(); }, true);
 
   /* ---------- financeiro ---------- */
-  var SALARIO_MINIMO = 1621;  // salário mínimo do ano (R$): troque quando mudar
+  // salário mínimo de cada ano (R$). Em janeiro, acrescente o ano novo aqui: sem ele, a GPS de competência daquele ano não é gerada
+  var SALARIOS_MINIMOS = { 2026: 1621 };
+  function salarioMinimo(ano){ return SALARIOS_MINIMOS[ano] || null; }
+  function ultimoAnoSalario(){ return Math.max.apply(null, Object.keys(SALARIOS_MINIMOS).map(Number)); }
+  // estimativas (benefício padrão, previsões do Dashboard): o do ano atual ou, sem ele, o último cadastrado
+  var SALARIO_MINIMO = salarioMinimo(new Date().getFullYear()) || SALARIOS_MINIMOS[ultimoAnoSalario()];
   var MESES_BENEFICIO = 4;    // 120 dias de salário-maternidade
   // GPS da gestante: segurada facultativa, plano simplificado (código 1473, 11% do salário mínimo)
   var GPS_CODIGO = '1473', GPS_ALIQUOTA = 0.11, GPS_SAL = 'https://sal.rfb.gov.br/calculo-contribuicao/contribuintes-2';
-  function gpsValor(){ return Math.round(SALARIO_MINIMO * GPS_ALIQUOTA * 100) / 100; }
+  // valor da GPS: 11% do salário mínimo do ano da competência (aaaa-mm). Sem competência: estimativa com o salário atual. Ano sem salário cadastrado: null
+  function gpsValor(comp){ var sm = comp ? salarioMinimo(+String(comp).slice(0, 4)) : SALARIO_MINIMO; return sm ? Math.round(sm * GPS_ALIQUOTA * 100) / 100 : null; }
+  function gpsSemSalario(r){ var a = String(gpsCompetencia(r)).slice(0, 4); return salarioMinimo(+a) ? '' : 'Salário mínimo de ' + a + ' não cadastrado: a guia não é gerada'; }
   function gpsCompetencia(r){ return r.gpsCompetencia || iso(new Date()).slice(0, 7); }   // aaaa-mm; padrão: o mês em que a guia é emitida
   function compTxt(c){ return c ? c.slice(5, 7) + '/' + c.slice(0, 4) : ''; }
   // NIT/PIS: 11 números com dígito verificador (pesos 3,2,9,8,7,6,5,4,3,2)
@@ -7468,13 +7495,30 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   function gpsDv(s){ var soma = 0, p = 2; for (var i = s.length - 1; i >= 0; i--){ soma += +s[i] * p; p = p === 9 ? 2 : p + 1; } var r = soma % 11; return r === 0 || r === 1 ? 0 : 11 - r; }
   // quem trabalha por conta própria (qualificação do app) recolhe como contribuinte individual: código 1163, os mesmos 11%
   function gpsCodigoDe(r){ return r && r.qualificacao && r.qualificacao.caminho === 'guia_individual' ? '1163' : GPS_CODIGO; }
+  // dias sem expediente bancário no país: feriados nacionais, Carnaval (segunda e terça), Sexta-feira Santa e Corpus Christi.
+  // Feriado só do estado ou da cidade não entra (a guia é paga pelo sistema bancário nacional).
+  function pascoa(a){
+    var b = a % 19, c = Math.floor(a / 100), d = a % 100, e = Math.floor(c / 4), f = c % 4, g = Math.floor((c + 8) / 25), h = Math.floor((c - g + 1) / 3);
+    var i = (19 * b + c - e - h + 15) % 30, k = Math.floor(d / 4), l = d % 4, m = (32 + 2 * f + 2 * k - i - l) % 7, n = Math.floor((b + 11 * i + 22 * m) / 451);
+    return new Date(a, Math.floor((i + m - 7 * n + 114) / 31) - 1, ((i + m - 7 * n + 114) % 31) + 1, 12);
+  }
+  var feriadosAno = {};
+  function feriadosBancarios(a){
+    if (feriadosAno[a]) return feriadosAno[a];
+    var p = pascoa(a), soma = function(n){ var d = new Date(p.getTime()); d.setDate(d.getDate() + n); return iso(d); };
+    return (feriadosAno[a] = ['01-01', '04-21', '05-01', '09-07', '10-12', '11-02', '11-15', '11-20', '12-25'].map(function(x){ return a + '-' + x; })
+      .concat([soma(-48), soma(-47), soma(-2), soma(60)]));   // Carnaval (segunda e terça), Sexta-feira Santa e Corpus Christi
+  }
+  function diaUtilBancario(d){ var s = d.getDay(); return s !== 0 && s !== 6 && feriadosBancarios(d.getFullYear()).indexOf(iso(d)) < 0; }
+  function proximoDiaUtil(d){ var x = new Date(d.getTime()); while (!diaUtilBancario(x)) x.setDate(x.getDate() + 1); return x; }
   function gpsGerar(r){
     if (!nitOk(r.nit)) return null;
-    var comp = gpsCompetencia(r), valor = gpsValor();
+    var comp = gpsCompetencia(r), valor = gpsValor(comp);
+    if (valor == null) return null;   // ano da competência sem salário mínimo cadastrado (SALARIOS_MINIMOS): a guia não sai com valor errado
     var sem = '858' + String(Math.round(valor * 100)).padStart(11, '0') + '0270' + gpsCodigoDe(r) + digits(r.nit).padStart(14, '0') + comp.replace('-', '') + '3';
     var cod = sem.slice(0, 3) + gpsDv(sem) + sem.slice(3);
     var blocos = [0, 1, 2, 3].map(function(b){ var bl = cod.slice(b * 11, b * 11 + 11); return bl + '-' + gpsDv(bl); });
-    var p = comp.split('-').map(Number), v = new Date(p[0], p[1], 15), ds = v.getDay(); if (ds === 6) v.setDate(17); else if (ds === 0) v.setDate(16);
+    var p = comp.split('-').map(Number), v = proximoDiaUtil(new Date(p[0], p[1], 15, 12));   // dia 15 do mês seguinte; sem expediente bancário, vai para o próximo dia útil
     return { codigo: cod, linha: blocos.join(' '), digitos: blocos.join('').replace(/-/g, ''), valor: valor, competencia: comp, vencimento: iso(v) };
   }
   var FIN_HONORARIOS = 0.3;   // honorários: 30% do benefício + o valor da guia
@@ -8313,7 +8357,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     var guia = !!inp.dataset.guia, r = state.rows.filter(function(x){ return x.id === (inp.dataset.valor || inp.dataset.guia); })[0]; if (!r) return;
     var v = moedaNum(inp.value), campo = guia ? 'valorGuia' : 'valorBeneficio', antes = r[campo] || null, p = { atualizadoEm: new Date().toISOString() };
     p[campo] = guia ? (v || null) : (v === beneficioPadrao() ? null : v);
-    try { await patchRow(r.id, p); toast((guia ? 'Guia de ' : 'Benefício de ') + (r.nome || '') + ': ' + brl(v), 'Desfazer', function(){ var u = {}; u[campo] = antes; patchRow(r.id, u).catch(function(e2){ toast(errMsg(e2)); }); }); }
+    try { await patchRow(r.id, p); toast((guia ? 'Guia de ' : 'Benefício de ') + (r.nome || '') + ': ' + brl(v), 'Desfazer', function(){ var u = {}; u[campo] = antes; desfazer(r.id, u); }); }
     catch(err){ inp.value = moedaTxt(guia ? valorGuia(r) : valorBenef(r)); toast(errMsg(err)); }
   });
 
@@ -8448,14 +8492,14 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     var r0 = state.rows.filter(function(x){ return x.id === sel.dataset.ressel; })[0]; if (!r0) return;
     var antes = { resultado: r0.resultado || '', concluso: !!r0.concluso, comparecimento: r0.comparecimento || '' };
     var k = sel.value;
-    try { await patchRow(r0.id, camposRes(k, r0)); toast((k ? CT_RES.filter(function(x){ return x[0] === k; })[0][1] + ': ' : 'Resultado apagado: ') + (r0.nome || ''), 'Desfazer', function(){ patchRow(r0.id, antes).catch(function(e2){ toast(errMsg(e2)); }); }); }
+    try { await patchRow(r0.id, camposRes(k, r0)); toast((k ? CT_RES.filter(function(x){ return x[0] === k; })[0][1] + ': ' : 'Resultado apagado: ') + (r0.nome || ''), 'Desfazer', function(){ desfazer(r0.id, antes); }); }
     catch(err){ sel.value = resAud(r0); toast(errMsg(err)); }
   });
   document.addEventListener('click', function(e){ if (e.target.closest && e.target.closest('select[data-ressel]')) e.stopPropagation(); }, true);
   async function mudarModo(sel){
     var r = state.rows.filter(function(x){ return x.id === sel.dataset.modo; })[0]; if (!r) return;
     var on = sel.value === 'o'; if (!!r.online === on) return;
-    try { await patchRow(r.id, { online: on, atualizadoEm: new Date().toISOString() }); toast((on ? 'Audiência online: ' : 'Audiência presencial: ') + (r.nome || ''), 'Desfazer', function(){ patchRow(r.id, { online: !on }).catch(function(e3){ toast(errMsg(e3)); }); }); }
+    try { await patchRow(r.id, { online: on, atualizadoEm: new Date().toISOString() }); toast((on ? 'Audiência online: ' : 'Audiência presencial: ') + (r.nome || ''), 'Desfazer', function(){ desfazer(r.id, { online: !on }); }); }
     catch(err){ sel.value = r.online ? 'o' : 'p'; toast(errMsg(err)); }
   }
   document.addEventListener('change', function(e){ var sel = e.target.closest && e.target.closest('select[data-modo]'); if (sel) mudarModo(sel); });
@@ -8467,7 +8511,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     if (md){
       var rm = state.rows.filter(function(x){ return x.id === md.dataset.id; })[0]; if (!rm) return;
       var on = md.dataset.v === 'o'; if (!!rm.online === on) return;
-      try { await patchRow(rm.id, { online: on, atualizadoEm: new Date().toISOString() }); toast((on ? 'Audiência online: ' : 'Audiência presencial: ') + (rm.nome || ''), 'Desfazer', function(){ patchRow(rm.id, { online: !on }).catch(function(e3){ toast(errMsg(e3)); }); }); }
+      try { await patchRow(rm.id, { online: on, atualizadoEm: new Date().toISOString() }); toast((on ? 'Audiência online: ' : 'Audiência presencial: ') + (rm.nome || ''), 'Desfazer', function(){ desfazer(rm.id, { online: !on }); }); }
       catch(err){ toast(errMsg(err)); }
       return;
     }
@@ -8482,7 +8526,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
       var r0 = state.rows.filter(function(x){ return x.id === m.dataset.id; })[0]; if (!r0) return;
       var antes = { resultado: r0.resultado || '', concluso: !!r0.concluso, comparecimento: r0.comparecimento || '' };
       var k = resAud(r0) === m.dataset.res ? '' : m.dataset.res;
-      try { await patchRow(r0.id, camposRes(k, r0)); toast((k ? CT_RES.filter(function(x){ return x[0] === k; })[0][1] + ': ' : 'Resultado apagado: ') + (r0.nome || ''), 'Desfazer', function(){ patchRow(r0.id, antes).catch(function(e2){ toast(errMsg(e2)); }); }); }
+      try { await patchRow(r0.id, camposRes(k, r0)); toast((k ? CT_RES.filter(function(x){ return x[0] === k; })[0][1] + ': ' : 'Resultado apagado: ') + (r0.nome || ''), 'Desfazer', function(){ desfazer(r0.id, antes); }); }
       catch(err){ toast(errMsg(err)); }
       return;
     }
@@ -8521,7 +8565,10 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
 
   /* ---------- data ---------- */
   function col(){ return state.db.collection('clientes'); }
-  async function saveRow(id, data){
+  // mudou: só os campos que a pessoa mudou na ficha. Com ele, grava só esses campos (atualizar_doc junta ao que está no banco),
+  // sem regravar o cadastro inteiro: o que o app, o robô do NIT ou outra pessoa gravou nesse meio-tempo não volta para trás
+  async function saveRow(id, data, mudou){
+    if (state.db && id && mudou){ if (Object.keys(mudou).length) await col().doc(id).update(mudou); return id; }
     if (state.db){ var ref = id ? col().doc(id) : col().doc(); await ref.set(data); return ref.id; }
     var nid = id || 'm' + (++memId);
     var base = state.todas || state.rows;
@@ -8609,10 +8656,37 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     try { var u = await ensureFolder(state.editing, $('f-nome').value.trim()); if (u){ $('f-pasta').innerHTML = '<a class="folder" href="' + esc(u) + '" target="_blank" rel="noopener"><svg class="i"><use href="#i-folder"/></svg>Abrir pasta no Drive</a>'; toast('Pasta criada no Drive'); } }
     catch(err){ toast('Pasta não criada: ' + driveErr(err)); b.disabled = false; b.lastChild.textContent = 'Criar pasta no Drive'; }
   });
+  // o último valor que este BI gravou em cada campo de cada mãe: o Desfazer só volta o que ninguém mudou depois
+  var gravados = {};
   async function patchRow(id, data){
     fixos[id] = true;
     if (state.db){ await col().doc(id).update(data); }
     else { state.todas = (state.todas || state.rows).map(function(r){ return r.id === id ? Object.assign({}, r, data) : r; }); filtrarFluxo(); render(); }
+    var g = gravados[id] || (gravados[id] = {});
+    Object.keys(data).forEach(function(k){ g[k] = data[k] === undefined ? undefined : JSON.parse(JSON.stringify(data[k])); });
+  }
+  // a mãe como está no banco agora, e não a cópia do navegador (que pode estar atrasada): usada antes de gravar listas e no Desfazer
+  async function lerFresca(id){
+    var local = acharNaBase(id);
+    if (!state.db) return local;
+    try { var g = await col().doc(id).get(); return g.exists ? Object.assign({ id: id }, g.data()) : local; } catch(e){ return local; }
+  }
+  // mesmo valor? vazio, null e '' contam como iguais; listas e objetos são comparados pelo conteúdo
+  function mesmoValor(a, b){ var n = function(v){ return v == null || v === '' ? '' : JSON.stringify(v); }; return n(a) === n(b); }
+  // Desfazer: volta só os campos que este BI gravou e que ainda estão como ele deixou; o que outra pessoa (ou um robô) mudou depois fica como está
+  async function desfazer(id, antes){
+    try {
+      var r = await lerFresca(id) || {}, meus = gravados[id] || {}, volta = {}, outros = [];
+      Object.keys(antes).forEach(function(k){
+        if (k === 'atualizadoEm' || !(k in meus)) return;
+        if (mesmoValor(r[k], meus[k])) volta[k] = antes[k]; else outros.push(CAMPOS_HIST[k] || k);
+      });
+      var nome = r.nome || 'a cliente';
+      if (!Object.keys(volta).length){ toast(outros.length ? 'Não foi desfeito: ' + nome + ' foi alterada por outra pessoa depois.' : 'Nada para desfazer: ' + nome); return; }
+      volta.atualizadoEm = new Date().toISOString();
+      await patchRow(id, volta);
+      toast(outros.length ? 'Desfeito em parte (' + nome + '): ' + outros.join(', ') + ' foi alterado por outra pessoa depois e ficou como está.' : 'Desfeito: ' + nome);
+    } catch(e){ toast(errMsg(e)); }
   }
   // qualquer nome (do aplicativo, em CAIXA ALTA ou digitado de qualquer jeito) fica no padrão: "Eliel dos Santos"
   function nomeProprio(n){
@@ -8943,13 +9017,16 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     var pastaCol = $('f-pasta-url') ? $('f-pasta-url').value.trim() : '';
     if (pastaCol){ var pm = pastaCol.match(/folders\/([A-Za-z0-9_-]+)/); data.pastaUrl = pastaCol; data.pastaId = pm ? pm[1] : ''; }
     delete data.id;
-    if (!state.editing && fluxoVista === 'novo') data.fluxo = 'novo';   // Novo cadastro feito no Fluxo novo: sem closer, vai direto ao Pós-venda
+    if (!state.editing && fluxoVista === 'novo') data.fluxo = 'novo';
+    // na edição, vai para o banco só o que é diferente do cadastro atual
+    var mudou = null;
+    if (state.editing){ mudou = {}; Object.keys(data).forEach(function(k){ if (!mesmoValor(data[k], prev[k])) mudou[k] = data[k]; }); }   // Novo cadastro feito no Fluxo novo: sem closer, vai direto ao Pós-venda
     $('f-save').disabled = true;
     try {
       var isNew = !state.editing;
       var noCadastro = $('form').parentElement === $('cad-box');
       var senhaGov = fluxoVista === 'novo' ? $('f-senha').value.trim() : '';
-      var newId = await saveRow(state.editing, data); if (dlg.open) dlg.close();
+      var newId = await saveRow(state.editing, data, mudou); if (dlg.open) dlg.close();
       toast(isNew ? 'Cliente cadastrada: ' + nome : 'Alterações salvas');
       if (senhaGov && newId){
         try {
@@ -9087,7 +9164,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     if (b.dataset.act === 'modo'){
       var on = b.dataset.v === 'o'; if (!!r.online === on) return;
       try { await patchRow(r.id, { online: on, atualizadoEm: new Date().toISOString() });
-        toast((on ? 'Audiência online: ' : 'Audiência presencial: ') + (r.nome || ''), 'Desfazer', function(){ patchRow(r.id, { online: !on }).catch(function(e3){ toast(errMsg(e3)); }); }); }
+        toast((on ? 'Audiência online: ' : 'Audiência presencial: ') + (r.nome || ''), 'Desfazer', function(){ desfazer(r.id, { online: !on }); }); }
       catch(err){ toast(errMsg(err)); }
       return;
     }
@@ -9147,7 +9224,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
       var antes = { avisado: !!r.avisado, situacao: sit(r), situacaoAnterior: r.situacaoAnterior || null, avisadoEm: r.avisadoEm || null, atualizadoEm: new Date().toISOString() };
       try { await patchRow(r.id, patch);
             toast((v ? 'Marcado como avisado: ' : 'Aviso desmarcado: ') + (r.nome || ''), 'Desfazer', function(){
-              patchRow(r.id, antes).then(function(){ toast('Desfeito: ' + (r.nome || '')); }, function(e3){ toast(errMsg(e3)); });
+              desfazer(r.id, antes);
             }); }
       catch(err){ toast(errMsg(err)); }
     }
@@ -9192,7 +9269,7 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     try {
       await patchRow(r.id, patch); dlgA.close();
       toast('Avisado por ' + (MEIOS[m.value] || m.value).toLowerCase() + ': ' + (r.nome || ''), 'Desfazer', function(){
-        patchRow(r.id, antes).then(function(){ toast('Desfeito: ' + (r.nome || '')); }, function(e3){ toast(errMsg(e3)); });
+        desfazer(r.id, antes);
       });
     } catch(err){ toast(errMsg(err)); }
     finally { $('av-save').disabled = false; }
