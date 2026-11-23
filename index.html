@@ -3050,12 +3050,18 @@ html[data-fx="novo"] .fcr-aqui{font-size:10px;font-weight:700;letter-spacing:.05
 html[data-fx="novo"] .fcr-st{font-size:11.5px;font-weight:500;white-space:nowrap;padding:3px 10px;border-radius:999px;border:1px dashed var(--ap-linha);color:var(--ink-3)}
 html[data-fx="novo"] .fcr-st.on{border:0;background:hsl(var(--c-sec)/.7);color:var(--ink-2)}
 }
-/* telas grandes (23/11/2026, a pedido: "em telas grandes o layout do Nascer ficou pequeno"): o BI inteiro cresce junto, na mesma proporção.
-   Até 1499px nada muda (o notebook do usuário e o celular ficam como estão). */
-@media (min-width:1500px){html[data-fx="novo"]{zoom:1.1}}
-@media (min-width:1750px){html[data-fx="novo"]{zoom:1.2}}
-@media (min-width:2100px){html[data-fx="novo"]{zoom:1.35}}
-@media (min-width:2500px){html[data-fx="novo"]{zoom:1.5}}
+/* telas grandes (23/11/2026). 1ª tentativa (crescer até 50%) ficou grande demais: "deve ser algo mais sóbrio".
+   Agora: o texto cresce pouco (5% a partir de 1800px, 10% a partir de 2200px) e o conteúdo não estica mais que 1680px;
+   numa tela muito larga ele fica numa faixa no centro, com o fundo dos dois lados. Até 1799px nada muda. */
+@media (min-width:1800px){html[data-fx="novo"]{zoom:1.05}}
+@media (min-width:2200px){html[data-fx="novo"]{zoom:1.1}}
+@media (min-width:1000px){
+html[data-fx="novo"] .content{max-width:1680px;margin-inline:auto}
+html[data-fx="novo"] .topo{padding-inline:max(28px,calc((100% - 1680px) / 2 + 28px))}
+/* com a ficha aberta ao lado, a lista usa a largura toda até a ficha */
+html.fc-split[data-fx="novo"] .content{max-width:none;margin-inline:0}
+html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
+}
 /* fim da lista nova */
 </style>
 <script src="vendor/supabase.min.js"></script>
@@ -10557,7 +10563,7 @@ html[data-fx="novo"] .fcr-st.on{border:0;background:hsl(var(--c-sec)/.7);color:v
      numa linha só, cabeçalho de duas linhas e a ficha ao lado da lista. Proposta aprovada: "vamos testar essa proposta".
      Só no computador e no fluxo novo; no celular continua a lista de antes. Recebe a mesma lista que a tela já filtrou (busca, Filtrar, ordem,
      Minhas clientes) e mantém as caixinhas do Pós-venda (data-pv), copiar (data-copiar, data-gpn-copia) e o clique na linha, que abre a ficha. ---------- */
-  // zoom do BI nas telas grandes (CSS: 1 até 1499px; 1.1 a 1.5 acima). Medidas da tela (getBoundingClientRect, clientX, innerWidth) divididas por ele viram medidas do BI
+  // zoom do BI nas telas grandes (CSS: 1 até 1799px; 1.05 e 1.1 acima). Medidas da tela (getBoundingClientRect, clientX, innerWidth) divididas por ele viram medidas do BI
   function zoomBI(){ var z = parseFloat(getComputedStyle(document.documentElement).zoom); return z > 0 ? z : 1; }
   function lnLigada(){ return fluxoVista === 'novo' && window.innerWidth >= 1000; }
   function lnSplit(){ return document.documentElement.classList.contains('fc-split'); }
