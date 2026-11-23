@@ -2270,7 +2270,7 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
 .auth-marca h1{margin:0;font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:clamp(30px,3.4vw,46px);line-height:1.05;color:#fff;letter-spacing:-.01em}
 .auth-marca .eyebrow{margin-top:12px;font-family:'Inter',system-ui,sans-serif;font-weight:700;font-size:12.5px;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.9)}
 .auth-card.card{position:relative;z-index:1;width:min(440px,100%);background:#fff!important;color:#1f1229;border:0!important;border-radius:30px!important;padding:32px 32px 24px!important;box-shadow:0 30px 80px rgba(20,6,40,.38)!important;gap:12px!important}
-.auth-tit h2{margin:0;font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:32px;line-height:1.1;color:#1f1229}
+.auth-tit h2{margin:0;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-weight:600;font-size:32px;line-height:1.1;color:#1f1229}
 .auth-card #auth-intro{color:#5d4a6e!important;font-size:14.5px;margin:-2px 0 4px}
 .auth-card form{gap:12px!important}
 .auth-card label{font-size:12px!important;font-weight:700!important;letter-spacing:.08em;text-transform:uppercase;color:#4b3a5c!important}
@@ -2334,11 +2334,11 @@ html[data-fx="novo"] #form.novo .f-body > #f-ativn-box:not([hidden]){display:fle
 .ig-passos{margin:0;padding:12px 14px 12px 34px;border-radius:12px;background:hsl(var(--c-sec)/.5);font-size:13px;line-height:1.55;color:var(--ink-2)}
 .ig-passos[hidden]{display:none}
 .ig-passos li+li{margin-top:6px}
-html[data-fx="novo"] .ig-dlg-cab h2{font-family:'Fraunces',Georgia,serif;font-size:22px}
+html[data-fx="novo"] .ig-dlg-cab h2{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:22px}
 
 /* ================= BI no estilo do aplicativo (06/11/2026, a pedido: "fonte, etc., para ficar bem bonitinho, igual o meu app") =================
    Só no Fluxo novo. Mesmo visual do app: fundo lilás claro, cartões brancos bem arredondados com sombra leve,
-   títulos em Fraunces, texto em Inter, números em roxo e botões com degradê roxo. */
+   títulos e texto em Inter (a serifada Fraunces só no nome do logo, desde 23/11/2026), números em roxo e botões com degradê roxo. */
 html[data-fx="novo"]:root:not([data-theme="dark"]){
   --c-bg:270 33% 96.5%;--c-card:0 0% 100%;--c-lat:0 0% 100%;--c-fg:276 31% 13%;--c-sec:275 52% 94.5%;--c-muted:271 23% 38%;
   --c-line:274 30% 89%;--c-input:274 28% 84%;--c-pri:272 55% 45%;
@@ -2355,7 +2355,7 @@ html[data-fx="novo"]{--font:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sa
 html[data-fx="novo"] body{font-family:var(--font);font-size:14px;background:var(--bg)}
 html[data-fx="novo"] .app{background:var(--bg)}
 
-/* ---------- moldura: menu lateral branco com a marca em Fraunces; o conteúdo no fundo lilás ---------- */
+/* ---------- moldura: menu lateral branco com a marca em Fraunces (a serifada fica só no logo); o conteúdo no fundo lilás ---------- */
 html[data-fx="novo"] .main{background:var(--bg)}
 html[data-fx="novo"] .lateral{background:hsl(var(--c-lat));border-right:1px solid var(--ap-linha);box-shadow:4px 0 24px rgba(41,24,56,.04)}
 @media (min-width:1000px){html[data-fx="novo"] .app:not(.collapsed) .lateral{width:248px}}
@@ -2389,7 +2389,7 @@ html[data-fx="novo"] .topo{height:64px;padding:0 28px;background:hsl(var(--c-bg)
 html[data-fx="novo"] .busca-geral input:not([type=checkbox]):not([type=radio]){height:40px;background:hsl(var(--c-card));border-color:var(--ap-linha);box-shadow:var(--sombra-leve)}
 html[data-fx="novo"] .topo-add{height:40px;padding:0 14px 0 20px;background:linear-gradient(135deg,var(--ap-g1),var(--ap-g2));font-weight:600;box-shadow:0 6px 16px rgba(102,46,153,.25)}
 html[data-fx="novo"] .topo-user{height:40px;background:hsl(var(--c-card));border:1px solid var(--ap-linha)}
-html[data-fx="novo"] .topo-user .av{background:linear-gradient(145deg,#e2cff1,#cca6ea);color:#561f86;font-family:'Fraunces',Georgia,serif;font-weight:600}
+html[data-fx="novo"] .topo-user .av{background:linear-gradient(145deg,#e2cff1,#cca6ea);color:#561f86;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-weight:600}
 html[data-fx="novo"] .tema-seg{background:hsl(var(--c-card));border:1px solid var(--ap-linha)}
 html[data-fx="novo"] .tema-seg button[aria-pressed="true"]{background:linear-gradient(135deg,var(--ap-g1),var(--ap-g2));color:#fff}
 html[data-fx="novo"] .topo-sino{border-radius:50%;background:hsl(var(--c-card));border:1px solid var(--ap-linha)}
@@ -2398,14 +2398,14 @@ html[data-fx="novo"] .pop{border-radius:16px;border-color:var(--ap-linha);paddin
 html[data-fx="novo"] .pop button,html[data-fx="novo"] .pop a{border-radius:10px;padding:9px 12px}
 html[data-fx="novo"] .content{padding:30px 36px 56px;gap:22px}
 
-/* ---------- cabeçalho de cada tela: título em Fraunces, ícone num quadradinho lilás ---------- */
+/* ---------- cabeçalho de cada tela: título em Inter (23/11/2026: "essa fonte é feia para sistema, só na logo"), ícone num quadradinho lilás ---------- */
 html[data-fx="novo"] .ph-ico,html[data-fx="novo"] .dn-h1-ico{width:44px;height:44px;border:0;border-radius:14px;background:linear-gradient(145deg,#efe2f8,#dcc1f0);color:#5a2591;box-shadow:0 4px 12px rgba(118,51,178,.14)}
 html[data-fx="novo"]:root[data-theme="dark"] .ph-ico,html[data-fx="novo"]:root[data-theme="dark"] .dn-h1-ico{background:linear-gradient(145deg,#3a2350,#2a1a3b);color:#d4b3f0;box-shadow:none}
 html[data-fx="novo"] .ph-ico .i,html[data-fx="novo"] .dn-h1-ico .i{width:20px;height:20px}
 html[data-fx="novo"] .ph-esq{gap:14px}
-html[data-fx="novo"] .ph h1,html[data-fx="novo"] .dn-h1{font-family:'Fraunces',Georgia,serif;font-size:28px;font-weight:600;letter-spacing:-.015em;line-height:1.15}
+html[data-fx="novo"] .ph h1,html[data-fx="novo"] .dn-h1{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.15}
 html[data-fx="novo"] .ph p{margin-top:4px;font-size:13px}
-html[data-fx="novo"] .dn-tit{font-family:'Fraunces',Georgia,serif;font-size:19px;font-weight:600;letter-spacing:-.01em}
+html[data-fx="novo"] .dn-tit{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:19px;font-weight:600;letter-spacing:-.01em}
 
 /* ---------- cartões brancos, cantos redondos e sombra leve (como os do app) ---------- */
 html[data-fx="novo"] .app .card,html[data-fx="novo"] .stats > .stat,html[data-fx="novo"] .stats > .card,html[data-fx="novo"] .fn-balao,
@@ -2436,7 +2436,7 @@ html[data-fx="novo"] #dash-box > section.dn-sec:first-of-type .dn-grade > .dn-ca
 html[data-fx="novo"] #dash-box > section.dn-sec:first-of-type .dn-grade > .dn-card:first-child :is(.dn-rot,.dn-rot .i,.dn-v,.dn-sub,.dn-var,.dn-var b){color:#fff!important}
 html[data-fx="novo"] #dash-box > section.dn-sec:first-of-type .dn-grade > .dn-card:first-child .dn-sub{opacity:.9}
 html[data-fx="novo"] #dash-box > section.dn-sec:first-of-type .dn-grade > .dn-card:first-child .dn-v{font-weight:400;font-size:34px}
-html[data-fx="novo"] .dn-rosca-c b{font-family:'Fraunces',Georgia,serif;font-size:26px;color:var(--ap-num)}
+html[data-fx="novo"] .dn-rosca-c b{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:26px;color:var(--ap-num)}
 html[data-fx="novo"] .dn-origem{padding:18px 20px}
 
 /* ---------- botões: roxo com degradê; os de contorno ficam brancos ---------- */
@@ -2479,7 +2479,7 @@ html[data-fx="novo"] .kb-tab tbody tr:hover,html[data-fx="novo"] .ct-tbl tbody t
 html[data-fx="novo"] .row{border-top-color:var(--ap-linha);padding:10px 14px}
 html[data-fx="novo"] .row:not(.head):hover,html[data-fx="novo"] .row[data-linha]:hover{background:var(--ap-hover)}
 html[data-fx="novo"] .kb-info{font-size:13px}
-html[data-fx="novo"] .kb-info b{font-family:'Fraunces',Georgia,serif;font-size:15px;font-weight:600}
+html[data-fx="novo"] .kb-info b{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:15px;font-weight:600}
 html[data-fx="novo"] .empty{border-radius:20px}
 
 /* ---------- abas de Financeiro e Configurações ---------- */
@@ -2488,21 +2488,21 @@ html[data-fx="novo"] .fin-sub button,html[data-fx="novo"] .cfg-tab{font-size:14p
 html[data-fx="novo"] .fin-sub button[aria-pressed="true"],html[data-fx="novo"] .cfg-tab.on{color:var(--ap-g2)!important;font-weight:600!important}
 html[data-fx="novo"]:root[data-theme="dark"] .fin-sub button[aria-pressed="true"],html[data-fx="novo"]:root[data-theme="dark"] .cfg-tab.on{color:#e3ccf6!important}
 html[data-fx="novo"] .fin-sub button[aria-pressed="true"]::after,html[data-fx="novo"] .cfg-tab.on::after{background:linear-gradient(90deg,var(--ap-g1),var(--ap-g2))!important;height:3px!important;border-radius:3px 3px 0 0!important}
-html[data-fx="novo"] .eq-sec h4{font-family:'Fraunces',Georgia,serif;font-size:17px;font-weight:600}
+html[data-fx="novo"] .eq-sec h4{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:17px;font-weight:600}
 html[data-fx="novo"] .eq-chip b{color:var(--ap-num);font-size:20px;font-weight:600}
-html[data-fx="novo"] .eq-av{background:linear-gradient(145deg,#e2cff1,#cca6ea);color:#561f86;font-family:'Fraunces',Georgia,serif;font-weight:600}
+html[data-fx="novo"] .eq-av{background:linear-gradient(145deg,#e2cff1,#cca6ea);color:#561f86;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-weight:600}
 
 /* ---------- janelas e o cartão da cliente ---------- */
 html[data-fx="novo"] dialog{border:0!important;border-radius:24px!important;box-shadow:0 30px 70px rgba(41,24,56,.28)!important}
 html[data-fx="novo"] dialog::backdrop,html[data-fx="novo"] .ficha-card{background:rgba(30,12,48,.45);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
-html[data-fx="novo"] .f-head h2{font-family:'Fraunces',Georgia,serif;font-size:22px;font-weight:600;letter-spacing:-.01em}
+html[data-fx="novo"] .f-head h2{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:22px;font-weight:600;letter-spacing:-.01em}
 html[data-fx="novo"] .field label{font-size:12.5px;font-weight:600}
 html[data-fx="novo"] .ficha-card>div{border:0;border-radius:24px;box-shadow:0 30px 70px rgba(41,24,56,.3)}
 html[data-fx="novo"] .fc-abas{border-radius:999px}
 html[data-fx="novo"] .fc-abas button[aria-pressed="true"]{background:linear-gradient(135deg,var(--ap-g1),var(--ap-g2))}
 html[data-fx="novo"] .fc-caixa{border-radius:18px;border-color:var(--ap-linha);background:var(--ap-lil)}
-html[data-fx="novo"] .fc-cx-nome b,html[data-fx="novo"] .fc-cx-nome h3,html[data-fx="novo"] .fc-cx-nome > :first-child{font-family:'Fraunces',Georgia,serif;font-size:19px;font-weight:600;letter-spacing:-.01em}
-html[data-fx="novo"] .fc-sec{font-family:'Fraunces',Georgia,serif;letter-spacing:0;text-transform:none;font-size:15px;font-weight:600;color:var(--ink)}
+html[data-fx="novo"] .fc-cx-nome b,html[data-fx="novo"] .fc-cx-nome h3,html[data-fx="novo"] .fc-cx-nome > :first-child{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:19px;font-weight:600;letter-spacing:-.01em}
+html[data-fx="novo"] .fc-sec{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;letter-spacing:0;text-transform:none;font-size:15px;font-weight:600;color:var(--ink)}
 html[data-fx="novo"] .fc-salvar .btn{min-height:44px;border-radius:14px;font-size:14px}
 html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:14px!important}
 html[data-fx="novo"] .kb-ana{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;font-size:12.5px;font-weight:500;color:var(--ink-3)}
@@ -2675,7 +2675,7 @@ html[data-fx="novo"] .pn-cpf,html[data-fx="novo"] .pn-fin{grid-column:span 12}
 html[data-fx="novo"] .pn-c.clic{cursor:pointer;transition:border-color .15s,background .15s}
 html[data-fx="novo"] .pn-c.clic:hover{border-color:hsl(var(--c-pri)/.35);background:var(--ap-lil)}
 html[data-fx="novo"] .pn-h{display:flex;align-items:center;gap:12px;margin:0 0 3px;min-height:22px}
-html[data-fx="novo"] .pn-t{margin:0;font-family:'Fraunces',Georgia,serif;font-size:16px;font-weight:600;letter-spacing:-.005em;color:var(--ink)}
+html[data-fx="novo"] .pn-t{margin:0;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:16px;font-weight:600;letter-spacing:-.005em;color:var(--ink)}
 html[data-fx="novo"] .pn-sub{margin:0 0 18px;font-size:12px;color:var(--ink-3);line-height:1.45}
 html[data-fx="novo"] .pn-lk{margin-left:auto;font-size:12px;font-weight:500;color:var(--ap-g1);padding:2px 0;background:none;border:0;cursor:pointer}
 html[data-fx="novo"]:root[data-theme="dark"] .pn-lk{color:#c9a3ea}
@@ -2931,7 +2931,7 @@ html[data-fx="novo"] .fc-lado .fct-host{flex:none;padding:26px 30px 0}
 html[data-fx="novo"] .fct-l1{display:flex;align-items:center;gap:14px;padding-right:40px}
 html[data-fx="novo"] .fct-av{width:50px;height:50px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:16px;font-weight:600;color:#fff;background:linear-gradient(135deg,var(--ap-g1),var(--ap-g2))}
 html[data-fx="novo"] .fct-t{min-width:0}
-html[data-fx="novo"] .fct-t h2{margin:0;font-family:'Fraunces',Georgia,serif;font-size:22px;font-weight:600;letter-spacing:-.01em;line-height:1.2;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .fct-t h2{margin:0;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:22px;font-weight:600;letter-spacing:-.01em;line-height:1.2;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 html[data-fx="novo"] .fct-t p{margin:3px 0 0;font-size:12.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 html[data-fx="novo"] .fct-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
 html[data-fx="novo"] .fct-jor{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;margin-top:18px}
