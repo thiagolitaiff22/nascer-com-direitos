@@ -4085,7 +4085,9 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
   function ehProspectador(p){ return !!p && p.perfil === 'prospectador'; }
   function soParceiros(){ return state.prosp.filter(function(p){ return !ehProspectador(p); }); }
   function prospectadoresDe(estado){ return state.prosp.filter(function(p){ return ehProspectador(p) && (!estado || p.regiaoId === estado); }); }
-  function prospName(id){ var p = id && prospById(id); return p ? p.nome : ''; }
+  function prospName(id){ var p = id && prospById(id); return p ? p.nome : gestorNome(id); }
+  // mãe cadastrada pelo gestor no aplicativo (SQL 61): responsavelId = "gestor:<e-mail>"; o nome vem da equipe
+  function gestorNome(id){ var m = /^gestor:(.+)$/.exec(String(id || '')); if (!m) return ''; var q = (state.equipe || []).find(function(e){ return String(e.email || '').toLowerCase() === m[1]; }); return q && q.nome ? q.nome : 'Gestor'; }
   function prospForAddress(end){
     var e = norm(end);
     return state.prosp.find(function(p){ return (p.palavrasEndereco || []).some(function(k){ return k && e.indexOf(norm(k)) >= 0; }); });
@@ -7205,7 +7207,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
     // parceiros: mães que entraram no período, quantas das mães dele já ganharam e o repasse pago no período
     var gPagos = (dnGastos.ultimo && dnGastos.ultimo.pagos) || [];
     var rkP = Object.keys(porParc).map(function(id){ var p = prospById(id), conc = rows.filter(function(r){ return r.responsavelId === id && ganhou(r); }).length, rp = gPagos.filter(function(x){ return x.papel === 'parc' && x.pessoa.id === id; }).reduce(function(a, x){ return a + (Number(x.pago.valor) || x.valor); }, 0);
-      return [p ? (p.tipo === 'clinica' && p.clinica ? p.clinica : p.nome) : 'Parceiro removido', porParc[id], conc, isAdmin() ? moedaTxt(rp) : '—']; }).sort(function(a, b){ return b[1] - a[1] || b[2] - a[2] || a[0].localeCompare(b[0], 'pt'); }).slice(0, 8);
+      return [p ? (p.tipo === 'clinica' && p.clinica ? p.clinica : p.nome) : (gestorNome(id) || 'Parceiro removido'), porParc[id], conc, isAdmin() ? moedaTxt(rp) : '—']; }).sort(function(a, b){ return b[1] - a[1] || b[2] - a[2] || a[0].localeCompare(b[0], 'pt'); }).slice(0, 8);
     var rkR = Object.keys(porResp).map(function(n){ return [n, porResp[n]]; }).sort(function(a, b){ return b[1] - a[1] || a[0].localeCompare(b[0], 'pt'); }).slice(0, 8);
     if (dashTudo) html += dnSecao('Parceiros e responsáveis', 'Mães que cada parceiro indicou no período, quantas mães dele já ganharam o benefício e o repasse pago no período; e quantas clientes cada responsável tem em andamento.', '<div class="dash-duo">' + dashRanking('Parceiros', ['Parceiro', 'Mães', 'Concedidas', 'Repasse'], rkP, 'Nenhuma mãe de parceiro no período.') + dashRanking('Em andamento por responsável', ['Responsável', 'Clientes'], rkR, 'Ninguém em andamento.') + '</div>');
     box.innerHTML = html;
@@ -7389,7 +7391,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
     // 6. de onde vêm: consultores e parceiros, cidades e perfil
     var grupos = {};
     ent.forEach(function(r){ var k = r.responsavelId || '_org'; (grupos[k] = grupos[k] || []).push(r); });
-    var nomeGrupo = function(k){ if (k === '_org') return 'Sem parceiro (orgânico)'; var p = prospById(k); return p ? (p.tipo === 'clinica' && p.clinica ? p.clinica : p.nome || 'Sem nome') : 'Parceiro removido'; };
+    var nomeGrupo = function(k){ if (k === '_org') return 'Sem parceiro (orgânico)'; var p = prospById(k); return p ? (p.tipo === 'clinica' && p.clinica ? p.clinica : p.nome || 'Sem nome') : (gestorNome(k) || 'Parceiro removido'); };
     var gl = Object.keys(grupos).map(function(k){ var l = grupos[k], nv = l.map(pnNivel); return { k: k, nome: nomeGrupo(k), n: l.length, ct: nv.filter(function(x){ return x >= 2; }).length, req: nv.filter(function(x){ return x >= 4; }).length, apr: nv.filter(function(x){ return x >= 5; }).length }; })
       .sort(function(a, b){ return (a.k === '_org') - (b.k === '_org') || b.n - a.n || b.apr - a.apr || a.nome.localeCompare(b.nome, 'pt'); });
     var gMax = Math.max.apply(null, gl.map(function(g){ return g.n; }).concat([1])), gVis = gl.slice(0, 7);
@@ -7484,7 +7486,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
     ctrs.forEach(function(r){ var n = r.contratoPor || 'Sem closer'; porCloser[n] = (porCloser[n] || 0) + 1; });
     cads.forEach(function(r){ if (!r.responsavelId) return; var p = porParc[r.responsavelId] = porParc[r.responsavelId] || [0, 0]; p[0]++; if (r.contratoEm) p[1]++; });
     var rkC = Object.keys(porCloser).map(function(n){ return [n, porCloser[n]]; }).sort(function(a, b){ return b[1] - a[1] || a[0].localeCompare(b[0], 'pt'); }).slice(0, 8);
-    var rkP = Object.keys(porParc).map(function(id){ var p = prospById(id); return [p ? (p.tipo === 'clinica' && p.clinica ? p.clinica : p.nome) : 'Parceiro removido', porParc[id][0], porParc[id][1]]; }).sort(function(a, b){ return b[1] - a[1] || b[2] - a[2] || a[0].localeCompare(b[0], 'pt'); }).slice(0, 8);
+    var rkP = Object.keys(porParc).map(function(id){ var p = prospById(id); return [p ? (p.tipo === 'clinica' && p.clinica ? p.clinica : p.nome) : (gestorNome(id) || 'Parceiro removido'), porParc[id][0], porParc[id][1]]; }).sort(function(a, b){ return b[1] - a[1] || b[2] - a[2] || a[0].localeCompare(b[0], 'pt'); }).slice(0, 8);
     var porResp = {}; rows.filter(function(r){ return fechado(r) || naFila(r); }).forEach(function(r){ var n = r.posResp || 'Sem responsável'; porResp[n] = (porResp[n] || 0) + 1; });
     var rkR = Object.keys(porResp).map(function(n){ return [n, porResp[n]]; }).sort(function(a, b){ return b[1] - a[1] || a[0].localeCompare(b[0], 'pt'); }).slice(0, 8);
     html += dashSecao('Rankings', 'no período', '<div class="dash-duo">' + (novoF ? dashRanking('Clientes em andamento por responsável', ['Responsável', 'Clientes'], rkR, 'Ninguém em andamento.') : dashRanking('Contratos por closer', ['Closer', 'Contratos'], rkC, 'Nenhum contrato fechado no período.')) + dashRanking('Mães por parceiro', ['Parceiro', 'Mães', 'Contratos'], rkP, 'Nenhuma mãe de parceiro no período.') + '</div>');
@@ -8220,7 +8222,8 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
     }).join('') || '<tr><td colspan="10" class="ct-mais small">Nenhum ganho' + (finSessao ? ' nesta origem' : '') + ' ainda. Os concedidos no INSS e as sentenças favoráveis aparecem aqui.</td></tr>';
   }
   var esc2 = function(t){ return esc(t); };
-  function valorInd(id){ var p = prospById(id), v = Number(p && p.valorIndicacao); return v > 0 ? v : FIN_INDICACAO; }
+  function valorInd(id){ if (gestorNome(id)) return 0;   // cadastro do gestor: sem comissão de indicação
+    var p = prospById(id), v = Number(p && p.valorIndicacao); return v > 0 ? v : FIN_INDICACAO; }
   /* ---------- acerto com a cliente: benefício pago, honorários e documentos ---------- */
   var FORMAS = { pix_cliente: 'Pix na conta da própria cliente', pix_terceiro: 'Pix para outra pessoa autorizada', pix_escritorio: 'Pix da cliente para o escritório', desconto: 'descontado no repasse', dinheiro: 'dinheiro em mãos', transferencia: 'transferência bancária' };
   // modo do acerto: dinheiro na conta da cliente → ela paga os honorários; na conta do escritório → o escritório paga a ela
@@ -9473,7 +9476,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
     $('f-situacao').value = r ? sit(r) : 'pendente';
     // parceiros e prospectadores (função híbrida: o prospectador também cadastra mães)
     $('f-resp').innerHTML = '<option value="">Sem parceiro</option>' + state.prosp.filter(function(p){ return p.ativo !== false; }).slice().sort(function(x, y){ return String(x.nome || '').localeCompare(String(y.nome || ''), 'pt'); }).map(function(p){ return '<option value="' + esc(p.id) + '">' + esc(p.nome) + (ehProspectador(p) ? ' (prospectador)' : '') + '</option>'; }).join('');
-    if (r && r.responsavelId && !Array.prototype.some.call($('f-resp').options, function(o){ return o.value === r.responsavelId; })){ var paAt = prospById(r.responsavelId); $('f-resp').insertAdjacentHTML('beforeend', '<option value="' + esc(r.responsavelId) + '">' + esc(paAt ? paAt.nome + ' (inativo)' : 'Parceiro atual (não carregado)') + '</option>'); }
+    if (r && r.responsavelId && !Array.prototype.some.call($('f-resp').options, function(o){ return o.value === r.responsavelId; })){ var paAt = prospById(r.responsavelId); $('f-resp').insertAdjacentHTML('beforeend', '<option value="' + esc(r.responsavelId) + '">' + esc(paAt ? paAt.nome + ' (inativo)' : gestorNome(r.responsavelId) ? gestorNome(r.responsavelId) + ' (gestor)' : 'Parceiro atual (não carregado)') + '</option>'); }
     $('f-resp').value = r && r.responsavelId ? r.responsavelId : '';
     $('f-aviso-resp').innerHTML = '<option value="">O próprio parceiro</option>' + soParceiros().map(function(p){ return '<option value="' + esc(p.id) + '">' + esc(p.nome) + '</option>'; }).join('');
     $('f-aviso-resp').value = r && prospById(r.avisoRespId) ? r.avisoRespId : '';
