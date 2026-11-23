@@ -2651,18 +2651,22 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   html[data-fx="novo"] .fc-salvar .btn{min-height:32px;border-radius:9px;font-size:12.5px}
   html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:10px!important}
 }
+
 /* ================= Dashboard completo (23/11/2026, a pedido: "mais completo, bonito, com respiro... quantas entram, quantas foram aprovadas") =================
    Só no computador. Cartões brancos com respiro, um número grande por tela, gráficos de traço fino e uma cor por série. */
 @media (min-width:1000px){
 html[data-fx="novo"]{--pn-cinza:hsl(274 14% 80%)}
 html[data-fx="novo"]:root[data-theme="dark"]{--pn-cinza:hsl(274 10% 34%)}
 html[data-fx="novo"] .pn-topo{margin-bottom:18px}
-html[data-fx="novo"] .pn{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:20px;margin-bottom:24px}
+html[data-fx="novo"] .pn{container:painel / inline-size;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:clamp(14px,1.35vw,22px);margin-bottom:24px}
 html[data-fx="novo"] .pn-c{background:hsl(var(--c-card));border:1px solid var(--ap-linha);border-radius:16px;padding:20px 22px;min-width:0;box-shadow:0 1px 2px rgba(41,24,56,.04)}
 html[data-fx="novo"]:root[data-theme="dark"] .pn-c{box-shadow:none}
-html[data-fx="novo"] .pn-s2{grid-column:span 2}html[data-fx="novo"] .pn-s3{grid-column:span 3}html[data-fx="novo"] .pn-s4{grid-column:span 4}
-html[data-fx="novo"] .pn-s5{grid-column:span 5}html[data-fx="novo"] .pn-s6{grid-column:span 6}html[data-fx="novo"] .pn-s7{grid-column:span 7}
-html[data-fx="novo"] .pn-s8{grid-column:span 8}html[data-fx="novo"] .pn-s12{grid-column:span 12}
+/* tela larga (a área do Dashboard com 1150px ou mais): número grande + 4 números numa linha; os cartões lado a lado */
+html[data-fx="novo"] .pn-hero{grid-column:span 4}html[data-fx="novo"] .pn-tile{grid-column:span 2}
+html[data-fx="novo"] .pn-cf{grid-column:span 7}html[data-fx="novo"] .pn-ci{grid-column:span 5}
+html[data-fx="novo"] .pn-ce{grid-column:span 8}html[data-fx="novo"] .pn-ct{grid-column:span 4}
+html[data-fx="novo"] .pn-cp{grid-column:span 7}html[data-fx="novo"] .pn-cc{grid-column:span 5}
+html[data-fx="novo"] .pn-cpf,html[data-fx="novo"] .pn-fin{grid-column:span 12}
 html[data-fx="novo"] .pn-c.clic{cursor:pointer;transition:border-color .15s,background .15s}
 html[data-fx="novo"] .pn-c.clic:hover{border-color:hsl(var(--c-pri)/.35);background:var(--ap-lil)}
 html[data-fx="novo"] .pn-h{display:flex;align-items:center;gap:12px;margin:0 0 3px;min-height:22px}
@@ -2782,7 +2786,59 @@ html[data-fx="novo"] .pn-fin-g > div:first-child{padding-left:0;border-left:0}
 html[data-fx="novo"] .pn-fin-v{margin:8px 0 2px;font-size:22px;font-weight:600;letter-spacing:-.02em;color:var(--ink)}
 /* o mapa continua igual, só com o mesmo respiro */
 html[data-fx="novo"] #dash-box .pn ~ .dn-sec{margin-top:0}
+/* ---------- cabe em qualquer tela de computador (23/11/2026, a pedido: "adaptável a qualquer tela de PC"; o "GPS" estava quebrando em duas linhas) ----------
+   letras e espaços acompanham a largura do Dashboard (cqi = 1% da largura), e nenhum rótulo quebra de linha: o que não couber termina em "…" e aparece inteiro ao passar o mouse */
+html[data-fx="novo"] .pn-c{padding:clamp(16px,1.9cqi,24px) clamp(16px,2.1cqi,26px)}
+html[data-fx="novo"] .pn-tile{padding:clamp(14px,1.6cqi,20px)}
+html[data-fx="novo"] .pn-t{font-size:clamp(14.5px,1.45cqi,17px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .pn-hero-v{font-size:clamp(40px,4.9cqi,58px)}
+html[data-fx="novo"] .pn-tile-v{font-size:clamp(22px,2.6cqi,32px)}
+html[data-fx="novo"] .pn-taxa-v{font-size:clamp(32px,3.7cqi,46px)}
+html[data-fx="novo"] .pn-fin-v{font-size:clamp(18px,2.1cqi,25px)}
+html[data-fx="novo"] .pn-tile-r,html[data-fx="novo"] .pn-tile-c,html[data-fx="novo"] .pn-var,html[data-fx="novo"] .pn-mini-t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .pn-rk th{white-space:nowrap}
+html[data-fx="novo"] .pn-rk .dir{width:clamp(56px,6.2cqi,78px)}
+html[data-fx="novo"] .pn-rk-n,html[data-fx="novo"] .pn-rk-b{max-width:none}
+html[data-fx="novo"] .pn-st li{white-space:nowrap;min-width:0}
+html[data-fx="novo"] .pn-st li small{overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .pn-leg li span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .pn-h .pn-leg-top li{white-space:nowrap}
+/* perfil das mães: as duas barras lado a lado, com a legenda numa linha */
+html[data-fx="novo"] .pn-perfil{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px clamp(24px,4cqi,56px)}
+html[data-fx="novo"] .pn-perfil .pn-mini-t{margin-top:0}
+html[data-fx="novo"] .pn-perfil .pn-seg{margin-bottom:12px}
+html[data-fx="novo"] .pn-perfil .pn-leg{display:flex;flex-wrap:wrap;gap:6px 22px}
+html[data-fx="novo"] .pn-perfil .pn-leg li b{margin-left:6px}
+html[data-fx="novo"] .pn-hero{position:relative}
+html[data-fx="novo"] .pn-hero-x{display:none}
+/* tela média (a área do Dashboard entre 860 e 1149px, como num notebook): o número grande vira uma faixa e os 4 números ficam lado a lado embaixo */
+@container painel (max-width:1149px){
+  html[data-fx="novo"] .pn-hero{grid-column:span 12}
+  html[data-fx="novo"] .pn-hero-x{display:flex;gap:clamp(24px,4.5cqi,56px);position:absolute;right:clamp(18px,3cqi,40px);top:50%;transform:translateY(-50%)}
+  html[data-fx="novo"] .pn-hero-x div{padding-left:clamp(14px,2cqi,22px);border-left:1px solid rgba(255,255,255,.22)}
+  html[data-fx="novo"] .pn-hero-x p{margin:0 0 6px;font-size:11.5px;color:rgba(255,255,255,.75);white-space:nowrap}
+  html[data-fx="novo"] .pn-hero-x b{font-size:clamp(18px,2.3cqi,26px);font-weight:600;letter-spacing:-.02em;color:#fff;white-space:nowrap}
+  html[data-fx="novo"] .pn-hero-x b small{font-size:11.5px;font-weight:500;color:rgba(255,255,255,.75);margin-left:6px;letter-spacing:0}
+  html[data-fx="novo"] .pn-hero-l{justify-content:flex-start;gap:clamp(28px,6cqi,72px);align-items:center}
+  html[data-fx="novo"] .pn-hero .pn-spark{width:220px;height:56px}
+  html[data-fx="novo"] .pn-tile{grid-column:span 3}
+  html[data-fx="novo"] .pn-ce{grid-column:span 7}html[data-fx="novo"] .pn-ct{grid-column:span 5}
 }
+/* tela estreita (abaixo de 860px de área): um cartão por linha e os números de 2 em 2 */
+@container painel (max-width:859px){
+  html[data-fx="novo"] .pn-tile{grid-column:span 6}
+  html[data-fx="novo"] .pn-hero .pn-spark{width:150px;height:46px}
+  html[data-fx="novo"] .pn-hero-l{gap:24px}
+  html[data-fx="novo"] .pn-cf,html[data-fx="novo"] .pn-ci,html[data-fx="novo"] .pn-ce,html[data-fx="novo"] .pn-ct,html[data-fx="novo"] .pn-cp,html[data-fx="novo"] .pn-cc{grid-column:span 12}
+  html[data-fx="novo"] .pn-fin-g{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:18px}
+  html[data-fx="novo"] .pn-fin-g > div:nth-child(3){padding-left:0;border-left:0}
+}
+@container painel (max-width:640px){
+  html[data-fx="novo"] .pn-perfil{grid-template-columns:1fr}
+}
+}
+/* fim do Dashboard completo */
+
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -6614,10 +6670,10 @@ html[data-fx="novo"] #dash-box .pn ~ .dn-sec{margin-top:0}
       ufs.map(function(uf){ return '<button type="button" class="pm-lin' + (sel === uf + '|*' ? ' esc' : '') + '" ' + at + '="' + uf + '|*"><span class="pm-uf">' + flagUfImg(uf) + '<span>' + esc(NOME_UF[uf] || uf) + '</span></span><b class="tnum">' + porUf[uf] + '</b>' + (o.n2 ? '<b class="tnum">' + o.n2(uf) + '</b>' : '') + '</button>'; }).join('') + '</div>' : '<p class="dn-vazio">' + esc(o.vazio) + '</p>')
       : ufs.length ? ufs.map(function(uf){
       var cids = Object.keys(porCid).filter(function(c){ return porCid[c].uf === uf; }).map(function(c){ return porCid[c]; }).sort(function(a, b){ return b.rows.length - a.rows.length || a.cidade.localeCompare(b.cidade, 'pt'); });
-      cidadesUfMapa(uf);
       return '<div class="dn-uf-bloco"><button type="button" class="dn-uf-lin' + (sel === uf + '|*' ? ' esc' : '') + '" ' + at + '="' + uf + '|*"><span>' + flagUfImg(uf) + '<b>' + esc(NOME_UF[uf] || uf) + '</b> <small>· ' + uf + '</small></span><b class="tnum">' + porUf[uf] + '</b></button>' +
-        cids.map(function(c){ var u = c.cidade ? bandeiraDaCidade(uf, c.cidade) : '', ch = uf + '|' + c.cidade;
-          return '<button type="button" class="dn-cid' + (sel === ch ? ' esc' : '') + '" ' + at + '="' + esc(ch) + '">' + (u ? '<img src="' + esc(u) + '" alt="Bandeira de ' + esc(c.cidade) + '" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'dn-semflag\'}))">' : '<span class="dn-semflag">' + svgI('i-pin') + '</span>') + '<span class="dn-cid-n">' + esc(c.cidade || 'Cidade não informada') + '</span><b class="tnum">' + c.rows.length + '</b></button>'; }).join('') + '</div>';
+        // sem a bandeira do município (22/11/2026, a pedido: "retire esse negócio de bandeira do município"): só o nome e o número
+        cids.map(function(c){ var ch = uf + '|' + c.cidade;
+          return '<button type="button" class="dn-cid' + (sel === ch ? ' esc' : '') + '" ' + at + '="' + esc(ch) + '"><span class="dn-cid-n">' + esc(c.cidade || 'Cidade não informada') + '</span><b class="tnum">' + c.rows.length + '</b></button>'; }).join('') + '</div>';
     }).join('') : '<p class="dn-vazio">' + esc(o.vazio) + '</p>';
     var esc2 = '';
     if (sel){
@@ -7022,10 +7078,17 @@ html[data-fx="novo"] #dash-box .pn ~ .dn-sec{margin-top:0}
   function pnPartes(partes, total){
     var vis = partes.filter(function(p){ return p.n > 0; });
     return '<div class="pn-seg" role="img" aria-label="' + esc(vis.map(function(p){ return p.nome + ': ' + p.n; }).join(', ')) + '">' + vis.map(function(p){ var w = total ? p.n / total * 100 : 0; return '<span style="flex:' + p.n + ' 1 0;background:var(' + p.cor + ')" title="' + esc(p.nome + ': ' + p.n + ' (' + Math.round(w) + '%)') + '">' + (w >= 14 ? Math.round(w) + '%' : '') + '</span>'; }).join('') + '</div>' +
-      '<ul class="pn-leg">' + partes.map(function(p){ return '<li><i style="background:var(' + p.cor + ')"></i>' + esc(p.nome) + '<b>' + pnNum(p.n) + '</b></li>'; }).join('') + '</ul>';
+      '<ul class="pn-leg">' + partes.map(function(p){ return '<li title="' + esc(p.nome + ': ' + p.n) + '"><i style="background:var(' + p.cor + ')"></i><span>' + esc(p.nome) + '</span><b>' + pnNum(p.n) + '</b></li>'; }).join('') + '</ul>';
   }
   function pnTile(rot, valor, varHtml, ctx, fn){
-    return '<div class="pn-c pn-s2 pn-tile' + (fn ? ' clic' : '') + '"' + (fn ? ' role="button" tabindex="0" data-fn="' + fn + '"' : '') + '><p class="pn-tile-r">' + rot + '</p><p class="pn-tile-v">' + valor + '</p>' + (varHtml || '') + (ctx ? '<p class="pn-tile-c">' + ctx + '</p>' : '') + '</div>';
+    return '<div class="pn-c pn-tile' + (fn ? ' clic' : '') + '"' + (fn ? ' role="button" tabindex="0" data-fn="' + fn + '"' : '') + '><p class="pn-tile-r">' + rot + '</p><p class="pn-tile-v">' + valor + '</p>' + (varHtml || '') + (ctx ? '<p class="pn-tile-c" title="' + esc(String(ctx).replace(/<[^>]+>/g, '')) + '">' + ctx + '</p>' : '') + '</div>';
+  }
+  // o gráfico do mês a mês é desenhado com a largura real do cartão (muda com a tela e com o menu aberto ou fechado)
+  var pnRO = null, pnLarg = 0;
+  function pnDesenharGraf(){
+    var l = document.querySelector('#dash-box [data-pn-graf]'); if (!l || !pnSerie) return;
+    var w = Math.floor(l.clientWidth); if (!w) return;
+    pnLarg = w; l.innerHTML = pnLinhas(pnSerie, Math.max(300, w));
   }
   function renderPainel(box){
     // primeira vez no Dashboard novo: abre em "Este ano" (num mês só, quase ninguém chega ao fim da jornada)
@@ -7049,8 +7112,12 @@ html[data-fx="novo"] #dash-box .pn ~ .dn-sec{margin-top:0}
     // 1. o número principal e os quatro marcos do período
     var meses12 = pnMeses(j.fim, 12), sp = meses12.map(function(m){ return rows.filter(function(r){ return dataCad(r).slice(0, 7) === m.k; }).length; }), spMax = Math.max.apply(null, sp.concat([1]));
     var spark = '<svg class="pn-spark" width="132" height="40" viewBox="0 0 132 40" aria-hidden="true">' + sp.map(function(v, i){ var h = Math.max(v ? 3 : 1.5, v / spMax * 36); return '<rect x="' + (i * 11) + '" y="' + (40 - h).toFixed(1) + '" width="7" height="' + h.toFixed(1) + '" rx="2" class="' + (i === 11 ? 'ag' : '') + '"><title>' + esc(meses12[i].rot.replace(/\/\d+$/, '')) + ': ' + v + '</title></rect>'; }).join('') + '</svg>';
-    html += '<div class="pn-c pn-s4 pn-hero"><p class="pn-tile-r">Mães que entraram</p><div class="pn-hero-l"><p class="pn-hero-v">' + pnNum(nEnt) + '</p>' + spark + '</div>' + pnVar(nEnt, aEnt) +
-      '<p class="pn-tile-c">' + (j.ini ? esc(dashPerRotulo().toLowerCase()) : 'desde o início') + ' · barras: últimos 12 meses</p></div>';
+    // na faixa larga (notebook e tela menor), o espaço à direita mostra o ritmo: média por mês, o melhor mês e o mês atual
+    var spIni = sp.findIndex ? sp.findIndex(function(v){ return v > 0; }) : 0, spUsa = spIni < 0 ? [] : sp.slice(spIni), spMed = spUsa.length ? Math.round(spUsa.reduce(function(a, v){ return a + v; }, 0) / spUsa.length) : 0;
+    var spMelhor = sp.indexOf(Math.max.apply(null, sp)), nomeMes = function(i){ var p = meses12[i].k.split('-'); return CAL_MESES[+p[1] - 1].slice(0, 3) + '/' + p[0].slice(2); };
+    html += '<div class="pn-c pn-hero"><p class="pn-tile-r">Mães que entraram</p><div class="pn-hero-l"><p class="pn-hero-v">' + pnNum(nEnt) + '</p>' + spark + '</div>' + pnVar(nEnt, aEnt) +
+      '<p class="pn-tile-c">' + (j.ini ? esc(dashPerRotulo().toLowerCase()) : 'desde o início') + ' · barras: últimos 12 meses</p>' +
+      '<div class="pn-hero-x"><div><p>Média por mês</p><b>' + pnNum(spMed) + '</b></div><div><p>Melhor mês</p><b>' + (sp[spMelhor] ? pnNum(sp[spMelhor]) + '<small>' + nomeMes(spMelhor) + '</small>' : '—') + '</b></div><div><p>Este mês</p><b>' + pnNum(sp[11]) + '</b></div></div></div>';
     html += pnTile('GPS pagas', pnNum(nGps), pnVar(nGps, aGps), nGps ? moedaTxt(nGps * (gpsValor() || 0)) + ' em guias' : 'nenhuma no período', 'gp');
     html += pnTile('Requerimentos', pnNum(nReq), pnVar(nReq, aReq), 'feitos no INSS', 'i');
     html += pnTile('Aprovadas', pnNum(nApr), pnVar(nApr, aApr), taxa == null ? 'sem decisão no período' : taxa + '% de aprovação', 'r');
@@ -7058,13 +7125,13 @@ html[data-fx="novo"] #dash-box .pn ~ .dn-sec{margin-top:0}
     // 2. funil: das mães que entraram no período, até onde chegaram
     var niv = ent.map(pnNivel), cont = PN_PASSOS.map(function(p, i){ return niv.filter(function(n){ return n >= i; }).length; });
     var perdas = ent.filter(perdaOuDesq).length;
-    html += '<section class="pn-c pn-s7"><div class="pn-h"><h2 class="pn-t">Jornada das mães</h2></div><p class="pn-sub">' + (nEnt ? 'Das ' + pnNum(nEnt) + ' mães que entraram ' + (j.ini ? 'no período' : 'desde o início') + ', quantas já chegaram a cada passo' : 'Nenhuma mãe entrou no período') + '</p>' +
+    html += '<section class="pn-c pn-cf"><div class="pn-h"><h2 class="pn-t">Jornada das mães</h2></div><p class="pn-sub">' + (nEnt ? 'Das ' + pnNum(nEnt) + ' mães que entraram ' + (j.ini ? 'no período' : 'desde o início') + ', quantas já chegaram a cada passo' : 'Nenhuma mãe entrou no período') + '</p>' +
       (nEnt ? '<div class="pn-funil">' + PN_PASSOS.map(function(p, i){ var pc = pnPct(cont[i], nEnt), ant2 = i ? cont[i - 1] : 0; return pnBarra(esc(p[0]), cont[i], pc, '<b>' + pnNum(cont[i]) + '</b><small>' + pc + '%</small>', p[0] + ': ' + cont[i] + ' de ' + nEnt + ' (' + pc + '%)' + (i ? ' · do passo anterior: ' + (pnPct(cont[i], ant2) == null ? '—' : pnPct(cont[i], ant2) + '%') : '') + ' · ' + p[1], i === 5 ? 'forte' : ''); }).join('') + '</div>' +
         '<p class="pn-nota">' + (perdas ? plural(perdas, 'mãe saiu', 'mães saíram') + ' no caminho (perda ou desqualificada). ' : '') + 'Passe o mouse numa barra para ver quanto passou do passo anterior.</p>' : '<div class="pn-vazio">Escolha um período maior no calendário.</div>') + '</section>';
     // 3. resultado no INSS
     var emAn = rows.filter(function(r){ return noInss(r) && statusInss(r) === 'analise'; }).length, emEx = rows.filter(function(r){ return noInss(r) && statusInss(r) === 'exigencia'; }).length;
     var tAn = pnMediana(rows.filter(function(r){ return r.der && (r.inssStatus === 'concedido' || r.inssStatus === 'indeferido') && no(pnDia(r.inssDecisaoEm)); }).map(function(r){ return pnDias(pnDia(r.der), pnDia(r.inssDecisaoEm)); }).filter(function(d){ return d >= 0; }));
-    html += '<section class="pn-c pn-s5"><div class="pn-h"><h2 class="pn-t">Resultado no INSS</h2></div><p class="pn-sub">Decisões ' + (j.ini ? 'do período' : 'desde o início') + ' e o que está esperando agora</p>' +
+    html += '<section class="pn-c pn-ci"><div class="pn-h"><h2 class="pn-t">Resultado no INSS</h2></div><p class="pn-sub">Decisões ' + (j.ini ? 'do período' : 'desde o início') + ' e o que está esperando agora</p>' +
       '<div class="pn-taxa"><p class="pn-taxa-v">' + (taxa == null ? '—' : taxa + '%') + '</p><div><p class="pn-taxa-r">de aprovação</p><p class="pn-tile-c">' + (decConc + decInd ? pnNum(decConc) + ' de ' + pnNum(decConc + decInd) + ' decididas' : 'nenhuma decisão no período') + '</p></div></div>' +
       '<div class="pn-meter" title="' + (taxa == null ? 'Sem decisões no período' : taxa + '% aprovadas') + '"><i style="width:' + (taxa || 0) + '%"></i></div>' +
       '<ul class="pn-st">' +
@@ -7078,14 +7145,13 @@ html[data-fx="novo"] #dash-box .pn ~ .dn-sec{margin-top:0}
     if (!j.ini){ var prim = rows.map(dataCad).filter(Boolean).sort()[0]; if (prim) nMes = Math.max(6, Math.min(24, (+j.fim.slice(0, 4) - +prim.slice(0, 4)) * 12 + (+j.fim.slice(5, 7) - +prim.slice(5, 7)) + 1)); }
     var ms = pnMeses(j.fim, nMes), porMes = function(q){ return ms.map(function(m){ return rows.filter(function(r){ return String(q(r) || '').slice(0, 7) === m.k; }).length; }); };
     pnSerie = { rot: ms.map(function(m){ return m.rot; }), nomes: ms.map(function(m){ var p = m.k.split('-'); var nm = CAL_MESES[+p[1] - 1]; return nm.charAt(0).toUpperCase() + nm.slice(1) + ' de ' + p[0]; }), series: [{ nome: 'Entradas', cor: '--ser-1', v: porMes(qEnt) }, { nome: 'Aprovadas', cor: '--ser-2', v: porMes(qApr) }], extra: { nome: 'Requerimentos', v: porMes(qReq) } };
-    var col = (box.clientWidth - 11 * 20) / 12, wEvo = Math.max(420, Math.floor(col * 8 + 7 * 20 - 46));
-    html += '<section class="pn-c pn-s8"><div class="pn-h"><h2 class="pn-t">Mês a mês</h2><ul class="pn-leg pn-leg-top">' + pnSerie.series.map(function(se){ return '<li><i style="background:var(' + se.cor + ')"></i>' + se.nome + '</li>'; }).join('') + '</ul><button type="button" class="pn-lk" data-pn-tabela>' + (pnTabela ? 'Ver gráfico' : 'Ver tabela') + '</button></div><p class="pn-sub">Mães que entraram e mães aprovadas em cada mês' + (nMes > 12 ? '' : ', nos últimos ' + nMes + ' meses') + '</p>' +
-      (pnTabela ? '<table class="kb-tab pn-tab"><thead><tr><th>Mês</th><th class="dir">Entradas</th><th class="dir">Requerimentos</th><th class="dir">Aprovadas</th></tr></thead><tbody>' + ms.map(function(m, i){ return '<tr><td>' + esc(pnSerie.nomes[i]) + '</td><td class="dir tnum">' + pnSerie.series[0].v[i] + '</td><td class="dir tnum">' + pnSerie.extra.v[i] + '</td><td class="dir tnum">' + pnSerie.series[1].v[i] + '</td></tr>'; }).reverse().join('') + '</tbody></table>' : pnLinhas(pnSerie, wEvo)) + '</section>';
+    html += '<section class="pn-c pn-ce"><div class="pn-h"><h2 class="pn-t">Mês a mês</h2><ul class="pn-leg pn-leg-top">' + pnSerie.series.map(function(se){ return '<li><i style="background:var(' + se.cor + ')"></i>' + se.nome + '</li>'; }).join('') + '</ul><button type="button" class="pn-lk" data-pn-tabela>' + (pnTabela ? 'Ver gráfico' : 'Ver tabela') + '</button></div><p class="pn-sub">Mães que entraram e mães aprovadas em cada mês' + (nMes > 12 ? '' : ', nos últimos ' + nMes + ' meses') + '</p>' +
+      (pnTabela ? '<table class="kb-tab pn-tab"><thead><tr><th>Mês</th><th class="dir">Entradas</th><th class="dir">Requerimentos</th><th class="dir">Aprovadas</th></tr></thead><tbody>' + ms.map(function(m, i){ return '<tr><td>' + esc(pnSerie.nomes[i]) + '</td><td class="dir tnum">' + pnSerie.series[0].v[i] + '</td><td class="dir tnum">' + pnSerie.extra.v[i] + '</td><td class="dir tnum">' + pnSerie.series[1].v[i] + '</td></tr>'; }).reverse().join('') + '</tbody></table>' : '<div class="pn-graf-lugar" data-pn-graf></div>') + '</section>';
     // 5. tempo típico de cada passo (mediana), entre as mães que terminaram o passo no período
     var TEMPOS = [['Cadastro → GPS paga', qEnt, qGps],['Parto → requerimento', function(r){ return pnDia(r.criancaNasc); }, qReq], ['Requerimento → decisão', qReq, function(r){ return r.inssStatus === 'concedido' || r.inssStatus === 'indeferido' ? pnDia(r.inssDecisaoEm) : ''; }], ['Decisão → pagamento', function(r){ return pnDia(r.inssDecisaoEm); }, pnPagaEm]];
     var tv = TEMPOS.map(function(t){ var l = rows.filter(function(r){ var a = t[1](r), b = t[2](r); return a && b && no(b); }).map(function(r){ return pnDias(t[1](r), t[2](r)); }).filter(function(d){ return d >= 0; }); return { m: pnMediana(l), n: l.length }; });
     var tMax = Math.max.apply(null, tv.map(function(t){ return t.m || 0; }).concat([1]));
-    html += '<section class="pn-c pn-s4"><div class="pn-h"><h2 class="pn-t">Tempo de cada passo</h2></div><p class="pn-sub">Dias que o passo costuma levar (mediana)</p><div class="pn-tempos">' +
+    html += '<section class="pn-c pn-ct"><div class="pn-h"><h2 class="pn-t">Tempo de cada passo</h2></div><p class="pn-sub">Dias que o passo costuma levar (mediana)</p><div class="pn-tempos">' +
       TEMPOS.map(function(t, i){ var v = tv[i]; return pnBarra(esc(t[0]), v.m || 0, v.m == null ? 0 : v.m / tMax * 100, v.m == null ? '<small>sem dados</small>' : '<b>' + v.m + ' d</b>', v.m == null ? 'Nenhuma mãe terminou este passo no período' : t[0] + ': ' + v.m + ' dias (mediana de ' + plural(v.n, 'mãe', 'mães') + ')', 'leve'); }).join('') + '</div>' +
       (function(){ var l = rows.filter(function(r){ var b = pnPagaEm(r); return b && dataCad(r) && no(b); }).map(function(r){ return pnDias(dataCad(r), pnPagaEm(r)); }).filter(function(d){ return d >= 0; }), m = pnMediana(l); return '<div class="pn-total"><p>Do cadastro ao benefício pago</p><b>' + (m == null ? '—' : m + ' dias') + '</b><small>' + (m == null ? 'nenhum benefício pago no período' : 'mediana de ' + plural(l.length, 'mãe', 'mães') + ' (inclui a espera pelo parto)') + '</small></div>'; })() + '</section>';
     // 6. de onde vêm: consultores e parceiros, cidades e perfil
@@ -7095,33 +7161,36 @@ html[data-fx="novo"] #dash-box .pn ~ .dn-sec{margin-top:0}
     var gl = Object.keys(grupos).map(function(k){ var l = grupos[k], nv = l.map(pnNivel); return { k: k, nome: nomeGrupo(k), n: l.length, ct: nv.filter(function(x){ return x >= 2; }).length, req: nv.filter(function(x){ return x >= 4; }).length, apr: nv.filter(function(x){ return x >= 5; }).length }; })
       .sort(function(a, b){ return (a.k === '_org') - (b.k === '_org') || b.n - a.n || b.apr - a.apr || a.nome.localeCompare(b.nome, 'pt'); });
     var gMax = Math.max.apply(null, gl.map(function(g){ return g.n; }).concat([1])), gVis = gl.slice(0, 7);
-    html += '<section class="pn-c pn-s6"><div class="pn-h"><h2 class="pn-t">Consultores e parceiros</h2><button type="button" class="pn-lk" data-fn="g">Ver parceiros</button></div><p class="pn-sub">Mães que cada um trouxe ' + (j.ini ? 'no período' : 'desde o início') + ' e até onde elas chegaram</p>' +
+    html += '<section class="pn-c pn-cp"><div class="pn-h"><h2 class="pn-t">Consultores e parceiros</h2><button type="button" class="pn-lk" data-fn="g">Ver parceiros</button></div><p class="pn-sub">Mães que cada um trouxe ' + (j.ini ? 'no período' : 'desde o início') + ' e até onde elas chegaram</p>' +
       (gl.length ? '<table class="pn-rk"><thead><tr><th>Quem trouxe</th><th class="dir">Entraram</th><th class="dir" title="GPS paga, ou pescadora, agricultora ou indígena">GPS ok</th><th class="dir">Requerim.</th><th class="dir">Aprovadas</th></tr></thead><tbody>' + gVis.map(function(g){ return '<tr' + (g.k === '_org' ? ' class="org"' : '') + '><td><span class="pn-rk-n" title="' + esc(g.nome) + '">' + esc(g.nome) + '</span><span class="pn-rk-b"><i style="width:' + (g.n / gMax * 100).toFixed(1) + '%"></i></span></td><td class="dir tnum"><b>' + g.n + '</b></td><td class="dir tnum">' + g.ct + '</td><td class="dir tnum">' + g.req + '</td><td class="dir tnum">' + g.apr + '</td></tr>'; }).join('') + '</tbody></table>' + (gl.length > 7 ? '<p class="pn-nota">e mais ' + plural(gl.length - 7, 'parceiro', 'parceiros') + '</p>' : '') : '<div class="pn-vazio">Nenhuma mãe entrou no período.</div>') + '</section>';
     var cids = {};
     ent.forEach(function(r){ var c = soCidade(r), uf = ufDaCliente(r); if (!c && !uf) c = 'Sem cidade'; var k = (c || 'Sem cidade') + (uf ? '/' + uf : ''); cids[k] = (cids[k] || 0) + 1; });
     var cl = Object.keys(cids).map(function(k){ return [k, cids[k]]; }).sort(function(a, b){ return b[1] - a[1] || a[0].localeCompare(b[0], 'pt'); }), cMax = cl.length ? cl[0][1] : 1;
-    html += '<section class="pn-c pn-s3"><div class="pn-h"><h2 class="pn-t">Cidades</h2></div><p class="pn-sub">De onde vêm as mães</p>' +
+    html += '<section class="pn-c pn-cc"><div class="pn-h"><h2 class="pn-t">Cidades</h2></div><p class="pn-sub">De onde vêm as mães</p>' +
       (cl.length ? '<ul class="pn-ml">' + cl.slice(0, 6).map(function(c){ return '<li title="' + esc(c[0] + ': ' + plural(c[1], 'mãe', 'mães')) + '"><p><span>' + esc(c[0]) + '</span><b>' + pnNum(c[1]) + '</b></p><i><em style="width:' + (c[1] / cMax * 100).toFixed(1) + '%"></em></i></li>'; }).join('') + '</ul>' + (cl.length > 6 ? '<p class="pn-nota">e mais ' + plural(cl.length - 6, 'cidade', 'cidades') + ' · veja o mapa abaixo</p>' : '') : '<div class="pn-vazio">Sem mães no período.</div>') + '</section>';
     var nGpsP = ent.filter(function(r){ return r.tipoSegurada && !rural(r); }).length, nEsp = ent.filter(rural).length, nSemR = nEnt - nGpsP - nEsp;
     var nInd = ent.filter(function(r){ return r.responsavelId; }).length;
-    html += '<section class="pn-c pn-s3"><div class="pn-h"><h2 class="pn-t">Perfil das mães</h2></div><p class="pn-sub">Das que entraram ' + (j.ini ? 'no período' : 'desde o início') + '</p>' +
-      (nEnt ? '<p class="pn-mini-t">Paga a GPS?</p>' + pnPartes([{ nome: 'Paga a GPS', n: nGpsP, cor: '--ser-1' }, { nome: 'Pescadora, agricultora ou indígena', n: nEsp, cor: '--ser-2' }, { nome: 'Ainda sem resposta', n: nSemR, cor: '--pn-cinza' }], nEnt) +
-        '<p class="pn-mini-t">Como chegaram</p>' + pnPartes([{ nome: 'Indicação de parceiro', n: nInd, cor: '--ser-1' }, { nome: 'Orgânico', n: nEnt - nInd, cor: '--ser-2' }], nEnt) : '<div class="pn-vazio">Sem mães no período.</div>') + '</section>';
+    html += '<section class="pn-c pn-cpf"><div class="pn-h"><h2 class="pn-t">Perfil das mães</h2></div><p class="pn-sub">Das que entraram ' + (j.ini ? 'no período' : 'desde o início') + '</p>' +
+      (nEnt ? '<div class="pn-perfil"><div><p class="pn-mini-t">Paga a GPS?</p>' + pnPartes([{ nome: 'Paga a GPS', n: nGpsP, cor: '--ser-1' }, { nome: 'Pescadora, agricultora ou indígena', n: nEsp, cor: '--ser-2' }, { nome: 'Ainda sem resposta', n: nSemR, cor: '--pn-cinza' }], nEnt) + '</div>' +
+        '<div><p class="pn-mini-t">Como chegaram</p>' + pnPartes([{ nome: 'Indicação de parceiro', n: nInd, cor: '--ser-1' }, { nome: 'Orgânico', n: nEnt - nInd, cor: '--ser-2' }], nEnt) + '</div></div>' : '<div class="pn-vazio">Sem mães no período.</div>') + '</section>';
     // 7. financeiro (só administrador)
     if (isAdmin()){
       var somaH = function(l){ return l.reduce(function(a, r){ return a + honorarios(r); }, 0); };
       var gan = rows.filter(function(r){ return no(pnAprovEm(r)); }), rec = rows.filter(function(r){ return ganhou(r) && r.repasse && r.repasse.data && no(pnDia(r.repasse.data)); }), aRec = rows.filter(function(r){ return ganhou(r) && !(r.repasse && r.repasse.data); });
       var valG = function(r){ return Number(r.gpsValor) > 0 ? Number(r.gpsValor) : (gpsValor() || 0); }, gastoG = rows.filter(function(r){ return no(pnDia(r.guiaPagaEm)); }).reduce(function(a, r){ return a + valG(r); }, 0);
-      html += '<section class="pn-c pn-s12 pn-fin"><div class="pn-h"><h2 class="pn-t">Financeiro</h2><button type="button" class="pn-lk" data-fn="f">Abrir o Financeiro</button></div><p class="pn-sub">Honorários de 30% do benefício + o valor da guia</p><div class="pn-fin-g">' +
+      html += '<section class="pn-c pn-fin"><div class="pn-h"><h2 class="pn-t">Financeiro</h2><button type="button" class="pn-lk" data-fn="f">Abrir o Financeiro</button></div><p class="pn-sub">Honorários de 30% do benefício + o valor da guia</p><div class="pn-fin-g">' +
         '<div><p class="pn-tile-r">Honorários das aprovadas</p><p class="pn-fin-v">' + moedaTxt(somaH(gan)) + '</p><p class="pn-tile-c">' + plural(gan.length, 'aprovada', 'aprovadas') + (j.ini ? ' no período' : '') + '</p></div>' +
         '<div><p class="pn-tile-r">Recebido</p><p class="pn-fin-v">' + moedaTxt(somaH(rec)) + '</p><p class="pn-tile-c">' + plural(rec.length, 'acerto feito', 'acertos feitos') + (j.ini ? ' no período' : '') + '</p></div>' +
-        '<div><p class="pn-tile-r">A receber</p><p class="pn-fin-v">' + moedaTxt(somaH(aRec)) + '</p><p class="pn-tile-c">' + plural(aRec.length, 'aprovada sem acerto', 'aprovadas sem acerto') + ', desde o início</p></div>' +
-        '<div><p class="pn-tile-r">Guias pagas</p><p class="pn-fin-v">' + moedaTxt(gastoG) + '</p><p class="pn-tile-c">' + plural(nGps, 'guia', 'guias') + (j.ini ? ' no período' : '') + ' · o escritório paga e a mãe devolve</p></div>' +
+        '<div><p class="pn-tile-r">A receber</p><p class="pn-fin-v">' + moedaTxt(somaH(aRec)) + '</p><p class="pn-tile-c">' + plural(aRec.length, 'aprovada sem acerto', 'aprovadas sem acerto') + '</p></div>' +
+        '<div><p class="pn-tile-r">Guias pagas</p><p class="pn-fin-v">' + moedaTxt(gastoG) + '</p><p class="pn-tile-c">' + plural(nGps, 'guia', 'guias') + ' · a mãe devolve</p></div>' +
       '</div></section>';
     }
     html += '</div>';
     html += dnSecao('Mapa das mães', 'Mães que entraram no período, por estado e cidade. Clique no estado ou na cidade para ver quem são.', dnMapa(ent));
     box.innerHTML = html;
+    pnDesenharGraf();
+    // menu lateral aberto ou fechado muda a largura sem mudar a janela: o gráfico se redesenha sozinho
+    if (window.ResizeObserver){ if (!pnRO) pnRO = new ResizeObserver(function(){ var l = document.querySelector('#dash-box [data-pn-graf]'); if (l && Math.abs(Math.floor(l.clientWidth) - pnLarg) >= 4) pnDesenharGraf(); }); pnRO.observe(box); }
     if (perAberto) pintarCalendario();
   }
   function renderDash(){
