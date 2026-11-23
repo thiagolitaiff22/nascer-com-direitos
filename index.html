@@ -2651,6 +2651,138 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
   html[data-fx="novo"] .fc-salvar .btn{min-height:32px;border-radius:9px;font-size:12.5px}
   html[data-fx="novo"] .toast,html[data-fx="novo"] #toast{border-radius:10px!important}
 }
+/* ================= Dashboard completo (23/11/2026, a pedido: "mais completo, bonito, com respiro... quantas entram, quantas foram aprovadas") =================
+   Só no computador. Cartões brancos com respiro, um número grande por tela, gráficos de traço fino e uma cor por série. */
+@media (min-width:1000px){
+html[data-fx="novo"]{--pn-cinza:hsl(274 14% 80%)}
+html[data-fx="novo"]:root[data-theme="dark"]{--pn-cinza:hsl(274 10% 34%)}
+html[data-fx="novo"] .pn-topo{margin-bottom:18px}
+html[data-fx="novo"] .pn{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:20px;margin-bottom:24px}
+html[data-fx="novo"] .pn-c{background:hsl(var(--c-card));border:1px solid var(--ap-linha);border-radius:16px;padding:20px 22px;min-width:0;box-shadow:0 1px 2px rgba(41,24,56,.04)}
+html[data-fx="novo"]:root[data-theme="dark"] .pn-c{box-shadow:none}
+html[data-fx="novo"] .pn-s2{grid-column:span 2}html[data-fx="novo"] .pn-s3{grid-column:span 3}html[data-fx="novo"] .pn-s4{grid-column:span 4}
+html[data-fx="novo"] .pn-s5{grid-column:span 5}html[data-fx="novo"] .pn-s6{grid-column:span 6}html[data-fx="novo"] .pn-s7{grid-column:span 7}
+html[data-fx="novo"] .pn-s8{grid-column:span 8}html[data-fx="novo"] .pn-s12{grid-column:span 12}
+html[data-fx="novo"] .pn-c.clic{cursor:pointer;transition:border-color .15s,background .15s}
+html[data-fx="novo"] .pn-c.clic:hover{border-color:hsl(var(--c-pri)/.35);background:var(--ap-lil)}
+html[data-fx="novo"] .pn-h{display:flex;align-items:center;gap:12px;margin:0 0 3px;min-height:22px}
+html[data-fx="novo"] .pn-t{margin:0;font-family:'Fraunces',Georgia,serif;font-size:16px;font-weight:600;letter-spacing:-.005em;color:var(--ink)}
+html[data-fx="novo"] .pn-sub{margin:0 0 18px;font-size:12px;color:var(--ink-3);line-height:1.45}
+html[data-fx="novo"] .pn-lk{margin-left:auto;font-size:12px;font-weight:500;color:var(--ap-g1);padding:2px 0;background:none;border:0;cursor:pointer}
+html[data-fx="novo"]:root[data-theme="dark"] .pn-lk{color:#c9a3ea}
+html[data-fx="novo"] .pn-lk:hover{text-decoration:underline}
+html[data-fx="novo"] .pn-nota{margin:14px 0 0;font-size:11.5px;color:var(--ink-3);line-height:1.5}
+html[data-fx="novo"] .pn-vazio{padding:28px 0;text-align:center;color:var(--ink-3);font-size:12.5px}
+/* números do topo */
+html[data-fx="novo"] .pn-tile{display:flex;flex-direction:column;padding:18px 18px 16px}
+html[data-fx="novo"] .pn-tile-r{margin:0;font-size:12px;color:var(--ink-3);font-weight:500}
+html[data-fx="novo"] .pn-tile-v{margin:8px 0 6px;font-size:28px;font-weight:600;letter-spacing:-.02em;line-height:1;color:var(--ink)}
+html[data-fx="novo"] .pn-tile-c{margin:6px 0 0;font-size:11.5px;color:var(--ink-3);line-height:1.4}
+html[data-fx="novo"] .pn-tile .pn-tile-c{margin-top:auto;padding-top:6px}
+html[data-fx="novo"] .pn-var{display:block;font-size:11.5px;color:var(--ink-3)}
+html[data-fx="novo"] .pn-var b{font-weight:600;color:var(--ink-2)}
+html[data-fx="novo"] .pn-var b.sobe{color:var(--green)}
+html[data-fx="novo"] .pn-var b.desce{color:var(--red)}
+html[data-fx="novo"] .pn-hero{padding:20px 22px 18px;background:linear-gradient(135deg,var(--ap-g1),var(--ap-g2));border:0;color:#fff}
+html[data-fx="novo"] .pn-hero .pn-tile-r,html[data-fx="novo"] .pn-hero .pn-tile-c,html[data-fx="novo"] .pn-hero .pn-var{color:rgba(255,255,255,.78)}
+html[data-fx="novo"] .pn-hero .pn-var b,html[data-fx="novo"] .pn-hero .pn-var b.sobe,html[data-fx="novo"] .pn-hero .pn-var b.desce{color:#fff}
+html[data-fx="novo"] .pn-hero-l{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:8px 0 6px}
+html[data-fx="novo"] .pn-hero-v{margin:0;font-size:52px;font-weight:600;letter-spacing:-.03em;line-height:.95;color:#fff}
+html[data-fx="novo"] .pn-spark rect{fill:rgba(255,255,255,.32)}
+html[data-fx="novo"] .pn-spark rect.ag{fill:#fff}
+/* barras horizontais: funil, tempos e cidades */
+html[data-fx="novo"] .pn-funil,html[data-fx="novo"] .pn-tempos,html[data-fx="novo"] .pn-cid{display:grid;gap:9px}
+html[data-fx="novo"] .pn-bl{display:grid;grid-template-columns:148px minmax(0,1fr) 78px;align-items:center;gap:14px;min-height:22px;border-radius:8px}
+html[data-fx="novo"] .pn-tempos .pn-bl{grid-template-columns:154px minmax(0,1fr) 46px;gap:12px}
+/* cidades: nome e número numa linha, barrinha embaixo (o nome inteiro cabe) */
+html[data-fx="novo"] .pn-ml{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+html[data-fx="novo"] .pn-ml p{display:flex;align-items:baseline;gap:10px;margin:0 0 5px;font-size:12.5px;color:var(--ink-2)}
+html[data-fx="novo"] .pn-ml p span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .pn-ml p b{margin-left:auto;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+html[data-fx="novo"] .pn-ml i{display:block;height:6px;border-radius:999px;background:var(--ap-lil)}
+html[data-fx="novo"] .pn-ml em{display:block;height:100%;border-radius:999px;background:hsl(var(--c-pri)/.6)}
+html[data-fx="novo"] .pn-bl-r{font-size:12.5px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-fx="novo"] .pn-bl-t{display:block;height:16px;border-radius:0 5px 5px 0;background:var(--ap-lil)}
+html[data-fx="novo"] .pn-bl-t i{display:block;height:100%;border-radius:0 4px 4px 0;background:var(--ser-1)}
+html[data-fx="novo"] .pn-bl.leve .pn-bl-t{height:10px;background:transparent}
+html[data-fx="novo"] .pn-bl.leve .pn-bl-t i{background:hsl(var(--c-pri)/.55)}
+html[data-fx="novo"] .pn-bl.forte .pn-bl-r{color:var(--ink);font-weight:600}
+html[data-fx="novo"] .pn-bl-v{font-size:12.5px;color:var(--ink-3);white-space:nowrap;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:6px}
+html[data-fx="novo"] .pn-bl-v b{font-weight:600;color:var(--ink)}
+html[data-fx="novo"] .pn-bl-v small{font-size:11.5px;color:var(--ink-3)}
+html[data-fx="novo"] .pn-funil .pn-bl-v{justify-content:flex-start}
+html[data-fx="novo"] .pn-total{margin-top:20px;padding:14px 16px;border-radius:12px;background:var(--ap-lil)}
+html[data-fx="novo"] .pn-total p{margin:0;font-size:12px;color:var(--ink-3)}
+html[data-fx="novo"] .pn-total b{display:block;margin:4px 0 2px;font-size:22px;font-weight:600;letter-spacing:-.02em;color:var(--ink)}
+html[data-fx="novo"] .pn-total small{font-size:11.5px;color:var(--ink-3)}
+/* resultado no INSS */
+html[data-fx="novo"] .pn-taxa{display:flex;align-items:center;gap:14px;margin:2px 0 12px}
+html[data-fx="novo"] .pn-taxa-v{margin:0;font-size:40px;font-weight:600;letter-spacing:-.03em;line-height:1;color:var(--ink)}
+html[data-fx="novo"] .pn-taxa-r{margin:0;font-size:13px;font-weight:600;color:var(--ink)}
+html[data-fx="novo"] .pn-taxa .pn-tile-c{margin-top:2px}
+html[data-fx="novo"] .pn-meter{height:8px;border-radius:999px;background:var(--green-soft);overflow:hidden;margin-bottom:16px}
+html[data-fx="novo"] .pn-meter i{display:block;height:100%;border-radius:999px;background:var(--green)}
+html[data-fx="novo"] .pn-st{list-style:none;margin:0;padding:0}
+html[data-fx="novo"] .pn-st li{display:flex;align-items:center;gap:10px;padding:9px 6px;margin:0 -6px;border-top:1px solid var(--ap-linha);font-size:12.5px;color:var(--ink-2);cursor:pointer;border-radius:8px}
+html[data-fx="novo"] .pn-st li:first-child{border-top:0}
+html[data-fx="novo"] .pn-st li:hover{background:var(--ap-lil)}
+html[data-fx="novo"] .pn-st li small{font-size:11.5px;color:var(--ink-3)}
+html[data-fx="novo"] .pn-st li b{margin-left:auto;font-size:14px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+html[data-fx="novo"] .pn-st-i{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;background:hsl(var(--c-sec));color:var(--ap-g1);flex:none}
+html[data-fx="novo"] .pn-st-i svg.i{width:13px;height:13px}
+html[data-fx="novo"] .pn-st-i.ok{background:var(--green-soft);color:var(--green)}
+html[data-fx="novo"] .pn-st-i.ruim{background:var(--red-soft);color:var(--red)}
+/* mês a mês */
+html[data-fx="novo"] .pn-leg{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+html[data-fx="novo"] .pn-leg li{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-2)}
+html[data-fx="novo"] .pn-leg li i{width:10px;height:10px;border-radius:3px;flex:none}
+html[data-fx="novo"] .pn-leg li b{margin-left:auto;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+html[data-fx="novo"] .pn-leg-top{display:flex;gap:16px;margin-left:14px}
+html[data-fx="novo"] .pn-leg-top li i{width:14px;height:3px;border-radius:2px}
+html[data-fx="novo"] .pn-graf{position:relative}
+html[data-fx="novo"] .pn-graf svg{display:block;overflow:visible}
+html[data-fx="novo"] .pn-g{stroke:var(--ap-linha);stroke-width:1}
+html[data-fx="novo"] .pn-ax{font-size:11px;fill:var(--ink-3);font-variant-numeric:tabular-nums}
+html[data-fx="novo"] .pn-fim{font-size:12px;font-weight:600;fill:var(--ink)}
+html[data-fx="novo"] .pn-fim-v{font-size:11px;fill:var(--ink-3)}
+html[data-fx="novo"] .pn-cruz{stroke:var(--ink-3);stroke-width:1;opacity:.45}
+html[data-fx="novo"] .pn-dica{position:absolute;min-width:180px;background:hsl(var(--c-card));border:1px solid var(--ap-linha);border-radius:12px;padding:10px 12px;box-shadow:0 8px 24px rgba(41,24,56,.12);pointer-events:none;font-size:12px;z-index:3}
+html[data-fx="novo"] .pn-dica b{display:block;font-weight:600;color:var(--ink);margin-bottom:6px}
+html[data-fx="novo"] .pn-dica p{display:flex;align-items:center;gap:8px;margin:3px 0;color:var(--ink-2)}
+html[data-fx="novo"] .pn-dica p i{width:10px;height:3px;border-radius:2px}
+html[data-fx="novo"] .pn-dica p span{margin-left:auto;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+html[data-fx="novo"] .pn-dica .pn-dica-x{padding-left:18px;color:var(--ink-3)}
+html[data-fx="novo"] .pn-tab{width:100%;font-size:12.5px}
+html[data-fx="novo"] .pn-tab td,html[data-fx="novo"] .pn-tab th{padding:7px 10px}
+html[data-fx="novo"] .pn-tab .dir{text-align:right}
+/* consultores e parceiros */
+html[data-fx="novo"] .pn-rk{width:100%;border-collapse:collapse;font-size:12.5px}
+html[data-fx="novo"] .pn-rk th{font-size:11px;font-weight:500;color:var(--ink-3);text-align:left;padding:0 8px 8px;border-bottom:1px solid var(--ap-linha)}
+html[data-fx="novo"] .pn-rk td{padding:9px 8px;border-bottom:1px solid var(--ap-linha);color:var(--ink-2);vertical-align:middle}
+html[data-fx="novo"] .pn-rk tr:last-child td{border-bottom:0}
+html[data-fx="novo"] .pn-rk .dir{text-align:right;width:74px}
+html[data-fx="novo"] .pn-rk th:first-child,html[data-fx="novo"] .pn-rk td:first-child{padding-left:0}
+html[data-fx="novo"] .pn-rk th:last-child,html[data-fx="novo"] .pn-rk td:last-child{padding-right:0}
+html[data-fx="novo"] .pn-rk td b{font-weight:600;color:var(--ink)}
+html[data-fx="novo"] .pn-rk-n{display:block;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink);font-weight:500}
+html[data-fx="novo"] .pn-rk-b{display:block;height:4px;margin-top:5px;max-width:220px}
+html[data-fx="novo"] .pn-rk-b i{display:block;height:100%;border-radius:999px;background:hsl(var(--c-pri)/.5)}
+html[data-fx="novo"] .pn-rk tr.org .pn-rk-n{color:var(--ink-3);font-weight:400}
+html[data-fx="novo"] .pn-rk tr.org .pn-rk-b i{background:var(--pn-cinza)}
+/* perfil: barra dividida em partes */
+html[data-fx="novo"] .pn-mini-t{margin:0 0 8px;font-size:12px;font-weight:600;color:var(--ink-2)}
+html[data-fx="novo"] .pn-mini-t ~ .pn-mini-t{margin-top:18px}
+html[data-fx="novo"] .pn-seg{display:flex;gap:2px;height:28px;margin-bottom:10px}
+html[data-fx="novo"] .pn-seg span{display:flex;align-items:center;padding:0 8px;border-radius:4px;min-width:0;font-size:11.5px;font-weight:600;color:#fff;white-space:nowrap;overflow:visible}
+html[data-fx="novo"] .pn-seg span[style*="--pn-cinza"]{color:var(--ink)}
+/* financeiro */
+html[data-fx="novo"] .pn-fin-g{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
+html[data-fx="novo"] .pn-fin-g > div{padding:2px 20px;border-left:1px solid var(--ap-linha)}
+html[data-fx="novo"] .pn-fin-g > div:first-child{padding-left:0;border-left:0}
+html[data-fx="novo"] .pn-fin-v{margin:8px 0 2px;font-size:22px;font-weight:600;letter-spacing:-.02em;color:var(--ink)}
+/* o mapa continua igual, só com o mesmo respiro */
+html[data-fx="novo"] #dash-box .pn ~ .dn-sec{margin-top:0}
+}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -6792,9 +6924,212 @@ html[data-fx="novo"] .fc-ana{display:flex;align-items:center;gap:7px;margin-top:
     box.innerHTML = html;
     if (perAberto) pintarCalendario();
   }
+  /* ---------- Dashboard completo do fluxo novo (23/11/2026, a pedido: "algo mais completo, bonito, com respiro, que funcione com os dados das mães:
+     quantas entram, quantas foram aprovadas"). Só na tela do computador (>= 1000px); no celular continua o renderDashNovo.
+     Tudo sai das mães do BI (state.rows, só o fluxo novo): nenhum número é digitado à mão. ---------- */
+  function pnDia(d){ return d ? diaLocal(d) || '' : ''; }
+  function pnContratoEm(r){ return ctPend(r) ? '' : (ctAssinadoEm(r) || pnDia(r.contratoEm)); }
+  function pnPaga(r){ return r.pagamento === 'pago' || !!(r.recebimento && r.recebimento.data) || !!(r.repasse && r.repasse.data) || arquivadoPago(r); }
+  function pnPagaEm(r){ return pnDia((r.recebimento && r.recebimento.data) || (r.repasse && r.repasse.data) || (pnPaga(r) ? r.arquivadoEm || r.inssDecisaoEm : '')); }
+  function pnAprovEm(r){ return ganhou(r) ? pnDia(r.inssDecisaoEm || r.sentencaEm || dataGanho(r)) : ''; }
+  // até onde a mãe chegou na jornada (0 = só entrou ... 7 = benefício pago). Do requerimento em diante, o passo já prova os de antes
+  var PN_PASSOS = [
+    ['Entraram', 'cadastro feito pelo aplicativo'],
+    ['Contrato assinado', 'contrato e procuração assinados no ZapSign'],
+    ['Documentos completos', 'senha gov.br, NIT, RG e CPF'],
+    ['GPS paga ou sem GPS', 'pescadora, agricultora ou indígena não paga a guia'],
+    ['Bebê nasceu', 'data de nascimento informada'],
+    ['Requerimento feito', 'protocolo no INSS'],
+    ['Aprovadas', 'benefício concedido no INSS ou na Justiça'],
+    ['Benefício pago', 'dinheiro na conta e acerto feito']
+  ];
+  function pnNivel(r){
+    if (pnPaga(r)) return 7;
+    if (ganhou(r)) return 6;
+    if (requerido(r) || String(r.processo || '').trim()) return 5;
+    var n = 0;
+    if (pnContratoEm(r)) n = 1;
+    if (n >= 1 && !faltamTxt(r)) n = 2;
+    // GPS paga conta mesmo com a senha ou um documento ainda faltando (a guia sai com o NIT, regra de 11/11/2026)
+    if (n >= 1 && (gpsPaga(r) || (n >= 2 && (rural(r) || semGps(r))))) n = 3;
+    if (n === 3 && r.criancaNasc) n = 4;
+    return n;
+  }
+  function pnMediana(v){ if (!v.length) return null; var s = v.slice().sort(function(a, b){ return a - b; }), m = Math.floor(s.length / 2); return s.length % 2 ? s[m] : Math.round((s[m - 1] + s[m]) / 2); }
+  function pnDias(a, b){ return Math.round((parseDate(b) - parseDate(a)) / 864e5); }
+  function pnNum(n){ return Number(n || 0).toLocaleString('pt-BR'); }
+  function pnPct(a, b){ return b ? Math.round(a / b * 100) : null; }
+  // variação contra o período anterior de mesmo tamanho
+  function pnVar(atual, antes){
+    if (antes == null) return '';
+    var d = atual - antes;
+    if (!d) return '<span class="pn-var">igual ao período anterior</span>';
+    // base pequena: a diferença em número diz mais que a porcentagem (de 1 para 229 seriam "22800%")
+    if (antes < 10) return '<span class="pn-var"><b class="' + (d > 0 ? 'sobe' : 'desce') + '">' + (d > 0 ? '+' : '−') + pnNum(Math.abs(d)) + '</b> vs anterior (' + pnNum(antes) + ')</span>';
+    var v = Math.round(d / antes * 100);
+    return '<span class="pn-var"><b class="' + (v > 0 ? 'sobe' : 'desce') + '">' + (v > 0 ? '↑ ' : '↓ ') + Math.abs(v) + '%</b> vs anterior</span>';
+  }
+  var pnSerie = null, pnTabela = false;
+  function pnMeses(fim, n){ var out = [], a = +fim.slice(0, 4), m = +fim.slice(5, 7); for (var i = 0; i < n; i++){ out.unshift({ k: a + '-' + (m < 10 ? '0' : '') + m, rot: DASH_MESES[m - 1] + (m === 1 || i === n - 1 ? '/' + String(a).slice(2) : '') }); m--; if (m < 1){ m = 12; a--; } } return out; }
+  // gráfico de linhas (entradas e aprovadas por mês): uma escala só, linhas de 2px, mira e dica ao passar o mouse
+  function pnLinhas(s, W){
+    var H = 230, ml = 34, mr = 92, mt = 16, mb = 30, pw = W - ml - mr, ph = H - mt - mb, n = s.rot.length;
+    var maxV = Math.max.apply(null, s.series.reduce(function(a, x){ return a.concat(x.v); }, [1])), passo = 1;
+    [1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 5000].some(function(p){ passo = p; return maxV / p <= 4; });
+    var topo = Math.ceil(maxV / passo) * passo;
+    var x = function(i){ return ml + (n > 1 ? pw * i / (n - 1) : pw / 2); }, y = function(v){ return mt + ph - ph * v / topo; };
+    var g = '';
+    for (var t = 0; t <= topo; t += passo) g += '<line class="pn-g" x1="' + ml + '" x2="' + (ml + pw) + '" y1="' + y(t).toFixed(1) + '" y2="' + y(t).toFixed(1) + '"/><text class="pn-ax" x="' + (ml - 10) + '" y="' + (y(t) + 4).toFixed(1) + '" text-anchor="end">' + pnNum(t) + '</text>';
+    var salto = Math.max(1, Math.ceil(n / Math.max(2, Math.floor(pw / 56))));
+    for (var i = 0; i < n; i++) if (i % salto === 0 || i === n - 1) g += '<text class="pn-ax" x="' + x(i).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="middle">' + esc(s.rot[i]) + '</text>';
+    var pts = function(v){ return v.map(function(q, k){ return [x(k), y(q)]; }); };
+    var base = y(0), corpo = '';
+    s.series.forEach(function(se, k){
+      var c = 'var(' + se.cor + ')';
+      if (k === 0 && n > 1) corpo += '<path d="' + curvaSuave(pts(se.v)) + 'L' + x(n - 1).toFixed(1) + ',' + base.toFixed(1) + 'L' + x(0).toFixed(1) + ',' + base.toFixed(1) + 'Z" fill="' + c + '" fill-opacity=".09" stroke="none"/>';
+      corpo += n > 1 ? '<path d="' + curvaSuave(pts(se.v)) + '" fill="none" stroke="' + c + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' : '';
+      var ul = se.v[n - 1];
+      corpo += '<circle cx="' + x(n - 1).toFixed(1) + '" cy="' + y(ul).toFixed(1) + '" r="4" fill="' + c + '" stroke="hsl(var(--c-card))" stroke-width="2"/>';
+    });
+    // rótulo no fim de cada linha (nome e valor do último mês); se as duas pontas ficarem perto, a de baixo desce
+    var fins = s.series.map(function(se){ return { nome: se.nome, v: se.v[n - 1], y: y(se.v[n - 1]) }; }).sort(function(a, b){ return a.y - b.y; });
+    for (var f = 1; f < fins.length; f++) if (fins[f].y - fins[f - 1].y < 30) fins[f].y = fins[f - 1].y + 30;
+    fins.forEach(function(fi){ corpo += '<text class="pn-fim" x="' + (x(n - 1) + 10).toFixed(1) + '" y="' + (fi.y - 2).toFixed(1) + '">' + esc(fi.nome) + '</text><text class="pn-fim-v" x="' + (x(n - 1) + 10).toFixed(1) + '" y="' + (fi.y + 13).toFixed(1) + '">' + pnNum(fi.v) + ' no mês</text>'; });
+    return '<div class="pn-graf"><svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Entradas e aprovadas por mês" data-ml="' + ml + '" data-pw="' + pw + '" data-n="' + n + '">' + g + corpo +
+      '<g class="pn-mira" hidden><line class="pn-cruz" y1="' + mt + '" y2="' + (mt + ph) + '"/>' + s.series.map(function(se, k){ return '<circle r="5" fill="var(' + se.cor + ')" stroke="hsl(var(--c-card))" stroke-width="2" data-k="' + k + '"/>'; }).join('') + '</g>' +
+      '<rect class="pn-alvo" x="' + ml + '" y="' + mt + '" width="' + pw + '" height="' + ph + '" fill="transparent"/></svg><div class="pn-dica" hidden></div></div>';
+  }
+  document.addEventListener('pointermove', function(e){
+    var svg = e.target.closest && e.target.closest('.pn-graf svg'); if (!svg || !pnSerie) return;
+    var b = svg.getBoundingClientRect(), ml = +svg.dataset.ml, pw = +svg.dataset.pw, n = +svg.dataset.n, H = +svg.getAttribute('height');
+    var i = Math.max(0, Math.min(n - 1, Math.round((e.clientX - b.left - ml) / (n > 1 ? pw / (n - 1) : 1)))), xs = ml + (n > 1 ? pw * i / (n - 1) : pw / 2);
+    var topo = Math.max.apply(null, pnSerie.series.reduce(function(a, x){ return a.concat(x.v); }, [1])), mt = 16, ph = H - 16 - 30, passo = 1;
+    [1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 5000].some(function(p){ passo = p; return topo / p <= 4; }); topo = Math.ceil(topo / passo) * passo;
+    var mira = svg.querySelector('.pn-mira'); mira.removeAttribute('hidden');
+    var l = mira.querySelector('line'); l.setAttribute('x1', xs); l.setAttribute('x2', xs);
+    Array.prototype.forEach.call(mira.querySelectorAll('circle'), function(c){ var v = pnSerie.series[+c.dataset.k].v[i]; c.setAttribute('cx', xs); c.setAttribute('cy', mt + ph - ph * v / topo); });
+    var tip = svg.parentNode.querySelector('.pn-dica');
+    tip.innerHTML = '<b>' + esc(pnSerie.nomes[i]) + '</b>' + pnSerie.series.map(function(se){ return '<p><i style="background:var(' + se.cor + ')"></i>' + esc(se.nome) + '<span>' + pnNum(se.v[i]) + '</span></p>'; }).join('') + (pnSerie.extra ? '<p class="pn-dica-x">' + esc(pnSerie.extra.nome) + '<span>' + pnNum(pnSerie.extra.v[i]) + '</span></p>' : '');
+    tip.hidden = false; var lx = xs + 14; if (lx + 190 > b.width) lx = xs - 204; tip.style.left = lx + 'px'; tip.style.top = '18px';
+  });
+  document.addEventListener('pointerout', function(e){
+    var svg = e.target.closest && e.target.closest('.pn-graf svg'); if (!svg || (e.relatedTarget && svg.contains(e.relatedTarget))) return;
+    svg.querySelector('.pn-mira').setAttribute('hidden', ''); svg.parentNode.querySelector('.pn-dica').hidden = true;
+  });
+  document.addEventListener('click', function(e){ var b = e.target.closest && e.target.closest('[data-pn-tabela]'); if (!b) return; pnTabela = !pnTabela; renderDash(); });
+  // barras horizontais (funil, tempos, cidades): uma cor só; o número fica na ponta, fora da barra
+  function pnBarra(rot, valor, pct, txt, dica, cls, fn){
+    return '<div class="pn-bl' + (cls ? ' ' + cls : '') + (fn ? ' clic' : '') + '"' + (fn ? ' role="button" tabindex="0" data-fn="' + fn + '"' : '') + ' title="' + esc(dica || '') + '"><span class="pn-bl-r">' + rot + '</span><span class="pn-bl-t"><i style="width:' + Math.max(valor > 0 ? 1.5 : 0, Math.min(100, pct)).toFixed(1) + '%"></i></span><span class="pn-bl-v">' + txt + '</span></div>';
+  }
+  // barra dividida em partes (perfil das mães): cada parte com a sua fatia escrita dentro, quando cabe
+  function pnPartes(partes, total){
+    var vis = partes.filter(function(p){ return p.n > 0; });
+    return '<div class="pn-seg" role="img" aria-label="' + esc(vis.map(function(p){ return p.nome + ': ' + p.n; }).join(', ')) + '">' + vis.map(function(p){ var w = total ? p.n / total * 100 : 0; return '<span style="flex:' + p.n + ' 1 0;background:var(' + p.cor + ')" title="' + esc(p.nome + ': ' + p.n + ' (' + Math.round(w) + '%)') + '">' + (w >= 14 ? Math.round(w) + '%' : '') + '</span>'; }).join('') + '</div>' +
+      '<ul class="pn-leg">' + partes.map(function(p){ return '<li><i style="background:var(' + p.cor + ')"></i>' + esc(p.nome) + '<b>' + pnNum(p.n) + '</b></li>'; }).join('') + '</ul>';
+  }
+  function pnTile(rot, valor, varHtml, ctx, fn){
+    return '<div class="pn-c pn-s2 pn-tile' + (fn ? ' clic' : '') + '"' + (fn ? ' role="button" tabindex="0" data-fn="' + fn + '"' : '') + '><p class="pn-tile-r">' + rot + '</p><p class="pn-tile-v">' + valor + '</p>' + (varHtml || '') + (ctx ? '<p class="pn-tile-c">' + ctx + '</p>' : '') + '</div>';
+  }
+  function renderPainel(box){
+    // primeira vez no Dashboard novo: abre em "Este ano" (num mês só, quase ninguém chega ao fim da jornada)
+    if (!lerGuardado('nascer-painel-v1', false)){ guardar('nascer-painel-v1', true); if (dashPer === 'mes'){ dashPer = 'ano'; guardar('nascer-dash-per', 'ano'); } }
+    var rows = state.rows, j = dashJanela(), hoje = iso(new Date());
+    var no = function(d){ return !!d && (!j.ini || d >= j.ini) && d <= j.fim; };
+    var ant = null;
+    if (j.ini){ var di = parseDate(j.ini), df = parseDate(j.fim), len = Math.round((df - di) / 864e5) + 1, af = new Date(di); af.setDate(af.getDate() - 1); var ai = new Date(af); ai.setDate(ai.getDate() - len + 1); ant = { ini: iso(ai), fim: iso(af) }; }
+    var noAnt = function(d){ return !!ant && !!d && d >= ant.ini && d <= ant.fim; };
+    var conta = function(f, q){ return rows.filter(function(r){ return f(q(r)); }).length; };
+    var qEnt = function(r){ return dataCad(r); }, qCt = pnContratoEm, qGps = function(r){ return pnDia(r.guiaPagaEm); }, qReq = function(r){ return pnDia(r.der); }, qApr = pnAprovEm;
+    var ent = rows.filter(function(r){ return no(dataCad(r)); });
+    var nEnt = ent.length, nCt = conta(no, qCt), nGps = conta(no, qGps), nReq = conta(no, qReq), nApr = conta(no, qApr);
+    var aEnt = ant ? conta(noAnt, qEnt) : null, aCt = ant ? conta(noAnt, qCt) : null, aGps = ant ? conta(noAnt, qGps) : null, aReq = ant ? conta(noAnt, qReq) : null, aApr = ant ? conta(noAnt, qApr) : null;
+    var decConc = rows.filter(function(r){ return r.inssStatus === 'concedido' && no(pnDia(r.inssDecisaoEm)); }).length, decInd = rows.filter(function(r){ return r.inssStatus === 'indeferido' && no(pnDia(r.inssDecisaoEm)); }).length;
+    var taxa = pnPct(decConc, decConc + decInd);
+    var curta = function(d, ano){ var p = String(d).split('-'); return p[2] + '/' + p[1] + (ano ? '/' + p[0].slice(2) : ''); };
+    var faixa = j.ini ? (j.ini === j.fim ? curta(j.fim, 1) : curta(j.ini, j.ini.slice(0, 4) !== j.fim.slice(0, 4)) + ' – ' + curta(j.fim, 1)) : 'desde o início';
+    var html = '<div class="fbar dn-topo pn-topo"><h1 class="dn-h1"><span class="dn-h1-ico">' + svgI('i-grid') + '</span>Dashboard</h1><span class="dn-sep" aria-hidden="true"></span>' + dashPeriodo(j) + '<span class="tb-fim fb-count tnum">' + esc(faixa) + '</span><span class="dn-atual">' + svgI('i-sync') + 'Atualizado às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + '</span></div>';
+    html += '<div class="pn">';
+    // 1. o número principal e os quatro marcos do período
+    var meses12 = pnMeses(j.fim, 12), sp = meses12.map(function(m){ return rows.filter(function(r){ return dataCad(r).slice(0, 7) === m.k; }).length; }), spMax = Math.max.apply(null, sp.concat([1]));
+    var spark = '<svg class="pn-spark" width="132" height="40" viewBox="0 0 132 40" aria-hidden="true">' + sp.map(function(v, i){ var h = Math.max(v ? 3 : 1.5, v / spMax * 36); return '<rect x="' + (i * 11) + '" y="' + (40 - h).toFixed(1) + '" width="7" height="' + h.toFixed(1) + '" rx="2" class="' + (i === 11 ? 'ag' : '') + '"><title>' + esc(meses12[i].rot.replace(/\/\d+$/, '')) + ': ' + v + '</title></rect>'; }).join('') + '</svg>';
+    html += '<div class="pn-c pn-s4 pn-hero"><p class="pn-tile-r">Mães que entraram</p><div class="pn-hero-l"><p class="pn-hero-v">' + pnNum(nEnt) + '</p>' + spark + '</div>' + pnVar(nEnt, aEnt) +
+      '<p class="pn-tile-c">' + (j.ini ? esc(dashPerRotulo().toLowerCase()) : 'desde o início') + ' · barras: últimos 12 meses</p></div>';
+    html += pnTile('Contratos assinados', pnNum(nCt), pnVar(nCt, aCt), nEnt ? pnPct(Math.min(nCt, nEnt), nEnt) + '% das que entraram' : '', 'k');
+    html += pnTile('GPS pagas', pnNum(nGps), pnVar(nGps, aGps), nGps ? moedaTxt(nGps * (gpsValor() || 0)) + ' em guias' : 'nenhuma no período', 'gp');
+    html += pnTile('Requerimentos', pnNum(nReq), pnVar(nReq, aReq), 'feitos no INSS', 'i');
+    html += pnTile('Aprovadas', pnNum(nApr), pnVar(nApr, aApr), taxa == null ? 'sem decisão no período' : taxa + '% de aprovação', 'r');
+    // 2. funil: das mães que entraram no período, até onde chegaram
+    var niv = ent.map(pnNivel), cont = PN_PASSOS.map(function(p, i){ return niv.filter(function(n){ return n >= i; }).length; });
+    var perdas = ent.filter(perdaOuDesq).length;
+    html += '<section class="pn-c pn-s7"><div class="pn-h"><h2 class="pn-t">Jornada das mães</h2></div><p class="pn-sub">' + (nEnt ? 'Das ' + pnNum(nEnt) + ' mães que entraram ' + (j.ini ? 'no período' : 'desde o início') + ', quantas já chegaram a cada passo' : 'Nenhuma mãe entrou no período') + '</p>' +
+      (nEnt ? '<div class="pn-funil">' + PN_PASSOS.map(function(p, i){ var pc = pnPct(cont[i], nEnt), ant2 = i ? cont[i - 1] : 0; return pnBarra(esc(p[0]), cont[i], pc, '<b>' + pnNum(cont[i]) + '</b><small>' + pc + '%</small>', p[0] + ': ' + cont[i] + ' de ' + nEnt + ' (' + pc + '%)' + (i ? ' · do passo anterior: ' + (pnPct(cont[i], ant2) == null ? '—' : pnPct(cont[i], ant2) + '%') : '') + ' · ' + p[1], i === 6 ? 'forte' : ''); }).join('') + '</div>' +
+        '<p class="pn-nota">' + (perdas ? plural(perdas, 'mãe saiu', 'mães saíram') + ' no caminho (perda ou desqualificada). ' : '') + 'Passe o mouse numa barra para ver quanto passou do passo anterior.</p>' : '<div class="pn-vazio">Escolha um período maior no calendário.</div>') + '</section>';
+    // 3. resultado no INSS
+    var emAn = rows.filter(function(r){ return noInss(r) && statusInss(r) === 'analise'; }).length, emEx = rows.filter(function(r){ return noInss(r) && statusInss(r) === 'exigencia'; }).length;
+    var tAn = pnMediana(rows.filter(function(r){ return r.der && (r.inssStatus === 'concedido' || r.inssStatus === 'indeferido') && no(pnDia(r.inssDecisaoEm)); }).map(function(r){ return pnDias(pnDia(r.der), pnDia(r.inssDecisaoEm)); }).filter(function(d){ return d >= 0; }));
+    html += '<section class="pn-c pn-s5"><div class="pn-h"><h2 class="pn-t">Resultado no INSS</h2></div><p class="pn-sub">Decisões ' + (j.ini ? 'do período' : 'desde o início') + ' e o que está esperando agora</p>' +
+      '<div class="pn-taxa"><p class="pn-taxa-v">' + (taxa == null ? '—' : taxa + '%') + '</p><div><p class="pn-taxa-r">de aprovação</p><p class="pn-tile-c">' + (decConc + decInd ? pnNum(decConc) + ' de ' + pnNum(decConc + decInd) + ' decididas' : 'nenhuma decisão no período') + '</p></div></div>' +
+      '<div class="pn-meter" title="' + (taxa == null ? 'Sem decisões no período' : taxa + '% aprovadas') + '"><i style="width:' + (taxa || 0) + '%"></i></div>' +
+      '<ul class="pn-st">' +
+        '<li data-fn="r" role="button" tabindex="0"><span class="pn-st-i ok">' + svgI('i-check') + '</span>Concedidas<b>' + pnNum(decConc) + '</b></li>' +
+        '<li data-fn="c" role="button" tabindex="0"><span class="pn-st-i ruim">' + svgI('i-x') + '</span>Indeferidas<small>vão para o Judicial</small><b>' + pnNum(decInd) + '</b></li>' +
+        '<li data-fn="i" role="button" tabindex="0"><span class="pn-st-i">' + svgI('i-clock') + '</span>Em análise agora<b>' + pnNum(emAn) + '</b></li>' +
+        '<li data-fn="i" role="button" tabindex="0"><span class="pn-st-i">' + svgI('i-alert') + '</span>Em exigência agora<b>' + pnNum(emEx) + '</b></li>' +
+      '</ul><p class="pn-nota">' + (tAn == null ? 'Ainda sem decisões para medir o tempo de análise.' : 'O INSS levou ' + tAn + ' dias para decidir (mediana).') + '</p></section>';
+    // 4. mês a mês: entradas e aprovadas (requerimentos aparecem na dica)
+    var nMes = Math.max(6, j.ini ? Math.min(24, (+j.fim.slice(0, 4) - +j.ini.slice(0, 4)) * 12 + (+j.fim.slice(5, 7) - +j.ini.slice(5, 7)) + 1) : 12);
+    if (!j.ini){ var prim = rows.map(dataCad).filter(Boolean).sort()[0]; if (prim) nMes = Math.max(6, Math.min(24, (+j.fim.slice(0, 4) - +prim.slice(0, 4)) * 12 + (+j.fim.slice(5, 7) - +prim.slice(5, 7)) + 1)); }
+    var ms = pnMeses(j.fim, nMes), porMes = function(q){ return ms.map(function(m){ return rows.filter(function(r){ return String(q(r) || '').slice(0, 7) === m.k; }).length; }); };
+    pnSerie = { rot: ms.map(function(m){ return m.rot; }), nomes: ms.map(function(m){ var p = m.k.split('-'); var nm = CAL_MESES[+p[1] - 1]; return nm.charAt(0).toUpperCase() + nm.slice(1) + ' de ' + p[0]; }), series: [{ nome: 'Entradas', cor: '--ser-1', v: porMes(qEnt) }, { nome: 'Aprovadas', cor: '--ser-2', v: porMes(qApr) }], extra: { nome: 'Requerimentos', v: porMes(qReq) } };
+    var col = (box.clientWidth - 11 * 20) / 12, wEvo = Math.max(420, Math.floor(col * 8 + 7 * 20 - 46));
+    html += '<section class="pn-c pn-s8"><div class="pn-h"><h2 class="pn-t">Mês a mês</h2><ul class="pn-leg pn-leg-top">' + pnSerie.series.map(function(se){ return '<li><i style="background:var(' + se.cor + ')"></i>' + se.nome + '</li>'; }).join('') + '</ul><button type="button" class="pn-lk" data-pn-tabela>' + (pnTabela ? 'Ver gráfico' : 'Ver tabela') + '</button></div><p class="pn-sub">Mães que entraram e mães aprovadas em cada mês' + (nMes > 12 ? '' : ', nos últimos ' + nMes + ' meses') + '</p>' +
+      (pnTabela ? '<table class="kb-tab pn-tab"><thead><tr><th>Mês</th><th class="dir">Entradas</th><th class="dir">Requerimentos</th><th class="dir">Aprovadas</th></tr></thead><tbody>' + ms.map(function(m, i){ return '<tr><td>' + esc(pnSerie.nomes[i]) + '</td><td class="dir tnum">' + pnSerie.series[0].v[i] + '</td><td class="dir tnum">' + pnSerie.extra.v[i] + '</td><td class="dir tnum">' + pnSerie.series[1].v[i] + '</td></tr>'; }).reverse().join('') + '</tbody></table>' : pnLinhas(pnSerie, wEvo)) + '</section>';
+    // 5. tempo típico de cada passo (mediana), entre as mães que terminaram o passo no período
+    var TEMPOS = [['Cadastro → contrato', qEnt, qCt], ['Contrato → GPS paga', qCt, qGps], ['Parto → requerimento', function(r){ return pnDia(r.criancaNasc); }, qReq], ['Requerimento → decisão', qReq, function(r){ return r.inssStatus === 'concedido' || r.inssStatus === 'indeferido' ? pnDia(r.inssDecisaoEm) : ''; }], ['Decisão → pagamento', function(r){ return pnDia(r.inssDecisaoEm); }, pnPagaEm]];
+    var tv = TEMPOS.map(function(t){ var l = rows.filter(function(r){ var a = t[1](r), b = t[2](r); return a && b && no(b); }).map(function(r){ return pnDias(t[1](r), t[2](r)); }).filter(function(d){ return d >= 0; }); return { m: pnMediana(l), n: l.length }; });
+    var tMax = Math.max.apply(null, tv.map(function(t){ return t.m || 0; }).concat([1]));
+    html += '<section class="pn-c pn-s4"><div class="pn-h"><h2 class="pn-t">Tempo de cada passo</h2></div><p class="pn-sub">Dias que o passo costuma levar (mediana)</p><div class="pn-tempos">' +
+      TEMPOS.map(function(t, i){ var v = tv[i]; return pnBarra(esc(t[0]), v.m || 0, v.m == null ? 0 : v.m / tMax * 100, v.m == null ? '<small>sem dados</small>' : '<b>' + v.m + ' d</b>', v.m == null ? 'Nenhuma mãe terminou este passo no período' : t[0] + ': ' + v.m + ' dias (mediana de ' + plural(v.n, 'mãe', 'mães') + ')', 'leve'); }).join('') + '</div>' +
+      (function(){ var l = rows.filter(function(r){ var b = pnPagaEm(r); return b && dataCad(r) && no(b); }).map(function(r){ return pnDias(dataCad(r), pnPagaEm(r)); }).filter(function(d){ return d >= 0; }), m = pnMediana(l); return '<div class="pn-total"><p>Do cadastro ao benefício pago</p><b>' + (m == null ? '—' : m + ' dias') + '</b><small>' + (m == null ? 'nenhum benefício pago no período' : 'mediana de ' + plural(l.length, 'mãe', 'mães') + ' (inclui a espera pelo parto)') + '</small></div>'; })() + '</section>';
+    // 6. de onde vêm: consultores e parceiros, cidades e perfil
+    var grupos = {};
+    ent.forEach(function(r){ var k = r.responsavelId || '_org'; (grupos[k] = grupos[k] || []).push(r); });
+    var nomeGrupo = function(k){ if (k === '_org') return 'Sem parceiro (orgânico)'; var p = prospById(k); return p ? (p.tipo === 'clinica' && p.clinica ? p.clinica : p.nome || 'Sem nome') : 'Parceiro removido'; };
+    var gl = Object.keys(grupos).map(function(k){ var l = grupos[k], nv = l.map(pnNivel); return { k: k, nome: nomeGrupo(k), n: l.length, ct: nv.filter(function(x){ return x >= 1; }).length, req: nv.filter(function(x){ return x >= 5; }).length, apr: nv.filter(function(x){ return x >= 6; }).length }; })
+      .sort(function(a, b){ return (a.k === '_org') - (b.k === '_org') || b.n - a.n || b.apr - a.apr || a.nome.localeCompare(b.nome, 'pt'); });
+    var gMax = Math.max.apply(null, gl.map(function(g){ return g.n; }).concat([1])), gVis = gl.slice(0, 7);
+    html += '<section class="pn-c pn-s6"><div class="pn-h"><h2 class="pn-t">Consultores e parceiros</h2><button type="button" class="pn-lk" data-fn="g">Ver parceiros</button></div><p class="pn-sub">Mães que cada um trouxe ' + (j.ini ? 'no período' : 'desde o início') + ' e até onde elas chegaram</p>' +
+      (gl.length ? '<table class="pn-rk"><thead><tr><th>Quem trouxe</th><th class="dir">Entraram</th><th class="dir">Contrato</th><th class="dir">Requerim.</th><th class="dir">Aprovadas</th></tr></thead><tbody>' + gVis.map(function(g){ return '<tr' + (g.k === '_org' ? ' class="org"' : '') + '><td><span class="pn-rk-n" title="' + esc(g.nome) + '">' + esc(g.nome) + '</span><span class="pn-rk-b"><i style="width:' + (g.n / gMax * 100).toFixed(1) + '%"></i></span></td><td class="dir tnum"><b>' + g.n + '</b></td><td class="dir tnum">' + g.ct + '</td><td class="dir tnum">' + g.req + '</td><td class="dir tnum">' + g.apr + '</td></tr>'; }).join('') + '</tbody></table>' + (gl.length > 7 ? '<p class="pn-nota">e mais ' + plural(gl.length - 7, 'parceiro', 'parceiros') + '</p>' : '') : '<div class="pn-vazio">Nenhuma mãe entrou no período.</div>') + '</section>';
+    var cids = {};
+    ent.forEach(function(r){ var c = soCidade(r), uf = ufDaCliente(r); if (!c && !uf) c = 'Sem cidade'; var k = (c || 'Sem cidade') + (uf ? '/' + uf : ''); cids[k] = (cids[k] || 0) + 1; });
+    var cl = Object.keys(cids).map(function(k){ return [k, cids[k]]; }).sort(function(a, b){ return b[1] - a[1] || a[0].localeCompare(b[0], 'pt'); }), cMax = cl.length ? cl[0][1] : 1;
+    html += '<section class="pn-c pn-s3"><div class="pn-h"><h2 class="pn-t">Cidades</h2></div><p class="pn-sub">De onde vêm as mães</p>' +
+      (cl.length ? '<ul class="pn-ml">' + cl.slice(0, 6).map(function(c){ return '<li title="' + esc(c[0] + ': ' + plural(c[1], 'mãe', 'mães')) + '"><p><span>' + esc(c[0]) + '</span><b>' + pnNum(c[1]) + '</b></p><i><em style="width:' + (c[1] / cMax * 100).toFixed(1) + '%"></em></i></li>'; }).join('') + '</ul>' + (cl.length > 6 ? '<p class="pn-nota">e mais ' + plural(cl.length - 6, 'cidade', 'cidades') + ' · veja o mapa abaixo</p>' : '') : '<div class="pn-vazio">Sem mães no período.</div>') + '</section>';
+    var nGpsP = ent.filter(function(r){ return r.tipoSegurada && !rural(r); }).length, nEsp = ent.filter(rural).length, nSemR = nEnt - nGpsP - nEsp;
+    var nInd = ent.filter(function(r){ return r.responsavelId; }).length;
+    html += '<section class="pn-c pn-s3"><div class="pn-h"><h2 class="pn-t">Perfil das mães</h2></div><p class="pn-sub">Das que entraram ' + (j.ini ? 'no período' : 'desde o início') + '</p>' +
+      (nEnt ? '<p class="pn-mini-t">Paga a GPS?</p>' + pnPartes([{ nome: 'Paga a GPS', n: nGpsP, cor: '--ser-1' }, { nome: 'Pescadora, agricultora ou indígena', n: nEsp, cor: '--ser-2' }, { nome: 'Ainda sem resposta', n: nSemR, cor: '--pn-cinza' }], nEnt) +
+        '<p class="pn-mini-t">Como chegaram</p>' + pnPartes([{ nome: 'Indicação de parceiro', n: nInd, cor: '--ser-1' }, { nome: 'Orgânico', n: nEnt - nInd, cor: '--ser-2' }], nEnt) : '<div class="pn-vazio">Sem mães no período.</div>') + '</section>';
+    // 7. financeiro (só administrador)
+    if (isAdmin()){
+      var somaH = function(l){ return l.reduce(function(a, r){ return a + honorarios(r); }, 0); };
+      var gan = rows.filter(function(r){ return no(pnAprovEm(r)); }), rec = rows.filter(function(r){ return ganhou(r) && r.repasse && r.repasse.data && no(pnDia(r.repasse.data)); }), aRec = rows.filter(function(r){ return ganhou(r) && !(r.repasse && r.repasse.data); });
+      var valG = function(r){ return Number(r.gpsValor) > 0 ? Number(r.gpsValor) : (gpsValor() || 0); }, gastoG = rows.filter(function(r){ return no(pnDia(r.guiaPagaEm)); }).reduce(function(a, r){ return a + valG(r); }, 0);
+      html += '<section class="pn-c pn-s12 pn-fin"><div class="pn-h"><h2 class="pn-t">Financeiro</h2><button type="button" class="pn-lk" data-fn="f">Abrir o Financeiro</button></div><p class="pn-sub">Honorários de 30% do benefício + o valor da guia</p><div class="pn-fin-g">' +
+        '<div><p class="pn-tile-r">Honorários das aprovadas</p><p class="pn-fin-v">' + moedaTxt(somaH(gan)) + '</p><p class="pn-tile-c">' + plural(gan.length, 'aprovada', 'aprovadas') + (j.ini ? ' no período' : '') + '</p></div>' +
+        '<div><p class="pn-tile-r">Recebido</p><p class="pn-fin-v">' + moedaTxt(somaH(rec)) + '</p><p class="pn-tile-c">' + plural(rec.length, 'acerto feito', 'acertos feitos') + (j.ini ? ' no período' : '') + '</p></div>' +
+        '<div><p class="pn-tile-r">A receber</p><p class="pn-fin-v">' + moedaTxt(somaH(aRec)) + '</p><p class="pn-tile-c">' + plural(aRec.length, 'aprovada sem acerto', 'aprovadas sem acerto') + ', desde o início</p></div>' +
+        '<div><p class="pn-tile-r">Guias pagas</p><p class="pn-fin-v">' + moedaTxt(gastoG) + '</p><p class="pn-tile-c">' + plural(nGps, 'guia', 'guias') + (j.ini ? ' no período' : '') + ' · o escritório paga e a mãe devolve</p></div>' +
+      '</div></section>';
+    }
+    html += '</div>';
+    html += dnSecao('Mapa das mães', 'Mães que entraram no período, por estado e cidade. Clique no estado ou na cidade para ver quem são.', dnMapa(ent));
+    box.innerHTML = html;
+    if (perAberto) pintarCalendario();
+  }
   function renderDash(){
     var box = $('dash-box'); if (!box || $('view-dash').hidden) return;
-    if (fluxoVista === 'novo'){ renderDashNovo(box); return; }
+    if (fluxoVista === 'novo'){ if (window.innerWidth >= 1000) renderPainel(box); else renderDashNovo(box); return; }   // computador: Dashboard completo; celular: o de antes
     var rows = state.rows, j = dashJanela(), no = function(d){ d = diaLocal(d); return !!d && d >= j.ini && d <= j.fim; };
     var curta = function(d, ano){ var p = String(d).split('-'); return p[2] + '/' + p[1] + (ano ? '/' + p[0].slice(2) : ''); };
     var faixa = fluxoVista === 'novo' ? (j.ini ? (j.ini === j.fim ? curta(j.fim, 1) : curta(j.ini, j.ini.slice(0, 4) !== j.fim.slice(0, 4)) + ' – ' + curta(j.fim, 1)) : 'todo o período') : (j.ini ? fmtDate(j.ini) + ' a ' + fmtDate(j.fim) : 'desde o início');
