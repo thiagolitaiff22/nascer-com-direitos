@@ -6928,14 +6928,13 @@ html[data-fx="novo"] #dash-box .pn ~ .dn-sec{margin-top:0}
      quantas entram, quantas foram aprovadas"). Só na tela do computador (>= 1000px); no celular continua o renderDashNovo.
      Tudo sai das mães do BI (state.rows, só o fluxo novo): nenhum número é digitado à mão. ---------- */
   function pnDia(d){ return d ? diaLocal(d) || '' : ''; }
-  function pnContratoEm(r){ return ctPend(r) ? '' : (ctAssinadoEm(r) || pnDia(r.contratoEm)); }
   function pnPaga(r){ return r.pagamento === 'pago' || !!(r.recebimento && r.recebimento.data) || !!(r.repasse && r.repasse.data) || arquivadoPago(r); }
   function pnPagaEm(r){ return pnDia((r.recebimento && r.recebimento.data) || (r.repasse && r.repasse.data) || (pnPaga(r) ? r.arquivadoEm || r.inssDecisaoEm : '')); }
   function pnAprovEm(r){ return ganhou(r) ? pnDia(r.inssDecisaoEm || r.sentencaEm || dataGanho(r)) : ''; }
-  // até onde a mãe chegou na jornada (0 = só entrou ... 7 = benefício pago). Do requerimento em diante, o passo já prova os de antes
+  // até onde a mãe chegou na jornada (0 = só entrou ... 6 = benefício pago). Do requerimento em diante, o passo já prova os de antes.
+  // O contrato não é um passo: ele é assinado no próprio cadastro, pelo aplicativo
   var PN_PASSOS = [
-    ['Entraram', 'cadastro feito pelo aplicativo'],
-    ['Contrato assinado', 'contrato e procuração assinados no ZapSign'],
+    ['Entraram', 'cadastro pelo aplicativo, com o contrato assinado na hora'],
     ['Documentos completos', 'senha gov.br, NIT, RG e CPF'],
     ['GPS paga ou sem GPS', 'pescadora, agricultora ou indígena não paga a guia'],
     ['Bebê nasceu', 'data de nascimento informada'],
@@ -6944,15 +6943,13 @@ html[data-fx="novo"] #dash-box .pn ~ .dn-sec{margin-top:0}
     ['Benefício pago', 'dinheiro na conta e acerto feito']
   ];
   function pnNivel(r){
-    if (pnPaga(r)) return 7;
-    if (ganhou(r)) return 6;
-    if (requerido(r) || String(r.processo || '').trim()) return 5;
-    var n = 0;
-    if (pnContratoEm(r)) n = 1;
-    if (n >= 1 && !faltamTxt(r)) n = 2;
+    if (pnPaga(r)) return 6;
+    if (ganhou(r)) return 5;
+    if (requerido(r) || String(r.processo || '').trim()) return 4;
+    var docs = !faltamTxt(r), n = docs ? 1 : 0;
     // GPS paga conta mesmo com a senha ou um documento ainda faltando (a guia sai com o NIT, regra de 11/11/2026)
-    if (n >= 1 && (gpsPaga(r) || (n >= 2 && (rural(r) || semGps(r))))) n = 3;
-    if (n === 3 && r.criancaNasc) n = 4;
+    if (gpsPaga(r) || (docs && (rural(r) || semGps(r)))) n = 2;
+    if (n === 2 && r.criancaNasc) n = 3;
     return n;
   }
   function pnMediana(v){ if (!v.length) return null; var s = v.slice().sort(function(a, b){ return a - b; }), m = Math.floor(s.length / 2); return s.length % 2 ? s[m] : Math.round((s[m - 1] + s[m]) / 2); }
@@ -7039,10 +7036,10 @@ html[data-fx="novo"] #dash-box .pn ~ .dn-sec{margin-top:0}
     if (j.ini){ var di = parseDate(j.ini), df = parseDate(j.fim), len = Math.round((df - di) / 864e5) + 1, af = new Date(di); af.setDate(af.getDate() - 1); var ai = new Date(af); ai.setDate(ai.getDate() - len + 1); ant = { ini: iso(ai), fim: iso(af) }; }
     var noAnt = function(d){ return !!ant && !!d && d >= ant.ini && d <= ant.fim; };
     var conta = function(f, q){ return rows.filter(function(r){ return f(q(r)); }).length; };
-    var qEnt = function(r){ return dataCad(r); }, qCt = pnContratoEm, qGps = function(r){ return pnDia(r.guiaPagaEm); }, qReq = function(r){ return pnDia(r.der); }, qApr = pnAprovEm;
+    var qEnt = function(r){ return dataCad(r); }, qGps = function(r){ return pnDia(r.guiaPagaEm); }, qReq = function(r){ return pnDia(r.der); }, qApr = pnAprovEm, qPag = pnPagaEm;
     var ent = rows.filter(function(r){ return no(dataCad(r)); });
-    var nEnt = ent.length, nCt = conta(no, qCt), nGps = conta(no, qGps), nReq = conta(no, qReq), nApr = conta(no, qApr);
-    var aEnt = ant ? conta(noAnt, qEnt) : null, aCt = ant ? conta(noAnt, qCt) : null, aGps = ant ? conta(noAnt, qGps) : null, aReq = ant ? conta(noAnt, qReq) : null, aApr = ant ? conta(noAnt, qApr) : null;
+    var nEnt = ent.length, nGps = conta(no, qGps), nReq = conta(no, qReq), nApr = conta(no, qApr), nPag = conta(no, qPag);
+    var aEnt = ant ? conta(noAnt, qEnt) : null, aGps = ant ? conta(noAnt, qGps) : null, aReq = ant ? conta(noAnt, qReq) : null, aApr = ant ? conta(noAnt, qApr) : null, aPag = ant ? conta(noAnt, qPag) : null;
     var decConc = rows.filter(function(r){ return r.inssStatus === 'concedido' && no(pnDia(r.inssDecisaoEm)); }).length, decInd = rows.filter(function(r){ return r.inssStatus === 'indeferido' && no(pnDia(r.inssDecisaoEm)); }).length;
     var taxa = pnPct(decConc, decConc + decInd);
     var curta = function(d, ano){ var p = String(d).split('-'); return p[2] + '/' + p[1] + (ano ? '/' + p[0].slice(2) : ''); };
@@ -7054,15 +7051,15 @@ html[data-fx="novo"] #dash-box .pn ~ .dn-sec{margin-top:0}
     var spark = '<svg class="pn-spark" width="132" height="40" viewBox="0 0 132 40" aria-hidden="true">' + sp.map(function(v, i){ var h = Math.max(v ? 3 : 1.5, v / spMax * 36); return '<rect x="' + (i * 11) + '" y="' + (40 - h).toFixed(1) + '" width="7" height="' + h.toFixed(1) + '" rx="2" class="' + (i === 11 ? 'ag' : '') + '"><title>' + esc(meses12[i].rot.replace(/\/\d+$/, '')) + ': ' + v + '</title></rect>'; }).join('') + '</svg>';
     html += '<div class="pn-c pn-s4 pn-hero"><p class="pn-tile-r">Mães que entraram</p><div class="pn-hero-l"><p class="pn-hero-v">' + pnNum(nEnt) + '</p>' + spark + '</div>' + pnVar(nEnt, aEnt) +
       '<p class="pn-tile-c">' + (j.ini ? esc(dashPerRotulo().toLowerCase()) : 'desde o início') + ' · barras: últimos 12 meses</p></div>';
-    html += pnTile('Contratos assinados', pnNum(nCt), pnVar(nCt, aCt), nEnt ? pnPct(Math.min(nCt, nEnt), nEnt) + '% das que entraram' : '', 'k');
     html += pnTile('GPS pagas', pnNum(nGps), pnVar(nGps, aGps), nGps ? moedaTxt(nGps * (gpsValor() || 0)) + ' em guias' : 'nenhuma no período', 'gp');
     html += pnTile('Requerimentos', pnNum(nReq), pnVar(nReq, aReq), 'feitos no INSS', 'i');
     html += pnTile('Aprovadas', pnNum(nApr), pnVar(nApr, aApr), taxa == null ? 'sem decisão no período' : taxa + '% de aprovação', 'r');
+    html += pnTile('Benefícios pagos', pnNum(nPag), pnVar(nPag, aPag), 'dinheiro na conta da mãe', 'r');
     // 2. funil: das mães que entraram no período, até onde chegaram
     var niv = ent.map(pnNivel), cont = PN_PASSOS.map(function(p, i){ return niv.filter(function(n){ return n >= i; }).length; });
     var perdas = ent.filter(perdaOuDesq).length;
     html += '<section class="pn-c pn-s7"><div class="pn-h"><h2 class="pn-t">Jornada das mães</h2></div><p class="pn-sub">' + (nEnt ? 'Das ' + pnNum(nEnt) + ' mães que entraram ' + (j.ini ? 'no período' : 'desde o início') + ', quantas já chegaram a cada passo' : 'Nenhuma mãe entrou no período') + '</p>' +
-      (nEnt ? '<div class="pn-funil">' + PN_PASSOS.map(function(p, i){ var pc = pnPct(cont[i], nEnt), ant2 = i ? cont[i - 1] : 0; return pnBarra(esc(p[0]), cont[i], pc, '<b>' + pnNum(cont[i]) + '</b><small>' + pc + '%</small>', p[0] + ': ' + cont[i] + ' de ' + nEnt + ' (' + pc + '%)' + (i ? ' · do passo anterior: ' + (pnPct(cont[i], ant2) == null ? '—' : pnPct(cont[i], ant2) + '%') : '') + ' · ' + p[1], i === 6 ? 'forte' : ''); }).join('') + '</div>' +
+      (nEnt ? '<div class="pn-funil">' + PN_PASSOS.map(function(p, i){ var pc = pnPct(cont[i], nEnt), ant2 = i ? cont[i - 1] : 0; return pnBarra(esc(p[0]), cont[i], pc, '<b>' + pnNum(cont[i]) + '</b><small>' + pc + '%</small>', p[0] + ': ' + cont[i] + ' de ' + nEnt + ' (' + pc + '%)' + (i ? ' · do passo anterior: ' + (pnPct(cont[i], ant2) == null ? '—' : pnPct(cont[i], ant2) + '%') : '') + ' · ' + p[1], i === 5 ? 'forte' : ''); }).join('') + '</div>' +
         '<p class="pn-nota">' + (perdas ? plural(perdas, 'mãe saiu', 'mães saíram') + ' no caminho (perda ou desqualificada). ' : '') + 'Passe o mouse numa barra para ver quanto passou do passo anterior.</p>' : '<div class="pn-vazio">Escolha um período maior no calendário.</div>') + '</section>';
     // 3. resultado no INSS
     var emAn = rows.filter(function(r){ return noInss(r) && statusInss(r) === 'analise'; }).length, emEx = rows.filter(function(r){ return noInss(r) && statusInss(r) === 'exigencia'; }).length;
@@ -7085,7 +7082,7 @@ html[data-fx="novo"] #dash-box .pn ~ .dn-sec{margin-top:0}
     html += '<section class="pn-c pn-s8"><div class="pn-h"><h2 class="pn-t">Mês a mês</h2><ul class="pn-leg pn-leg-top">' + pnSerie.series.map(function(se){ return '<li><i style="background:var(' + se.cor + ')"></i>' + se.nome + '</li>'; }).join('') + '</ul><button type="button" class="pn-lk" data-pn-tabela>' + (pnTabela ? 'Ver gráfico' : 'Ver tabela') + '</button></div><p class="pn-sub">Mães que entraram e mães aprovadas em cada mês' + (nMes > 12 ? '' : ', nos últimos ' + nMes + ' meses') + '</p>' +
       (pnTabela ? '<table class="kb-tab pn-tab"><thead><tr><th>Mês</th><th class="dir">Entradas</th><th class="dir">Requerimentos</th><th class="dir">Aprovadas</th></tr></thead><tbody>' + ms.map(function(m, i){ return '<tr><td>' + esc(pnSerie.nomes[i]) + '</td><td class="dir tnum">' + pnSerie.series[0].v[i] + '</td><td class="dir tnum">' + pnSerie.extra.v[i] + '</td><td class="dir tnum">' + pnSerie.series[1].v[i] + '</td></tr>'; }).reverse().join('') + '</tbody></table>' : pnLinhas(pnSerie, wEvo)) + '</section>';
     // 5. tempo típico de cada passo (mediana), entre as mães que terminaram o passo no período
-    var TEMPOS = [['Cadastro → contrato', qEnt, qCt], ['Contrato → GPS paga', qCt, qGps], ['Parto → requerimento', function(r){ return pnDia(r.criancaNasc); }, qReq], ['Requerimento → decisão', qReq, function(r){ return r.inssStatus === 'concedido' || r.inssStatus === 'indeferido' ? pnDia(r.inssDecisaoEm) : ''; }], ['Decisão → pagamento', function(r){ return pnDia(r.inssDecisaoEm); }, pnPagaEm]];
+    var TEMPOS = [['Cadastro → GPS paga', qEnt, qGps],['Parto → requerimento', function(r){ return pnDia(r.criancaNasc); }, qReq], ['Requerimento → decisão', qReq, function(r){ return r.inssStatus === 'concedido' || r.inssStatus === 'indeferido' ? pnDia(r.inssDecisaoEm) : ''; }], ['Decisão → pagamento', function(r){ return pnDia(r.inssDecisaoEm); }, pnPagaEm]];
     var tv = TEMPOS.map(function(t){ var l = rows.filter(function(r){ var a = t[1](r), b = t[2](r); return a && b && no(b); }).map(function(r){ return pnDias(t[1](r), t[2](r)); }).filter(function(d){ return d >= 0; }); return { m: pnMediana(l), n: l.length }; });
     var tMax = Math.max.apply(null, tv.map(function(t){ return t.m || 0; }).concat([1]));
     html += '<section class="pn-c pn-s4"><div class="pn-h"><h2 class="pn-t">Tempo de cada passo</h2></div><p class="pn-sub">Dias que o passo costuma levar (mediana)</p><div class="pn-tempos">' +
@@ -7095,11 +7092,11 @@ html[data-fx="novo"] #dash-box .pn ~ .dn-sec{margin-top:0}
     var grupos = {};
     ent.forEach(function(r){ var k = r.responsavelId || '_org'; (grupos[k] = grupos[k] || []).push(r); });
     var nomeGrupo = function(k){ if (k === '_org') return 'Sem parceiro (orgânico)'; var p = prospById(k); return p ? (p.tipo === 'clinica' && p.clinica ? p.clinica : p.nome || 'Sem nome') : 'Parceiro removido'; };
-    var gl = Object.keys(grupos).map(function(k){ var l = grupos[k], nv = l.map(pnNivel); return { k: k, nome: nomeGrupo(k), n: l.length, ct: nv.filter(function(x){ return x >= 1; }).length, req: nv.filter(function(x){ return x >= 5; }).length, apr: nv.filter(function(x){ return x >= 6; }).length }; })
+    var gl = Object.keys(grupos).map(function(k){ var l = grupos[k], nv = l.map(pnNivel); return { k: k, nome: nomeGrupo(k), n: l.length, ct: nv.filter(function(x){ return x >= 2; }).length, req: nv.filter(function(x){ return x >= 4; }).length, apr: nv.filter(function(x){ return x >= 5; }).length }; })
       .sort(function(a, b){ return (a.k === '_org') - (b.k === '_org') || b.n - a.n || b.apr - a.apr || a.nome.localeCompare(b.nome, 'pt'); });
     var gMax = Math.max.apply(null, gl.map(function(g){ return g.n; }).concat([1])), gVis = gl.slice(0, 7);
     html += '<section class="pn-c pn-s6"><div class="pn-h"><h2 class="pn-t">Consultores e parceiros</h2><button type="button" class="pn-lk" data-fn="g">Ver parceiros</button></div><p class="pn-sub">Mães que cada um trouxe ' + (j.ini ? 'no período' : 'desde o início') + ' e até onde elas chegaram</p>' +
-      (gl.length ? '<table class="pn-rk"><thead><tr><th>Quem trouxe</th><th class="dir">Entraram</th><th class="dir">Contrato</th><th class="dir">Requerim.</th><th class="dir">Aprovadas</th></tr></thead><tbody>' + gVis.map(function(g){ return '<tr' + (g.k === '_org' ? ' class="org"' : '') + '><td><span class="pn-rk-n" title="' + esc(g.nome) + '">' + esc(g.nome) + '</span><span class="pn-rk-b"><i style="width:' + (g.n / gMax * 100).toFixed(1) + '%"></i></span></td><td class="dir tnum"><b>' + g.n + '</b></td><td class="dir tnum">' + g.ct + '</td><td class="dir tnum">' + g.req + '</td><td class="dir tnum">' + g.apr + '</td></tr>'; }).join('') + '</tbody></table>' + (gl.length > 7 ? '<p class="pn-nota">e mais ' + plural(gl.length - 7, 'parceiro', 'parceiros') + '</p>' : '') : '<div class="pn-vazio">Nenhuma mãe entrou no período.</div>') + '</section>';
+      (gl.length ? '<table class="pn-rk"><thead><tr><th>Quem trouxe</th><th class="dir">Entraram</th><th class="dir" title="GPS paga, ou pescadora, agricultora ou indígena">GPS ok</th><th class="dir">Requerim.</th><th class="dir">Aprovadas</th></tr></thead><tbody>' + gVis.map(function(g){ return '<tr' + (g.k === '_org' ? ' class="org"' : '') + '><td><span class="pn-rk-n" title="' + esc(g.nome) + '">' + esc(g.nome) + '</span><span class="pn-rk-b"><i style="width:' + (g.n / gMax * 100).toFixed(1) + '%"></i></span></td><td class="dir tnum"><b>' + g.n + '</b></td><td class="dir tnum">' + g.ct + '</td><td class="dir tnum">' + g.req + '</td><td class="dir tnum">' + g.apr + '</td></tr>'; }).join('') + '</tbody></table>' + (gl.length > 7 ? '<p class="pn-nota">e mais ' + plural(gl.length - 7, 'parceiro', 'parceiros') + '</p>' : '') : '<div class="pn-vazio">Nenhuma mãe entrou no período.</div>') + '</section>';
     var cids = {};
     ent.forEach(function(r){ var c = soCidade(r), uf = ufDaCliente(r); if (!c && !uf) c = 'Sem cidade'; var k = (c || 'Sem cidade') + (uf ? '/' + uf : ''); cids[k] = (cids[k] || 0) + 1; });
     var cl = Object.keys(cids).map(function(k){ return [k, cids[k]]; }).sort(function(a, b){ return b[1] - a[1] || a[0].localeCompare(b[0], 'pt'); }), cMax = cl.length ? cl[0][1] : 1;
