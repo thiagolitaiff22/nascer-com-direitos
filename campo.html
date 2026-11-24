@@ -1500,7 +1500,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 116;
+  var APP_VERSAO = 117;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1762,7 +1762,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
       '<nav class="abas' + (ehGestor() ? ' gs gn' : semGanho() ? ' sg' : '') + '" id="abas">' +
         navBotoes() +
       '</nav>';
-    $('abas').addEventListener('click', function(e){ var b = e.target.closest('[data-aba]'); if (!b) return; if (ehProspectador() && b.dataset.aba === 'novo' && (!ehGestor() || gestorCadastra())) return escolherNovo(); /* gestor sem o SQL 61: o + vai direto ao cadastro da mãe */ irPara(b.dataset.aba); });
+    $('abas').addEventListener('click', function(e){ var b = e.target.closest('[data-aba]'); if (!b) return; if (ehProspectador() && b.dataset.aba === 'novo') return escolherNovo(); irPara(b.dataset.aba); });
     $('topo-av').onclick = function(){ irPara('conta'); };
     $('topo-sino').onclick = abrirSino;
     if (window.MutationObserver) new MutationObserver(tituloTopo).observe($('vista'), { childList: true });
@@ -1797,9 +1797,59 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
   function ehGestor(){ return !!(quem && quem.perfil === 'gestor'); }
   function ehProspectador(){ return !!(quem && (quem.perfil === 'prospectador' || quem.perfil === 'gestor')); }
   // o acesso do gestor no aplicativo é "gestor:<e-mail>" (SQL 59); o resto dos dados vem do painel dele
-  // o gestor cadastra mães (sempre) e parceiros (SQL 61). "Cadastrar um parceiro" só aparece quando o banco já tem a função gestor_criar_parceiro
+  // o gestor cadastra mães e parceiros. Parceiro: com o SQL 61, pela função gestor_criar_parceiro; sem ele, pelo login de administrador do BI
   function gestorCadastra(){ return lsGet('campo_gestor_cad') === '1'; }
   var gestorCadVisto = false;
+  var sessaoGestorBI = null;   // { access_token, refresh_token, expires_at }: só na memória, nunca gravada no celular
+  function guardarSessaoBI(s){ if (s && s.access_token) sessaoGestorBI = { access_token: s.access_token, refresh_token: s.refresh_token || '', expires_at: s.expires_at || (Date.now() / 1000 + (+s.expires_in || 3600)) }; }
+  function emailGestor(){ var m = /^gestor:(.+)$/.exec(String((quem && quem.prospId) || '')); return m ? m[1] : ''; }
+  function pedirSenhaBI(){
+    return new Promise(function(ok, nao){
+      var t = tela('<b>Confirme a sua senha do BI</b><p>Para criar o acesso de um parceiro, o aplicativo usa o seu login do BI. A senha não fica guardada no celular.</p>' +
+        '<label class="fone" style="margin:4px 0 8px"><input id="sbi-senha" type="password" autocomplete="current-password" placeholder="Senha do BI"></label><p id="sbi-erro" style="color:#c0392b;margin:0 0 8px;min-height:1em"></p>' +
+        '<button id="sbi-ok">Confirmar</button><button class="sec2" id="sbi-x">Cancelar</button>');
+      var campo = t.querySelector('#sbi-senha'), erro = t.querySelector('#sbi-erro'), bt = t.querySelector('#sbi-ok');
+      setTimeout(function(){ campo.focus(); }, 60);
+      t.querySelector('#sbi-x').onclick = function(){ t.remove(); nao('cancelado'); };
+      bt.onclick = function(){
+        var p = campo.value; if (!p){ erro.textContent = 'Digite a senha do BI.'; return; }
+        bt.disabled = true; erro.textContent = '';
+        fetch(CFG.url + '/auth/v1/token?grant_type=password', { method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ email: emailGestor(), password: p }) })
+          .then(function(r){ return r.ok ? r.json() : null; })
+          .then(function(s){ bt.disabled = false; if (!s || !s.access_token){ erro.textContent = 'Senha errada. É a mesma senha do BI.'; return; } guardarSessaoBI(s); t.remove(); ok(s.access_token); },
+                function(){ bt.disabled = false; erro.textContent = 'Sem internet agora. Tente de novo.'; });
+      };
+      campo.addEventListener('keydown', function(e){ if (e.key === 'Enter') bt.click(); });
+    });
+  }
+  function sessaoBI(){
+    var s = sessaoGestorBI;
+    if (s && s.access_token && s.expires_at > Date.now() / 1000 + 60) return Promise.resolve(s.access_token);
+    var renova = s && s.refresh_token ? fetch(CFG.url + '/auth/v1/token?grant_type=refresh_token', { method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: s.refresh_token }) }).then(function(r){ return r.ok ? r.json() : null; }, function(){ return null; }) : Promise.resolve(null);
+    return renova.then(function(n){ if (n && n.access_token){ guardarSessaoBI(n); return n.access_token; } sessaoGestorBI = null; return pedirSenhaBI(); });
+  }
+  // mesmo caminho do BI: grava o parceiro na equipe do gestor e cria o acesso dele ao aplicativo; se o acesso falhar, desfaz o parceiro
+  function criarParceiroPeloBI(a){
+    return sessaoBI().then(function(jwt){
+      var em = emailGestor(), H = { apikey: CFG.key, Authorization: 'Bearer ' + jwt, 'Content-Type': 'application/json' };
+      var bytes = new Uint8Array(16); (window.crypto || window.msCrypto).getRandomValues(bytes);
+      var id = Array.prototype.map.call(bytes, function(x){ return ('0' + x.toString(16)).slice(-2); }).join(''), agora = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'), g = a.p_ganho !== false;
+      var data = { nome: a.p_nome, tipo: a.p_tipo === 'clinica' ? 'clinica' : 'pessoa', clinica: a.p_tipo === 'clinica' ? a.p_clinica : '', regiao: a.p_cidade || '', regiaoId: '', gestorEmail: em,
+        telefone: a.p_telefone || '', ativo: true, semGanho: !g, comConf: g ? Math.max(+a.p_com_conf || 0, 0) : 0, comLib: g ? Math.max(+a.p_com_lib || 0, 0) : 0,
+        criadoEm: agora, atualizadoEm: agora, criadoPor: 'gestor:' + em };
+      var falha = function(msg){ var e = new Error(msg); e.amigavel = msg; throw e; };
+      return fetch(CFG.url + '/rest/v1/prospectadores', { method: 'POST', headers: Object.assign({ Prefer: 'return=minimal' }, H), body: JSON.stringify({ id: id, data: data }) })
+        .then(function(r){ if (!r.ok) return r.json().catch(function(){ return {}; }).then(function(){ falha('O seu login do BI não conseguiu cadastrar o parceiro. Avise o escritório.'); }); })
+        .then(function(){ return fetch(CFG.url + '/rest/v1/rpc/campo_definir_login', { method: 'POST', headers: H, body: JSON.stringify({ p_prosp: id, p_usuario: a.p_usuario, p_senha: a.p_senha, p_provisoria: true }) }); })
+        .then(function(r){ return r.json().catch(function(){ return null; }).then(function(d){
+          if (r.ok) return { ok: true, id: id, usuario: typeof d === 'string' ? d : a.p_usuario };
+          var msg = d && d.message ? String(d.message) : 'Não foi possível criar o acesso do parceiro.';
+          if (/outro prospectador/.test(msg)) msg = 'Este CPF já tem acesso ao aplicativo.';
+          return fetch(CFG.url + '/rest/v1/prospectadores?id=eq.' + id, { method: 'DELETE', headers: H }).then(function(){ return { erro: msg }; }, function(){ return { erro: msg }; });
+        }); });
+    });
+  }
+  function criarParceiro(a){ return ehGestor() && !gestorCadastra() ? criarParceiroPeloBI(a) : chamar(ehGestor() ? 'gestor_criar_parceiro' : 'prosp_criar_parceiro', a); }
   function conferirGestorCadastra(){
     if (gestorCadVisto || !ehGestor() || !token || navigator.onLine === false) return;
     gestorCadVisto = true;
@@ -2174,7 +2224,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
       if (novoP.senha.length < 6){ alert('A senha precisa ter pelo menos 6 caracteres.'); $('np-senha').focus(); return; }
       if (navigator.onLine === false) return alert('Sem internet agora. Para cadastrar um parceiro é preciso estar conectado.');
       var b = this; b.disabled = true; b.lastChild.textContent = 'Criando…';
-      chamar(ehGestor() ? 'gestor_criar_parceiro' : 'prosp_criar_parceiro', { p_token: token, p_nome: nome, p_tipo: novoP.tipo, p_clinica: novoP.tipo === 'clinica' ? clinica : '', p_cidade: cidade, p_telefone: novoP.fone, p_usuario: String(novoP.usuario || '').replace(/\D/g, ''), p_senha: novoP.senha, p_ganho: novoP.ganho !== false, p_com_conf: numReais(novoP.conf), p_com_lib: numReais(novoP.lib) })
+      criarParceiro({ p_token: token, p_nome: nome, p_tipo: novoP.tipo, p_clinica: novoP.tipo === 'clinica' ? clinica : '', p_cidade: cidade, p_telefone: novoP.fone, p_usuario: String(novoP.usuario || '').replace(/\D/g, ''), p_senha: novoP.senha, p_ganho: novoP.ganho !== false, p_com_conf: numReais(novoP.conf), p_com_lib: numReais(novoP.lib) })
         .then(function(d){
           if (d && d.ok){
             var rotulo = novoP.tipo === 'clinica' ? clinica : nome, tel = novoP.fone, usr = d.usuario, sen = novoP.senha;
@@ -2182,7 +2232,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
             acessoCriado(rotulo, tel, usr, sen);
           } else { alert((d && (d.erro || d.message)) || 'Não foi possível criar o parceiro.'); }
         })
-        .catch(function(){ alert('Sem internet agora. Tente de novo.'); })
+        .catch(function(e){ if (e === 'cancelado') return; alert(e && e.amigavel ? e.amigavel : 'Sem internet agora. Tente de novo.'); })
         .then(function(){ if (document.body.contains(b)){ b.disabled = false; b.lastChild.textContent = 'Criar parceiro'; } });
     };
   }
@@ -2299,7 +2349,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
     if (semGanho() && aba === 'recebimentos') aba = 'painel';
     if (aba === 'recebimentos'){ carregarReceb(); return vistaRecebimentos(); }
     if (aba === 'conta') return vistaConta();
-    if (ehGestor() && (aba === 'recebimentos' || (!gestorCadastra() && aba === 'novop'))) aba = 'painel';
+    if (ehGestor() && aba === 'recebimentos') aba = 'painel';
     if (ehProspectador()) return aba === 'novop' ? vistaProspNovo() : aba === 'novo' ? vistaNovo() : aba === 'maes' ? vistaClientesParceira() : aba === 'clientes' ? vistaProspLista() : vistaProspPainel();
     if (aba === 'painel') return vistaPainel();
     if (aba === 'clientes') return vistaClientes();
@@ -4433,7 +4483,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
               .then(function(r){ return r.json(); })
               .then(function(g){
                 if (!g || !g.token){ tirarEsqueleto(true); alert((g && g.erro) || 'Não foi possível abrir o seu acesso de gestor agora. Tente de novo em instantes.'); return true; }
-                token = g.token; lsSet('campo_token', token); lsSet('campo_gestor_nome', g.nome || ''); lsSet('campo_aba', 'painel'); aba = 'painel';
+                token = g.token; lsSet('campo_token', token); guardarSessaoBI(s); lsSet('campo_gestor_nome', g.nome || ''); lsSet('campo_aba', 'painel'); aba = 'painel';
                 quem = null; iniciar(); return true;
               }, function(){ tirarEsqueleto(true); alert('Sem conexão com o sistema agora. Tente de novo.'); return true; });
           });
