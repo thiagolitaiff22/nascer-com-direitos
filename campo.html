@@ -1500,7 +1500,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 115;
+  var APP_VERSAO = 116;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -1732,7 +1732,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
   function navBotoes(){
     var b = function(a, ic, t, extra){ var p = String(t).split('|'); return '<button type="button" data-aba="' + a + '"><svg><use href="#' + ic + '"/></svg>' + (p[1] ? '<span class="l-lg">' + p[0] + '</span><span class="l-sm">' + p[1] + '</span>' : p[0]) + (extra || '') + '</button>'; };
     var bolha = '<span class="bolha" id="bolha" hidden></span>';
-    if (ehGestor()) return b('painel', 'i-painel', 'Início') + b('clientes', 'i-grupo', 'Equipe') + (gestorCadastra() ? b('novo', 'i-novo', 'Novo', bolha) : '') + b('maes', 'i-bebe', 'Mães') + b('conta', 'i-pessoa', 'Conta');   // 23/11: gestor também cadastra mães e parceiros (SQL 61)
+    if (ehGestor()) return b('painel', 'i-painel', 'Início') + b('clientes', 'i-grupo', 'Equipe') + b('novo', 'i-novo', 'Novo', bolha) + b('maes', 'i-bebe', 'Mães') + b('conta', 'i-pessoa', 'Conta');   // 23/11: gestor também cadastra mães e parceiros (SQL 61)
     return ehProspectador()
       ? b('painel', 'i-painel', 'Início') + b('clientes', 'i-grupo', 'Parceiros') + b('novo', 'i-novo', 'Novo', bolha) + b('maes', 'i-bebe', 'Mães') + b('recebimentos', 'i-moeda', 'Meus ganhos|Ganhos')
       : b('painel', 'i-painel', 'Início') + b('clientes', 'i-grupo', 'Mães') + b('novo', 'i-novo', 'Novo cadastro|Novo', bolha) + b('recebimentos', 'i-moeda', 'Meus ganhos|Ganhos') + b('conta', 'i-pessoa', 'Conta');
@@ -1759,10 +1759,10 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
         '<button type="button" class="av" id="topo-av" aria-label="Sua conta"></button></div>' +
       '<div class="tit-tela"><b id="topo-nome"></b><span id="topo-sub"></span></div>' +
       '<main class="vista" id="vista"></main>' +
-      '<nav class="abas' + (ehGestor() ? ' gs' + (gestorCadastra() ? ' gn' : '') : semGanho() ? ' sg' : '') + '" id="abas">' +
+      '<nav class="abas' + (ehGestor() ? ' gs gn' : semGanho() ? ' sg' : '') + '" id="abas">' +
         navBotoes() +
       '</nav>';
-    $('abas').addEventListener('click', function(e){ var b = e.target.closest('[data-aba]'); if (!b) return; if (ehProspectador() && b.dataset.aba === 'novo') return escolherNovo(); irPara(b.dataset.aba); });
+    $('abas').addEventListener('click', function(e){ var b = e.target.closest('[data-aba]'); if (!b) return; if (ehProspectador() && b.dataset.aba === 'novo' && (!ehGestor() || gestorCadastra())) return escolherNovo(); /* gestor sem o SQL 61: o + vai direto ao cadastro da mãe */ irPara(b.dataset.aba); });
     $('topo-av').onclick = function(){ irPara('conta'); };
     $('topo-sino').onclick = abrirSino;
     if (window.MutationObserver) new MutationObserver(tituloTopo).observe($('vista'), { childList: true });
@@ -1797,7 +1797,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
   function ehGestor(){ return !!(quem && quem.perfil === 'gestor'); }
   function ehProspectador(){ return !!(quem && (quem.perfil === 'prospectador' || quem.perfil === 'gestor')); }
   // o acesso do gestor no aplicativo é "gestor:<e-mail>" (SQL 59); o resto dos dados vem do painel dele
-  // 23/11: o gestor cadastra mães e parceiros (SQL 61). O + só aparece quando o banco já tem a função gestor_criar_parceiro
+  // o gestor cadastra mães (sempre) e parceiros (SQL 61). "Cadastrar um parceiro" só aparece quando o banco já tem a função gestor_criar_parceiro
   function gestorCadastra(){ return lsGet('campo_gestor_cad') === '1'; }
   var gestorCadVisto = false;
   function conferirGestorCadastra(){
@@ -2299,7 +2299,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
     if (semGanho() && aba === 'recebimentos') aba = 'painel';
     if (aba === 'recebimentos'){ carregarReceb(); return vistaRecebimentos(); }
     if (aba === 'conta') return vistaConta();
-    if (ehGestor() && (aba === 'recebimentos' || (!gestorCadastra() && (aba === 'novo' || aba === 'novop')))) aba = 'painel';
+    if (ehGestor() && (aba === 'recebimentos' || (!gestorCadastra() && aba === 'novop'))) aba = 'painel';
     if (ehProspectador()) return aba === 'novop' ? vistaProspNovo() : aba === 'novo' ? vistaNovo() : aba === 'maes' ? vistaClientesParceira() : aba === 'clientes' ? vistaProspLista() : vistaProspPainel();
     if (aba === 'painel') return vistaPainel();
     if (aba === 'clientes') return vistaClientes();

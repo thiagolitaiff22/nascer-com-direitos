@@ -4611,7 +4611,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
     var eq = (state.equipe || []).filter(function(u){ return u.ativo !== false && u.email; }).sort(function(a, b){ return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
     var atual = String(resp[1] || '').toLowerCase(), nomeAt = String(resp[0] || '');
     var respSel = '<select id="fc-resp"><option value="">Ninguém ainda</option>' + eq.map(function(u){ return '<option value="' + esc(u.email) + '"' + (String(u.email).toLowerCase() === atual || (!atual && u.nome === nomeAt) ? ' selected' : '') + '>' + esc(u.nome || u.email) + '</option>'; }).join('') + '</select>';
-    var dc = String(r.dataCadastro || r.criadoEm || '').slice(0, 10), par = prospById(r.responsavelId), parNome = par ? (par.tipo === 'clinica' && par.clinica ? par.clinica : par.nome) : (r.criadoPorNome ? 'Cadastro de ' + r.criadoPorNome : (r.origem === 'organico' ? 'Orgânico' : ''));
+    var dc = String(r.dataCadastro || r.criadoEm || '').slice(0, 10), par = prospById(r.responsavelId), parNome = par ? (par.tipo === 'clinica' && par.clinica ? par.clinica : par.nome) : (r.criadoPorNome || gestorNome(r.responsavelId) ? 'Cadastro de ' + (r.criadoPorNome || gestorNome(r.responsavelId)) : (r.origem === 'organico' ? 'Orgânico' : ''));
     var pode = t !== 'r' && t !== 'q';
     return '<div class="fc-p p-dados"><div class="fc-c"><span class="fc-rot">Partes envolvidas*</span><div class="fc-parte"><button type="button" data-act="edit" title="Abrir o cadastro">' + esc(r.nome || 'Cliente') + '</button><span>Cliente</span></div></div>' +
       '<div class="kb-linhas fc-parto">' + linhaParto(r) + linhaGps(r) + '</div>' + fcGuia(r) +
@@ -5131,7 +5131,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
       (lista.slice(0, limiteDe(box)).map(cadLinha).join('') || '<tr><td colspan="8" class="empty">' + (todos.length ? 'Nenhum cliente neste filtro.' : 'Nenhum cliente em cadastro. Clique em <b>Novo cadastro</b> para começar.') + '</td></tr>') + linhaMais(box, lista.length, 8) + '</tbody></table>');
   }
   function cadLinha(r){
-    var id = esc(r.id), k = leadDe(r), par = prospById(r.responsavelId), parNome = par ? (par.tipo === 'clinica' && par.clinica ? par.clinica : par.nome) : (r.criadoPorNome ? 'Cadastro de ' + r.criadoPorNome : (r.origem === 'organico' ? 'Orgânico' : 'Sem parceiro'));
+    var id = esc(r.id), k = leadDe(r), par = prospById(r.responsavelId), parNome = par ? (par.tipo === 'clinica' && par.clinica ? par.clinica : par.nome) : (r.criadoPorNome || gestorNome(r.responsavelId) ? 'Cadastro de ' + (r.criadoPorNome || gestorNome(r.responsavelId)) : (r.origem === 'organico' ? 'Orgânico' : 'Sem parceiro'));
     var falt = dadosFaltando(r), dc = String(r.dataCadastro || r.criadoEm || '').slice(0, 10), nd = dc ? -daysUntil(dc) : null;
     var pn = prioridadeNasc(r), dp = r.dpp ? daysUntil(r.dpp) : null, atr = k === 'novo' && nd >= 2 ? 'sem ligação' : atrasoTxt(r).replace('parada há ', 'parada ');
     var parto = nascido(r) ? '<div class="cad-l1">Bebê já nasceu</div><small class="verm" title="O escritório atende só gestantes">Fora do perfil</small>'
