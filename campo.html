@@ -1351,6 +1351,15 @@ html[data-tema="dark"] .tuto-pts i.on{background:#c49be6}
 .db-tile.aviso b{color:#c2410c}
 .db-tile small{display:block;margin-top:2px;font-size:12.5px;line-height:1.25;color:var(--ink2)}
 .db-tile svg{position:absolute;right:10px;top:50%;width:16px;height:16px;margin-top:-8px;fill:none;stroke:var(--ink2);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+/* cadastro rápido no Início (26/11/2026): quantas a pessoa indicou assim e como estão */
+.db-rap-l{grid-template-columns:1fr}
+.db-rap{display:flex;align-items:center;gap:14px;padding:12px 32px 12px 16px}
+.db-rap b{flex:none;min-width:30px;text-align:center}
+.db-rap small{margin:0;min-width:0}
+.db-rap small strong{display:block;font-size:14px;font-weight:700;color:var(--ink);margin-bottom:1px}
+.pm-rapf{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-6px 0 14px;padding:10px 14px;border-radius:14px;background:#f1e8f8;color:#561f86;font-size:13px}
+.pm-rapf button{border:0;background:none;padding:0;font:inherit;font-weight:700;color:#7633b2;text-decoration:underline;cursor:pointer}
+html[data-tema="dark"] .pm-rapf{background:#241a2d;color:#d9c2ee}html[data-tema="dark"] .pm-rapf button{color:#c49be6}
 .db-card:active,.db-tile:active,.db-rl:active{transform:scale(.985)}
 html[data-tema="dark"] .db-card,html[data-tema="dark"] .db-tile{box-shadow:none}
 html[data-tema="dark"] .db-bar i,html[data-tema="dark"] .db-rn i,html[data-tema="dark"] .db-pos{background:#2c2236}
@@ -1500,7 +1509,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
 <script>
 (function(){
   'use strict';
-  var APP_VERSAO = 118;
+  var APP_VERSAO = 119;
   // Supabase do Nascer com Direitos: cole aqui os MESMOS endereço e chave pública do config.js (sistema do escritório)
   var CFG = { url: 'https://rqgaliouhuulycbxxmjd.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ2FsaW91aHV1bHljYnh4bWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MjU4OTIsImV4cCI6MjEwNzQwMTg5Mn0.Jgtz27iGOI9Vwt_4EXzbe6xuKEYKt5JjETO6Q9vgAuM' };
   var CFG_OK = !/COLE_AQUI/.test(CFG.url + CFG.key);
@@ -2019,11 +2028,13 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
     var corpo = !maesV
       ? '<div class="pm-hero"><small>' + (G ? 'Sua equipe' : 'Sua rede') + '</small><div class="pm-num">' + (G ? nProsp + nRede : l.length) + '</div><p>' + (G ? nProsp + (nProsp === 1 ? ' prospectador' : ' prospectadores') + ' · ' + nRede + (nRede === 1 ? ' parceiro' : ' parceiros') : (l.length === 1 ? 'parceiro cadastrado' : 'parceiros cadastrados')) + '</p>' +
           '<div class="pm-trio"><span><b>' + t.ind + '</b>indicações</span><span><b>' + t.con + '</b>contratos</span><span><b>' + t.cnc + '</b>concedidos</span></div></div>' +
+        blocoRapido(cl, 'data-ir="maes" data-filtro="rapido"') +
         dbMeta('parc', (G ? todas : rede).filter(function(m){ return noMes(m.cadastro); }).length, 'indicações no mês') +
         dbRanking(l) +
         '<div class="db-tiles db-opc">' + dbAtalho(l.filter(function(x){ return noMes(x.criadoEm); }).length, G ? 'novos na equipe no mês' : 'parceiros novos no mês', 'data-ir="clientes"') + dbAtalho(l.filter(function(x){ return !(+x.indicacoes); }).length, 'ainda sem indicação', 'data-ir="clientes"', 'aviso') + '</div>'
       : '<div class="pm-hero"><small>Mães</small><div class="pm-num">' + todas.length + '</div><p>' + (G ? 'indicadas pela sua equipe' : cl.length + (cl.length === 1 ? ' sua' : ' suas') + ' · ' + rede.length + ' dos seus parceiros') + '</p>' +
           '<div class="pm-trio"><span><b>' + r.and + '</b>em andamento</span><span><b>' + r.pend + '</b>com pendência</span><span><b>' + r.ok + '</b>deram certo</span></div></div>' +
+        blocoRapido(cl, 'data-ir="maes" data-filtro="rapido"') +
         dbMeta('maes', todas.filter(function(m){ return noMes(m.cadastro); }).length, 'mães no mês') +
         dbGrafico(todas.map(function(m){ return m.cadastro; }), 'Cadastros por semana') +
         '<div class="db-tiles db-opc">' + dbAtalho(cl.filter(function(c){ return faltas(c).length; }).length, G ? 'com pendência' : 'suas com pendência', 'data-ir="maes" data-filtro="faltam"', 'aviso') + (G ? dbAtalho(nRede, 'parceiros na rede', 'data-ir="clientes"') : dbAtalho(rede.length, 'mães dos parceiros', 'data-maes-rede')) + '</div>';
@@ -2913,7 +2924,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
   }
   function linhaMae(c){
     var s = situacaoSimples(c);
-    return '<button type="button" class="pm-m" data-cli="' + esc(c.id) + '"><span class="pm-av">' + esc(iniciais(c.nome)) + '</span><span class="pm-n"><b>' + esc(bonito(c.nome) || 'Sem nome') + '</b><span class="pm-l2"><span class="pm-s ' + s[0] + '">' + esc(s[1]) + '</span><small>' + (ehGestor() && c.parceiro ? esc(bonito(c.parceiro)) + ' · ' : '') + (c.cadastro ? esc(quando(c.cadastro)) : '') + '</small></span>' + (semGanho() ? '' : '<span class="pm-pts"><span class="' + (marcos(c).conf ? 'on' : '') + '"><i></i>Confirmada</span><span class="' + (marcos(c).lib ? 'on' : '') + '"><i></i>Benefício liberado</span></span>') + '</span><span class="pm-seta">›</span></button>';
+    return '<button type="button" class="pm-m" data-cli="' + esc(c.id) + '"><span class="pm-av">' + esc(iniciais(c.nome)) + '</span><span class="pm-n"><b>' + esc(bonito(c.nome) || 'Sem nome') + '</b><span class="pm-l2"><span class="pm-s ' + s[0] + '">' + esc(s[1]) + '</span><small>' + (c.origem === 'rapido' ? 'Cadastro rápido · ' : '') + (ehGestor() && c.parceiro ? esc(bonito(c.parceiro)) + ' · ' : '') + (c.cadastro ? esc(quando(c.cadastro)) : '') + '</small></span>' + (semGanho() ? '' : '<span class="pm-pts"><span class="' + (marcos(c).conf ? 'on' : '') + '"><i></i>Confirmada</span><span class="' + (marcos(c).lib ? 'on' : '') + '"><i></i>Benefício liberado</span></span>') + '</span><span class="pm-seta">›</span></button>';
   }
   function depoisDoInicio(){ caberInicio(); setTimeout(function(){ conviteAvisos(); caberInicio(); reativarAvisos(); }, 600); }
   // Início sem rolagem: tira do fim da lista as linhas que não cabem na tela (as outras ficam na aba Mães ou Parceiros)
@@ -3141,7 +3152,7 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
       '<div class="pm-hero"><small>Deram certo</small><div class="pm-num">' + r.ok + '</div><p>' + frase + '</p>' +
         '<div class="pm-trio"><span><b>' + r.total + '</b>enviadas</span><span><b>' + r.and + '</b>em andamento</span><span><b>' + r.pend + '</b>com pendência</span></div></div>' +
       (false ? '<button type="button" class="pm-alerta" data-ir="faltam"><span class="n">' + r.pend + '</span><span><b>' + (r.pend === 1 ? 'mãe com documento faltando' : 'mães com documento faltando') + '</b><small>Toque para ver quais e completar</small></span></button>' : '') +
-      (cl.length ? '<div class="db-corpo">' + dbMeta('maes', cl.filter(function(c){ return noMes(c.cadastro); }).length, 'mães no mês') + dbGrafico(cl.map(function(c){ return c.cadastro; }), 'Seus cadastros por semana') +
+      (cl.length ? '<div class="db-corpo">' + blocoRapido(cl, 'data-ir="rapido"') + dbMeta('maes', cl.filter(function(c){ return noMes(c.cadastro); }).length, 'mães no mês') + dbGrafico(cl.map(function(c){ return c.cadastro; }), 'Seus cadastros por semana') +
           '<div class="db-tiles db-opc">' + dbAtalho(r.pend, 'com pendência', 'data-ir="faltam"', 'aviso') + dbAtalho(cl.filter(function(c){ return noMes(c.cadastro); }).length, 'enviadas neste mês', 'data-ir="todos"') + '</div></div>'
         : '<div class="vazio" style="margin-top:14px">' + (navigator.onLine === false && !painel ? 'Sem internet: o painel aparece quando o celular tiver sinal.' : 'As mães que você cadastrar aparecem aqui. Toque em <b>Novo cadastro</b> para começar.') + '</div>') +
       '';
@@ -3324,14 +3335,23 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
     };
   }
   var GRUPOS_P = [['todos', 'Todas'], ['faltam', 'Pendências'], ['andamento', 'Andamento'], ['ganharam', 'Deram certo']];
-  function noGrupoP(c, g){ var ok = marcos(c).lib, fl = !ok && faltas(c).length > 0; return g === 'todos' || (g === 'faltam' && fl) || (g === 'ganharam' && ok) || (g === 'andamento' && !fl && !ok); }
+  function noGrupoP(c, g){ if (g === 'rapido') return c.origem === 'rapido'; var ok = marcos(c).lib, fl = !ok && faltas(c).length > 0; return g === 'todos' || (g === 'faltam' && fl) || (g === 'ganharam' && ok) || (g === 'andamento' && !fl && !ok); }
+  // Início: quantas mães a pessoa (ou a equipe do gestor) indicou pelo cadastro rápido e como estão; tocar abre Mães só com elas
+  function blocoRapido(lista, attrs){
+    var q = lista.filter(function(c){ return c.origem === 'rapido'; }); if (!q.length) return '';
+    var fe = q.filter(function(c){ return marcos(c).conf; }).length, nf = q.filter(function(c){ return !marcos(c).conf && c.desqualificada; }).length, cl = q.length - fe - nf;
+    var partes = [fe ? fe + (fe === 1 ? ' fechou contrato' : ' fecharam contrato') : '', cl ? cl + ' com o closer' : '', nf ? nf + (nf === 1 ? ' não fechou' : ' não fecharam') : ''].filter(Boolean);
+    return '<div class="db-tiles db-rap-l"><button type="button" class="db-tile db-rap" ' + attrs + '><b>' + q.length + '</b><small><strong>' + (ehGestor() ? 'Da equipe pelo cadastro rápido' : q.length === 1 ? 'Indicada pelo cadastro rápido' : 'Indicadas pelo cadastro rápido') + '</strong>' + esc(partes.join(' · ')) + '</small><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button></div>';
+  }
   function vistaClientesParceira(){
     var cl = clientesPainel().slice().sort(function(a, b){ return String(b.cadastro || '').localeCompare(String(a.cadastro || '')); });
-    if (!GRUPOS_P.some(function(g){ return g[0] === filtroCli; })) filtroCli = 'todos';
+    if (filtroCli !== 'rapido' && !GRUPOS_P.some(function(g){ return g[0] === filtroCli; })) filtroCli = 'todos';
+    var nRap = cl.filter(function(c){ return c.origem === 'rapido'; }).length;
     $('vista').innerHTML =
       '<div class="pm-ola"><h2>' + (ehGestor() ? 'Mães da equipe' : 'Suas mães') + '</h2><span>' + (cl.length ? cl.length + (ehGestor() ? (cl.length === 1 ? ' mãe indicada pela sua equipe' : ' mães indicadas pela sua equipe') : (cl.length === 1 ? ' mãe enviada por você' : ' mães enviadas por você')) : (ehGestor() ? 'Nenhuma mãe indicada pela equipe ainda' : 'Nenhuma mãe enviada ainda')) + '</span></div>' +
       '<label class="pm-busca"><svg><use href="#i-busca"/></svg><input id="busca-cli" placeholder="Buscar pelo nome" value="' + esc(buscaCli) + '" autocomplete="off"></label>' +
       '<div class="pm-filtro" id="chips">' + GRUPOS_P.map(function(g){ var n = cl.filter(function(c){ return noGrupoP(c, g[0]); }).length; return '<button type="button" class="' + (g[0] === 'faltam' ? 'fa' : g[0] === 'ganharam' ? 'ok' : '') + '" data-g="' + g[0] + '" aria-pressed="' + (filtroCli === g[0]) + '"><b>' + n + '</b><span>' + g[1] + '</span></button>'; }).join('') + '</div>' +
+      (filtroCli === 'rapido' ? '<div class="pm-rapf"><span><b>Cadastro rápido</b> · ' + nRap + (nRap === 1 ? ' mãe' : ' mães') + '</span><button type="button" id="rap-todas">Ver todas</button></div>' : '') +
       '<div id="lista-cli"></div><div id="fila"></div>';
     function desenhar(){
       var q = buscaCli.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
@@ -3341,7 +3361,8 @@ html[data-tema="dark"] #perm-tela .perm-bloq{background:#2a1517;border-color:#4a
     }
     desenhar();
     $('busca-cli').addEventListener('input', function(){ buscaCli = this.value; desenhar(); });
-    $('chips').addEventListener('click', function(e){ var b = e.target.closest('[data-g]'); if (!b) return; filtroCli = b.dataset.g; Array.prototype.forEach.call(this.children, function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); desenhar(); });
+    $('chips').addEventListener('click', function(e){ var b = e.target.closest('[data-g]'); if (!b) return; var tinhaFaixa = filtroCli === 'rapido'; filtroCli = b.dataset.g; if (tinhaFaixa) return vistaClientesParceira(); Array.prototype.forEach.call(this.children, function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); desenhar(); });
+    if ($('rap-todas')) $('rap-todas').onclick = function(){ filtroCli = 'todos'; vistaClientesParceira(); };
     $('lista-cli').addEventListener('click', function(e){ var c = e.target.closest('[data-cli]'); if (c) fichaCli(c.dataset.cli); });
     mostrarFila();
   }
