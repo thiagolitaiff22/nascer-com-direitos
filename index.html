@@ -3063,6 +3063,9 @@ html.fc-split[data-fx="novo"] .content{max-width:none;margin-inline:0}
 html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
 }
 /* fim da lista nova */
+/* cadastro rápido (26/11/2026): os três botões do closer numa linha só */
+.rap-acoes{display:flex!important;gap:6px;justify-content:flex-end;flex-wrap:nowrap}
+.rap-acoes .kb-btn{width:auto;flex:none;padding-inline:12px;white-space:nowrap}
 </style>
 <script src="vendor/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -3164,6 +3167,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
       <button class="tab" role="tab" id="tab-cad" aria-selected="false" type="button" title="Cadastro"><svg class="i"><use href="#i-phone"/></svg><span>Cadastro</span><b class="nav-n tnum" id="nn-d"></b></button>
       <button class="tab" role="tab" id="tab-desq" aria-selected="false" type="button" title="Perdas e desqualificados"><svg class="i"><use href="#i-bellx"/></svg><span>Perdas e desqualificados</span></button>
       <div class="nav-lbl" id="lbl-pos" aria-hidden="true">Pós-venda</div>
+      <button class="tab" role="tab" id="tab-rap" aria-selected="false" type="button" title="Cadastro rápido" hidden><svg class="i"><use href="#i-phone"/></svg><span>Cadastro rápido</span><b class="nav-n tnum" id="nn-cr"></b></button>
       <button class="tab" role="tab" id="tab-ctr" aria-selected="false" type="button" title="Pós-venda"><svg class="i"><use href="#i-check"/></svg><span>Pós-venda</span><b class="nav-n tnum" id="nn-k"></b></button>
       <button class="tab" role="tab" id="tab-gps" aria-selected="false" type="button" title="GPS (urbana)" hidden><svg class="i"><use href="#i-cash"/></svg><span>GPS (urbana)</span><b class="nav-n tnum" id="nn-gp"></b></button>
       <button class="tab" role="tab" id="tab-nasc" aria-selected="false" type="button" title="Aguardando nascimento" hidden><svg class="i"><use href="#i-baby"/></svg><span>Aguardando parto</span><b class="nav-n tnum" id="nn-an"></b></button>
@@ -3249,6 +3253,17 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
         <div class="list" id="ctr-list"></div>
       </section>
 
+      <section id="view-rap" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18.75px">
+        <div class="stats" id="rap-stats"></div>
+        <div class="fbar">
+          <div class="search tb-busca"><svg class="i"><use href="#i-search"/></svg><input id="rap-q" type="search" autocomplete="off" placeholder="Buscar mãe, WhatsApp…"></div>
+          <button type="button" class="fb-lnk" data-filtrar aria-haspopup="true"><svg class="i"><use href="#i-filter"/></svg>Filtrar</button>
+          <select class="tb-sel kb-ord" aria-label="Ordenar" title="Ordenar"></select>
+          <button type="button" class="fb-lnk minhas-btn" data-minhas aria-pressed="false" title="Mostra só as mães em que você já ligou">Minhas clientes</button>
+        </div>
+        <div class="kb-info" id="rap-info"></div>
+        <div class="list" id="rap-list"></div>
+      </section>
       <section id="view-gps" class="vw-dash" hidden style="display:flex;flex-direction:column;gap:18.75px">
         <div class="stats" id="gpn-stats"></div>
         <div class="fbar">
@@ -5685,6 +5700,97 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
     var p = e.target.closest('[data-rqn-prot]'); if (p){ var r = acharRow(p.dataset.rqnProt); if (r && (rural(r) || gpsPaga(r) || window.confirm('A GPS de ' + r.nome + ' não consta como paga. Registrar o protocolo assim mesmo?'))) abrirRequerimento(r); return; }
     var cp = e.target.closest('[data-gpn-copia]'); if (cp){ try { await copiarTexto(cp.dataset.gpnCopia); toast('Código de barras da GPS copiado'); } catch(err){ toast('Não foi possível copiar.'); } return; }
   }); ligarLista(lid.replace('-list', ''), function(){ return null; }, render); });
+  /* ---------- Cadastro rápido (26/11/2026, pedido: "um cadastro rápido... o nome e número dessa mãe para que o Closer faça o fechamento").
+     O aplicativo manda só o nome e o WhatsApp (SQL 62, cadastroRapido). O closer liga, completa CPF, parto e atividade e fecha o contrato aqui;
+     com o contrato fechado a mãe entra no Pós-venda, que cobra RG, CPF, senha gov.br e NIT como nas outras. "Não fechou" tira da lista
+     (fica guardada no banco, como as desqualificadas). ---------- */
+  var rapQ = '';
+  function rapBusca(r, q){ if (!q) return true; var s = semAcento(q), d = digits(q); return semAcento(r.nome || '').indexOf(s) >= 0 || (d.length >= 3 && digits(r.contato || '').indexOf(d) >= 0); }
+  function rapParceiro(r){ var par = prospById(r.responsavelId); return par ? (par.tipo === 'clinica' && par.clinica ? par.clinica : par.nome) : (r.criadoPorNome || gestorNome(r.responsavelId) || 'Sem parceiro'); }
+  function rapEspera(r){ return diasDesdeIso(r.criadoEm) || 0; }
+  function rapTent(r){ return r.tentativas > 0 ? 'Não atendeu' + (r.tentativas > 1 ? ' ' + r.tentativas + 'x' : '') + (r.ultimaTentativaEm ? ' · ' + lnRel(diaLocal(r.ultimaTentativaEm)) : '') : ''; }
+  function rapEu(){ var e = meuEmail(), u = (state.equipe || []).filter(function(x){ return String(x.email || '').toLowerCase() === e; })[0]; return { nome: (u && u.nome) || (state.me && state.me.nome) || e, email: e }; }
+  function rapBotoes(r){ var id = esc(r.id); return '<div class="kb-duplo rap-acoes"><button type="button" class="kb-btn" data-rap-fechar="' + id + '">' + svgI('i-ok') + 'Fechar contrato</button><button type="button" class="kb-btn sec" data-rap-tent="' + id + '" title="Ligou e ela não atendeu: conta uma tentativa">Não atendeu</button><button type="button" class="kb-btn sec" data-rap-perdeu="' + id + '" title="Ela não quis fechar: sai da lista (fica guardada)">Não fechou</button></div>'; }
+  function rapInfo(r){
+    var t = rapTent(r), w = rapEspera(r);
+    return { etapa: 'Esperando o closer', etapaSel: '', status: [t ? kbSt(t, 'lar') : kbSt('Ainda não ligou', 'info')], resp: r.contatoCloser || '', dias: w, parado: w >= 2 && !(r.tentativas > 0),
+      dataVal: foneDe(r) ? fmtTel(foneDe(r)) : '—', acao: rapBotoes(r) };
+  }
+  function renderRapido(){
+    var box = $('rap-list'); if (!box) return;
+    var todos = state.rows.filter(function(r){ return faseDe(r) === 'cr'; }), hoje = iso(new Date());
+    statsNovo('rap-stats', [['i-phone', 'Esperando o closer', todos.length, 'só com nome e WhatsApp'], ['i-alert', 'Ainda sem ligação', todos.filter(function(r){ return !(r.tentativas > 0); }).length, 'ninguém ligou ainda'],
+      ['i-clock', 'Não atenderam', todos.filter(function(r){ return r.tentativas > 0; }).length, 'ligar de novo'], ['i-users', 'Cadastradas hoje', todos.filter(function(r){ return r.criadoEm && diaLocal(r.criadoEm) === hoje; }).length, 'pelo aplicativo']]);
+    // quem espera há mais tempo primeiro
+    var l = ordenar(todos.filter(function(r){ return rapBusca(r, rapQ) && (!soMinhas || minha(r)) && passaFiltro(r); }), function(a, b){ return String(a.criadoEm || '').localeCompare(String(b.criadoEm || '')); });
+    kbInfo('rap', 'cr', l.length, 'mãe', 'mães');
+    tabelaFase(box, l, rapInfo, 'WhatsApp', 'Nenhum cadastro rápido esperando o closer.');
+  }
+  async function rapTentativa(r){
+    var ag = new Date().toISOString(), eu = rapEu(), p = { tentativas: (r.tentativas || 0) + 1, ultimaTentativaEm: ag, contatoCloser: eu.nome, contatoCloserEmail: eu.email, atualizadoEm: ag }, antes = antesDe(r, p);
+    try { await patchRow(r.id, p); toast('Não atendeu: ' + r.nome + ' (' + p.tentativas + 'ª tentativa)', 'Desfazer', function(){ desfazer(r.id, antes); }); } catch(err){ toast(errMsg(err)); }
+  }
+  async function rapPerdeu(r){
+    var motivo = String(window.prompt('Não fechou o contrato: qual o motivo? (obrigatório)', '') || '').trim();
+    if (!motivo) return;
+    if (motivo.length < 3){ toast('Escreva o motivo para tirar a mãe da lista.'); return; }
+    var ag = new Date().toISOString(), eu = rapEu(), p = { leadStatus: 'desqualificado', desqualMotivo: motivo.slice(0, 300), desqualEm: iso(new Date()), contatoCloser: eu.nome, contatoCloserEmail: eu.email, atualizadoEm: ag }, antes = antesDe(r, p);
+    try { if (cardAberto && cardAberto.id === r.id) fecharCard(); await patchRow(r.id, p); toast('Não fechou: ' + r.nome + ' saiu da lista', 'Desfazer', function(){ desfazer(r.id, antes); }); } catch(err){ toast(errMsg(err)); }
+  }
+  // Fechar contrato: o closer confirma quem fechou e completa o que o Pós-venda e a GPS precisam (CPF, data do parto e a atividade)
+  function fecharRapido(r){
+    var eu = rapEu(), cx = 'width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line-2,#cdb7df);background:var(--soft,#f5eff9);color:inherit;font:inherit;margin:0 0 10px';
+    var rot = function(t){ return '<label class="mini" style="display:block;margin:0 0 4px">' + t + '</label>'; };
+    var quem = (state.equipe || []).filter(function(u){ return u.ativo !== false && u.email; }).sort(function(a, b){ return String(a.nome).localeCompare(String(b.nome), 'pt-BR'); });
+    var f = document.createElement('div'); f.className = 'cid-sheet';
+    f.innerHTML = '<div><h3>Fechar contrato</h3><p>' + esc(r.nome) + (foneDe(r) ? ' · ' + esc(fmtTel(foneDe(r))) : '') + '</p>' +
+      rot('Closer que fechou') + '<select id="fr-quem" style="' + cx + '"><option value="">Escolha o closer</option>' + quem.map(function(u){ return '<option value="' + esc(u.email) + '"' + (String(u.email).toLowerCase() === eu.email ? ' selected' : '') + '>' + esc(u.nome || u.email) + '</option>'; }).join('') + '</select>' +
+      rot('CPF da mãe') + '<input id="fr-cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" value="' + esc(r.cpf ? maskCPF(r.cpf) : '') + '" style="' + cx + '">' +
+      rot('Data prevista do parto') + '<input type="date" id="fr-dpp" value="' + esc(String(r.dpp || '').slice(0, 10)) + '" style="' + cx + '">' +
+      rot('É pescadora, agricultora ou indígena?') + '<select id="fr-ativ" style="' + cx + '">' + ativOpts(r) + '</select>' +
+      rot('Data do fechamento') + '<input type="date" id="fr-data" value="' + iso(new Date()) + '" style="' + cx + '">' +
+      '<label style="display:flex;gap:10px;align-items:flex-start;margin:2px 0 10px;font-size:14px;line-height:1.35"><input type="checkbox" id="fr-ass" style="margin-top:3px;width:18px;height:18px;flex:none"><span><b>Ela assinou o contrato e a procuração</b><br><span class="mini">Marque só depois que ela assinar.</span></span></label>' +
+      '<p style="margin:0 0 10px">A mãe vai para o <b>Pós-venda</b>, que cobra RG, CPF, senha gov.br e NIT.</p>' +
+      '<div style="display:flex;gap:8px;justify-content:flex-end"><button type="button" class="btn" data-x>Cancelar</button><button type="button" class="btn primary" data-ok>Confirmar fechamento</button></div></div>';
+    ($('dlg').open ? $('dlg') : document.body).appendChild(f);
+    var campo = function(id){ return f.querySelector('#' + id); };
+    f.querySelector('[data-x]').onclick = function(){ f.remove(); };
+    f.addEventListener('click', function(e){ if (e.target === f) f.remove(); });
+    campo('fr-cpf').addEventListener('input', function(){ this.value = maskCPF(this.value); });
+    f.querySelector('[data-ok]').onclick = async function(){
+      var sel = campo('fr-quem'), cpf = campo('fr-cpf').value, dpp = campo('fr-dpp').value, at = campo('fr-ativ').value, data = campo('fr-data').value || iso(new Date());
+      if (!sel.value){ toast('Escolha o closer que fechou o contrato.'); sel.focus(); return; }
+      if (!cpfValido(cpf)){ toast('Confira o CPF da mãe: este não é válido.'); campo('fr-cpf').focus(); return; }
+      var n = dpp ? daysUntil(dpp) : null;
+      if (n == null){ toast('Informe a data prevista do parto.'); campo('fr-dpp').focus(); return; }
+      if (n < 0){ toast('O escritório atende só gestantes: a data do parto já passou.'); campo('fr-dpp').focus(); return; }
+      if (!at){ toast('Pergunte se ela é pescadora, agricultora ou indígena.'); campo('fr-ativ').focus(); return; }
+      if (!campo('fr-ass').checked){ toast('Marque que ela assinou o contrato e a procuração.'); return; }
+      var dc = digits(cpf), dup = (state.todas || state.rows).filter(function(x){ return x.id !== r.id && digits(x.cpf) === dc; })[0];
+      if (dup && !window.confirm('Já existe uma mãe com este CPF no sistema: ' + dup.nome + '. Fechar assim mesmo?')) return;
+      var u = quem.filter(function(x){ return x.email === sel.value; })[0], ag = new Date().toISOString(), rp = respPosNovo();
+      var falta = (Array.isArray(r.faltaDocs) ? r.faltaDocs : []).concat(['rg_frente', 'cpf']).filter(function(x, i, a){ return a.indexOf(x) === i; });
+      var pf = Object.assign({ cpf: maskCPF(dc), dpp: dpp, fatoGerador: 'gestante', fluxo: 'novo', contratoEm: data, leadStatus: 'fechado', contratoPor: (u && u.nome) || sel.value, contratoPorEmail: sel.value, propostaAceita: true,
+        posResp: rp ? rp.nome || rp.email : '', posRespEmail: rp ? rp.email : '', posEtapa: '', posMudouEm: '', contatoPrazoEm: '', faltaDocs: falta, atualizadoEm: ag }, ativPatch(at, r));
+      var antes = antesDe(r, pf), b = this; b.disabled = true;
+      try {
+        if (cardAberto && cardAberto.id === r.id) fecharCard();
+        await patchRow(r.id, pf); f.remove();
+        toast('Contrato fechado: ' + r.nome + ' foi para o Pós-venda', 'Desfazer', function(){ desfazer(r.id, antes); });
+        if (!r.pastaId) ensureFolder(r.id, r.nome).catch(function(){});   // pasta no Drive para os documentos (o parceiro completa pelo aplicativo)
+      } catch(err){ b.disabled = false; toast(errMsg(err)); }
+    };
+  }
+  (function(){
+    var q = $('rap-q'); if (q) q.addEventListener('input', function(){ rapQ = this.value.trim(); renderRapido(); });
+    var el = $('rap-list'); if (!el) return;
+    el.addEventListener('click', function(e){
+      var b = e.target.closest('[data-rap-fechar],[data-rap-tent],[data-rap-perdeu]'); if (!b) return;
+      var r = acharRow(b.dataset.rapFechar || b.dataset.rapTent || b.dataset.rapPerdeu); if (!r) return;
+      if (b.dataset.rapFechar) fecharRapido(r); else if (b.dataset.rapTent) rapTentativa(r); else rapPerdeu(r);
+    });
+    ligarLista('rap', function(){ return null; }, render);
+  })();
   /* ---------- Fila de protocolo: um botão por etapa ---------- */
   var FILA_COLS = [['conferir', 'Conferência'], ['protocolar', 'Protocolar', 'ok']];
   var FILA_LEGADO = { para_analisar: 'conferir', analise: 'conferir', fazer_requerimento: 'protocolar', redigindo: 'protocolar' };
@@ -7158,7 +7264,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
   document.addEventListener('input', function(e){ if (e.target.id === 'parcn-q'){ parcNQ = e.target.value.trim(); var pos = e.target.selectionStart; renderParcNovo(); var q2 = $('parcn-q'); if (q2){ q2.focus(); try { q2.setSelectionRange(pos, pos); } catch(er){} } } });
   document.addEventListener('change', function(e){ var id = e.target.id; if (id === 'parcn-sit') parcNSit = e.target.value; else if (id === 'parcn-tipo') parcNTipo = e.target.value; else if (id === 'parcn-pros') parcNPros = e.target.value; else return; renderParcNovo(); });
   function renderDashNovo(box){
-    var rows = state.rows, j = dashJanela(), no = function(d){ d = diaLocal(d); return !!d && (!j.ini || d >= j.ini) && d <= j.fim; };
+    var rows = state.rows.filter(naJornada), j = dashJanela(), no = function(d){ d = diaLocal(d); return !!d && (!j.ini || d >= j.ini) && d <= j.fim; };
     var ant = null;
     if (j.ini){ var di = parseDate(j.ini), df = parseDate(j.fim), len = Math.round((df - di) / 864e5) + 1, af = new Date(di); af.setDate(af.getDate() - 1); var ai = new Date(af); ai.setDate(ai.getDate() - len + 1); ant = { ini: iso(ai), fim: iso(af) }; }
     var noAnt = function(d){ d = diaLocal(d); return !!ant && !!d && d >= ant.ini && d <= ant.fim; };
@@ -7326,7 +7432,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
   function renderPainel(box){
     // primeira vez no Dashboard novo: abre em "Este ano" (num mês só, quase ninguém chega ao fim da jornada)
     if (!lerGuardado('nascer-painel-v1', false)){ guardar('nascer-painel-v1', true); if (dashPer === 'mes'){ dashPer = 'ano'; guardar('nascer-dash-per', 'ano'); } }
-    var rows = state.rows, j = dashJanela(), hoje = iso(new Date());
+    var rows = state.rows.filter(naJornada), j = dashJanela(), hoje = iso(new Date());
     var no = function(d){ return !!d && (!j.ini || d >= j.ini) && d <= j.fim; };
     var ant = null;
     if (j.ini){ var di = parseDate(j.ini), df = parseDate(j.fim), len = Math.round((df - di) / 864e5) + 1, af = new Date(di); af.setDate(af.getDate() - 1); var ai = new Date(af); ai.setDate(ai.getDate() - len + 1); ant = { ini: iso(ai), fim: iso(af) }; }
@@ -7537,8 +7643,8 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
   /* ---------- balões das fases: um por etapa do caminho da cliente ---------- */
   var FASES_ANT = [['d', 'i-phone'], ['k', 'i-check'], ['h', 'i-file'], ['i', 'i-inss'], ['c', 'i-gavel'], ['r', 'i-box']];
   // fluxo novo (padrão definido em 04/11/2026): sem Cadastro e sem Fila; GPS, nascimento e requerimento têm tela própria
-  var FASES_NOVO = [['k', 'i-check'], ['gp', 'i-cash'], ['an', 'i-baby'], ['rq', 'i-file'], ['i', 'i-inss'], ['c', 'i-gavel'], ['r', 'i-box']];
-  var FASES = FASES_ANT.concat([['gp', 'i-cash'], ['an', 'i-baby'], ['rq', 'i-file']]);
+  var FASES_NOVO = [['cr', 'i-phone'], ['k', 'i-check'], ['gp', 'i-cash'], ['an', 'i-baby'], ['rq', 'i-file'], ['i', 'i-inss'], ['c', 'i-gavel'], ['r', 'i-box']];
+  var FASES = FASES_ANT.concat([['gp', 'i-cash'], ['an', 'i-baby'], ['rq', 'i-file'], ['cr', 'i-phone']]);
   function fasesAtivas(){ return fluxoVista === 'novo' ? FASES_NOVO : FASES_ANT; }
   function lerGuardado(k, pad){ try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? pad : v; } catch(e){ return pad; } }
   function guardar(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
@@ -7547,7 +7653,10 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
            sem closer e sem Controladoria: entra direto no Pós-venda
      antigo: todas as outras; segue como era, com closer, Controladoria e Fila (cadastros antigos e app desatualizado, sem contrato) */
   function diaCadastro(r){ return r.criadoEm ? diaLocal(r.criadoEm) : String(r.dataCadastro || '').slice(0, 10); }
-  function doFluxoNovo(r){ return r.fluxo === 'novo' || !!r.contratoEm; }   // o Fluxo antigo acabou (18/11/2026): quem já tem contrato fica no novo; quem nunca fechou contrato sai do BI (continua guardada no banco)
+  function doFluxoNovo(r){ return r.fluxo === 'novo' || !!r.contratoEm || !!r.cadastroRapido; }   // o Fluxo antigo acabou (18/11/2026): quem já tem contrato fica no novo; quem nunca fechou contrato sai do BI (continua guardada no banco)
+  // cadastro rápido do aplicativo (SQL 62): só nome e WhatsApp; fica com o closer até ele fechar o contrato
+  function rapidoAberto(r){ return !!r.cadastroRapido && !r.contratoEm && !String(r.processo || '').trim() && !requerido(r); }
+  function naJornada(r){ return !(r.cadastroRapido && !r.contratoEm); }   // Dashboard: a mãe do cadastro rápido só conta depois que o closer fecha o contrato
   var fluxoVista = 'novo';   // o Fluxo antigo saiu do BI em 18/11/2026 (a pedido: "acabe com o fluxo antigo e delete ele de todo o BI"): sem o botão Fluxo novo / Fluxo antigo
   function filtrarFluxo(){ var novo = fluxoVista === 'novo'; state.rows = (state.todas || state.rows || []).filter(function(r){ return doFluxoNovo(r) === novo; }); }
   function acharNaBase(id){ return (state.todas || state.rows).filter(function(x){ return x.id === id; })[0]; }
@@ -7578,7 +7687,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
     return u;
   }
   // contrato ainda sem assinatura: só ganha o responsável (uma vez); contrato assinado (ou sem ZapSign): vira contrato fechado
-  function vaiProPos(r){ return doFluxoNovo(r) && !r.contratoEm && !r.arquivado && r.leadStatus !== 'desqualificado' && !String(r.processo || '').trim() && !requerido(r) && !(ctPend(r) && r.posRespEmail); }
+  function vaiProPos(r){ return doFluxoNovo(r) && !rapidoAberto(r) && !r.contratoEm && !r.arquivado && r.leadStatus !== 'desqualificado' && !String(r.processo || '').trim() && !requerido(r) && !(ctPend(r) && r.posRespEmail); }
   function levarFluxoNovo(){
     (state.todas || state.rows || []).forEach(function(r){
       var chave = r.id + (ctPend(r) ? ':pendente' : ':assinado');   // quando a mãe assina, ela volta a ser levada (agora para fechar o contrato)
@@ -7611,6 +7720,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
       i: [ins.length, exi ? plural(exi, 'em exigência', 'em exigência') : lat ? plural(lat, 'análise atrasada', 'análises atrasadas') : 'requerimentos no INSS', plural(ins.length, 'requerimento', 'requerimentos') + ' · ' + plural(exi, 'exigência', 'exigências')],
       c: [jud.length, marc ? plural(marc, 'audiência marcada', 'audiências marcadas') : 'ações em andamento', plural(jud.length, 'ação', 'ações') + ' · ' + plural(marc, 'audiência marcada', 'audiências marcadas')],
       r: [pagos, contatar ? plural(contatar, 'para contatar', 'para contatar') : plural(pagos, 'paga', 'pagas'), plural(pagos, 'paga', 'pagas') + ' · ' + plural(contatar, 'para contatar', 'para contatar')],
+      cr: (function(){ var l = rows.filter(function(r){ return faseDe(r) === 'cr'; }), nl = l.filter(function(r){ return !(r.tentativas > 0); }).length; return [l.length, nl ? plural(nl, 'para ligar', 'para ligar') : l.length ? 'Ligar de novo' : 'Ninguém esperando', plural(l.length, 'mãe esperando o closer', 'mães esperando o closer') + (nl ? ' · ' + plural(nl, 'ainda sem ligação', 'ainda sem ligação') : '')]; })(),
       gp: (function(){ var l = rows.filter(function(r){ return faseDe(r) === 'gp'; }), pg = l.filter(gpsTarefa).length, sn = l.filter(function(r){ return !nitOk(r.nit); }).length; return [l.length, pg ? plural(pg, 'com o prazo agora', 'com o prazo agora') : sn ? plural(sn, 'sem NIT', 'sem NIT') : 'Aguardando o prazo', plural(l.length, 'cliente', 'clientes') + ' · ' + plural(pg, 'com o prazo da GPS agora', 'com o prazo da GPS agora')]; })(),
       an: (function(){ var l = rows.filter(function(r){ return faseDe(r) === 'an'; }), sm = l.filter(function(r){ var d = daysUntil(r.dpp); return d != null && d <= 7; }).length; return [l.length, sm ? plural(sm, 'parto em até 7 dias', 'partos em até 7 dias') : 'Aguardando', plural(l.length, 'gestante', 'gestantes') + ' · ' + plural(sm, 'parto em até 7 dias', 'partos em até 7 dias')]; })(),
       rq: (function(){ var l = rows.filter(function(r){ return faseDe(r) === 'rq'; }), ce = l.filter(function(r){ return noContratos(r) && posEtapaDe(r) === 'cert'; }).length, pr = l.length - ce; return [l.length, pr ? plural(pr, 'pronta para requerer', 'prontas para requerer') : ce ? plural(ce, 'esperando certidão', 'esperando certidão') : 'Tudo em dia', plural(ce, 'esperando certidão', 'esperando certidão') + ' · ' + plural(pr, 'pronta para requerer', 'prontas para requerer')]; })()
@@ -7628,6 +7738,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
     if (t === 'gp') return !!gpnQ;
     if (t === 'an') return !!nanQ;
     if (t === 'rq') return !!rqnQ;
+    if (t === 'cr') return !!rapQ;
     return false;
   }
   function pintarLimpar(){
@@ -7642,8 +7753,8 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
   function limparFiltros(){
     kbF.uf = ''; kbF.parc = ''; cadQ = ''; cadSit = ''; ctrQ2 = ''; ctrSit = ''; filaQ = ''; filaSit = ''; inssQ = ''; inssSit = ''; judSit = ''; state.q = ''; state.r.q = ''; state.r.f = '';
     if (soMinhas){ soMinhas = false; Array.prototype.forEach.call(document.querySelectorAll('[data-minhas]'), function(b){ b.setAttribute('aria-pressed', 'false'); }); }
-    gpnQ = ''; nanQ = ''; rqnQ = '';
-    ['cad-q', 'ctr-q', 'fila-q', 'inss-q', 'bc-q', 'q', 'r-q', 'gpn-q', 'nan-q', 'rqn-q'].forEach(function(id){ if ($(id)) $(id).value = ''; });
+    gpnQ = ''; nanQ = ''; rqnQ = ''; rapQ = '';
+    ['cad-q', 'ctr-q', 'fila-q', 'inss-q', 'bc-q', 'q', 'r-q', 'gpn-q', 'nan-q', 'rqn-q', 'rap-q'].forEach(function(id){ if ($(id)) $(id).value = ''; });
     $('r-f').value = ''; render();
   }
   function renderFunil(){
@@ -7653,7 +7764,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
     // fluxo novo não tem Cadastro (sem closer): a tela só existe no fluxo antigo
     var nv = fluxoVista === 'novo';
     ['tab-cad', 'tab-fila'].forEach(function(i){ if ($(i)) $(i).hidden = nv; });
-    ['tab-gps', 'tab-nasc', 'tab-req'].forEach(function(i){ if ($(i)) $(i).hidden = !nv; });
+    ['tab-gps', 'tab-nasc', 'tab-req', 'tab-rap'].forEach(function(i){ if ($(i)) $(i).hidden = !nv; });
     // fluxo novo: uma seção só, na ordem da jornada; desqualificada nem entra, então não há Comercial nem Perdas
     ['lbl-com', 'tab-desq', 'lbl-op'].forEach(function(i){ if ($(i)) $(i).hidden = nv; });
     if ($('lbl-pos')) $('lbl-pos').textContent = nv ? 'Jornada da mãe' : 'Pós-venda';
@@ -7778,7 +7889,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
     else if (de === 'i' && fase === 'c'){ openForm(r); setTimeout(function(){ $('f-proc').scrollIntoView({ block: 'center' }); $('f-proc').focus(); }, 60); toast('Preencha o número do processo e a data do ajuizamento'); }
     else toast('Essa passagem não é permitida por aqui.');
   }
-  function faseDe(r){ if (r.arquivado) return arquivadoPago(r) ? 'r' : 'q'; if (String(r.processo || '').trim()) return 'c'; if (requerido(r)) return 'i'; if (naFila(r)) return doFluxoNovo(r) ? 'rq' : 'h'; if (noContratos(r)) return doFluxoNovo(r) ? faseNovoPos(r) : 'k'; if (desqualificada(r) || perdidoAuto(r)) return 'q'; return 'd'; }
+  function faseDe(r){ if (r.arquivado) return arquivadoPago(r) ? 'r' : 'q'; if (rapidoAberto(r)) return r.leadStatus === 'desqualificado' ? 'q' : 'cr'; if (String(r.processo || '').trim()) return 'c'; if (requerido(r)) return 'i'; if (naFila(r)) return doFluxoNovo(r) ? 'rq' : 'h'; if (noContratos(r)) return doFluxoNovo(r) ? faseNovoPos(r) : 'k'; if (desqualificada(r) || perdidoAuto(r)) return 'q'; return 'd'; }
   // fluxo novo: senha/documentos ficam no Pós-venda; GPS, nascimento e certidão/requerimento ganham tela própria
   // gestante que paga GPS, com NIT válido, guia ainda não paga e contrato sem pendência: a guia já pode sair
   function aptaGps(r){ return !rural(r) && !semGps(r) && !nascido(r) && !gpsPaga(r) && !ctPend(r) && nitOk(r.nit) && ['senha', 'docs', 'prazo_gps', 'gps'].indexOf(posEtapaDe(r)) >= 0; }
@@ -7825,7 +7936,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
   $('bg-res').addEventListener('mousedown', function(e){ e.preventDefault(); var b = e.target.closest('[data-bg]'); if (!b) return; var r = acharNaBase(b.dataset.bg); $('bg-res').hidden = true; $('bg-q').blur(); if (r) abrirNoFluxo(r); });
   function abrirNoFluxo(r){ var f = doFluxoNovo(r) ? 'novo' : 'antigo'; if (f !== fluxoVista) trocarFluxo(f); abrirCard(r.id, noCadastro(r)); }
   // com milhares de mães, desenhar as 14 telas a cada mudança trava o BI: só a tela aberta é desenhada (as outras, quando forem abertas em showTab)
-  var RENDER_TELA = { b: [renderDash], d: [renderCad], k: [renderContratos], h: [renderFila], q: [renderDesq], i: [renderInss], c: [renderList], r: [renderRet], g: [renderParcNovo, renderProsp], e: [renderEquipe], f: [renderFin], gp: [renderGpsNovo], an: [renderNascNovo], rq: [renderReqNovo] };
+  var RENDER_TELA = { b: [renderDash], d: [renderCad], k: [renderContratos], h: [renderFila], q: [renderDesq], i: [renderInss], c: [renderList], r: [renderRet], g: [renderParcNovo, renderProsp], e: [renderEquipe], f: [renderFin], gp: [renderGpsNovo], an: [renderNascNovo], rq: [renderReqNovo], cr: [renderRapido] };
   function renderTela(t){ (RENDER_TELA[t] || []).forEach(function(f){ f(); }); }
   function render(){
     memoPos = typeof WeakMap === 'function' ? new WeakMap() : null;
@@ -9911,7 +10022,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
     } catch(err){ toast(errMsg(err)); }
     finally { $('av-save').disabled = false; }
   });
-  var VIEWS = { b: ['tab-dash', 'view-dash'], d: ['tab-cad', 'view-cad'], i: ['tab-inss', 'view-inss'], k: ['tab-ctr', 'view-ctr'], q: ['tab-desq', 'view-desq'], h: ['tab-fila', 'view-fila'], c: ['tab-jud', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-ret', 'view-ret'], g: ['tab-parc', 'view-parc'], e: ['tab-equipe', 'view-equipe'], gp: ['tab-gps', 'view-gps'], an: ['tab-nasc', 'view-nasc'], rq: ['tab-req', 'view-req'] };
+  var VIEWS = { b: ['tab-dash', 'view-dash'], d: ['tab-cad', 'view-cad'], i: ['tab-inss', 'view-inss'], k: ['tab-ctr', 'view-ctr'], q: ['tab-desq', 'view-desq'], h: ['tab-fila', 'view-fila'], c: ['tab-jud', 'view-clientes'], f: ['tab-fin', 'view-fin'], r: ['tab-ret', 'view-ret'], g: ['tab-parc', 'view-parc'], e: ['tab-equipe', 'view-equipe'], gp: ['tab-gps', 'view-gps'], an: ['tab-nasc', 'view-nasc'], rq: ['tab-req', 'view-req'], cr: ['tab-rap', 'view-rap'] };
   var TITULOS = {
     b: ['Dashboard', 'Como está o escritório: clientes por fase, contratos, protocolos e resultados'],
     d: ['Cadastro', 'Clientes ainda sem requerimento no INSS: dados, documentos e prazo'],
@@ -9928,6 +10039,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
     t: ['Contestações', 'Audiência, resultado e teses da contestação do INSS'],
     g: ['Parceiros', 'Estados de atuação, responsável de cada um e os parceiros que cadastram as clientes'],
     e: ['Configurações', 'Equipe, integrações e parceiros'],
+    cr: ['Cadastro rápido', 'Mães cadastradas no aplicativo só com o nome e o WhatsApp: o closer liga, completa os dados e fecha o contrato'],
     gp: ['GPS (urbana)', 'Guia da segurada facultativa: gerada pelo NIT e paga automaticamente pelo Asaas, 5 dias antes do prazo'],
     an: ['Aguardando parto', 'GPS paga (ou pescadora, agricultora ou indígena): esperando o parto; a IA fala com a mãe uma semana antes'],
     rq: ['Requerimento', 'A IA pede a certidão à mãe e o sistema faz o requerimento no Meu INSS']
@@ -9936,7 +10048,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
     state.view = which;
     if ((which === 'e' || which === 'f') && !isAdmin()) which = 'b';
     if (fluxoVista === 'novo' && (which === 'd' || which === 'h' || which === 'q')) which = which === 'h' ? 'rq' : 'k';   // fluxo novo não tem Cadastro, Fila nem Perdas
-    if (fluxoVista !== 'novo' && (which === 'gp' || which === 'an' || which === 'rq')) which = 'k';
+    if (fluxoVista !== 'novo' && (which === 'gp' || which === 'an' || which === 'rq' || which === 'cr')) which = 'k';
     telaAberta = which; if (telaDoFunil(which)) ultimaFase = which;
     $('pop-filtro').hidden = true;
     Object.keys(VIEWS).forEach(function(k){ $(VIEWS[k][0]).setAttribute('aria-selected', VIEWS[k][0] === VIEWS[which][0] ? 'true' : 'false'); $(VIEWS[k][1]).hidden = k !== which; });
@@ -10570,8 +10682,9 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
   function zoomBI(){ var z = parseFloat(getComputedStyle(document.documentElement).zoom); return z > 0 ? z : 1; }
   function lnLigada(){ return fluxoVista === 'novo' && window.innerWidth >= 1000; }
   function lnSplit(){ return document.documentElement.classList.contains('fc-split'); }
-  var LN_BOX = { 'ctr-list': 'k', 'gpn-list': 'gp', 'nan-list': 'an', 'rqn-list': 'rq', 'inss-list': 'i', 'list': 'c', 'r-list': 'r' };
+  var LN_BOX = { 'rap-list': 'cr', 'ctr-list': 'k', 'gpn-list': 'gp', 'nan-list': 'an', 'rqn-list': 'rq', 'inss-list': 'i', 'list': 'c', 'r-list': 'r' };
   var LN_ETAPA = {
+    cr: [0, 'Cadastro rápido', 'Mães cadastradas no aplicativo só com o nome e o WhatsApp. O closer liga, completa CPF, parto e atividade e fecha o contrato; com o contrato fechado, a mãe vai para o Pós-venda.'],
     k:  [1, 'Pós-venda', 'Só as exceções: senha gov.br, NIT, RG e CPF, e a pergunta se é pescadora, agricultora ou indígena. Com tudo completo, a mãe segue sozinha. As caixinhas resolvem ali mesmo.'],
     gp: [2, 'GPS', 'Guia da segurada facultativa (código 1473). Vence no dia 15 do mês seguinte; em feriado ou fim de semana, no próximo dia útil. A primeira guia não pode atrasar.'],
     an: [3, 'Aguardando parto', 'GPS paga, ou pescadora, agricultora ou indígena (sem GPS). Agora é esperar o parto.'],
@@ -10580,7 +10693,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
     c:  [0, 'Judicial', 'Indeferidas no INSS que viraram ação na Justiça.'],
     r:  [6, 'Arquivados', 'Benefício pago e acerto feito. Mães que podem ter direito de novo com outro filho.']
   };
-  var lnSit = { gp: '', an: '', rq: '' }, lnInfo = {};
+  var lnSit = { gp: '', an: '', rq: '', cr: '' }, lnInfo = {};
   function lnIni(n){ var p = String(n || '?').trim().split(/\s+/); return ((p[0] || '?').charAt(0) + (p.length > 1 ? p[p.length - 1].charAt(0) : '')).toUpperCase(); }
   function lnRel(dia){ var n = daysUntil(dia); return n == null ? '' : n === 0 ? 'hoje' : n === 1 ? 'amanhã' : n === -1 ? 'ontem' : n > 0 ? 'em ' + n + ' d' : 'há ' + (-n) + ' d'; }
   function lnDm(dia){ dia = String(dia || '').slice(0, 10); return dia ? dia.slice(8, 10) + '/' + dia.slice(5, 7) : ''; }
@@ -10593,6 +10706,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
   // prioridade da linha: 'at' = prazo nosso passou (faixa vermelha); 'lg' = vence em até 7 dias (faixa lilás)
   function lnTom(t, r){
     var hoje = iso(new Date()), perto = function(d){ var n = daysUntil(d); return n != null && n >= 0 && n <= 7; };
+    if (t === 'cr') return rapEspera(r) >= 2 && !(r.tentativas > 0) ? 'lg' : '';
     if (t === 'k' || t === 'gp'){ if (!r.tipoSegurada && t === 'k') return ''; if (rural(r) || semGps(r) || gpsPaga(r)) return ''; var v = prazoGps(r); return v && v < hoje ? 'at' : v && perto(v) ? 'lg' : ''; }
     if (t === 'an'){ var p = String(r.dpp || '').slice(0, 10); return p && p < hoje ? 'at' : p && perto(p) ? 'lg' : ''; }
     if (t === 'i'){ var k = statusInss(r); if (k === 'exigencia'){ var e = String(r.exigenciaPrazo || '').slice(0, 10); return e && e < hoje ? 'at' : 'lg'; } return analiseAtrasada(r) ? 'lg' : ''; }
@@ -10608,6 +10722,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
       var f = docsApp(r).filter(function(x){ return !x.ok; }).map(function(x){ return x.k === 'rg_frente' ? 'RG' : x.k === 'senha' ? 'Senha gov.br' : x.k === 'nit' ? 'NIT' : x.k === 'cpf' ? 'CPF' : x.n; });
       return f.length ? lnFt('Falta ' + f.join(', '), '', '') : lnFt('Tudo completo', 'ok', 'i-check');
     }
+    if (t === 'cr'){ var tt = rapTent(r); return tt ? lnFt(tt, 'lar', 'i-phone') : lnFt('Ainda não ligou', '', 'i-clock'); }
     if (t === 'gp'){ var v = prazoGps(r); return !nitOk(r.nit) ? lnFt('Falta o NIT', 'verm', 'i-alert') : v && v < hoje ? lnFt('Pagamento não confirmado', 'verm', 'i-alert') : gpsTarefa(r) ? lnFt('Prazo chegou: pagar a guia', 'lar', 'i-clock') : gpsGerar(r) ? lnFt('Guia pronta', 'ok', 'i-check') : lnFt('Aguardando o prazo', '', 'i-clock'); }
     if (t === 'an') return rural(r) ? lnFt(ativNovoTxt(r) + ' · sem GPS', '', '') : semGps(r) ? lnFt('Sem GPS', '', '') : gpsPaga(r) ? lnFt('GPS paga', 'ok', 'i-check') : lnFt('GPS a conferir', 'lar', 'i-alert');
     if (t === 'rq') return noContratos(r) && posEtapaDe(r) === 'cert' ? lnFt('Esperando a certidão', '', 'i-clock') : lnFt('Pronta para requerer', 'lar', 'i-file');
@@ -10620,6 +10735,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
   function lnPrazo(t, r){
     var tm = lnTom(t, r), tom = tm === 'at' ? 'verm' : tm === 'lg' ? 'lg' : '';
     if (t === 'k'){ if (!r.tipoSegurada) return '<span class="ln-vz">—</span>'; if (rural(r) || semGps(r)) return '<span class="ln-vz">sem GPS</span>'; if (gpsPaga(r)) return '<span class="ln-pz ok"><b>GPS paga</b></span>'; return lnPz(prazoGps(r), tom); }
+    if (t === 'cr') return foneDe(r) ? '<span class="ln-pz"><b class="tnum">' + esc(fmtTel(foneDe(r))) + '</b></span>' : '<span class="ln-vz">sem WhatsApp</span>';
     if (t === 'gp') return lnPz(prazoGps(r), tom);
     if (t === 'an') return lnPz(r.dpp, tom, '', daysUntil(r.dpp) < 0 ? 'passou ' + lnRel(r.dpp) : lnRel(r.dpp));
     if (t === 'rq') return r.criancaNasc ? lnPz(r.criancaNasc, '', 'nasceu ', lnRel(r.criancaNasc)) : lnPz(r.dpp, '', 'previsto ', lnRel(r.dpp));
@@ -10637,6 +10753,12 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
     if (t === 'k') return [M,
       ['Senha gov.br', 100, function(r){ return pvCel(r, 'senha'); }, 'c'], ['NIT', 58, function(r){ return pvCel(r, 'nit'); }, 'c'], ['RG', 52, function(r){ return pvCel(r, 'rg_frente'); }, 'c'], ['CPF', 52, function(r){ return pvCel(r, 'cpf'); }, 'c'],
       ['Prazo da GPS', 178, function(r){ return lnPrazo('k', r); }], R, N];
+    if (t === 'cr') return [M,
+      ['WhatsApp', 172, function(r){ var tel = foneDe(r); return tel ? '<span class="tnum">' + esc(fmtTel(tel)) + '</span>' + lnCp('data-copiar', digits(tel), 'Copiar o WhatsApp') : '<span class="ln-vz">—</span>'; }],
+      ['Cadastro de', 176, function(r){ return '<span class="ln-mute">' + esc(rapParceiro(r)) + '</span>'; }],
+      ['Situação', 196, function(r){ return lnFalta('cr', r); }],
+      ['Esperando', 86, function(r){ return lnDias(rapEspera(r)); }, 'r'],
+      ['', 330, function(r){ return rapBotoes(r); }]];
     if (t === 'gp') return [M, ['O que falta', 236, function(r){ return lnFalta('gp', r); }], ['Prazo da GPS', 178, function(r){ return lnPrazo('gp', r); }], R, N,
       ['', 56, function(r){ var g = gpsGerar(r); return g ? lnCp('data-gpn-copia', g.digitos, 'Copiar o código de barras da guia') : ''; }, 'c']];
     if (t === 'an') return [M, ['Situação', 236, function(r){ return lnFalta('an', r); }], ['Parto previsto', 178, function(r){ return lnPrazo('an', r); }], R, N];
@@ -10667,6 +10789,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
       var P = {
         gp: [['venc', 'Prazo vencido', function(r){ return lnTom('gp', r) === 'at'; }, 'verm'], ['semnit', 'Sem NIT', function(r){ return !nitOk(r.nit); }], ['agora', 'Prazo chegou', gpsTarefa], ['espera', 'Aguardando o prazo', function(r){ return !gpsTarefa(r) && lnTom('gp', r) !== 'at'; }]],
         an: [['sem', 'Parto em até 7 dias', function(r){ var n = daysUntil(r.dpp); return n != null && n <= 7; }], ['mes', 'Parto em até 30 dias', function(r){ var n = daysUntil(r.dpp); return n != null && n <= 30; }], ['esp', 'Pescadora, agricultora ou indígena', rural]],
+        cr: [['nova', 'Ainda sem ligação', function(r){ return !(r.tentativas > 0); }], ['tent', 'Não atenderam', function(r){ return r.tentativas > 0; }]],
         rq: [['cert', 'Esperando a certidão', function(r){ return noContratos(r) && posEtapaDe(r) === 'cert'; }], ['pronta', 'Pronta para requerer', function(r){ return !(noContratos(r) && posEtapaDe(r) === 'cert'); }]]
       }[t] || [];
       F = { atual: lnSit[t] || '', local: P, itens: [['', 'Todas', lista.length]].concat(P.map(function(x){ return [x[0], x[1], lista.filter(x[2]).length, x[3]]; })) };
@@ -10784,6 +10907,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
   // o próximo passo: [tom, frase, ação] — a ação vira o botão ao lado da frase (as mesmas que existiam nas linhas e na ficha)
   function fcProximo(r, t){
     var hoje = iso(new Date()), d10 = function(x){ return String(x || '').slice(0, 10); }, atr = lnTom(t, r) === 'at';
+    if (t === 'cr') return [r.tentativas > 0 ? 'lar' : '', r.tentativas > 0 ? rapTent(r) + '. Ligar de novo e fechar o contrato.' : 'Ligar para a mãe, completar os dados e fechar o contrato.', ['rap-fechar', 'Fechar contrato']];
     if (t === 'k'){
       if (ctPend(r)) return ['verm', 'Falta assinar o contrato.', null];
       if (!r.tipoSegurada) return ['lar', 'Pescadora, agricultora ou indígena?', ['atividade', 'Responder']];
@@ -10867,6 +10991,7 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
     var b = e.target.closest && e.target.closest('[data-fc-acao]'); if (!b || !cardAberto) return;
     var r = acharRow(cardAberto.id); if (!r) return;
     var a = b.dataset.fcAcao, ag = new Date().toISOString();
+    if (a === 'rap-fechar'){ fecharRapido(r); return; }
     if (a === 'senha' || a === 'nit'){ pvAbrir(b, r, a); return; }
     if (a.indexOf('doc:') === 0){ pvDoc(r, a.slice(4), true); return; }
     if (a.indexOf('desdoc:') === 0){ pvDoc(r, a.slice(7), false); return; }
