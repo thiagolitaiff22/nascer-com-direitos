@@ -2675,6 +2675,9 @@ html[data-fx="novo"] .pn-cf{grid-column:span 7}html[data-fx="novo"] .pn-ci{grid-
 html[data-fx="novo"] .pn-ce{grid-column:span 8}html[data-fx="novo"] .pn-ct{grid-column:span 4}
 html[data-fx="novo"] .pn-cp{grid-column:span 7}html[data-fx="novo"] .pn-cc{grid-column:span 5}
 html[data-fx="novo"] .pn-cpf,html[data-fx="novo"] .pn-fin{grid-column:span 12}
+html[data-fx="novo"] .pn-cr{grid-column:span 12}
+html[data-fx="novo"] .pn-cr-l{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;margin-top:20px;padding-top:16px;border-top:1px solid var(--ap-linha)}
+@container painel (max-width:859px){html[data-fx="novo"] .pn-cr-l{grid-template-columns:1fr;gap:20px}}
 html[data-fx="novo"] .pn-c.clic{cursor:pointer;transition:border-color .15s,background .15s}
 html[data-fx="novo"] .pn-c.clic:hover{border-color:hsl(var(--c-pri)/.35);background:var(--ap-lil)}
 html[data-fx="novo"] .pn-h{display:flex;align-items:center;gap:12px;margin:0 0 3px;min-height:22px}
@@ -5711,6 +5714,25 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
   function rapTent(r){ return r.tentativas > 0 ? 'Não atendeu' + (r.tentativas > 1 ? ' ' + r.tentativas + 'x' : '') + (r.ultimaTentativaEm ? ' · ' + lnRel(diaLocal(r.ultimaTentativaEm)) : '') : ''; }
   function rapEu(){ var e = meuEmail(), u = (state.equipe || []).filter(function(x){ return String(x.email || '').toLowerCase() === e; })[0]; return { nome: (u && u.nome) || (state.me && state.me.nome) || e, email: e }; }
   function rapBotoes(r){ var id = esc(r.id); return '<div class="kb-duplo rap-acoes"><button type="button" class="kb-btn" data-rap-fechar="' + id + '">' + svgI('i-ok') + 'Fechar contrato</button><button type="button" class="kb-btn sec" data-rap-tent="' + id + '" title="Ligou e ela não atendeu: conta uma tentativa">Não atendeu</button><button type="button" class="kb-btn sec" data-rap-perdeu="' + id + '" title="Ela não quis fechar: sai da lista (fica guardada)">Não fechou</button></div>'; }
+  // números do cadastro rápido no período (Dashboard). no(dia) diz se o dia está no período escolhido
+  function rapResumo(no){
+    var todas = state.rows.filter(function(r){ return r.cadastroRapido; });
+    var naoFechou = function(r){ return !r.contratoEm && r.leadStatus === 'desqualificado'; };
+    var ent = todas.filter(function(r){ return no(dataCad(r)); });
+    var fech = todas.filter(function(r){ return r.contratoEm && no(pnDia(r.contratoEm)); });
+    var naoF = todas.filter(function(r){ return naoFechou(r) && no(pnDia(r.desqualEm || r.atualizadoEm)); });
+    var esp = todas.filter(function(r){ return faseDe(r) === 'cr'; });
+    var entF = ent.filter(function(r){ return r.contratoEm; }).length, entN = ent.filter(naoFechou).length;
+    var closers = {}, quem = {};
+    fech.forEach(function(r){ var k = r.contratoPor || 'Sem nome'; (closers[k] = closers[k] || { f: 0, n: 0 }).f++; });
+    naoF.forEach(function(r){ var k = r.contatoCloser || 'Sem nome'; (closers[k] = closers[k] || { f: 0, n: 0 }).n++; });
+    ent.forEach(function(r){ var k = rapParceiro(r), q = quem[k] = quem[k] || { e: 0, f: 0 }; q.e++; if (r.contratoEm) q.f++; });
+    return { ent: ent.length, fech: fech.length, esp: esp.length, semLig: esp.filter(function(r){ return !(r.tentativas > 0); }).length, entF: entF, entN: entN, taxa: pnPct(entF, entF + entN),
+      tempo: pnMediana(fech.map(function(r){ return pnDias(dataCad(r), pnDia(r.contratoEm)); }).filter(function(d){ return d >= 0; })),
+      closers: Object.keys(closers).map(function(k){ return { nome: k, f: closers[k].f, n: closers[k].n }; }).sort(function(a, b){ return b.f - a.f || b.n - a.n || a.nome.localeCompare(b.nome, 'pt'); }),
+      quem: Object.keys(quem).map(function(k){ return { nome: k, e: quem[k].e, f: quem[k].f }; }).sort(function(a, b){ return b.e - a.e || b.f - a.f || a.nome.localeCompare(b.nome, 'pt'); }) };
+  }
+  function rapDias(n){ return n == null ? '' : n === 0 ? 'no mesmo dia' : 'em ' + n + (n === 1 ? ' dia' : ' dias'); }
   function rapInfo(r){
     var t = rapTent(r), w = rapEspera(r);
     return { etapa: 'Esperando o closer', etapaSel: '', status: [t ? kbSt(t, 'lar') : kbSt('Ainda não ligou', 'info')], resp: r.contatoCloser || '', dias: w, parado: w >= 2 && !(r.tentativas > 0),
@@ -7291,6 +7313,12 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
         dnCard('i-scale', 'Taxa de concessão', dnPct(conc, conc + indef), conc + ' de ' + (conc + indef) + ' decididos') +
         dnCard('i-clock', 'Do parto ao requerimento', tMedio == null ? '—' : tMedio + ' d', tMedio == null ? 'sem requerimentos no período' : 'média de ' + plural(tempos.length, 'requerimento', 'requerimentos')) +
         dnCard('i-users', 'Com GPS · Sem GPS', urbEnt + ' · ' + rurEnt, 'sem GPS: pescadora, agricultora ou indígena') + '</div>' : ''));
+    var rpM = rapResumo(no);
+    html += dnSecao('Cadastro rápido', 'Mães que chegaram pelo aplicativo só com o nome e o WhatsApp, e os contratos que o closer fechou no período. A taxa conta as cadastradas no período que o closer já resolveu.', '<div class="dn-grade">' +
+      dnCard('i-phone', 'Cadastros rápidos', rpM.ent, 'enviados pelo aplicativo') +
+      dnCard('i-check', 'Contratos fechados', rpM.fech, rpM.tempo == null ? 'pelo closer' : rapDias(rpM.tempo) + ' (mediana)', rpM.fech ? 'ok' : '') +
+      dnCard('i-scale', 'Taxa de fechamento', rpM.taxa == null ? '—' : rpM.taxa + '%', rpM.entF + rpM.entN ? rpM.entF + ' fecharam · ' + rpM.entN + ' não fecharam' : 'nenhuma resolvida ainda') +
+      dnCard('i-clock', 'Esperando o closer', rpM.esp, rpM.semLig ? plural(rpM.semLig, 'ainda sem ligação', 'ainda sem ligação') : 'agora', '', '', 'cr') + '</div>');
     // fases numa linha fina, em vez de um balão por fase
     var dnGastosHtml = isAdmin() ? dnSecao('Gastos do período', 'Guias GPS pagas no período (11% do salário mínimo cada) e repasses a parceiros e prospectadores com baixa no período (Financeiro › Comissões). Ainda a pagar: guias que venceram agora e comissões sem baixa.', dnGastos(rows, no, noAnt)) : '';
     // evolução + origem
@@ -7480,6 +7508,19 @@ html.fc-split[data-fx="novo"] .topo{padding-inline:28px}
         '<li data-fn="i" role="button" tabindex="0"><span class="pn-st-i">' + svgI('i-alert') + '</span>Em exigência agora<b>' + pnNum(emEx) + '</b></li>' +
         (tAn == null ? '' : '<li class="pn-st-sem"><span class="pn-st-i">' + svgI('i-cal') + '</span>Dias até a decisão<b>' + tAn + ' d</b></li>') +
       '</ul><p class="pn-nota">' + (tAn == null ? 'Ainda sem decisões para medir o tempo de análise.' : 'O INSS levou ' + tAn + ' dias para decidir (mediana).') + '</p></section>';
+    // 3b. cadastro rápido: as mães que chegaram só com o nome e o WhatsApp e o que o closer fechou
+    var rp = rapResumo(no), noP = j.ini ? 'no período' : 'desde o início';
+    var rkRap = function(cab, linhas, vazio){ return linhas.length ? '<table class="pn-rk"><thead><tr>' + cab.map(function(c, i){ return '<th' + (i ? ' class="dir"' : '') + '>' + c + '</th>'; }).join('') + '</tr></thead><tbody>' + linhas.slice(0, 6).map(function(l){ return '<tr><td><span class="pn-rk-n" title="' + esc(l[0]) + '">' + esc(l[0]) + '</span></td>' + l.slice(1).map(function(v){ return '<td class="dir tnum">' + pnNum(v) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>' : '<div class="pn-vazio">' + vazio + '</div>'; };
+    html += '<section class="pn-c pn-cr"><div class="pn-h"><h2 class="pn-t">Cadastro rápido</h2><button type="button" class="pn-lk" data-fn="cr">Abrir o Cadastro rápido</button></div><p class="pn-sub">Mães que chegaram pelo aplicativo só com o nome e o WhatsApp e os contratos que o closer fechou ' + noP + '</p>' +
+      '<div class="pn-fin-g">' +
+        '<div><p class="pn-tile-r">Cadastros rápidos</p><p class="pn-fin-v">' + pnNum(rp.ent) + '</p><p class="pn-tile-c">enviados pelo aplicativo</p></div>' +
+        '<div><p class="pn-tile-r">Contratos fechados</p><p class="pn-fin-v">' + pnNum(rp.fech) + '</p><p class="pn-tile-c">' + (rp.tempo == null ? 'pelo closer' : rapDias(rp.tempo) + ' depois do cadastro (mediana)') + '</p></div>' +
+        '<div><p class="pn-tile-r">Taxa de fechamento</p><p class="pn-fin-v">' + (rp.taxa == null ? '—' : rp.taxa + '%') + '</p><p class="pn-tile-c">' + (rp.entF + rp.entN ? pnNum(rp.entF) + ' fecharam · ' + pnNum(rp.entN) + ' não fecharam' : 'nenhuma resolvida ainda') + '</p></div>' +
+        '<div><p class="pn-tile-r">Esperando o closer</p><p class="pn-fin-v">' + pnNum(rp.esp) + '</p><p class="pn-tile-c">' + (rp.semLig ? plural(rp.semLig, 'ainda sem ligação', 'ainda sem ligação') : 'agora') + '</p></div>' +
+      '</div>' +
+      '<div class="pn-cr-l"><div><p class="pn-mini-t">Por closer</p>' + rkRap(['Closer', 'Fechou', 'Não fechou'], rp.closers.map(function(c){ return [c.nome, c.f, c.n]; }), 'Nenhum contrato fechado ' + noP + '.') + '</div>' +
+        '<div><p class="pn-mini-t">Quem cadastrou</p>' + rkRap(['Parceiro', 'Enviou', 'Fechou'], rp.quem.map(function(q){ return [q.nome, q.e, q.f]; }), 'Nenhum cadastro rápido ' + noP + '.') + '</div></div>' +
+      '<p class="pn-nota">A taxa conta só as mães cadastradas ' + noP + ' que o closer já resolveu (fechou ou não fechou).</p></section>';
     // 4. mês a mês: entradas e aprovadas (requerimentos aparecem na dica)
     var nMes = Math.max(6, j.ini ? Math.min(24, (+j.fim.slice(0, 4) - +j.ini.slice(0, 4)) * 12 + (+j.fim.slice(5, 7) - +j.ini.slice(5, 7)) + 1) : 12);
     if (!j.ini){ var prim = rows.map(dataCad).filter(Boolean).sort()[0]; if (prim) nMes = Math.max(6, Math.min(24, (+j.fim.slice(0, 4) - +prim.slice(0, 4)) * 12 + (+j.fim.slice(5, 7) - +prim.slice(5, 7)) + 1)); }
